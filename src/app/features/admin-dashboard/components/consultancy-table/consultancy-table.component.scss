@@ -1,0 +1,160 @@
+.table-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  max-height: 500px;
+  /* enables sticky header */
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead th {
+  background: #435fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+.hash-col {
+  width: 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #374151;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  transition: background-color 0.2s;
+}
+
+td.hash-col {
+  color: #9ca3af;
+  text-align: center;
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: #f0fdf4;
+  /* gentle light green hover */
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+
+  &.active {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #86efac;
+  }
+
+  &.inactive {
+    background: #fff1f2;
+    color: #e11d48;
+    border-color: #fda4af;
+  }
+
+  &.dormant {
+    background: #f5f5f4;
+    color: #57534e;
+    border-color: #d6d3d1;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    opacity: 1;
+    background: rgba(229, 231, 235, 0.5); /* subtle hover background */
+  }
+}
+
+.view-all-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.empty-row {
+  text-align: center;
+  padding: 32px 16px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  th,
+  td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}

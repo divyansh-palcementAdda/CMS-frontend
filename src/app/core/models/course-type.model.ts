@@ -1,0 +1,30 @@
+export interface CourseTypeDTO {
+  id?: number;
+  name?: string;
+  description?: string;
+  active?: boolean;
+  courseCount?: number;
+}
+
+export interface CourseTypeItem {
+  id: number;
+  sNo: number;
+  name: string;
+  code: string;
+  students: number;
+  status: 'Active' | 'Inactive';
+  courses: number;
+}
+
+export interface CourseTypeStats {
+  totalCourseType: number;
+  activeCourseType: number;
+  totalCourses: number;
+  totalStudents: number;
+}
+
+export interface CourseTypePageData {
+  stats: CourseTypeStats;
+  courseTypes: CourseTypeItem[];
+  totalCount: number;
+}

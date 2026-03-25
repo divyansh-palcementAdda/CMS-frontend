@@ -1,0 +1,69 @@
+<div class="dashboard-layout">
+  <!-- White Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Right body: topbar + content -->
+  <div class="dashboard-body">
+    <!-- Top navbar with role chips + avatar -->
+    <app-topbar></app-topbar>
+
+    <main class="main-content">
+      <!-- Professional Skeleton Loader -->
+      <div *ngIf="loading()" class="skeleton-wrapper">
+        <div class="skeleton-header skeleton-pulse"></div>
+        <div class="skeleton-grid">
+          <div class="skeleton-main">
+            <div class="skeleton-banner skeleton-pulse"></div>
+            <div class="skeleton-stats-grid">
+              <div class="skeleton-card skeleton-pulse" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
+            </div>
+            <div class="skeleton-table skeleton-pulse"></div>
+          </div>
+          <div class="skeleton-sidebar skeleton-pulse"></div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="!loading() && error()" class="error-state">
+        <span>{{ error() }}</span>
+        <button class="retry-btn" (click)="loadData()">Retry</button>
+      </div>
+
+      <!-- Dashboard Content -->
+      <ng-container *ngIf="!loading() && !error()">
+        <!-- Full-width Welcome Banner -->
+        <div class="welcome-heading">
+          <h2 class="welcome-title">Welcome Back !</h2>
+          <p class="welcome-sub">Here’s what happening...</p>
+        </div>
+
+        <div class="content-wrapper">
+          <!-- TOP SECTION: Panels alongside Recent Activity -->
+          <div class="top-section-grid">
+            <div class="top-left-panels">
+              <app-welcome-banner [commissionData]="commissionData()"></app-welcome-banner>
+              <app-stats-cards [stats]="stats()"></app-stats-cards>
+              <app-management-panel [stats]="stats()"></app-management-panel>
+              <app-admission-panel [stats]="stats()"></app-admission-panel>
+            </div>
+
+            <div class="top-right-sidebar">
+              <app-activity-feed class="activity-fit-height"
+                [activities]="dashboardData()?.recentActivities ?? null"></app-activity-feed>
+            </div>
+          </div>
+
+          <!-- BOTTOM SECTION: Charts span full width -->
+          <div class="bottom-full-width-section">
+            <app-admission-charts [chartData]="chartData()"></app-admission-charts>
+            <app-fees-status-chart [chartData]="chartData()"></app-fees-status-chart>
+            <app-consultancy-course-chart
+              [data]="chartData()?.consultancyVsCourse ?? null"></app-consultancy-course-chart>
+            <app-consultancy-table [consultancies]="dashboardData()?.consultancyData"></app-consultancy-table>
+            <app-recent-forms [forms]="dashboardData()?.recentForms"></app-recent-forms>
+          </div>
+        </div>
+      </ng-container>
+    </main>
+  </div>
+</div>
