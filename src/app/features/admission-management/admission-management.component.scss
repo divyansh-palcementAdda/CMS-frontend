@@ -197,7 +197,8 @@ $danger-bg: #FEE2E2;
 
     .table-wrapper {
       overflow-x: auto;
-      padding: 0 16px 8px; /* Slightly reduced container padding */
+      padding: 0 16px 8px;
+      /* Slightly reduced container padding */
       /* Adds space so the rounded header isn't flushed against the edges */
 
       table {
@@ -218,23 +219,53 @@ $danger-bg: #FEE2E2;
             padding: 14px 12px;
             /* Slimmer padding to prevent horizontal scroll bars on Mac screens */
             font-weight: 500;
-            font-size: 13px; /* Slightly smaller header text to save space */
+            font-size: 13px;
+            /* Slightly smaller header text to save space */
             text-align: left;
             border: none;
             white-space: nowrap;
             vertical-align: middle;
 
             /* Explicit table widths to lock alignment */
-            &:nth-child(1) { width: 4%; }
-            &:nth-child(2) { width: 16%; }
-            &:nth-child(3) { width: 16%; }
-            &:nth-child(4) { width: 6%; }
-            &:nth-child(5) { width: 8%; }
-            &:nth-child(6) { width: 12%; }
-            &:nth-child(7) { width: 8%; }
-            &:nth-child(8) { width: 10%; }
-            &:nth-child(9) { width: 10%; }
-            &:nth-child(10) { width: 10%; }
+            &:nth-child(1) {
+              width: 4%;
+            }
+
+            &:nth-child(2) {
+              width: 16%;
+            }
+
+            &:nth-child(3) {
+              width: 16%;
+            }
+
+            &:nth-child(4) {
+              width: 6%;
+            }
+
+            &:nth-child(5) {
+              width: 8%;
+            }
+
+            &:nth-child(6) {
+              width: 12%;
+            }
+
+            &:nth-child(7) {
+              width: 8%;
+            }
+
+            &:nth-child(8) {
+              width: 10%;
+            }
+
+            &:nth-child(9) {
+              width: 10%;
+            }
+
+            &:nth-child(10) {
+              width: 10%;
+            }
 
             &:first-child {
               border-top-left-radius: 10px;
@@ -264,7 +295,8 @@ $danger-bg: #FEE2E2;
             td {
               padding: 12px 12px;
               /* Exact match with TH padding, tighter spacing vertically and horizontally */
-              font-size: 13px; /* Smaller text fits more gracefully in 10 columns */
+              font-size: 13px;
+              /* Smaller text fits more gracefully in 10 columns */
               vertical-align: middle;
               border-bottom: 1px solid $card-border;
               white-space: normal;
@@ -286,7 +318,8 @@ $danger-bg: #FEE2E2;
                 max-width: 180px;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap; /* Keep name strictly on 1 or 2 distinct lines via br */
+                white-space: nowrap;
+                /* Keep name strictly on 1 or 2 distinct lines via br */
               }
             }
 
@@ -367,20 +400,25 @@ $danger-bg: #FEE2E2;
       }
     }
 
+
     .status-pill {
+      display: inline-block;
       padding: 4px 12px;
       border-radius: 4px;
       font-size: 12px;
       font-weight: 500;
+      border: 1px solid transparent;
 
       &.active {
-        background: $success-bg;
-        color: $success;
+        background: #D1FAE5;
+        color: #059669;
+        border-color: #A7F3D0;
       }
 
       &.inactive {
-        background: $danger-bg;
-        color: $danger;
+        background: #FEE2E2;
+        color: #DC2626;
+        border-color: #FECACA;
       }
     }
 

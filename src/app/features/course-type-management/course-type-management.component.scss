@@ -97,16 +97,17 @@ $text-light: #64748B;
         &.purple {
           color: #849bf3;
         }
-        
+
         &.solid {
-          color: #8b5cf6; 
+          color: #8b5cf6;
         }
 
         &:not(.solid) {
           background: #EEF2FF;
         }
+
         &.solid {
-          background: #EEF2FF; 
+          background: #EEF2FF;
         }
       }
     }
@@ -141,7 +142,7 @@ $text-light: #64748B;
       .search-box {
         position: relative;
         width: 300px;
-        
+
         .search-icon {
           position: absolute;
           left: 12px;
@@ -187,18 +188,45 @@ $text-light: #64748B;
             font-weight: 500;
             text-align: left;
             border: none;
-            
-            /* Column sizing to ensure alignment (7 columns) */
-            &:nth-child(1) { width: 5%; }
-            &:nth-child(2) { width: 25%; }
-            &:nth-child(3) { width: 15%; }
-            &:nth-child(4) { width: 15%; }
-            &:nth-child(5) { width: 10%; }
-            &:nth-child(6) { width: 15%; }
-            &:nth-child(7) { width: 15%; }
 
-            &:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-            &:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+            /* Column sizing to ensure alignment (7 columns) */
+            &:nth-child(1) {
+              width: 5%;
+            }
+
+            &:nth-child(2) {
+              width: 25%;
+            }
+
+            &:nth-child(3) {
+              width: 15%;
+            }
+
+            &:nth-child(4) {
+              width: 15%;
+            }
+
+            &:nth-child(5) {
+              width: 10%;
+            }
+
+            &:nth-child(6) {
+              width: 15%;
+            }
+
+            &:nth-child(7) {
+              width: 15%;
+            }
+
+            &:first-child {
+              border-top-left-radius: 8px;
+              border-bottom-left-radius: 8px;
+            }
+
+            &:last-child {
+              border-top-right-radius: 8px;
+              border-bottom-right-radius: 8px;
+            }
 
             &.text-center {
               text-align: center !important;
@@ -209,6 +237,7 @@ $text-light: #64748B;
         tbody {
           tr {
             transition: background-color 0.2s;
+
             &:hover {
               background-color: #F8FAFC;
             }
@@ -346,7 +375,7 @@ $text-light: #64748B;
 @media (max-width: 768px) {
   .course-type-page-wrapper {
     padding: 16px;
-    
+
     .stats-grid {
       grid-template-columns: 1fr;
     }

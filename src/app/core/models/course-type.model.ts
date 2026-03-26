@@ -11,6 +11,8 @@ export interface CourseTypeItem {
   sNo: number;
   name: string;
   code: string;
+  description?: string;
+  duration?: string;
   students: number;
   status: 'Active' | 'Inactive';
   courses: number;

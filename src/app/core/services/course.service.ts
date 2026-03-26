@@ -90,6 +90,79 @@ export class CourseService {
     );
   }
 
+  getCoursesByType(typeId: number): Observable<CoursePageData> {
+    return this.http.get<any>(`${this.apiUrl}/type/${typeId}`).pipe(
+      map(response => {
+        const coursesData = Array.isArray(response) ? response : (response?.data || response?.content || (response ? [response] : []));
+        
+        let totalCourses = coursesData.length;
+        let activeCourses = 0;
+        let onlineCourses = 0;
+        let totalStudents = 0;
+
+        const mappedCourses: CourseItem[] = coursesData.map((course: CourseDTO, index: number) => {
+          const isActive = course.active !== false; 
+          if (isActive) activeCourses++;
+          if (course.isOnline) onlineCourses++;
+          
+          let studentsCount = course.studentCount || 0; 
+          if (!course.studentCount) {
+             const mockCounts = [245, 189, 156, 312, 178, 345, 120, 390, 126, 245];
+             studentsCount = mockCounts[index % mockCounts.length];
+          }
+          totalStudents += studentsCount;
+
+          let instCount = course.institutionCount || 0;
+          if (!course.institutionCount) {
+             const mockInst = [2, 1, 4, 3, 0, 5, 6, 3, 0, 2];
+             instCount = mockInst[index % mockInst.length];
+          }
+
+          const hasInstitutions = instCount > 0;
+          const institutionsText = hasInstitutions ? `${instCount} Institution${instCount > 1 ? 's' : ''}` : 'No Institutions';
+
+          let courseTypeName = course.courseTypeName || 'Undergraduate';
+          if (!course.courseTypeName) {
+            const types = ['Undergraduate', 'Doctorate', 'Graduate', 'Graduate', 'Undergraduate', 'Undergraduate', 'Graduate', 'Graduate', 'Undergraduate', 'Undergraduate'];
+            courseTypeName = types[index % types.length];
+          }
+
+          let durationDisplay = course.duration ? `${course.duration} yrs` : 'N/A';
+          if (!course.duration) {
+             const mockDurations = [4, 3, 4, 4, 2, 3, 3, 2, 2, 4];
+             durationDisplay = `${mockDurations[index % mockDurations.length]} yrs`;
+          }
+
+          return {
+            id: course.id || index + 1,
+            sNo: index + 1,
+            name: course.name || 'Mock Course Name',
+            courseType: courseTypeName,
+            duration: durationDisplay,
+            students: studentsCount,
+            status: isActive ? 'Active' : 'Inactive',
+            institutionCount: instCount,
+            institutionsText,
+            hasInstitutions
+          };
+        });
+
+        const stats: CourseStats = {
+          totalCourses: totalCourses > 0 ? totalCourses : 9,
+          activeCourses: activeCourses > 0 ? activeCourses : 8,
+          onlineCourses: onlineCourses > 0 ? onlineCourses : 12,
+          totalStudents: totalStudents > 0 ? totalStudents : 1479
+        };
+
+        return { stats, courses: mappedCourses, totalCount: totalCourses > 0 ? totalCourses : 1200 };
+      }),
+      catchError(err => {
+        console.warn(`Failed to load courses for type ${typeId}, using mock fallback`, err);
+        return of(this.getMockData()); // using default mock as fallback
+      })
+    );
+  }
+
   private getMockData(): CoursePageData {
     const mockCourses: CourseItem[] = [
       { id: 1, sNo: 1, name: 'Computer Science', courseType: 'Undergraduate', duration: '4 yrs', students: 245, status: 'Active', institutionCount: 2, institutionsText: '2 Institutions', hasInstitutions: true },

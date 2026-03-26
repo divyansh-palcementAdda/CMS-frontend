@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
 import { AdmissionService } from '../../core/services/admission.service';
@@ -16,6 +16,7 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
   styleUrl: './admission-management.component.scss'
 })
 export class AdmissionManagementComponent implements OnInit {
+
   pageData: AdmissionPageData | null = null;
   filteredAdmissions: AdmissionItem[] = [];
   searchTerm: string = '';
@@ -30,7 +31,8 @@ export class AdmissionManagementComponent implements OnInit {
 
   constructor(
     private admissionService: AdmissionService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -55,10 +57,13 @@ export class AdmissionManagementComponent implements OnInit {
           this.calculatePagination();
         }
       });
-      
+
       this.loading = false;
       console.log('--- Admission Data Loaded ---', data);
     });
+  }
+  onView(id: number) {
+    this.router.navigate(['/admissions', id]);
   }
 
   onSearchChange(): void {

@@ -11,7 +11,7 @@ import { RolePageData, RoleItem } from '../../core/models/role.model';
 @Component({
   selector: 'app-role-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, TopbarComponent, RouterLink],
   templateUrl: './role-management.component.html',
   styleUrl: './role-management.component.scss'
 })

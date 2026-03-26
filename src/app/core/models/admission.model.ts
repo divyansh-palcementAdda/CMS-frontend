@@ -25,6 +25,7 @@ export interface AdmissionItem {
   address?: string;
   city?: string;
   state?: string;
+  country?: string;
   pincode?: string;
   
   enrollmentId?: string;

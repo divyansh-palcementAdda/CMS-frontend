@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { AdmissionPageData } from '../models/admission.model';
+import { AdmissionItem, AdmissionPageData } from '../models/admission.model';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +48,51 @@ export class AdmissionService {
       catchError(err => {
         console.warn('Failed to load admission data, using mock fallback', err);
         return of(this.getMockData());
+      })
+    );
+  }
+
+  getAdmissionById(id: number): Observable<AdmissionItem> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => {
+        const s = response?.data || response;
+        if (!s) throw new Error('Student not found');
+
+        return {
+          ...s,
+          fullName: s.fullName || 'Unknown Student',
+          courseName: s.courseName || 'N/A',
+          feeStatus: s.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid',
+          status: 'Active',
+          age: s.age || 21 // Mock age if not from backend
+        };
+      }),
+      catchError(err => {
+        console.warn(`Failed to load student with id ${id}, using mock fallback`, err);
+        const mockList = this.getMockData().admissions;
+        const mock = mockList.find(m => m.id == id) || mockList[0];
+        
+        // Enrich mock with more fields for detail view
+        return of({
+          ...mock,
+          fatherName: 'David Doe',
+          motherName: 'Erica Doe',
+          dateOfBirth: '27 May 2004',
+          email: 'johndoe@gmail.com',
+          phoneNumber: '+91 9054378923',
+          alternatePhone: '+91 9054378923',
+          whatsappPhoneNo: '+91 9054378923',
+          city: 'Jaipur',
+          state: 'Rajasthan',
+          country: 'India',
+          enrollmentId: 'ENR-2026-010',
+          admissionSource: 'Direct',
+          admissionDate: 'March 8, 2026',
+          institutionName: 'MIT',
+          admittedByUserName: 'Sarah Martinez',
+          counselorName: 'Jenny Wilson',
+          age: 21
+        });
       })
     );
   }

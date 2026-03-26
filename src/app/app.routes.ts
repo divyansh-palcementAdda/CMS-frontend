@@ -55,8 +55,32 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' }
   },
   {
+    path: 'course-types/:id',
+    loadComponent: () => import('./features/course-type-detail/course-type-detail.component').then(m => m.CourseTypeDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
     path: 'consultancy',
     loadComponent: () => import('./features/consultancy-management/consultancy-management.component').then(m => m.ConsultancyManagementComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'consultancy/:id',
+    loadComponent: () => import('./features/consultancy-detail/consultancy-detail.component').then(m => m.ConsultancyDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'admissions/:id',
+    loadComponent: () => import('./features/admission-detail/admission-detail.component').then(m => m.AdmissionDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'users/:id',
+    loadComponent: () => import('./features/user-detail/user-detail.component').then(m => m.UserDetailComponent),
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },

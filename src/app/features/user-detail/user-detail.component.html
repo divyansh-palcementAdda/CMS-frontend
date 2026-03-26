@@ -1,0 +1,210 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+
+    <main class="main-content">
+      <div *ngIf="loading" class="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+
+      <ng-container *ngIf="!loading && user">
+        <!-- Header Section -->
+        <div class="page-header">
+          <div class="header-left">
+            <nav class="breadcrumbs">
+              <span class="crumb">Dashboard</span> /
+              <span class="crumb">Users</span> /
+              <span class="crumb">All Users</span> /
+              <span class="crumb active">Details</span>
+            </nav>
+
+            <div class="title-row">
+              <div class="back-btn" routerLink="/users">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="white" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div class="user-main-info">
+                <h1>{{ user.fullName }}</h1>
+                <span class="user-id">User Id: USR-{{ user.id }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="action-btn edit" (click)="onEdit()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Edit
+            </button>
+            <button class="action-btn delete" (click)="onDelete()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Upper Content Grid -->
+        <div class="upper-grid">
+          <!-- User Information Card -->
+          <div class="info-card user-info-card">
+            <div class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              User Information
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <label>UserName</label>
+                <span class="value">{{ user.username }}</span>
+              </div>
+              <div class="info-item">
+                <label>Full Name</label>
+                <span class="value">{{ user.fullName }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email ID</label>
+                <span class="value link">{{ user.email }}</span>
+              </div>
+              <div class="info-item">
+                <label>Roles</label>
+                <div class="badge-row">
+                  <span class="role-badge" *ngFor="let role of user.roles">{{ role.name }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <label>Status</label>
+                <span class="badge green-box">{{ user.status }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email Verified</label>
+                <span class="badge teal-box">{{ user.emailVerified ? 'Yes' : 'No' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Created at</label>
+                <span class="value">{{ user.createdAt }}</span>
+              </div>
+              <div class="info-item">
+                <label>Last Updated</label>
+                <span class="value">{{ user.updatedAt }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity & Stats Column -->
+          <div class="stats-col">
+            <!-- Admission Activity -->
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <polyline points="16 11 18 13 22 9"></polyline>
+                </svg>
+                Admission Activity
+              </div>
+              <div class="activity-stats">
+                <div class="stat-row">
+                  <span>Direct Admissions</span>
+                  <span class="stat-val">{{ user.directAdmissions }}</span>
+                </div>
+                <div class="stat-row">
+                  <span>Via Consultancy</span>
+                  <span class="stat-val">{{ user.viaConsultancy }}</span>
+                </div>
+                <div class="stat-row total">
+                  <span>Total Admissions</span>
+                  <span class="stat-val">{{ user.totalAdmissions }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <!-- <div class="info-card">
+              <div class="card-title no-bg">Quick Stats</div>
+              <div class="quick-stats-list">
+                <div class="stat-row">
+                  <span>Course Mode</span>
+                  <span class="stat-val dark">Online</span>
+                </div>
+                <div class="stat-row">
+                  <span>Course Fees</span>
+                  <span class="stat-val price">₹485,000</span>
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- Consultancy Ownership Table -->
+        <div class="consultancy-section">
+          <div class="section-header">
+            <h2>Consultancy Ownership</h2>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Course Name</th>
+                  <th>Email</th>
+                  <th>Duration</th>
+                  <th>Students</th>
+                  <th>Status</th>
+                  <th>Institution</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of user.consultancies; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="font-bold">{{ c.name }}</td>
+                  <td class="email-cell">{{ c.email }}</td>
+                  <td>{{ c.duration }}</td>
+                  <td>{{ c.students }}</td>
+                  <td><span class="status-badge active">{{ c.status }}</span></td>
+                  <td>{{ c.institutionName }}</td>
+                  <td class="actions">
+                    <div class="action-icons">
+                      <button class="icon-btn" title="View">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </button>
+                      <button class="icon-btn" title="Edit">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                      <button class="icon-btn" title="Delete">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                          </path>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+    </main>
+  </div>
+</div>

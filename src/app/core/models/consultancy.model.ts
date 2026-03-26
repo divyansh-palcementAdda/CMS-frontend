@@ -45,3 +45,71 @@ export interface ConsultancyPageData {
   consultancies: ConsultancyItem[];
   totalCount: number;
 }
+
+export interface ConsultancyFinancials {
+  totalProjected: string;
+  payableAmount: string;
+  paidAmount: string;
+  unpaidAmount: string;
+}
+
+export interface ConsultancyCourse {
+  id: number;
+  sNo: number;
+  name: string;
+  type: string;
+  duration: string;
+  students: number;
+  status: 'Active' | 'Inactive';
+  institution: string;
+}
+
+export interface ConsultancyChartData {
+  label: string;
+  value: number;
+}
+
+export interface ConsultancyRepresentative {
+  id: number;
+  sNo: number;
+  name: string;
+  email: string;
+  role: string;
+  status: 'Active' | 'Inactive';
+}
+
+export interface ConsultancyInstitutionOverview {
+  id: number;
+  sNo: number;
+  institutionName: string;
+  courseName: string;
+  courseType: string;
+  admissionCount: number;
+}
+
+export interface ConsultancyAdmission {
+  id: number;
+  sNo: number;
+  studentName: string;
+  courseName: string;
+  duration: string;
+  discount: string;
+  feeStatus: 'Paid' | 'Unpaid' | 'Partial';
+  status: 'Active' | 'Inactive';
+  session: string;
+  admissionDate: string;
+}
+
+export interface ConsultancyDetail extends ConsultancyDTO {
+  financials: ConsultancyFinancials;
+  quickStats: {
+    totalCourses: number;
+    projectedAmount: string;
+    status: 'Active' | 'Inactive' | 'Dormant';
+  };
+  topCourses: ConsultancyChartData[];
+  courses: ConsultancyCourse[];
+  representatives: ConsultancyRepresentative[];
+  institutionsOverview: ConsultancyInstitutionOverview[];
+  allAdmissions: ConsultancyAdmission[];
+}

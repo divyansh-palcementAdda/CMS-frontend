@@ -1,0 +1,276 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+
+    <main class="main-content">
+      <div *ngIf="loading" class="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+
+      <ng-container *ngIf="!loading && detail">
+        <!-- Breadcrumbs & Header -->
+        <div class="page-header">
+          <div class="header-left">
+            <nav class="breadcrumbs">
+              <span class="crumb">Dashboard</span> /
+              <span class="crumb">Admission</span> /
+              <span class="crumb">All Admission</span> /
+              <span class="crumb active">Details</span>
+            </nav>
+
+            <div class="title-row">
+              <div class="back-btn" routerLink="/admin/admission-management">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="white" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div class="name-id">
+                <h1>{{ detail.fullName }}</h1>
+                <span class="enroll-id">Enrollment Id: {{ detail.enrollmentId || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="action-btn edit" (click)="onEdit()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              Edit
+            </button>
+            <button class="action-btn delete" (click)="onDelete()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <!-- Left Column -->
+          <div class="left-col">
+            <!-- Personal Information -->
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Personal Information
+              </div>
+              <div class="info-grid personal">
+                <div class="info-item">
+                  <label>Name</label>
+                  <span>{{ detail.fullName }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Father's Name</label>
+                  <span>{{ detail.fatherName || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Mother's Name</label>
+                  <span>{{ detail.motherName || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Date of Birth</label>
+                  <span>{{ detail.dateOfBirth || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Age</label>
+                  <span>{{ detail.age }} years</span>
+                </div>
+                <div class="info-item">
+                  <label>Email ID</label>
+                  <span class="link">{{ detail.email || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Phone Number</label>
+                  <span>{{ detail.phoneNumber || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Alternate Number</label>
+                  <span>{{ detail.alternatePhone || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Whatsapp Number</label>
+                  <span class="success-text">{{ detail.whatsappPhoneNo || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>City</label>
+                  <span>{{ detail.city || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>State</label>
+                  <span>{{ detail.state || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Country</label>
+                  <span>{{ detail.country || 'N/A' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admission Information -->
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Admission Information
+              </div>
+              <div class="info-grid admission">
+                <div class="info-item">
+                  <label>Source of Admission</label>
+                  <span class="badge blue">{{ detail.admissionSource || 'Direct' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Admission Date</label>
+                  <span>{{ detail.admissionDate || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Course Name</label>
+                  <div class="row-flex">
+                    <span>{{ detail.courseName }}</span>
+                    <button class="mini-btn">View Details</button>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <label>Institution Name</label>
+                  <div class="row-flex">
+                    <span>{{ detail.institutionName || 'N/A' }}</span>
+                    <button class="mini-btn">View Details</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="right-col">
+            <!-- User Information -->
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                User Information
+              </div>
+              <div class="info-row">
+                <div class="info-item-col">
+                  <label>User Name</label>
+                  <span class="font-bold">{{ detail.fullName }}</span>
+                </div>
+                <button class="mini-btn purple">View Details</button>
+              </div>
+            </div>
+
+            <!-- Admission Activity -->
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <polyline points="16 11 18 13 22 9"></polyline>
+                </svg>
+                Admission Activity
+              </div>
+              <div class="activity-list">
+                <div class="info-row border-b">
+                  <div class="info-item-col">
+                    <label>Admitted By</label>
+                    <span class="font-bold">{{ detail.admittedByUserName || 'Sarah Martinez' }}</span>
+                  </div>
+                  <button class="mini-btn purple">View Details</button>
+                </div>
+                <div class="activity-bottom">
+                  <div class="info-item-col">
+                    <label>Counselled By</label>
+                    <span class="font-bold">{{ detail.counselorName || 'Jenny Wilson' }}</span>
+                  </div>
+                  <div class="fees-status">
+                    <label>Fees Status</label>
+                    <div class="status-wrap">
+                      <div class="toggle-mock active"></div>
+                      <span class="badge green">Paid</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="info-card transparent">
+              <div class="card-title no-bg">Financial Summary</div>
+              <div class="financial-grid">
+                <div class="fin-card blue">
+                  <div class="fin-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                      <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="fin-details">
+                    <label>Percentage Paid</label>
+                    <span class="fin-value">70%</span>
+                  </div>
+                </div>
+
+                <div class="fin-card purple">
+                  <div class="fin-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                      <path d="M12 12h.01"></path>
+                    </svg>
+                  </div>
+                  <div class="fin-details">
+                    <label>Token Amount Paid</label>
+                    <span class="fin-value">₹ 3000</span>
+                  </div>
+                </div>
+
+                <div class="fin-card teal">
+                  <div class="fin-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <path d="M15 3h6v6"></path>
+                      <path d="M9 21H3v-6"></path>
+                      <path d="M21 3l-7 7"></path>
+                      <path d="M3 21l7-7"></path>
+                    </svg>
+                  </div>
+                  <div class="fin-details">
+                    <label>Discount %</label>
+                    <span class="fin-value">8%</span>
+                  </div>
+                </div>
+
+                <div class="fin-card red">
+                  <div class="fin-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </div>
+                  <div class="fin-details">
+                    <label>Scholarship</label>
+                    <span class="fin-value">N/A</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </main>
+  </div>
+</div>

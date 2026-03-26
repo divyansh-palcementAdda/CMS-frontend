@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
@@ -11,12 +11,13 @@ import { UserPageData, UserItem } from '../../core/models/user.model';
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, RouterLink],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
 })
 
 export class UserManagementComponent implements OnInit, OnDestroy {
+
   loading = true;
   pageData: UserPageData | null = null;
   filteredUsers: UserItem[] = [];
@@ -29,12 +30,14 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   private sub!: Subscription;
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private router: Router) { }
 
   ngOnInit() {
     this.fetchData();
   }
-
+  onView(id: number) {
+    this.router.navigate(['/users', id]);
+  }
   fetchData() {
     this.loading = true;
     this.sub = this.userService.getUsersData().subscribe(data => {
@@ -53,9 +56,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.filteredUsers = this.pageData.users;
     } else {
       this.filteredUsers = this.pageData.users.filter(u =>
-        u.name.toLowerCase().includes(term) ||
-        u.email.toLowerCase().includes(term) ||
-        u.role.toLowerCase().includes(term)
+        (u.fullName || '').toLowerCase().includes(term) ||
+        (u.email || '').toLowerCase().includes(term) ||
+        ((u.role as string) || '').toLowerCase().includes(term)
       );
     }
     this.currentPage = 1;
@@ -85,8 +88,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return pages;
   }
 
-  getRoleClass(roleStr: string): string {
-    if (!roleStr) return '';
+  getRoleClass(roleStr: string | undefined): string {
+    if (!roleStr) return 'student';
     // Use the first role for styling if there are multiple
     const firstRole = roleStr.split(',')[0].trim().toLowerCase();
     // Replace spaces with dashes

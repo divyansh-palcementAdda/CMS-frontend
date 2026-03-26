@@ -49,14 +49,13 @@ $card-border: #F1F5F9;
       height: 40px;
       border-radius: 50%;
       border: none;
-      background: #849bf3;
       color: white;
       cursor: pointer;
       transition: background 0.2s;
 
-      &:hover {
-        background: color.adjust(#849bf3, $lightness: -10%);
-      }
+      // &:hover {
+      //   background: color.adjust(#849bf3, $lightness: -10%);
+      // }
     }
 
     h2 {
@@ -71,7 +70,7 @@ $card-border: #F1F5F9;
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #849bf3;
+    background: linear-gradient(135deg, #Af71ff, #435FFF);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -124,14 +123,17 @@ $card-border: #F1F5F9;
           background: #EEF2FF;
           color: #849bf3;
         }
+
         &.active {
           background: #FDF4FF;
           color: #C026D3;
         }
+
         &.users {
           background: #EEF2FF;
           color: #849bf3;
         }
+
         &.permission {
           background: #EEF2FF;
           color: #849bf3;
@@ -207,7 +209,8 @@ $card-border: #F1F5F9;
 
     thead {
       th {
-        background: #435FFF; /* Same blue as previous components */
+        background: #435FFF;
+        /* Same blue as previous components */
         color: white;
         padding: 16px;
         font-size: 13px;
@@ -217,16 +220,40 @@ $card-border: #F1F5F9;
         &.text-center {
           text-align: center !important;
         }
-        
-        &:nth-child(1) { width: 5%; }
-        &:nth-child(2) { width: 20%; }
-        &:nth-child(3) { width: 35%; }
-        &:nth-child(4) { width: 15%; }
-        &:nth-child(5) { width: 10%; }
-        &:nth-child(6) { width: 15%; }
 
-        &:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-        &:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        &:nth-child(1) {
+          width: 5%;
+        }
+
+        &:nth-child(2) {
+          width: 20%;
+        }
+
+        &:nth-child(3) {
+          width: 35%;
+        }
+
+        &:nth-child(4) {
+          width: 15%;
+        }
+
+        &:nth-child(5) {
+          width: 10%;
+        }
+
+        &:nth-child(6) {
+          width: 15%;
+        }
+
+        &:first-child {
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+        }
+
+        &:last-child {
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+        }
       }
     }
 
@@ -238,7 +265,7 @@ $card-border: #F1F5F9;
         color: $text-dark;
         vertical-align: middle;
       }
-      
+
       tr:last-child td {
         border-bottom: none;
       }
@@ -252,17 +279,25 @@ $card-border: #F1F5F9;
       text-align: center;
     }
 
+
     .status-pill {
       display: inline-block;
       padding: 4px 12px;
-      border-radius: 100px;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: 500;
-      
+      border: 1px solid transparent;
+
       &.active {
-        background-color: #ECFDF5;
-        color: #10B981;
-        border: 1px solid #A7F3D0;
+        background: #D1FAE5;
+        color: #059669;
+        border-color: #A7F3D0;
+      }
+
+      &.inactive {
+        background: #FEE2E2;
+        color: #DC2626;
+        border-color: #FECACA;
       }
     }
 
@@ -282,9 +317,17 @@ $card-border: #F1F5F9;
         justify-content: center;
         transition: color 0.2s;
 
-        &:hover { color: #849bf3; }
-        &.edit:hover { color: #8B5CF6; }
-        &.delete:hover { color: #EF4444; }
+        &:hover {
+          color: #849bf3;
+        }
+
+        &.edit:hover {
+          color: #8B5CF6;
+        }
+
+        &.delete:hover {
+          color: #EF4444;
+        }
       }
     }
 
@@ -349,6 +392,7 @@ $card-border: #F1F5F9;
 
         &.nav-btn {
           color: $text-dark;
+
           &:hover:not(:disabled) {
             background: transparent;
             color: #849bf3;
