@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { CourseDTO, CourseItem, CoursePageData, CourseStats } from '../models/course.model';
+import { CourseDTO, CourseDetail, CourseItem, CoursePageData, CourseStats } from '../models/course.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,12 @@ export class CourseService {
   private apiUrl = `${environment.apiUrl}/courses`;
 
   constructor(private http: HttpClient) { }
+
+  getCourseDetail(id: number): Observable<CourseDetail> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/detail`).pipe(
+      map(response => response.data)
+    );
+  }
 
   getCoursesData(): Observable<CoursePageData> {
     return this.http.get<any>(this.apiUrl).pipe(
@@ -161,6 +167,10 @@ export class CourseService {
         return of(this.getMockData()); // using default mock as fallback
       })
     );
+  }
+
+  deleteCourse(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   private getMockData(): CoursePageData {

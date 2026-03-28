@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { InstitutionPageData, InstitutionItem, InstitutionStats } from '../models/institution.model';
+import { InstitutionPageData, InstitutionItem, InstitutionStats, InstitutionDetail } from '../models/institution.model';
 
 @Injectable({
   providedIn: 'root'
@@ -77,6 +77,17 @@ export class InstitutionService {
           { id: 1, name: 'B.Tech Computer Science' },
           { id: 2, name: 'BBA General' }
         ]);
+      })
+    );
+  }
+
+  getInstitutionDetail(id: number): Observable<InstitutionDetail> {
+    const url = `${this.apiUrl}/${id}/detail`;
+    return this.http.get<any>(url).pipe(
+      map(res => res.data || res),
+      catchError(err => {
+        console.error(`Failed to load institution detail for ${id}`, err);
+        throw err;
       })
     );
   }

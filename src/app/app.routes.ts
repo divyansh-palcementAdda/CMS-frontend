@@ -37,6 +37,12 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' }
   },
   {
+    path: 'institutions/:id',
+    loadComponent: () => import('./features/institution-detail/institution-detail.component').then(m => m.InstitutionDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
     path: 'roles',
     loadComponent: () => import('./features/role-management/role-management.component').then(m => m.RoleManagementComponent),
     canActivate: [authGuard, roleGuard],
@@ -45,6 +51,12 @@ export const routes: Routes = [
   {
     path: 'courses',
     loadComponent: () => import('./features/course-management/course-management.component').then(m => m.CourseManagementComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'courses/:id',
+    loadComponent: () => import('./features/course-detail/course-detail.component').then(m => m.CourseDetailComponent),
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },

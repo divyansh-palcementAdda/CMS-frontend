@@ -1,0 +1,326 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+
+    <main class="main-content" style="padding: 0; background: transparent;">
+      <div class="detail-container" *ngIf="!loading && courseDetail; else loadingState">
+        
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs">
+          <span (click)="goBack()">Dashboard</span> / 
+          <span (click)="goBack()">Courses</span> / 
+          <span (click)="goBack()">All Courses</span> / 
+          <span class="active">Details</span>
+        </nav>
+
+        <!-- Header -->
+        <header class="detail-header">
+          <div class="header-left">
+            <button class="back-btn" (click)="goBack()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div class="title-info">
+              <h1>{{ courseDetail.basicInfo.name }}</h1>
+              <p>Course ID: {{ courseDetail.basicInfo.id }}</p>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="btn-edit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              Edit
+            </button>
+            <button class="btn-delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+              </svg>
+              Delete
+            </button>
+          </div>
+        </header>
+
+        <div class="detail-grid">
+          <!-- Left Column -->
+          <div class="left-col">
+            <!-- Basic Information Card -->
+            <section class="info-card">
+              <div class="card-header">
+                <div class="header-title">
+                  <svg class="icon-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1M9 15h1m4 0h1" />
+                  </svg>
+                  <h2>Basic Information</h2>
+                </div>
+              </div>
+              <div class="card-grid">
+                <div class="info-item">
+                  <label>Course Name</label>
+                  <p>{{ courseDetail.basicInfo.name }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Course Type</label>
+                  <span class="badge badge-undergraduate">{{ courseDetail.basicInfo.courseType }}</span>
+                </div>
+                <div class="info-item">
+                  <label>Course Mode</label>
+                  <p>{{ courseDetail.basicInfo.mode }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Course Fees</label>
+                  <p>{{ courseDetail.basicInfo.fees }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Duration</label>
+                  <p>{{ courseDetail.basicInfo.duration }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Status</label>
+                  <span class="badge badge-active">{{ courseDetail.basicInfo.status }}</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Right Column -->
+          <div class="right-col">
+            <!-- Current Enrollment Card -->
+            <section class="enroll-card">
+              <div class="enroll-content">
+                <label>Current Enrollment</label>
+                <div class="enroll-number">{{ courseDetail.enrollmentStats.currentEnrollment }}</div>
+                <p>{{ courseDetail.enrollmentStats.description }}</p>
+              </div>
+            </section>
+
+            <!-- Quick Stats Card -->
+            <section class="quick-stats-card">
+              <h3>Quick Stats</h3>
+              <div class="stats-list">
+                <div class="stat-row">
+                  <span>Course Mode</span>
+                  <span class="stat-value">{{ courseDetail.quickStats.courseMode }}</span>
+                </div>
+                <div class="stat-row">
+                  <span>Course Fees</span>
+                  <span class="stat-value blue-text">{{ courseDetail.quickStats.courseFees }}</span>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Consultancy Partners & Enrollment Table -->
+        <section class="table-card consultancy-section">
+          <div class="table-header-box">
+             <div class="header-left-title">
+                <h2>Consultancy Partners & Enrollment</h2>
+                <p>Overview of consultancy partners mapped to this course</p>
+             </div>
+             <div class="header-badges">
+                <div class="stat-badge purple-badge">
+                   <span class="label">Total Partners</span>
+                   <span class="value">{{ courseDetail.consultancies.length }}</span>
+                </div>
+                <div class="stat-badge mint-badge">
+                   <span class="label">Total Students</span>
+                   <span class="value">{{ courseDetail.enrollmentStats.currentEnrollment }}</span>
+                </div>
+             </div>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Consultancy</th>
+                  <th>Course Type</th>
+                  <th>Students Enrolled</th>
+                  <th>Revenue Generated</th>
+                  <th>Commission Paid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of courseDetail.consultancies; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>
+                    <div class="consultancy-cell">
+                      <span class="bold-text">{{ item.name }}</span>
+                      <a class="view-all">View All Courses (8)</a>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-undergraduate">{{ item.courseType }}</span></td>
+                  <td><span class="badge-count">{{ item.studentsEnrolled }}</span></td>
+                  <td class="bold-text">{{ item.revenueGenerated }}</td>
+                  <td class="bold-text">{{ item.commissionPaid }}</td>
+                </tr>
+                <tr class="total-row">
+                  <td colspan="3" class="bold-text">Total</td>
+                  <td><span class="badge-count">{{ courseDetail.enrollmentStats.currentEnrollment }}</span></td>
+                  <td class="bold-text">₹ 7,44,676</td> <!-- Simulated total sum -->
+                  <td class="bold-text">₹ 13,03,092</td> <!-- Simulated total sum -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- All Admission Table -->
+        <section class="table-card">
+          <div class="table-header">
+            <h2>All Admission</h2>
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Search Admission" [(ngModel)]="searchTerm">
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Student Name</th>
+                  <th>Course</th>
+                  <th>Duration</th>
+                  <th>Discount %</th>
+                  <th>Fee Status</th>
+                  <th>Status</th>
+                  <th>Admission Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of courseDetail.admissions; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="bold-text">{{ item.studentName }}</td>
+                  <td>{{ item.course }}</td>
+                  <td>{{ item.duration }}</td>
+                  <td><span class="badge badge-scholar">{{ item.discount }}</span></td>
+                  <td><span class="badge badge-success">{{ item.feeStatus }}</span></td>
+                  <td><span class="badge badge-active">{{ item.status }}</span></td>
+                  <td>{{ item.admissionDate }}</td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </button>
+                      <button class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </button>
+                      <button class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <p>Showing 10 records out of 1200 Users</p>
+            <div class="pagination">
+              <button class="active">1</button>
+              <button>2</button>
+              <button>3</button>
+              <button>4</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- All Institution Table -->
+        <section class="table-card">
+          <div class="table-header">
+            <h2>All Institution</h2>
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Search Institution" [(ngModel)]="searchTerm">
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Students</th>
+                  <th>Status</th>
+                  <th>Course</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of courseDetail.institutions; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td class="bold-text">{{ item.name }}</td>
+                  <td>{{ item.code }}</td>
+                  <td class="bold-text">{{ item.students }}</td>
+                  <td><span class="badge badge-active">{{ item.status }}</span></td>
+                  <td><span class="badge-count blue-badge">{{ item.courseCount }} Course</span></td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></button>
+                      <button class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button>
+                      <button class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Top 5 Consultancy Chart -->
+        <section class="chart-card">
+          <div class="card-header">
+            <h2>Top 5 Consultancy</h2>
+          </div>
+          <div class="chart-content">
+            <apx-chart
+              *ngIf="chartOptions"
+              [series]="chartOptions.series!"
+              [chart]="chartOptions.chart!"
+              [xaxis]="chartOptions.xaxis!"
+              [yaxis]="chartOptions.yaxis!"
+              [plotOptions]="chartOptions.plotOptions!"
+              [fill]="chartOptions.fill!"
+              [dataLabels]="chartOptions.dataLabels!"
+              [stroke]="chartOptions.stroke!"
+              [grid]="chartOptions.grid!"
+              [tooltip]="chartOptions.tooltip!"
+              [colors]="chartOptions.colors!"
+            ></apx-chart>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Loading State -->
+      <ng-template #loadingState>
+        <div class="loading-state">
+          <div class="loader"></div>
+          <p>Loading Course Details...</p>
+        </div>
+      </ng-template>
+    </main>
+  </div>
+</div>

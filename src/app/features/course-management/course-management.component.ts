@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { CourseService } from '../../core/services/course.service';
@@ -26,7 +26,38 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   
   private destroy$ = new Subject<void>();
 
-  constructor(private courseService: CourseService) {}
+  constructor(
+    private courseService: CourseService,
+    private router: Router
+  ) {}
+
+  onView(id: number) {
+    this.router.navigate(['/courses', id]);
+  }
+
+  onEdit(id: number) {
+    console.log(`Edit button clicked with id: ${id}`);
+    window.location.hash = ''; 
+  }
+
+  onDelete(id: number) {
+    if (window.confirm('Are you sure you want to delete this course?')) {
+      this.loading = true;
+      this.courseService.deleteCourse(id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            alert('Course deleted successfully');
+            this.loadData();
+          },
+          error: (err: any) => {
+            console.error('Error deleting course', err);
+            alert('Failed to delete course');
+            this.loading = false;
+          }
+        });
+    }
+  }
 
   ngOnInit() {
     this.loadData();

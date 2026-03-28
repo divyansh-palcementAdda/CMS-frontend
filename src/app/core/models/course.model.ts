@@ -37,3 +37,53 @@ export interface CoursePageData {
   courses: CourseItem[];
   totalCount: number;
 }
+
+export interface CourseDetail {
+  basicInfo: {
+    id: number;
+    name: string;
+    courseType: string;
+    mode: string;
+    fees: string;
+    duration: string;
+    status: string;
+  };
+  enrollmentStats: {
+    currentEnrollment: number;
+    description: string;
+  };
+  quickStats: {
+    courseMode: string;
+    courseFees: string;
+  };
+  consultancies: Array<{
+    id: number;
+    name: string;
+    courseType: string;
+    studentsEnrolled: number;
+    revenueGenerated: string;
+    commissionPaid: string;
+  }>;
+  admissions: Array<{
+    id: number;
+    studentName: string;
+    course: string;
+    duration: string;
+    discount: string;
+    feeStatus: string;
+    status: string;
+    admissionDate: string;
+  }>;
+  institutions: Array<{
+    id: number;
+    name: string;
+    code: string;
+    students: number;
+    status: string;
+    courseCount: number;
+  }>;
+  topConsultancies: Array<{
+    label: string;
+    value: number;
+  }>;
+}

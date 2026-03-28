@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
@@ -33,10 +33,19 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   coursesForExpandedInst: { id: number, name: string }[] = [];
   loadingCourses = false;
 
-  constructor(private institutionService: InstitutionService) {}
+  constructor(
+    private institutionService: InstitutionService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.fetchData();
+  }
+
+  viewInstitution(id: number | undefined) {
+    if (id) {
+      this.router.navigate(['/institutions', id]);
+    }
   }
 
   fetchData() {
