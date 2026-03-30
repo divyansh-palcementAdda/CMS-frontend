@@ -66,6 +66,10 @@ export class RoleService {
     );
   }
 
+  deleteRole(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   private getMockData(): RolePageData {
     const mockRoles: RoleItem[] = [
       { id: 1, sNo: 1, name: 'Super Admin', description: 'Full system access', users: 245, status: 'Active' },

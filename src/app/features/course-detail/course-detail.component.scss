@@ -86,39 +86,66 @@
   }
 
   .header-actions {
-    display: flex;
-    gap: 12px;
+    display: flex !important;
+    gap: 16px !important;
+    align-items: center !important;
+    flex-direction: row !important;
 
     button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 10px 24px !important;
+      border-radius: 12px !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 10px !important;
+      cursor: pointer !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+      letter-spacing: 0.02em !important;
+      outline: none !important;
 
-      svg { width: 18px; height: 18px; }
+      svg {
+        width: 18px !important;
+        height: 18px !important;
+        display: block !important;
+        transition: transform 0.3s ease !important;
+        stroke-width: 2 !important;
+      }
+
+      &:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+        
+        svg {
+          transform: rotate(-10deg) scale(1.1) !important;
+        }
+      }
+
+      &:active {
+        transform: translateY(0) !important;
+      }
     }
 
     .btn-edit {
-      background-color: white;
-      color: #64748b;
-      border: 1px solid #e2e8f0;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+      color: white !important;
+      border: 1px solid rgba(99, 102, 241, 0.2) !important;
+
       &:hover {
-        background-color: #f1f5f9;
-        border-color: #cbd5e1;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
       }
     }
 
     .btn-delete {
-      background-color: #fee2e2;
-      color: #ef4444;
-      border: 1px solid #fecaca;
+      background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+      color: white !important;
+      border: 1px solid rgba(244, 63, 94, 0.2) !important;
+
       &:hover {
-        background-color: #fecaca;
+        background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
       }
     }
   }
@@ -197,7 +224,7 @@
         font-weight: 700;
         color: #1e293b;
 
-        &.blue-text { color: #10b981; } // Green in figma stats? Actually the label says fees ₹485,000 in green.
+        &.blue-text { color: #10b981; }
       }
     }
   }
@@ -255,7 +282,27 @@
   }
 }
 
-/* Tables */
+/* Tables Section Customization */
+.table-card {
+  &.table-only {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .table-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+      color: #1E293B;
+    }
+  }
+}
+
 .table-header-box {
   padding: 24px;
   display: flex;
@@ -310,49 +357,60 @@
   }
 }
 
-.table-responsive {
+.table-wrapper {
   overflow-x: auto;
-}
+  padding: 0 24px 8px;
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  
-  thead {
-    background-color: #4f46e5;
-    tr th {
-      color: white;
-      text-align: left;
-      padding: 16px 24px;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: capitalize;
-    }
-  }
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    
+    thead {
+      background-color: #435FFF;
+      tr th {
+        color: white;
+        text-align: left;
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        text-transform: capitalize;
+        border: none;
 
-  tbody {
-    tr {
-      border-bottom: 1px solid #f1f5f9;
-      &:last-child { border-bottom: none; }
-      &:hover { background-color: #f8fafc; }
-      
-      td {
-        padding: 16px 24px;
-        font-size: 14px;
-        color: #64748b;
-
-        &.bold-text {
-          color: #1e293b;
-          font-weight: 600;
-        }
+        &:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        &:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
       }
+    }
 
-      &.total-row {
-        background-color: #f8fafc;
+    tbody {
+      tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: background-color 0.2s;
+        
+        &:hover { background-color: #f8fafc; }
+        
         td {
-          color: #1e293b;
-          font-weight: 700;
-          font-size: 15px;
+          padding: 16px 16px;
+          font-size: 13px;
+          color: #64748b;
+          border-bottom: 1px solid #E2E8F0;
+          vertical-align: middle;
+
+          &.bold-text {
+            color: #1e293b;
+            font-weight: 600;
+          }
+
+          &.text-center { text-align: center !important; }
+        }
+
+        &.total-row {
+          background-color: #f8fafc;
+          td {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 15px;
+          }
         }
       }
     }
@@ -372,20 +430,6 @@ table {
   }
 }
 
-/* Badges */
-.badge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-block;
-
-  &-undergraduate { background-color: #eef2ff; color: #6366f1; }
-  &-active { background-color: #ccfbf1; color: #0d9488; }
-  &-success { background-color: #ccfbf1; color: #0d9488; }
-  &-scholar { background-color: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe; }
-}
-
 .badge-count {
   background-color: #ccfbf1;
   color: #0d9488;
@@ -397,87 +441,6 @@ table {
   &.blue-badge {
     background-color: #eff6ff;
     color: #3b82f6;
-  }
-}
-
-/* Action Buttons */
-.action-btns {
-  display: flex;
-  gap: 12px;
-  
-  .btn-icon {
-    background: none;
-    border: none;
-    padding: 4px;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: color 0.2s;
-    
-    &:hover { color: #6366f1; }
-    svg { width: 18px; height: 18px; }
-  }
-}
-
-/* Search Box */
-.search-box {
-  position: relative;
-  width: 240px;
-
-  input {
-    width: 100%;
-    padding: 8px 12px 8px 36px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    font-size: 13px;
-    outline: none;
-    &:focus { border-color: #6366f1; }
-  }
-
-  svg {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    color: #94a3b8;
-  }
-}
-
-/* Table Footer */
-.table-footer {
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #f1f5f9;
-  font-size: 13px;
-  color: #64748b;
-}
-
-.pagination {
-  display: flex;
-  gap: 8px;
-
-  button {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-    background: white;
-    font-size: 12px;
-    font-weight: 500;
-    color: #64748b;
-    cursor: pointer;
-    
-    &.active {
-      background-color: #f1f5f9;
-      color: #1e293b;
-      font-weight: 600;
-    }
   }
 }
 

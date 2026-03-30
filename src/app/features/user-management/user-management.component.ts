@@ -8,10 +8,12 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 import { UserService } from '../../core/services/user.service';
 import { UserPageData, UserItem } from '../../core/models/user.model';
 
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
 })
@@ -30,6 +32,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   private sub!: Subscription;
 
+  // Actions
+  showDeleteModal = false;
+  selectedUser: UserItem | null = null;
+
   constructor(private userService: UserService, private router: Router) { }
 
   ngOnInit() {
@@ -37,6 +43,38 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
   onView(id: number) {
     this.router.navigate(['/users', id]);
+  }
+
+  onEdit(id: number) {
+    this.router.navigate([], { fragment: 'edit' });
+  }
+
+  onDelete(user: UserItem) {
+    this.selectedUser = user;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
+    this.selectedUser = null;
+  }
+
+  confirmDelete() {
+    if (this.selectedUser && this.selectedUser.id) {
+      this.loading = true;
+      this.userService.deleteUser(this.selectedUser.id).subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.selectedUser = null;
+          this.fetchData();
+        },
+        error: (err) => {
+          console.error('Error deleting user', err);
+          this.loading = false;
+          this.showDeleteModal = false;
+        }
+      });
+    }
   }
   fetchData() {
     this.loading = true;

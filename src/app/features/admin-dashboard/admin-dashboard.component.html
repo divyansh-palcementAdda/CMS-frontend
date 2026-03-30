@@ -59,10 +59,29 @@
             <app-fees-status-chart [chartData]="chartData()"></app-fees-status-chart>
             <app-consultancy-course-chart
               [data]="chartData()?.consultancyVsCourse ?? null"></app-consultancy-course-chart>
-            <app-consultancy-table [consultancies]="dashboardData()?.consultancyData"></app-consultancy-table>
-            <app-recent-forms [forms]="dashboardData()?.recentForms"></app-recent-forms>
+            <app-consultancy-table 
+              [consultancies]="dashboardData()?.consultancyData"
+              (view)="onViewConsultancy($event)"
+              (edit)="onEditConsultancy($event)"
+              (delete)="onDeleteConsultancy($event)">
+            </app-consultancy-table>
+            <app-recent-forms 
+              [forms]="dashboardData()?.recentForms"
+              (view)="onViewAdmission($event)"
+              (edit)="onEditAdmission($event)"
+              (delete)="onDeleteAdmission($event)">
+            </app-recent-forms>
           </div>
         </div>
+
+        <!-- Confirmation Modal -->
+        <app-confirmation-modal
+          *ngIf="showDeleteModal"
+          [title]="'Delete ' + deleteType"
+          [message]="'Are you sure you want to delete \'' + (itemToDelete?.name || itemToDelete?.fullName || 'this record') + '\'?'"
+          (confirm)="confirmDelete()"
+          (cancel)="cancelDelete()">
+        </app-confirmation-modal>
       </ng-container>
     </main>
   </div>

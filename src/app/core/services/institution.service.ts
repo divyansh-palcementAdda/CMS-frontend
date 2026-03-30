@@ -92,6 +92,10 @@ export class InstitutionService {
     );
   }
 
+  deleteInstitution(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   private getMockData(): InstitutionPageData {
     const mockInstitutions: InstitutionItem[] = [
       { id: 1, sNo: 1, name: 'Manipal', code: 'MNU-101', students: 12, status: 'Active', course: '2 Course' },

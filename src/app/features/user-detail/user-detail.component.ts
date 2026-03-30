@@ -8,11 +8,14 @@ import { UserService } from '../../core/services/user.service';
 import { UserItem } from '../../core/models/user.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ConsultancyService } from '../../core/services/consultancy.service';
+
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss']
 })
@@ -22,10 +25,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   user: UserItem | null = null;
   private destroy$ = new Subject<void>();
 
+  // Actions
+  showDeleteModal = false;
+  itemToDelete: any = null;
+  deleteType: 'user' | 'consultancy' = 'user';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private consultancyService: ConsultancyService
   ) {}
 
   ngOnInit() {
@@ -55,15 +64,69 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
 
   onEdit() {
-    console.log('Edit clicked for user:', this.userId);
-    window.location.hash = '';
+    this.router.navigate([], { fragment: 'edit' });
   }
 
   onDelete() {
-    if (confirm('Are you sure you want to delete this user?')) {
-      alert('User marked inactive (Mock)');
-      this.router.navigate(['/users']);
+    this.itemToDelete = this.user;
+    this.deleteType = 'user';
+    this.showDeleteModal = true;
+  }
+
+  onViewConsultancy(id: number) {
+    this.router.navigate(['/consultancy-management', id]);
+  }
+
+  onEditConsultancy(id: number) {
+    this.router.navigate(['/consultancy-management'], { fragment: 'edit' });
+  }
+
+  onDeleteConsultancy(consultancy: any) {
+    this.itemToDelete = consultancy;
+    this.deleteType = 'consultancy';
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.itemToDelete = null;
+    this.showDeleteModal = false;
+  }
+
+  confirmDelete() {
+    if (!this.itemToDelete) return;
+    this.loading = true;
+    let deleteObservable;
+
+    if (this.deleteType === 'user') {
+      deleteObservable = this.userService.deleteUser(this.userId);
+    } else if (this.deleteType === 'consultancy') {
+      deleteObservable = this.consultancyService.deleteConsultancy(this.itemToDelete.id);
+    } else {
+      this.loading = false;
+      this.showDeleteModal = false;
+      return;
     }
+
+    deleteObservable.subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.itemToDelete = null;
+        if (this.deleteType === 'user') {
+          this.router.navigate(['/users']);
+        } else {
+          this.loadData();
+        }
+      },
+      error: (err) => {
+        console.error(`Error deleting ${this.deleteType}`, err);
+        this.loading = false;
+        this.showDeleteModal = false;
+      }
+    });
+  }
+
+  goBack() {
+    this.router.navigate(['/users']);
   }
 
   ngOnDestroy() {

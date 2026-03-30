@@ -10,11 +10,12 @@ import { CourseTypeItem } from '../../core/models/course-type.model';
 import { CoursePageData, CourseItem } from '../../core/models/course.model';
 import { Subject, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-course-type-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './course-type-detail.component.html',
   styleUrls: ['./course-type-detail.component.scss']
 })
@@ -27,6 +28,11 @@ export class CourseTypeDetailComponent implements OnInit, OnDestroy {
   currentPage = 1;
   pageSize = 10;
   private destroy$ = new Subject<void>();
+
+  // Actions
+  showDeleteModal = false;
+  deleteType: string = '';
+  itemToDelete: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,27 +52,67 @@ export class CourseTypeDetailComponent implements OnInit, OnDestroy {
   }
 
   onEdit() {
-    console.log(`Edit button clicked for ID: ${this.typeId}`);
-    window.location.hash = '';
+    this.router.navigate([], { fragment: 'edit' });
+  }
+
+  goBack() {
+    this.router.navigate(['/course-types']);
   }
 
   onDelete() {
-    if (window.confirm('Are you sure you want to delete this course type?')) {
-      this.loading = true;
-      this.courseTypeService.deleteCourseType(this.typeId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            alert('Course type deleted successfully');
-            this.router.navigate(['/course-types']);
-          },
-          error: (err: any) => {
-            console.error('Error deleting course type', err);
-            alert('Failed to delete course type');
-            this.loading = false;
-          }
-        });
+    this.deleteType = 'CourseType';
+    this.itemToDelete = this.typeDetail;
+    this.showDeleteModal = true;
+  }
+
+  // Course Actions
+  onViewCourse(id: number) {
+    this.router.navigate(['/courses', id]);
+  }
+
+  onEditCourse(id: number) {
+    this.router.navigate(['/courses', id], { fragment: 'edit' });
+  }
+
+  onDeleteCourse(course: CourseItem) {
+    this.deleteType = 'Course';
+    this.itemToDelete = course;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
+    this.itemToDelete = null;
+  }
+
+  confirmDelete() {
+    if (!this.itemToDelete) return;
+
+    this.loading = true;
+    let deleteObservable;
+
+    if (this.deleteType === 'CourseType') {
+      deleteObservable = this.courseTypeService.deleteCourseType(this.typeId);
+    } else {
+      deleteObservable = this.courseService.deleteCourse(this.itemToDelete.id);
     }
+
+    deleteObservable.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.itemToDelete = null;
+        if (this.deleteType === 'CourseType') {
+          this.router.navigate(['/course-types']);
+        } else {
+          this.loadData();
+        }
+      },
+      error: (err: any) => {
+        console.error(`Error deleting ${this.deleteType}`, err);
+        this.loading = false;
+        this.showDeleteModal = false;
+      }
+    });
   }
 
   loadData() {

@@ -71,6 +71,11 @@ export interface AdmissionItem {
   status?: string; // 'Active' | 'Inactive'
   duration?: string;
   discountPercentageDisplay?: string;
+
+  // Financial details used in templates
+  percentagePaid?: number;
+  tokenAmount?: number;
+  discountPercentage?: number;
 }
 
 export interface AdmissionPageData {

@@ -8,10 +8,12 @@ import { AdmissionService } from '../../core/services/admission.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+
 @Component({
   selector: 'app-admission-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
 })
@@ -28,6 +30,10 @@ export class AdmissionManagementComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 10;
   totalPages: number = 1;
+
+  // Actions
+  showDeleteModal: boolean = false;
+  selectedAdmission: AdmissionItem | null = null;
 
   constructor(
     private admissionService: AdmissionService,
@@ -64,6 +70,38 @@ export class AdmissionManagementComponent implements OnInit {
   }
   onView(id: number) {
     this.router.navigate(['/admissions', id]);
+  }
+
+  onEdit(id: number) {
+    this.router.navigate([], { fragment: 'edit' });
+  }
+
+  onDelete(admission: AdmissionItem) {
+    this.selectedAdmission = admission;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
+    this.selectedAdmission = null;
+  }
+
+  confirmDelete() {
+    if (this.selectedAdmission && this.selectedAdmission.id) {
+      this.loading = true;
+      this.admissionService.deleteAdmission(this.selectedAdmission.id!).subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.selectedAdmission = null;
+          this.fetchData();
+        },
+        error: (err) => {
+          console.error('Error deleting admission', err);
+          this.loading = false;
+          this.showDeleteModal = false;
+        }
+      });
+    }
   }
 
   onSearchChange(): void {

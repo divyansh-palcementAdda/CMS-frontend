@@ -8,11 +8,12 @@ import { CourseService } from '../../core/services/course.service';
 import { CourseItem, CoursePageData } from '../../core/models/course.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-course-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './course-management.component.html',
   styleUrls: ['./course-management.component.scss']
 })
@@ -26,6 +27,10 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   
   private destroy$ = new Subject<void>();
 
+  // Actions
+  showDeleteModal = false;
+  selectedCourse: CourseItem | null = null;
+
   constructor(
     private courseService: CourseService,
     private router: Router
@@ -36,24 +41,34 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   }
 
   onEdit(id: number) {
-    console.log(`Edit button clicked with id: ${id}`);
-    window.location.hash = ''; 
+    this.router.navigate([], { fragment: 'edit' });
   }
 
-  onDelete(id: number) {
-    if (window.confirm('Are you sure you want to delete this course?')) {
+  onDelete(course: CourseItem) {
+    this.selectedCourse = course;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.selectedCourse = null;
+    this.showDeleteModal = false;
+  }
+
+  confirmDelete() {
+    if (this.selectedCourse) {
       this.loading = true;
-      this.courseService.deleteCourse(id)
+      this.courseService.deleteCourse(this.selectedCourse.id)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            alert('Course deleted successfully');
+            this.selectedCourse = null;
+            this.showDeleteModal = false;
             this.loadData();
           },
           error: (err: any) => {
             console.error('Error deleting course', err);
-            alert('Failed to delete course');
             this.loading = false;
+            this.showDeleteModal = false;
           }
         });
     }

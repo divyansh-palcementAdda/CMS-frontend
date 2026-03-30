@@ -50,9 +50,13 @@
   color: #64748B;
   margin-bottom: 16px;
 
-  .crumb.active {
-    color: #1E293B;
-    font-weight: 500;
+  .crumb {
+    cursor: pointer;
+    &:hover { color: #6366F1; }
+    &.active {
+      color: #1E293B;
+      font-weight: 500;
+    }
   }
 }
 
@@ -71,6 +75,11 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: translateX(-2px);
+  }
 }
 
 .user-main-info {
@@ -88,26 +97,67 @@
 }
 
 .header-actions {
-  display: flex;
-  gap: 12px;
-}
+  display: flex !important;
+  gap: 16px !important;
+  align-items: center !important;
+  flex-direction: row !important;
 
-.action-btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  border: 1px solid #E2E8F0;
-  background: white;
-  color: #475569;
+  .action-btn {
+    padding: 10px 24px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    letter-spacing: 0.02em !important;
+    outline: none !important;
 
-  &.delete {
-    color: #EF4444;
-    background: #FEF2F2;
-    border: none;
+    svg {
+      width: 18px !important;
+      height: 18px !important;
+      display: block !important;
+      transition: transform 0.3s ease !important;
+      stroke-width: 2 !important;
+    }
+
+    &:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+      
+      svg {
+        transform: rotate(-10deg) scale(1.1) !important;
+      }
+    }
+
+    &:active {
+      transform: translateY(0) !important;
+    }
+
+    &.edit {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+      color: white !important;
+      border: 1px solid rgba(99, 102, 241, 0.2) !important;
+
+      &:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+      }
+    }
+
+    &.delete {
+      background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+      color: white !important;
+      border: 1px solid rgba(244, 63, 94, 0.2) !important;
+
+      &:hover {
+        background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+      }
+    }
   }
 }
 
@@ -175,79 +225,6 @@
   flex-wrap: wrap;
 }
 
-.badge {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-
-  &.purple {
-    background: #a25de4;
-    color: #f0f0f0;
-  }
-
-  &.green-box {
-    background: #ECFDF5;
-    color: #10B981;
-    width: max-content;
-  }
-
-  &.teal-box {
-    background: #F0FDFA;
-    color: #14B8A6;
-    width: max-content;
-  }
-}
-
-.role-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  background: #fAE8FF;
-  /* Fallback */
-  color: #C026D3;
-
-  &.super-admin {
-    background: #E0E7FF;
-    color: #4F46E5;
-  }
-
-  &.admin,
-  &.sub-admin {
-    background: #EDE9FE;
-    color: #7C3AED;
-  }
-
-  &.finance {
-    background: #E0F2FE;
-    color: #0284C7;
-  }
-
-  &.faculty {
-    background: #F3E8FF;
-    color: #9333EA;
-  }
-
-  &.consultant,
-  &.consultancy-representative {
-    background: #FAE8FF;
-    color: #C026D3;
-  }
-
-  &.student {
-    background: #E0E7FF;
-    color: #4338CA;
-  }
-
-  &.support {
-    background: #D1FAE5;
-    color: #059669;
-  }
-}
-
 /* Stats Column */
 .activity-stats {
   display: flex;
@@ -292,94 +269,77 @@
   gap: 16px;
 }
 
-/* Table Section */
-.consultancy-section {
-  h2 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #1E293B;
-    margin-bottom: 20px;
-  }
-}
-
-.table-wrapper {
+/* Table Card Section Customization */
+.table-card {
   background: white;
   border-radius: 12px;
   border: 1px solid #F1F5F9;
-  overflow: hidden;
+  margin-bottom: 32px;
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
+  .table-header {
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-    thead {
-      background: #435FFF;
-
-      th {
-        color: white;
-        text-align: left;
-        padding: 16px;
-        font-weight: 600;
-        font-size: 14px;
-      }
+    .table-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1E293B;
+      margin: 0;
     }
+  }
 
-    tbody {
-      tr {
-        border-bottom: 1px solid #F1F5F9;
+  .table-wrapper {
+    padding: 0 24px 8px;
+    
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
 
-        &:last-child {
+      thead {
+        background: #435FFF;
+        th {
+          color: white;
+          padding: 14px 16px;
+          font-weight: 500;
+          font-size: 13px;
+          text-align: left;
           border: none;
+          &:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+          &:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
         }
+      }
 
-        td {
-          padding: 16px;
-          font-size: 14px;
-          color: #475569;
-
-          &.font-bold {
-            color: #1E293B;
-            font-weight: 600;
-          }
-
-          &.email-cell {
-            color: #64748B;
+      tbody {
+        tr {
+          border-bottom: 1px solid #F1F5F9;
+          transition: background-color 0.2s;
+          &:hover { background-color: #F8FAFC; }
+          
+          td {
+            padding: 16px;
             font-size: 13px;
+            color: #475569;
+            border-bottom: 1px solid #E2E8F0;
+            vertical-align: middle;
+
+            &.font-bold {
+              color: #1E293B;
+              font-weight: 600;
+            }
+
+            &.email-cell {
+              color: #64748B;
+              font-size: 13.5px;
+            }
+            
+            &.text-center { text-align: center !important; }
           }
         }
       }
     }
-  }
-}
-
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-
-  &.active {
-    background: #DCFCE7;
-    color: #15803D;
-  }
-}
-
-.action-icons {
-  display: flex;
-  gap: 12px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    opacity: 0.7;
   }
 }
 

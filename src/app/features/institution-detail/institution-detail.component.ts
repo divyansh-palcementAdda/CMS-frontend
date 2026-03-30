@@ -1,17 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgApexchartsModule } from "ng-apexcharts";
 import { InstitutionService } from '../../core/services/institution.service';
 import { InstitutionDetail } from '../../core/models/institution.model';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { FormsModule } from '@angular/forms';
+import { CourseService } from '../../core/services/course.service';
+import { AdmissionService } from '../../core/services/admission.service';
+import { ConsultancyService } from '../../core/services/consultancy.service';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-institution-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgApexchartsModule, SidebarComponent, TopbarComponent, FormsModule],
+  imports: [CommonModule, RouterModule, NgApexchartsModule, SidebarComponent, TopbarComponent, FormsModule, ConfirmationModalComponent],
   templateUrl: './institution-detail.component.html',
   styleUrls: ['./institution-detail.component.scss']
 })
@@ -19,6 +23,11 @@ export class InstitutionDetailComponent implements OnInit {
   id: number | null = null;
   detail: InstitutionDetail | null = null;
   loading = true;
+
+  // Actions
+  showDeleteModal = false;
+  itemToDelete: any = null;
+  deleteType: 'institution' | 'course' | 'admission' | 'consultancy' = 'institution';
 
   chartOptions: any = {
     series: [],
@@ -81,7 +90,11 @@ export class InstitutionDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private institutionService: InstitutionService
+    private router: Router,
+    private institutionService: InstitutionService,
+    private courseService: CourseService,
+    private admissionService: AdmissionService,
+    private consultancyService: ConsultancyService
   ) {}
 
   ngOnInit(): void {
@@ -116,6 +129,105 @@ export class InstitutionDetailComponent implements OnInit {
       data: consultancies.map(t => t.value)
     }];
     this.chartOptions.xaxis.categories = consultancies.map(t => t.label);
+  }
+
+  onEdit() {
+    this.router.navigate([], { fragment: 'edit' });
+  }
+
+  onDelete() {
+    this.itemToDelete = this.detail?.basicInfo;
+    this.deleteType = 'institution';
+    this.showDeleteModal = true;
+  }
+
+  onViewCourse(id: number) {
+    this.router.navigate(['/course-management', id]);
+  }
+
+  onEditCourse(id: number) {
+    this.router.navigate(['/course-management'], { fragment: 'edit' });
+  }
+
+  onDeleteCourse(course: any) {
+    this.itemToDelete = course;
+    this.deleteType = 'course';
+    this.showDeleteModal = true;
+  }
+
+  onViewAdmission(id: number) {
+    this.router.navigate(['/admission-management', id]);
+  }
+
+  onEditAdmission(id: number) {
+    this.router.navigate(['/admission-management'], { fragment: 'edit' });
+  }
+
+  onDeleteAdmission(admission: any) {
+    this.itemToDelete = admission;
+    this.deleteType = 'admission';
+    this.showDeleteModal = true;
+  }
+
+  onViewConsultancy(id: number) {
+    this.router.navigate(['/consultancy-management', id]);
+  }
+
+  onEditConsultancy(id: number) {
+    this.router.navigate(['/consultancy-management'], { fragment: 'edit' });
+  }
+
+  onDeleteConsultancy(consultancy: any) {
+    this.itemToDelete = consultancy;
+    this.deleteType = 'consultancy';
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.itemToDelete = null;
+    this.showDeleteModal = false;
+  }
+
+  confirmDelete() {
+    if (!this.itemToDelete) return;
+    this.loading = true;
+    let deleteObservable;
+
+    switch (this.deleteType) {
+      case 'institution':
+        deleteObservable = this.institutionService.deleteInstitution(this.id!);
+        break;
+      case 'course':
+        deleteObservable = this.courseService.deleteCourse(this.itemToDelete.id);
+        break;
+      case 'admission':
+        deleteObservable = this.admissionService.deleteAdmission(this.itemToDelete.id);
+        break;
+      case 'consultancy':
+        deleteObservable = this.consultancyService.deleteConsultancy(this.itemToDelete.id);
+        break;
+      default:
+        this.loading = false;
+        this.showDeleteModal = false;
+        return;
+    }
+
+    deleteObservable.subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.itemToDelete = null;
+        if (this.deleteType === 'institution') {
+          this.router.navigate(['/institution-management']);
+        } else {
+          this.loadDetails(this.id!);
+        }
+      },
+      error: (err) => {
+        console.error(`Error deleting ${this.deleteType}`, err);
+        this.loading = false;
+        this.showDeleteModal = false;
+      }
+    });
   }
 
   goBack(): void {

@@ -14,14 +14,14 @@
         <div class="page-header">
           <div class="header-left">
             <nav class="breadcrumbs">
-              <span class="crumb">Dashboard</span> /
-              <span class="crumb">Admission</span> /
-              <span class="crumb">All Admission</span> /
+              <span class="crumb" (click)="goBack()">Dashboard</span> /
+              <span class="crumb" (click)="goBack()">Admission</span> /
+              <span class="crumb" (click)="goBack()">All Admission</span> /
               <span class="crumb active">Details</span>
             </nav>
 
             <div class="title-row">
-              <div class="back-btn" routerLink="/admin/admission-management">
+              <div class="back-btn" (click)="goBack()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="white" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round" />
@@ -99,7 +99,7 @@
                 </div>
                 <div class="info-item">
                   <label>Whatsapp Number</label>
-                  <span class="success-text">{{ detail.whatsappPhoneNo || 'N/A' }}</span>
+                  <span class="status-pill active">{{ detail.whatsappPhoneNo || 'N/A' }}</span>
                 </div>
                 <div class="info-item">
                   <label>City</label>
@@ -131,7 +131,7 @@
               <div class="info-grid admission">
                 <div class="info-item">
                   <label>Source of Admission</label>
-                  <span class="badge blue">{{ detail.admissionSource || 'Direct' }}</span>
+                  <span class="status-pill active">{{ detail.admissionSource || 'Direct' }}</span>
                 </div>
                 <div class="info-item">
                   <label>Admission Date</label>
@@ -140,14 +140,14 @@
                 <div class="info-item">
                   <label>Course Name</label>
                   <div class="row-flex">
-                    <span>{{ detail.courseName }}</span>
+                    <span class="font-bold">{{ detail.courseName }}</span>
                     <button class="mini-btn">View Details</button>
                   </div>
                 </div>
                 <div class="info-item">
                   <label>Institution Name</label>
                   <div class="row-flex">
-                    <span>{{ detail.institutionName || 'N/A' }}</span>
+                    <span class="font-bold">{{ detail.institutionName || 'N/A' }}</span>
                     <button class="mini-btn">View Details</button>
                   </div>
                 </div>
@@ -200,9 +200,29 @@
                   </div>
                   <div class="fees-status">
                     <label>Fees Status</label>
-                    <div class="status-wrap">
-                      <div class="toggle-mock active"></div>
-                      <span class="badge green">Paid</span>
+                    <div class="fee-status-toggle">
+                      <div class="status-option paid" [class.active]="detail.fiftyPercentFeesPaid"
+                        (click)="toggleFeeStatus('Paid')">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
+                          <rect x="5" y="10" width="14" height="6" rx="1" stroke="currentColor" stroke-width="2"
+                            fill="none" />
+                          <circle cx="12" cy="13" r="2" fill="currentColor" />
+                        </svg>
+                        <span>Paid</span>
+                      </div>
+                      <div class="status-option unpaid" [class.active]="!detail.fiftyPercentFeesPaid"
+                        (click)="toggleFeeStatus('Unpaid')">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
+                          <rect x="5" y="10" width="14" height="6" rx="1" stroke="currentColor" stroke-width="2"
+                            fill="none" />
+                          <line x1="5" y1="10" x2="19" y2="16" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        <span>Unpaid</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -222,7 +242,7 @@
                   </div>
                   <div class="fin-details">
                     <label>Percentage Paid</label>
-                    <span class="fin-value">70%</span>
+                    <span class="fin-value">{{ detail.percentagePaid || '70' }}%</span>
                   </div>
                 </div>
 
@@ -235,7 +255,7 @@
                   </div>
                   <div class="fin-details">
                     <label>Token Amount Paid</label>
-                    <span class="fin-value">₹ 3000</span>
+                    <span class="fin-value">₹ {{ detail.tokenAmount || '3000' }}</span>
                   </div>
                 </div>
 
@@ -250,7 +270,7 @@
                   </div>
                   <div class="fin-details">
                     <label>Discount %</label>
-                    <span class="fin-value">8%</span>
+                    <span class="fin-value">{{ detail.discountPercentage || '8' }}%</span>
                   </div>
                 </div>
 
@@ -263,7 +283,7 @@
                   </div>
                   <div class="fin-details">
                     <label>Scholarship</label>
-                    <span class="fin-value">N/A</span>
+                    <span class="fin-value">{{ detail.isScholar ? 'Yes' : 'N/A' }}</span>
                   </div>
                 </div>
               </div>
@@ -271,6 +291,15 @@
           </div>
         </div>
       </ng-container>
+
+      <!-- Confirmation Modal -->
+      <app-confirmation-modal
+        *ngIf="showDeleteModal"
+        [title]="'Delete Admission Record'"
+        [message]="'Are you sure you want to delete this admission record for \'' + detail?.fullName + '\'?'"
+        (confirm)="confirmDelete()"
+        (cancel)="cancelDelete()">
+      </app-confirmation-modal>
     </main>
   </div>
 </div>

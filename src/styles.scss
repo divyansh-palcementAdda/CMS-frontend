@@ -120,6 +120,233 @@ button {
   }
 }
 
+/* Standardized Search Box */
+.search-box {
+  position: relative;
+  width: 250px;
+
+  input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1E293B;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #FFFFFF;
+
+    &::placeholder {
+      color: #64748B;
+    }
+
+    &:focus {
+      border-color: #6366F1;
+    }
+  }
+
+  svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748B;
+    pointer-events: none;
+  }
+}
+
+/* Standardized Pagination Section */
+.pagination-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f1f5f9;
+
+  .showing-text {
+    font-size: 14px;
+    color: #64748B;
+  }
+
+  .pagination-controls {
+    display: flex;
+    gap: 8px;
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: #64748B;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        background: #F1F5F9;
+        color: #1E293B;
+      }
+
+      &.active {
+        background: #E2E8F0;
+        color: #1E293B;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.nav-btn {
+        color: #1E293B;
+
+        &:hover:not(:disabled) {
+          background: transparent;
+          color: #6366F1;
+        }
+      }
+    }
+  }
+}
+
+/* Standardized Action Icons */
+.action-icons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+
+  .icon-btn {
+    background: none;
+    border: none;
+    color: #64748B;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+
+    &:hover {
+      background: #F8FAFC;
+    }
+
+    /* Themed hover states */
+    &.view:hover {
+      color: #6366F1;
+    }
+
+    &.edit:hover {
+      color: #8B5CF6;
+    }
+
+    &.delete:hover {
+      color: #EF4444;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+/* Fee Status Toggle - Pixel Perfect */
+.fee-status-toggle {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 2px;
+  width: fit-content;
+  cursor: pointer;
+  user-select: none;
+
+  .status-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 18px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    transition: all 0.2s ease;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    &.active {
+      &.paid {
+        background: #00B884;
+        color: #FFFFFF;
+      }
+      &.unpaid {
+        background: #F43F5E;
+        color: #FFFFFF;
+      }
+    }
+
+    &:not(.active):hover {
+      background: #F8FAFC;
+    }
+  }
+}
+
+/* Refined Admission Badges */
+.discount-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  
+  &.scholarship {
+    background: #EEF2FF;
+    color: #4F46E5;
+    border: 1px solid #E0E7FF;
+  }
+  
+  &.percent {
+    background: transparent;
+    color: #1E293B;
+    font-weight: 600;
+  }
+}
+
+/* Status Pill Refinement */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  
+  &.active {
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #D1FAE5;
+  }
+  
+  &.inactive {
+    background: #FEF2F2;
+    color: #EF4444;
+    border: 1px solid #FEE2E2;
+  }
+}
+
 /* Utility for Responsive Tables */
 .table-wrapper {
   overflow-x: auto;
@@ -144,5 +371,16 @@ button {
 
   .btn-primary {
     width: 100%;
+  }
+
+  .pagination-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .search-box {
+    width: 100% !important;
   }
 }

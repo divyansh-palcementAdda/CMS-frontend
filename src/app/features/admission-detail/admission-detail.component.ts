@@ -9,10 +9,12 @@ import { AdmissionItem } from '../../core/models/admission.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+
 @Component({
   selector: 'app-admission-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './admission-detail.component.html',
   styleUrls: ['./admission-detail.component.scss']
 })
@@ -22,11 +24,14 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   detail: AdmissionItem | null = null;
   private destroy$ = new Subject<void>();
 
+  // Actions
+  showDeleteModal = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private admissionService: AdmissionService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -55,16 +60,60 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   }
 
   onEdit() {
-    console.log('Edit clicked for admission:', this.admissionId);
-    window.location.hash = '';
+    this.router.navigate([], { fragment: 'edit' });
   }
 
   onDelete() {
-    if (confirm('Are you sure you want to delete this admission record?')) {
-      // In a real app, call service.deleteAdmission(id)
-      alert('Admission record deleted (Mock)');
-      this.router.navigate(['/admission-management']);
-    }
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
+  }
+
+  confirmDelete() {
+    this.loading = true;
+    this.admissionService.deleteAdmission(this.admissionId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.router.navigate(['/admission-management']);
+        },
+        error: (err) => {
+          console.error('Error deleting admission', err);
+          this.loading = false;
+          this.showDeleteModal = false;
+        }
+      });
+  }
+
+  goBack() {
+    this.router.navigate(['/admission-management']);
+  }
+
+  toggleFeeStatus(status: 'Paid' | 'Unpaid') {
+    if (!this.detail) return;
+    const isPaid = status === 'Paid';
+
+    this.loading = true;
+    this.admissionService.updateFeeStatus(this.detail.id, isPaid)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          if (this.detail) {
+            this.detail.feeStatus = status;
+            this.detail.fiftyPercentFeesPaid = isPaid;
+            this.detail.feeStatus = isPaid ? 'Paid' : 'Unpaid';
+          }
+          this.loading = false;
+          this.loadData();
+        },
+        error: (err) => {
+          console.error('Error updating fee status', err);
+          this.loading = false;
+        }
+      });
   }
 
   ngOnDestroy() {

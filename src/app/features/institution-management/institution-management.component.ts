@@ -8,10 +8,12 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 import { InstitutionService } from '../../core/services/institution.service';
 import { InstitutionPageData, InstitutionItem } from '../../core/models/institution.model';
 
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+
 @Component({
   selector: 'app-institution-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './institution-management.component.html',
   styleUrl: './institution-management.component.scss'
 })
@@ -33,6 +35,10 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   coursesForExpandedInst: { id: number, name: string }[] = [];
   loadingCourses = false;
 
+  // Actions
+  showDeleteModal = false;
+  selectedInstitution: InstitutionItem | null = null;
+
   constructor(
     private institutionService: InstitutionService,
     private router: Router
@@ -42,9 +48,41 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
     this.fetchData();
   }
 
-  viewInstitution(id: number | undefined) {
+  onView(id: number | undefined) {
     if (id) {
       this.router.navigate(['/institutions', id]);
+    }
+  }
+
+  onEdit(id: number | undefined) {
+    this.router.navigate([], { fragment: 'edit' });
+  }
+
+  onDelete(inst: InstitutionItem) {
+    this.selectedInstitution = inst;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.selectedInstitution = null;
+    this.showDeleteModal = false;
+  }
+
+  confirmDelete() {
+    if (this.selectedInstitution && this.selectedInstitution.id) {
+      this.loading = true;
+      this.institutionService.deleteInstitution(this.selectedInstitution.id).subscribe({
+        next: () => {
+          this.selectedInstitution = null;
+          this.showDeleteModal = false;
+          this.fetchData();
+        },
+        error: (err) => {
+          console.error('Error deleting institution', err);
+          this.loading = false;
+          this.showDeleteModal = false;
+        }
+      });
     }
   }
 

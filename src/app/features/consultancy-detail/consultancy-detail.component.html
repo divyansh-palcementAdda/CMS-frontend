@@ -11,60 +11,56 @@
 
       <ng-container *ngIf="!loading && consultancy">
         <!-- Breadcrumbs -->
-        <nav class="breadcrumb">
-          <span class="crumb" routerLink="/admin/dashboard">Dashboard</span>
+        <div class="breadcrumbs">
+          <span class="crumb" (click)="router.navigate(['/dashboard'])">Dashboard</span>
           <span class="separator">/</span>
-          <span class="crumb" routerLink="/consultancy">Consultancy</span>
+          <span class="crumb" (click)="router.navigate(['/consultancy-management'])">Consultancy</span>
           <span class="separator">/</span>
-          <span class="crumb">All Consultancies</span>
+          <span class="crumb" (click)="router.navigate(['/consultancy-management'])">All Consultancies</span>
           <span class="separator">/</span>
           <span class="crumb active">Details</span>
-        </nav>
+        </div>
 
         <!-- Page Header -->
-        <div class="page-header">
-          <div class="title-row">
-            <div class="back-btn" routerLink="/consultancy">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="12" fill="#6366F1" />
-                <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
+        <header class="page-header">
+          <div class="header-left">
+            <button class="back-btn" (click)="goBack()" title="Back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M19 12H5M12 19l-7-7 7-7"></path>
               </svg>
-            </div>
+            </button>
             <div class="name-id">
               <h1>{{ consultancy.name }}</h1>
               <span class="consultancy-id">Consultancy ID: {{ consultancy.id }}</span>
             </div>
           </div>
-          <div class="action-btns">
-            <button class="btn edit-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div class="header-actions">
+            <button class="action-btn edit" (click)="onEdit()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
               Edit
             </button>
-            <button class="btn delete-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="action-btn delete" (click)="onDelete()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"></polyline>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
               </svg>
               Delete
             </button>
           </div>
-        </div>
+        </header>
 
         <div class="content-grid">
-          <!-- Left Column (Information Panels) -->
+          <!-- Info Column (Left) -->
           <div class="info-column">
             <!-- Basic Information -->
-            <div class="card panel-card">
-              <div class="panel-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
                 <h3>Basic Information</h3>
               </div>
@@ -83,155 +79,133 @@
                 </div>
                 <div class="info-item">
                   <label>Institution/ Firm Name</label>
-                  <span class="value">{{ consultancy.institutionOrFirmName }}</span>
+                  <span class="value">{{ consultancy.institutionOrFirmName || 'N/A' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Contact Information -->
-            <div class="card panel-card">
-              <div class="panel-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
-                  <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                  </path>
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                 </svg>
                 <h3>Contact Information</h3>
               </div>
               <div class="info-grid">
                 <div class="info-item">
                   <label>Mobile Number</label>
-                  <span class="value">{{ consultancy.mobile }}</span>
+                  <span class="value">{{ consultancy.mobile || 'N/A' }}</span>
                 </div>
                 <div class="info-item">
                   <label>Alternate Number</label>
-                  <span class="value">{{ consultancy.alternateNo }}</span>
+                  <span class="value">{{ consultancy.alternateNo || 'N/A' }}</span>
                 </div>
                 <div class="info-item">
                   <label>WhatsApp Number</label>
-                  <span class="value green-text">{{ consultancy.whatsappNo }}</span>
+                  <span class="value highlight">{{ consultancy.whatsappNo || 'N/A' }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Location Information -->
-            <div class="card panel-card">
-              <div class="panel-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+            <div class="info-card">
+              <div class="card-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
+                  <circle cx="12" cy="12" r="3"></circle>
                 </svg>
                 <h3>Location Information</h3>
               </div>
               <div class="info-grid">
                 <div class="info-item">
                   <label>City</label>
-                  <span class="value">{{ consultancy.city }}</span>
+                  <span class="value">{{ consultancy.city || 'N/A' }}</span>
                 </div>
                 <div class="info-item">
                   <label>State</label>
-                  <span class="value">{{ consultancy.state }}</span>
+                  <span class="value">{{ consultancy.state || 'N/A' }}</span>
                 </div>
-                <div class="info-item full-width">
+                <div class="info-item">
                   <label>Permanent Address</label>
-                  <span class="value">{{ consultancy.permanentAddress }}</span>
+                  <span class="value">{{ consultancy.permanentAddress || 'N/A' }}</span>
                 </div>
-                <div class="info-item full-width">
+                <div class="info-item">
                   <label>Current Address</label>
-                  <span class="value">{{ consultancy.currentAddress }}</span>
+                  <span class="value">{{ consultancy.currentAddress || 'N/A' }}</span>
                 </div>
-              </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="card chart-card">
-              <div class="chart-header">
-                <h3>Top 5 Courses Offered</h3>
-              </div>
-              <div class="chart-container">
-                <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
-                  [plotOptions]="chartOptions.plotOptions" [dataLabels]="chartOptions.dataLabels"
-                  [fill]="chartOptions.fill" [colors]="chartOptions.colors" [tooltip]="chartOptions.tooltip"
-                  [yaxis]="chartOptions.yaxis" [grid]="chartOptions.grid">
-                </apx-chart>
               </div>
             </div>
           </div>
 
-          <!-- Right Column (Stats & Financials) -->
+          <!-- Stats Column (Right) -->
           <div class="stats-column">
-            <!-- Commission Card -->
-            <div class="card commission-card">
+            <div class="commission-card-premium">
               <span class="label">Commission Percentage</span>
-              <div class="value-row">
-                <span class="amount">{{ consultancy.commissionPercentage }} %</span>
-              </div>
-              <span class="description">per successful Registration</span>
+              <span class="amount">{{ consultancy.commissionPercentage }} %</span>
+              <span class="description">per successful enrollment</span>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="card quick-stats-card">
+            <div class="quick-stats-card">
               <h3>Quick Stats</h3>
-              <div class="stat-list">
-                <div class="stat-row">
-                  <span class="stat-label">Total courses</span>
-                  <span class="stat-value bold">{{ consultancy.quickStats.totalCourses }}</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Projected Amount</span>
-                  <span class="stat-value green-text bold">{{ consultancy.quickStats.projectedAmount }}</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-label">Status</span>
-                  <span class="status-pill" [ngClass]="consultancy.quickStats.status.toLowerCase()">
-                    {{ consultancy.quickStats.status }}
-                  </span>
-                </div>
+              <div class="stat-row">
+                <span class="label">Total courses</span>
+                <span class="value">{{ consultancy.quickStats.totalCourses || 0 }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="label">Projected Amount</span>
+                <span class="value" style="color: #10B981;">₹{{ consultancy.quickStats.projectedAmount || '0' }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="label">Status</span>
+                <span class="status-badge" [class]="consultancy.quickStats.status || 'Active'">{{ consultancy.quickStats.status || 'Active' }}</span>
               </div>
             </div>
 
-            <!-- Financial Summary -->
-            <div class="card financial-summary-card">
+            <div class="financial-summary-section">
               <h3>Financial Summary</h3>
-              <div class="financial-grid">
-                <div class="fin-stat blue">
-                  <div class="fin-header">
-                    <div class="fin-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              <div class="fin-grid">
+                <div class="fm-card blue">
+                  <div class="fm-header">
+                    <div class="fm-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
                       </svg>
                     </div>
                     <span>Total Projected</span>
                   </div>
-                  <div class="fin-value">{{ consultancy.financials.totalProjected }}</div>
+                  <div class="fm-value">₹{{ consultancy.financials.totalProjected || '0' }}</div>
                 </div>
-                <div class="fin-stat purple">
-                  <div class="fin-header">
-                    <div class="fin-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <div class="fm-card purple">
+                  <div class="fm-header">
+                    <div class="fm-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                        <path d="M12 12h.01"></path>
+                        <line x1="12" y1="4" x2="12" y2="20"></line>
                       </svg>
                     </div>
                     <span>Payable Amount</span>
                   </div>
-                  <div class="fin-value">{{ consultancy.financials.payableAmount }}</div>
+                  <div class="fm-value">₹{{ consultancy.financials.payableAmount || '0' }}</div>
                 </div>
-                <div class="fin-stat green">
-                  <div class="fin-header">
-                    <div class="fin-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                <div class="fm-card teal">
+                  <div class="fm-header">
+                    <div class="fm-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
                       </svg>
                     </div>
                     <span>Paid Amount</span>
                   </div>
-                  <div class="fin-value">{{ consultancy.financials.paidAmount }}</div>
+                  <div class="fm-value">₹{{ consultancy.financials.paidAmount || '0' }}</div>
                 </div>
-                <div class="fin-stat red">
-                  <div class="fin-header">
-                    <div class="fin-icon">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <div class="fm-card red">
+                  <div class="fm-header">
+                    <div class="fm-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -239,346 +213,287 @@
                     </div>
                     <span>Unpaid Amount</span>
                   </div>
-                  <div class="fin-value">{{ consultancy.financials.unpaidAmount }}</div>
+                  <div class="fm-value">₹{{ consultancy.financials.unpaidAmount || '0' }}</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- All Courses Table -->
-        <div class="card table-card">
-          <div class="table-header">
+        <!-- Chart Section -->
+        <div class="chart-section mb-32">
+          <h3 class="chart-title">Top 5 Courses Offered</h3>
+          <div id="chart">
+            <apx-chart
+              [series]="chartOptions.series"
+              [chart]="chartOptions.chart"
+              [xaxis]="chartOptions.xaxis"
+              [plotOptions]="chartOptions.plotOptions"
+              [dataLabels]="chartOptions.dataLabels"
+              [fill]="chartOptions.fill"
+              [tooltip]="chartOptions.tooltip"
+              [yaxis]="chartOptions.yaxis"
+              [grid]="chartOptions.grid"
+              [colors]="chartOptions.colors">
+            </apx-chart>
+          </div>
+        </div>
+
+        <!-- Tables Section -->
+        <div class="table-card mb-32">
+          <div class="table-header-row">
             <h3>All Courses</h3>
-            <div class="search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" placeholder="Search Courses">
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Courses" [(ngModel)]="courseSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
             </div>
           </div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>S.No</th>
-                  <th>Course Name</th>
-                  <th>Course Type</th>
-                  <th>Duration</th>
-                  <th>Students</th>
-                  <th>Status</th>
-                  <th>Institution</th>
-                  <th class="actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let course of consultancy.courses; let i = index">
-                  <td>{{ course.sNo }}</td>
-                  <td class="bold">{{ course.name }}</td>
-                  <td>
-                    <span class="type-badge" [ngClass]="course.type.toLowerCase()">
-                      {{ course.type }}
-                    </span>
-                  </td>
-                  <td>{{ course.duration }}</td>
-                  <td>{{ course.students }}</td>
-                  <td>
-                    <span class="status-pill small" [ngClass]="course.status.toLowerCase()">
-                      {{ course.status }}
-                    </span>
-                  </td>
-                  <td>{{ course.institution }}</td>
-                  <td class="actions">
-                    <div class="action-icons">
-                      <button class="view-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg></button>
-                      <button class="edit-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg></button>
-                      <button class="delete-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                          </path>
-                        </svg></button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Course Name</th>
+                <th>Course Type</th>
+                <th>Duration</th>
+                <th>Students</th>
+                <th>Status</th>
+                <th>Institution</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let course of paginatedCourses">
+                <td>{{ course.sNo }}</td>
+                <td class="bold-text">{{ course.name }}</td>
+                <td><span class="tag-badge">{{ course.type }}</span></td>
+                <td>{{ course.duration }}</td>
+                <td>{{ course.students }}</td>
+                <td><span class="status-badge Active">Active</span></td>
+                <td>{{ course.institution }}</td>
+                <td class="text-center">
+                  <div class="action-tools">
+                    <div class="tool-btn" (click)="onViewCourse(course.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                    <div class="tool-btn" (click)="onEditCourse(course.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
+                    <div class="tool-btn" (click)="onDeleteCourse(course)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <div class="table-footer">
-            <span class="showing">Showing {{ consultancy.courses.length }} records out of 1200 Users</span>
+            <span class="record-count">Showing {{ paginatedCourses.length }} of {{ filteredCourses.length }} records</span>
             <div class="pagination">
-              <button class="nav-btn">&lt;</button>
-              <button class="page-btn active">1</button>
-              <button class="page-btn">2</button>
-              <button class="page-btn">3</button>
-              <button class="page-btn">4</button>
-              <button class="nav-btn">&gt;</button>
+              <span class="nav-btn" (click)="coursePage > 1 && changePage('course', -1)" [class.disabled]="coursePage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </span>
+              <span class="page-link active">{{ coursePage }}</span>
+              <span class="nav-btn" (click)="coursePage < getTotalPages(filteredCourses.length, coursePageSize) && changePage('course', 1)" [class.disabled]="coursePage >= getTotalPages(filteredCourses.length, coursePageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- All Users Table -->
-        <div class="card table-card">
-          <div class="table-header">
+        <div class="table-card mb-32">
+          <div class="table-header-row">
             <h3>All Users</h3>
-            <div class="search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" placeholder="Search Users">
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Users" [(ngModel)]="userSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
             </div>
           </div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>S.No</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th class="actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let user of consultancy.representatives">
-                  <td>{{ user.sNo }}</td>
-                  <td class="bold">{{ user.name }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>
-                    <span class="role-badge" [ngClass]="user.role.toLowerCase().replace(' ', '-')">
-                      {{ user.role }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="status-pill small" [ngClass]="user.status.toLowerCase()">
-                      {{ user.status }}
-                    </span>
-                  </td>
-                  <td class="actions">
-                    <div class="action-icons">
-                      <button class="view-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg></button>
-                      <button class="edit-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg></button>
-                      <button class="delete-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                          </path>
-                        </svg></button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rep of paginatedUsers">
+                <td>{{ rep.sNo }}</td>
+                <td class="bold-text">{{ rep.name }}</td>
+                <td>{{ rep.email }}</td>
+                <td><span class="tag-badge">{{ rep.role }}</span></td>
+                <td><span class="status-badge Active">Active</span></td>
+                <td class="text-center">
+                  <div class="action-tools">
+                    <div class="tool-btn" (click)="onViewUser(rep.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                    <div class="tool-btn" (click)="onEditUser(rep.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
+                    <div class="tool-btn" (click)="onDeleteUser(rep)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <div class="table-footer">
-            <span class="showing">Showing {{ consultancy.representatives.length }} records out of 1200 Users</span>
+            <span class="record-count">Showing {{ paginatedUsers.length }} of {{ filteredUsers.length }} records</span>
             <div class="pagination">
-              <button class="nav-btn">&lt;</button>
-              <button class="page-btn active">1</button>
-              <button class="page-btn">2</button>
-              <button class="page-btn">3</button>
-              <button class="page-btn">4</button>
-              <button class="nav-btn">&gt;</button>
+              <span class="nav-btn" (click)="userPage > 1 && changePage('user', -1)" [class.disabled]="userPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </span>
+              <span class="page-link active">{{ userPage }}</span>
+              <span class="nav-btn" (click)="userPage < getTotalPages(filteredUsers.length, userPageSize) && changePage('user', 1)" [class.disabled]="userPage >= getTotalPages(filteredUsers.length, userPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- Institutions & Admissions Overview Table -->
-        <div class="card table-card">
-          <div class="table-header">
+        <!-- Additional Tables for Institutions and Admissions -->
+        <div class="table-card mb-32">
+          <div class="table-header-row">
             <h3>Institutions & Admissions Overview</h3>
-            <div class="search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" placeholder="Search Institutions">
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Overview" [(ngModel)]="instSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
             </div>
           </div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>S.No</th>
-                  <th>Institution</th>
-                  <th>Course Name</th>
-                  <th>Course Type</th>
-                  <th>Admission</th>
-                  <th class="actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of consultancy.institutionsOverview">
-                  <td>{{ item.sNo }}</td>
-                  <td class="bold">{{ item.institutionName }}</td>
-                  <td>{{ item.courseName }}</td>
-                  <td>
-                    <span class="type-badge" [ngClass]="item.courseType.toLowerCase()">
-                      {{ item.courseType }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="admission-count-badge">{{ item.admissionCount }}</span>
-                  </td>
-                  <td class="actions">
-                    <div class="action-icons">
-                      <button class="view-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg></button>
-                      <button class="edit-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg></button>
-                      <button class="delete-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                          </path>
-                        </svg></button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Institution</th>
+                <th>Course Name</th>
+                <th>Course Type</th>
+                <th>Admission</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of paginatedInstitutions">
+                <td>{{ item.sNo }}</td>
+                <td class="bold-text">{{ item.institutionName }}</td>
+                <td>{{ item.courseName }}</td>
+                <td><span class="tag-badge">{{ item.courseType }}</span></td>
+                <td><span class="status-pill active">{{ item.admissionCount }}</span></td>
+                <td class="text-center">
+                  <div class="action-tools">
+                    <div class="tool-btn" (click)="onViewInstitution(item.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                    <div class="tool-btn" (click)="onEditInstitution(item.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
+                    <div class="tool-btn" (click)="onDeleteInstitution(item)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <div class="table-footer">
-            <span class="showing">Showing {{ consultancy.institutionsOverview.length }} records out of 1200 Users</span>
+            <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ filteredInstitutions.length }} records</span>
             <div class="pagination">
-              <button class="nav-btn">&lt;</button>
-              <button class="page-btn active">1</button>
-              <button class="page-btn">2</button>
-              <button class="page-btn">3</button>
-              <button class="page-btn">4</button>
-              <button class="nav-btn">&gt;</button>
+              <span class="nav-btn" (click)="instPage > 1 && changePage('inst', -1)" [class.disabled]="instPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </span>
+              <span class="page-link active">{{ instPage }}</span>
+              <span class="nav-btn" (click)="instPage < getTotalPages(filteredInstitutions.length, instPageSize) && changePage('inst', 1)" [class.disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- All Admission Table -->
-        <div class="card table-card mb-48">
-          <div class="table-header">
+        <!-- Final Table -->
+        <div class="table-card mb-32">
+          <div class="table-header-row">
             <h3>All Admission</h3>
-            <div class="search-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" placeholder="Search Admission">
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Admission" [(ngModel)]="admSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
             </div>
           </div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>S.No</th>
-                  <th>Student Name</th>
-                  <th>Course</th>
-                  <th>Duration</th>
-                  <th>Discount %</th>
-                  <th>Fee Status</th>
-                  <th>Status</th>
-                  <th>Session</th>
-                  <th>Admission Date</th>
-                  <th class="actions">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let admission of consultancy.allAdmissions">
-                  <td>{{ admission.sNo }}</td>
-                  <td class="bold">{{ admission.studentName }}</td>
-                  <td>{{ admission.courseName }}</td>
-                  <td>{{ admission.duration }}</td>
-                  <td>
-                    <span class="discount-badge" [ngClass]="{'scholar': admission.discount === 'Scholarship'}">
-                      {{ admission.discount }}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="fee-status-container" [ngClass]="admission.feeStatus.toLowerCase()">
-                      <div class="fee-pill paid"
-                        [class.active]="admission.feeStatus === 'Paid' || admission.feeStatus === 'Partial'">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="3">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Paid
-                      </div>
-                      <div class="fee-pill unpaid" [class.active]="admission.feeStatus === 'Unpaid'">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="3">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                        Unpaid
-                      </div>
+          <table>
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Duration</th>
+                <th>Discount %</th>
+                <th>Fee Status</th>
+                <th>Status</th>
+                <th>Session</th>
+                <th>Admission Date</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let admission of paginatedAdmissions">
+                <td>{{ admission.sNo }}</td>
+                <td class="bold-text">{{ admission.studentName }}</td>
+                <td>{{ admission.courseName }}</td>
+                <td>{{ admission.duration }}</td>
+                <td><span class="tag-badge">{{ admission.discount }}</span></td>
+                <td>
+                  <div class="fee-status-toggle">
+                    <div class="status-option paid" [class.active]="admission.feeStatus === 'Paid' || admission.feeStatus === 'Partial'">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Paid</span>
                     </div>
-                  </td>
-                  <td>
-                    <span class="status-pill small" [ngClass]="admission.status.toLowerCase()">
-                      {{ admission.status }}
-                    </span>
-                  </td>
-                  <td>{{ admission.session }}</td>
-                  <td>{{ admission.admissionDate }}</td>
-                  <td class="actions">
-                    <div class="action-icons">
-                      <button class="view-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg></button>
-                      <button class="edit-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg></button>
-                      <button class="delete-btn-small"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                          </path>
-                        </svg></button>
+                    <div class="status-option unpaid" [class.active]="admission.feeStatus === 'Unpaid'">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                      <span>Unpaid</span>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                  </div>
+                </td>
+                <td><span class="status-badge Active">{{ admission.status }}</span></td>
+                <td>{{ admission.session }}</td>
+                <td>{{ admission.admissionDate }}</td>
+                <td class="text-center">
+                  <div class="action-tools">
+                    <div class="tool-btn" (click)="onViewAdmission(admission.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                    <div class="tool-btn" (click)="onEditAdmission(admission.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
+                    <div class="tool-btn" (click)="onDeleteAdmission(admission)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           <div class="table-footer">
-            <span class="showing">Showing {{ consultancy.allAdmissions.length }} records out of 1200 Admission</span>
+            <span class="record-count">Showing {{ paginatedAdmissions.length }} of {{ filteredAdmissions.length }} records</span>
             <div class="pagination">
-              <button class="nav-btn">&lt;</button>
-              <button class="page-btn active">1</button>
-              <button class="page-btn">2</button>
-              <button class="page-btn">3</button>
-              <button class="page-btn">4</button>
-              <button class="nav-btn">&gt;</button>
+              <span class="nav-btn" (click)="admPage > 1 && changePage('adm', -1)" [class.disabled]="admPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </span>
+              <span class="page-link active">{{ admPage }}</span>
+              <span class="nav-btn" (click)="admPage < getTotalPages(filteredAdmissions.length, admPageSize) && changePage('adm', 1)" [class.disabled]="admPage >= getTotalPages(filteredAdmissions.length, admPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </span>
             </div>
           </div>
         </div>
       </ng-container>
+
+      <!-- Confirmation Modal -->
+      <app-confirmation-modal
+        *ngIf="showDeleteModal"
+        [title]="'Delete ' + deleteType"
+        [message]="'Are you sure you want to delete \'' + (itemToDelete?.name || itemToDelete?.studentName || itemToDelete?.institutionName || 'this item') + '\'?'"
+        (confirm)="confirmDelete()"
+        (cancel)="cancelDelete()">
+      </app-confirmation-modal>
     </main>
   </div>
 </div>

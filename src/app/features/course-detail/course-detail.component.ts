@@ -6,6 +6,8 @@ import { NgApexchartsModule, ChartComponent } from "ng-apexcharts";
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { CourseService } from '../../core/services/course.service';
+import { AdmissionService } from '../../core/services/admission.service';
+import { InstitutionService } from '../../core/services/institution.service';
 import { CourseDetail } from '../../core/models/course.model';
 
 import {
@@ -22,6 +24,7 @@ import {
   ApexTooltip,
   ApexGrid
 } from "ng-apexcharts";
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -42,7 +45,7 @@ export type ChartOptions = {
 @Component({
   selector: 'app-course-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgApexchartsModule, SidebarComponent, TopbarComponent, FormsModule],
+  imports: [CommonModule, RouterModule, NgApexchartsModule, SidebarComponent, TopbarComponent, FormsModule, ConfirmationModalComponent],
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.scss']
 })
@@ -55,10 +58,17 @@ export class CourseDetailComponent implements OnInit {
   loading = true;
   searchTerm = '';
 
+  // Actions
+  showDeleteModal = false;
+  deleteType: string = '';
+  itemToDelete: any = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private courseService: CourseService
+    private courseService: CourseService,
+    private admissionService: AdmissionService,
+    private institutionService: InstitutionService
   ) {
     this.initChart();
   }
@@ -178,5 +188,90 @@ export class CourseDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/courses']);
+  }
+
+  onEdit() {
+    this.router.navigate([], { fragment: 'edit' });
+  }
+
+  onDelete() {
+    this.deleteType = 'Course';
+    this.itemToDelete = { name: this.courseDetail?.basicInfo.name };
+    this.showDeleteModal = true;
+  }
+
+  // Admission Actions
+  onViewAdmission(id: number) {
+    this.router.navigate(['/admissions', id]);
+  }
+
+  onEditAdmission(id: number) {
+    this.router.navigate(['/admissions', id], { fragment: 'edit' });
+  }
+
+  onDeleteAdmission(admission: any) {
+    this.deleteType = 'Admission';
+    this.itemToDelete = { ...admission, name: admission.studentName };
+    this.showDeleteModal = true;
+  }
+
+  // Institution Actions
+  onViewInstitution(id: number) {
+    this.router.navigate(['/institutions', id]);
+  }
+
+  onEditInstitution(id: number) {
+    this.router.navigate(['/institutions', id], { fragment: 'edit' });
+  }
+
+  onDeleteInstitution(institution: any) {
+    this.deleteType = 'Institution';
+    this.itemToDelete = institution;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
+    this.itemToDelete = null;
+  }
+
+  confirmDelete() {
+    if (!this.itemToDelete) return;
+
+    this.loading = true;
+    let deleteObservable;
+
+    switch (this.deleteType) {
+      case 'Course':
+        deleteObservable = this.courseService.deleteCourse(this.courseId);
+        break;
+      case 'Admission':
+        deleteObservable = this.admissionService.deleteAdmission(this.itemToDelete.id);
+        break;
+      case 'Institution':
+        deleteObservable = this.institutionService.deleteInstitution(this.itemToDelete.id);
+        break;
+      default:
+        this.loading = false;
+        this.showDeleteModal = false;
+        return;
+    }
+
+    deleteObservable.subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.itemToDelete = null;
+        if (this.deleteType === 'Course') {
+          this.goBack();
+        } else {
+          this.loadCourseDetail();
+        }
+      },
+      error: (err) => {
+        console.error(`Error deleting ${this.deleteType}:`, err);
+        this.loading = false;
+        this.showDeleteModal = false;
+      }
+    });
   }
 }
