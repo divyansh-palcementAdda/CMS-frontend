@@ -1,0 +1,381 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2>{{ isEditMode ? 'Edit Admission' : 'Add New Admission' }}</h2>
+        <p>{{ isEditMode ? 'Modify student admission details' : 'Create a new student record or upload in bulk' }}</p>
+      </div>
+      <button class="close-btn" (click)="onClose()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Modal Tabs (Only in Add Mode) -->
+    <div class="modal-tabs" *ngIf="!isEditMode">
+      <div class="tab-item" [class.active]="activeTab === 'single'" (click)="setTab('single')">
+        Single Record
+      </div>
+      <div class="tab-item" [class.active]="activeTab === 'bulk'" (click)="setTab('bulk')">
+        Bulk Upload
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Step Progress (Only for Single Record) -->
+      <div class="step-progress" *ngIf="activeTab === 'single'">
+        <div class="step-dot" [class.active]="currentStep === 1" [class.completed]="currentStep > 1"></div>
+        <div class="step-dot" [class.active]="currentStep === 2" [class.completed]="currentStep > 2"></div>
+      </div>
+
+      <!-- Single Record Form -->
+      <form [formGroup]="admissionForm" *ngIf="activeTab === 'single'">
+
+        <!-- Step 1: Personal Details -->
+        <div class="step-content" *ngIf="currentStep === 1">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Full Name <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" formControlName="fullName" placeholder="Enter student full name">
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('fullName')">Full name is required</div>
+            </div>
+
+            <div class="input-group">
+              <label>Father's Name</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user-friends"></i>
+                <input type="text" formControlName="fatherName" placeholder="Enter father's name">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Mother's Name</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-female"></i>
+                <input type="text" formControlName="motherName" placeholder="Enter mother's name">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Date of Birth <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar"></i>
+                <input type="date" formControlName="dateOfBirth">
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('dateOfBirth')">Valid DOB is required</div>
+            </div>
+
+            <div class="input-group">
+              <label>Gender <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-venus-mars"></i>
+                <select formControlName="gender">
+                  <option value="">Select Gender</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Email Address <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" formControlName="email" placeholder="Enter email address">
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('email')">Valid email is required</div>
+            </div>
+
+            <div class="input-group">
+              <label>Phone Number <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-phone"></i>
+                <input type="text" formControlName="phoneNumber" placeholder="Enter 10-digit mobile">
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('phoneNumber')">Valid 10-digit mobile required</div>
+            </div>
+
+            <div class="input-group">
+              <label>WhatsApp Number</label>
+              <div class="input-wrapper">
+                <i class="fa-brands fa-whatsapp"></i>
+                <input type="text" formControlName="whatsappPhoneNo" placeholder="Enter WhatsApp number">
+              </div>
+              <div class="checkbox-group" (click)="toggleSameAsMobile()">
+                <input type="checkbox" [checked]="isSameAsMobile">
+                <span>Same as mobile number</span>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>City <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-city"></i>
+                <input type="text" formControlName="city" placeholder="Enter city">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>State <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-map"></i>
+                <input type="text" formControlName="state" placeholder="Enter state">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Pincode <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-map-pin"></i>
+                <input type="text" formControlName="pincode" placeholder="Enter 6-digit pincode">
+              </div>
+            </div>
+
+            <div class="input-group full-width">
+              <label>Full Address <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-location-dot"></i>
+                <textarea formControlName="address" placeholder="Enter complete residential address"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Admission & Academic Details -->
+        <div class="step-content" *ngIf="currentStep === 2">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Admission Source <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-share-nodes"></i>
+                <select formControlName="admissionSource">
+                  <option value="USER">Direct / User</option>
+                  <option value="CONSULTANCY">Via Consultancy</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group" *ngIf="admissionForm.get('admissionSource')?.value === 'CONSULTANCY'">
+              <label>Consultancy <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-handshake"></i>
+                <select formControlName="consultancyId">
+                  <option value="">Select Consultancy</option>
+                  <option *ngFor="let c of filteredConsultancies" [value]="c.id">{{ c.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Admitted By <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user-tie"></i>
+                <select formControlName="admittedByUserId">
+                  <option value="">Select User</option>
+                  <option *ngFor="let u of filteredUsers" [value]="u.id">{{ u.fullName }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Counseled By</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user-check"></i>
+                <input type="text" formControlName="counselorName" placeholder="Enter counselor name">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Institution <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-university"></i>
+                <select formControlName="institutionId" (change)="onInstitutionChange()">
+                  <option value="">Select Institution</option>
+                  <option *ngFor="let inst of institutions" [value]="inst.id">{{ inst.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Course <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-book"></i>
+                <select formControlName="courseId">
+                  <option value="">Select Course</option>
+                  <option *ngFor="let course of filteredCourses" [value]="course.id">{{ course.name }}</option>
+                </select>
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('courseId')">Please select a course</div>
+            </div>
+
+            <div class="input-group">
+              <label>Admission Date <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar-check"></i>
+                <input type="date" formControlName="admissionDate">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Session</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-clock"></i>
+                <input type="text" formControlName="session" placeholder="e.g. 2025-26">
+              </div>
+            </div>
+
+            <div class="input-group" *ngIf="!admissionForm.get('isScholar')?.value">
+              <label>Discount Type</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-tags"></i>
+                <select formControlName="discountType">
+                  <option value="">No Discount</option>
+                  <option value="FLAT">Flat Amount</option>
+                  <option value="PERCENTAGE">Percentage</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group"
+              *ngIf="!admissionForm.get('isScholar')?.value && admissionForm.get('discountType')?.value">
+              <label>Discount Value</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-coins"></i>
+                <input type="number" formControlName="discountValue" placeholder="Enter value">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Scholar Student?</label>
+              <div class="checkbox-group">
+                <input type="checkbox" formControlName="isScholar">
+                <span>Yes, enrolled under scholarship</span>
+              </div>
+            </div>
+
+            <div class="input-group full-width" *ngIf="admissionForm.get('isScholar')?.value">
+              <label>Scholarship Details</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-info-circle"></i>
+                <textarea formControlName="scholarshipDetails"
+                  placeholder="Enter scholarship scheme name and details"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- ================= BULK TAB ================= -->
+      <div *ngIf="activeTab === 'bulk'" class="bulk-container">
+
+        <div class="bulk-card download-card">
+          <div class="bulk-card-content">
+            <h4>Download Admission Excel Template</h4>
+            <p>Download the template, fill in admission details, and upload it back to the system</p>
+            <button class="btn-download" (click)="downloadTemplate()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+              </svg>
+              Download Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="bulk-card upload-card">
+          <h4>Upload Updated Excel Template</h4>
+          <p>Upload the completed Excel file after filling student admission details</p>
+
+          <div class="drop-zone" [class.drag-over]="isDragging" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+
+            <span *ngIf="!selectedFile" class="drop-text">Drag and drop your Excel file here</span>
+            <span *ngIf="selectedFile" class="drop-text selected-file">{{selectedFile.name}}</span>
+
+            <span class="drop-subtext">only supports .xlsx .xls upto 5MB</span>
+
+            <button class="btn-browse" (click)="fileInput.click()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              </svg>
+              Browse
+            </button>
+            <input #fileInput type="file" style="display: none" accept=".xlsx,.xls" (change)="onFileSelected($event)">
+          </div>
+        </div>
+
+        <div class="bulk-results" *ngIf="bulkResponse">
+          <div class="bulk-stats">
+            <div class="stat-card total">
+              <span class="stat-value">{{ bulkResponse.totalRecords }}</span>
+              <span class="stat-label">Processed</span>
+            </div>
+            <div class="stat-card success">
+              <span class="stat-value">{{ bulkResponse.successCount }}</span>
+              <span class="stat-label">Success</span>
+            </div>
+            <div class="stat-card failure">
+              <span class="stat-value">{{ bulkResponse.failureCount }}</span>
+              <span class="stat-label">Failed</span>
+            </div>
+          </div>
+
+          <div class="failure-list" *ngIf="bulkResponse.failures?.length > 0">
+            <h4><i class="fa-solid fa-circle-exclamation"></i> Errors in Upload</h4>
+            <div class="failure-items">
+              <div class="failure-item" *ngFor="let fail of bulkResponse.failures">
+                <span class="row-num">Row {{ fail.rowNumber }}</span>
+                <span class="error">{{ fail.error }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <div class="footer-left">
+        <!-- <a class="template-link" *ngIf="activeTab === 'bulk'" (click)="downloadTemplate()">
+          <i class="fa-solid fa-download"></i>
+          Download Excel Template
+        </a> -->
+      </div>
+      <div class="footer-actions">
+        <!-- Single Record Actions -->
+        <ng-container *ngIf="activeTab === 'single'">
+          <button class="cancel-btn" (click)="onClose()">Cancel</button>
+          <button class="prev-btn" *ngIf="currentStep === 2" (click)="prevStep()">Back</button>
+          <button class="next-btn" *ngIf="currentStep === 1" (click)="nextStep()">Next</button>
+          <button class="submit-btn" *ngIf="currentStep === 2" (click)="onSubmit()"
+            [disabled]="admissionForm.invalid || isSaving">
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="isSaving"></i>
+            {{ isEditMode ? 'Update Admission' : 'Submit Admission' }}
+          </button>
+        </ng-container>
+
+        <!-- Bulk Upload Actions -->
+        <ng-container *ngIf="activeTab === 'bulk'">
+          <button class="cancel-btn" (click)="onClose()">Cancel</button>
+          <button class="submit-btn" [disabled]="!selectedFile || isUploading" (click)="uploadBulk()">
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="isUploading"></i>
+            {{ isUploading ? 'Uploading...' : 'Start Upload' }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

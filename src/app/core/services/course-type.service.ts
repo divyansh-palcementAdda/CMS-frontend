@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { CourseTypeDTO, CourseTypeItem, CourseTypePageData, CourseTypeStats } from '../models/course-type.model';
+import { CourseTypeDTO, CourseTypeItem, CourseTypePageData, CourseTypeStats, CreateCourseTypeDTO, BulkUploadResponse } from '../models/course-type.model';
 
 @Injectable({
   providedIn: 'root'
@@ -90,6 +90,10 @@ export class CourseTypeService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  createCourseType(data: CreateCourseTypeDTO): Observable<any> {
+    return this.http.post(this.apiUrl, data);
+  }
+
   private getCourseCode(name: string): string {
     const nameLower = name.toLowerCase();
     if (nameLower.includes('undergraduate')) return 'UG';
@@ -98,5 +102,17 @@ export class CourseTypeService {
     if (nameLower.includes('certificate')) return 'CERT';
     if (nameLower.includes('diploma')) return 'DIP';
     return name ? name.substring(0, 3).toUpperCase() : 'N/A';
+  }
+
+  bulkUploadCourseTypes(file: File): Observable<BulkUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkUploadResponse>(`${this.apiUrl}/bulk-upload`, formData);
+  }
+
+  downloadBulkUploadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/bulk-upload/template`, {
+      responseType: 'blob'
+    });
   }
 }

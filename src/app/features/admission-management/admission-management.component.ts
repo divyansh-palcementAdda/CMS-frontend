@@ -2,29 +2,47 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
 import { AdmissionService } from '../../core/services/admission.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AdmissionFormModalComponent } from './components/admission-form-modal/admission-form-modal.component';
 
 @Component({
   selector: 'app-admission-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    SidebarComponent, 
+    TopbarComponent, 
+    ConfirmationModalComponent,
+    AdmissionFormModalComponent
+  ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
 })
 export class AdmissionManagementComponent implements OnInit {
 
   pageData: AdmissionPageData | null = null;
-  filteredAdmissions: AdmissionItem[] = [];
   searchTerm: string = '';
   loading: boolean = true;
   private sub: Subscription | null = null;
   private routeSub: Subscription | null = null;
+  
+  // Search state
+  searchSubject = new Subject<string>();
+  private searchSub: Subscription | null = null;
+
+  // Filters & Sorting
+  activeStatFilter: string = '';
+  selectedCourseId: number | undefined = undefined;
+  sortColumn: string = '';
+  sortDirection: string = '';
 
   // Pagination
   currentPage: number = 1;
@@ -33,7 +51,9 @@ export class AdmissionManagementComponent implements OnInit {
 
   // Actions
   showDeleteModal: boolean = false;
+  showAdmissionModal: boolean = false;
   selectedAdmission: AdmissionItem | null = null;
+  selectedStudentId?: number;
 
   constructor(
     private admissionService: AdmissionService,
@@ -42,28 +62,38 @@ export class AdmissionManagementComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.fetchData();
+    // Check URL for any pre-filled filters
+    this.routeSub = this.route.queryParams.subscribe(params => {
+      if (params['type']) {
+        this.activeStatFilter = params['type'];
+      }
+      this.fetchData();
+    });
+
+    // Debounce search input
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.searchTerm = searchTerm;
+      this.currentPage = 1;
+      this.fetchData();
+    });
   }
 
   fetchData(): void {
     this.loading = true;
-    this.sub = this.admissionService.getAdmissionsData().subscribe(data => {
+    this.sub = this.admissionService.getAdmissionsData(
+      this.currentPage,
+      this.pageSize,
+      this.searchTerm,
+      this.activeStatFilter,
+      this.selectedCourseId,
+      this.sortColumn,
+      this.sortDirection
+    ).subscribe(data => {
       this.pageData = data;
-      this.filteredAdmissions = data.admissions;
-
-      // Check URL for any pre-filled filters
-      this.routeSub = this.route.queryParams.subscribe(params => {
-        if (params['type']) {
-          this.searchTerm = params['type'];
-          this.onSearchChange();
-        } else {
-          // If no type parameter is present, show all admissions (no filter)
-          this.searchTerm = '';
-          this.filteredAdmissions = this.pageData ? this.pageData.admissions : [];
-          this.calculatePagination();
-        }
-      });
-
+      this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
       this.loading = false;
       console.log('--- Admission Data Loaded ---', data);
     });
@@ -72,8 +102,19 @@ export class AdmissionManagementComponent implements OnInit {
     this.router.navigate(['/admissions', id]);
   }
 
+  openAddAdmission(): void {
+    this.selectedStudentId = undefined;
+    this.showAdmissionModal = true;
+  }
+
   onEdit(id: number) {
-    this.router.navigate([], { fragment: 'edit' });
+    this.selectedStudentId = id;
+    this.showAdmissionModal = true;
+  }
+
+  closeAdmissionModal(): void {
+    this.showAdmissionModal = false;
+    this.selectedStudentId = undefined;
   }
 
   onDelete(admission: AdmissionItem) {
@@ -105,35 +146,45 @@ export class AdmissionManagementComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    if (!this.pageData) return;
-
-    if (this.searchTerm.trim() === '') {
-      this.filteredAdmissions = this.pageData.admissions;
-    } else {
-      const term = this.searchTerm.toLowerCase();
-      this.filteredAdmissions = this.pageData.admissions.filter(item =>
-        (item.fullName || '').toLowerCase().includes(term) ||
-        (item.courseName || '').toLowerCase().includes(term) ||
-        (item.feeStatus || '').toLowerCase().includes(term) ||
-        (item.status || '').toLowerCase().includes(term)
-      );
-    }
-    this.currentPage = 1; // reset page on search
-    this.calculatePagination();
+    this.searchSubject.next(this.searchTerm);
   }
 
-  calculatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredAdmissions.length / this.pageSize) || 1;
+  onPageSizeChange(): void {
+    this.pageSize = Number(this.pageSize);
+    this.currentPage = 1;
+    this.fetchData();
+  }
+
+  onStatFilter(filter: string): void {
+    if (this.activeStatFilter === filter) {
+      this.activeStatFilter = ''; // toggle off
+    } else {
+      this.activeStatFilter = filter;
+    }
+    this.currentPage = 1;
+    this.fetchData();
+  }
+
+  sortBy(column: string): void {
+    if (this.sortColumn === column) {
+      // Toggle direction
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.currentPage = 1;
+    this.fetchData();
   }
 
   get paginatedAdmissions(): AdmissionItem[] {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    return this.filteredAdmissions.slice(startIndex, startIndex + this.pageSize);
+    return this.pageData ? this.pageData.admissions : [];
   }
 
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
       this.currentPage = page;
+      this.fetchData();
     }
   }
 
@@ -169,6 +220,12 @@ export class AdmissionManagementComponent implements OnInit {
   ngOnDestroy(): void {
     if (this.sub) {
       this.sub.unsubscribe();
+    }
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
     }
   }
 }

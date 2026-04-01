@@ -12,6 +12,17 @@ export interface CourseDTO {
   fees?: number;
 }
 
+export interface CreateCourseDTO {
+  name: string;
+  isOnline: boolean;
+  active: boolean;
+  duration: number;
+  fees: number;
+  courseTypeId: number;
+  institutionIds?: number[];
+}
+
+
 export interface CourseItem {
   id: number;
   sNo: number;
@@ -85,5 +96,15 @@ export interface CourseDetail {
   topConsultancies: Array<{
     label: string;
     value: number;
+  }>;
+}
+
+export interface BulkUploadResponse {
+  totalProcessed: number;
+  successCount: number;
+  failureCount: number;
+  failures: Array<{
+    rowNumber: number;
+    errorMessage: string;
   }>;
 }

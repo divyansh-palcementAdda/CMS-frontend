@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { UserPageData, UserItem, UserStats, UserRole } from '../models/user.model';
+import { UserPageData, UserItem, UserStats, UserRole, CreateUserDTO, BulkUserUploadResponse } from '../models/user.model';
 import { DatePipe } from '@angular/common';
 
 @Injectable({
@@ -135,5 +135,33 @@ export class UserService {
     } catch {
       return fallback;
     }
+  }
+
+  createUser(user: CreateUserDTO): Observable<UserItem> {
+    return this.http.post<UserItem>(this.apiUrl, user);
+  }
+
+  bulkUpload(file: File): Observable<BulkUserUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkUserUploadResponse>(`${this.apiUrl}/bulk-upload`, formData);
+  }
+
+  downloadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/template`, { responseType: 'blob' });
+  }
+
+  sendOtp(email: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/send-otp?email=${email}`, {});
+  }
+
+  verifyOtp(email: string, otp: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/verify-otp?email=${email}&otp=${otp}`, {});
+  }
+
+  getAllRoles(): Observable<any[]> {
+    return this.http.get<any>(`${environment.apiUrl}/roles`).pipe(
+      map(response => response.data || [])
+    );
   }
 }

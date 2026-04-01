@@ -6,6 +6,13 @@ export interface CourseTypeDTO {
   courseCount?: number;
 }
 
+export interface CreateCourseTypeDTO {
+  name: string;
+  description: string;
+  active: boolean;
+  courseId?: number;
+}
+
 export interface CourseTypeItem {
   id: number;
   sNo: number;
@@ -29,4 +36,14 @@ export interface CourseTypePageData {
   stats: CourseTypeStats;
   courseTypes: CourseTypeItem[];
   totalCount: number;
+}
+
+export interface BulkUploadResponse {
+  totalProcessed: number;
+  successCount: number;
+  failureCount: number;
+  failures: Array<{
+    rowNumber: number;
+    errorMessage: string;
+  }>;
 }

@@ -3,9 +3,10 @@ export interface AdmissionStats {
   indirectAdmission: number;
   scholarAdmission: number;
   totalApplication: number;
-  approvedAdmissions: number;
-  pendingAdmissions: number;
-  rejectedAdmissions: number;
+  partialFeesPaid: number;
+  tokenAmountPaid: number;
+  partialfessUnpaid: number;
+  tokenAmountUnpaid: number;
 }
 
 export interface AdmissionItem {
@@ -21,45 +22,45 @@ export interface AdmissionItem {
   alternatePhone?: string;
   whatsappPhoneNo?: string;
   gender?: string;
-  
+
   address?: string;
   city?: string;
   state?: string;
   country?: string;
   pincode?: string;
-  
+
   enrollmentId?: string;
   admissionDate?: string;
   admissionSource?: string;
-  
+
   consultancyId?: number;
   consultancyName?: string;
-  
+
   admittedByUserId?: number;
   admittedByUserName?: string;
-  
+
   counselorName?: string;
-  
+
   courseId?: number;
   courseName: string;
-  
+
   institutionId?: number;
   institutionName?: string;
   session?: string;
-  
+
   discountType?: string;
   discountValue?: number;
   isScholar?: boolean;
   scholarshipDetails?: string;
-  
+
   commissionStatus?: string;
   commissionAmount?: number;
   commissionPaidDate?: string;
   commissionPaymentReference?: string;
-  
+
   fiftyPercentFeesPaid?: boolean;
   tokenAmountPaid?: boolean;
-  
+
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
@@ -83,3 +84,13 @@ export interface AdmissionPageData {
   admissions: AdmissionItem[];
   totalCount: number;
 }
+
+export interface BulkUploadResponse {
+  totalProcessed: number;
+  successCount: number;
+  failureCount: number;
+  failures: Array<{
+    rowNumber: number;
+    errorMessage: string;
+  }>;
+}

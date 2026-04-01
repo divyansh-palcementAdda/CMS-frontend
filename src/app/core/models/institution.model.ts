@@ -94,3 +94,39 @@ export interface InstitutionDetail {
     value: number;
   }>;
 }
+
+export interface CreateInstitutionDTO {
+  name: string;
+  code: string;
+  institutionType: string;
+  description?: string;
+  email: string;
+  phoneNumber: string;
+  website?: string;
+  establishedYear?: number;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+  status: string;
+  courseIds: number[];
+}
+
+export interface SuccessEntry {
+  id: number;
+  message: string;
+}
+
+export interface FailureEntry {
+  rowNumber: number;
+  errorMessage: string;
+}
+
+export interface BulkUploadResponse {
+  totalProcessed: number;
+  successCount: number;
+  failureCount: number;
+  successes: SuccessEntry[];
+  failures: FailureEntry[];
+}

@@ -54,3 +54,31 @@ export interface UserPageData {
   users: UserItem[];
   totalCount: number;
 }
+
+export interface CreateUserDTO {
+  username: string;
+  password?: string;
+  email: string;
+  fullName: string;
+  mobile?: string;
+  roles: string[];
+  otp?: string;
+}
+
+export interface SuccessEntry {
+  id: number;
+  message: string;
+}
+
+export interface FailureEntry {
+  rowNumber: number;
+  errorMessage: string;
+}
+
+export interface BulkUserUploadResponse {
+  totalProcessed: number;
+  successCount: number;
+  failureCount: number;
+  successes: SuccessEntry[];
+  failures: FailureEntry[];
+}

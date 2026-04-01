@@ -1,0 +1,271 @@
+<div class="modal-backdrop">
+  <div class="modal-container">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="black" stroke-width="2" />
+          <path d="M8 12H16M12 8V16" stroke="black" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <h3>Add Consultancy</h3>
+      </div>
+      <button class="close-btn" (click)="onClose()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <button class="tab-btn" [class.active]="activeTab === 'single'" (click)="switchTab('single')">Single
+        Consultancy</button>
+      <button class="tab-btn" [class.active]="activeTab === 'bulk'" (click)="switchTab('bulk')">Bulk
+        Consultancy</button>
+    </div>
+
+    <div class="modal-content">
+
+      <!-- ================= SINGLE TAB ================= -->
+      <form *ngIf="activeTab === 'single'" [formGroup]="consultancyForm" (ngSubmit)="onSubmitSingle()">
+
+        <div class="form-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+            <path d="M4 10h16M10 4v16"></path>
+          </svg>
+          <h4>Basic Information</h4>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Consultancy Name <span class="req">*</span></label>
+            <input type="text" formControlName="name" placeholder="Enter Consultancy Name">
+            <small class="error-text"
+              *ngIf="consultancyForm.get('name')?.invalid && consultancyForm.get('name')?.touched">Name is required (min
+              3 chars).</small>
+          </div>
+
+          <div class="form-group">
+            <label>Email ID <span class="req">*</span></label>
+            <input type="email" formControlName="email" placeholder="email@example.com">
+            <small class="error-text"
+              *ngIf="consultancyForm.get('email')?.invalid && consultancyForm.get('email')?.touched">Valid email is
+              required.</small>
+          </div>
+
+          <div class="form-group">
+            <label>PAN Card Number <span class="req">*</span></label>
+            <input type="text" formControlName="pan" placeholder="ASDBH1234T">
+            <small class="error-text"
+              *ngIf="consultancyForm.get('pan')?.invalid && consultancyForm.get('pan')?.touched">Invalid PAN
+              format.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Contact Number <span class="req">*</span></label>
+            <input type="text" formControlName="mobile" placeholder="+91 9876543211">
+            <small class="error-text"
+              *ngIf="consultancyForm.get('mobile')?.invalid && consultancyForm.get('mobile')?.touched">Valid contact is
+              required.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Alternate Number <span class="req">*</span></label>
+            <input type="text" formControlName="alternateNo" placeholder="+91 9876543211">
+
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="sameAsMobileAlt" formControlName="sameAsMobileAlt">
+              <label for="sameAsMobileAlt">Same as Mobile Number</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Whatsapp Number <span class="req">*</span></label>
+            <input type="text" formControlName="whatsappNo" placeholder="+91 9876543211">
+
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="sameAsMobileWa" formControlName="sameAsMobileWa">
+              <label for="sameAsMobileWa">Same as Mobile Number</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>City <span class="req">*</span></label>
+            <input type="text" formControlName="city" placeholder="Enter City">
+          </div>
+
+          <div class="form-group">
+            <label>State <span class="req">*</span></label>
+            <input type="text" formControlName="state" placeholder="Enter State">
+          </div>
+
+          <div class="form-group">
+            <label>Permanent Address <span class="req">*</span></label>
+            <input type="text" formControlName="permanentAddress" placeholder="Enter Permanent Address">
+          </div>
+
+          <div class="form-group">
+            <label>Current Address <span class="req">*</span></label>
+            <input type="text" formControlName="currentAddress" placeholder="Enter Current Address">
+          </div>
+
+          <div class="form-group">
+            <label>Institution or Firm Name <span class="req">*</span></label>
+            <input type="text" formControlName="institutionOrFirmName" placeholder="Enter Institution or Firm Name">
+          </div>
+
+          <div class="form-group">
+            <label>Commission % <span class="req">*</span></label>
+            <input type="number" formControlName="commissionPercentage" placeholder="0.00" min="0" max="100" step="0.1">
+          </div>
+
+          <div class="form-group">
+            <label>Consultancy Status <span class="req">*</span></label>
+            <select formControlName="status">
+              <option value="ACTIVE" selected>Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="DORMANT">Dormant</option>
+            </select>
+          </div>
+
+          <div class="form-group checklist-group">
+            <label>Link Courses <span class="req">*</span></label>
+            <div class="checklist-container">
+              <input type="text" class="checklist-search" placeholder="Search courses..." [(ngModel)]="searchCourses"
+                [ngModelOptions]="{standalone: true}">
+              <div class="checklist-items">
+                <label class="checklist-item" *ngFor="let course of filteredCourses">
+                  <input type="checkbox" [checked]="isSelected('courseIds', course.id)"
+                    (change)="toggleSelection('courseIds', course.id)">
+                  <span>{{course.name}}</span>
+                </label>
+                <div *ngIf="filteredCourses.length === 0" class="no-results">No records found.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group checklist-group">
+            <label>Link Institutions <span class="req">*</span></label>
+            <div class="checklist-container">
+              <input type="text" class="checklist-search" placeholder="Search institutions..."
+                [(ngModel)]="searchInstitutions" [ngModelOptions]="{standalone: true}">
+              <div class="checklist-items">
+                <label class="checklist-item" *ngFor="let inst of filteredInstitutions">
+                  <input type="checkbox" [checked]="isSelected('institutionIds', inst.id)"
+                    (change)="toggleSelection('institutionIds', inst.id)">
+                  <span>{{inst.name}}</span>
+                </label>
+                <div *ngIf="filteredInstitutions.length === 0" class="no-results">No records found.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group checklist-group">
+            <label>Link Users <span class="req">*</span></label>
+            <div class="checklist-container"
+              [class.error-border]="consultancyForm.get('representativeIds')?.invalid && consultancyForm.get('representativeIds')?.touched">
+              <input type="text" class="checklist-search" placeholder="Search users..." [(ngModel)]="searchUsers"
+                [ngModelOptions]="{standalone: true}">
+              <div class="checklist-items">
+                <label class="checklist-item" *ngFor="let user of filteredUsers">
+                  <input type="checkbox" [checked]="isSelected('representativeIds', user.id || user.userId)"
+                    (change)="toggleSelection('representativeIds', user.id || user.userId)">
+                  <span>{{user.fullName || user.email}}</span>
+                </label>
+                <div *ngIf="filteredUsers.length === 0" class="no-results">No records found.</div>
+              </div>
+            </div>
+            <small class="error-text"
+              *ngIf="consultancyForm.get('representativeIds')?.invalid && consultancyForm.get('representativeIds')?.touched">At
+              least one user must be linked.</small>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isSubmitting">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="consultancyForm.invalid || isSubmitting">
+            <span *ngIf="isSubmitting">Submitting...</span>
+            <span *ngIf="!isSubmitting">Submit</span>
+          </button>
+        </div>
+      </form>
+
+
+      <!-- ================= BULK TAB ================= -->
+      <div *ngIf="activeTab === 'bulk'" class="bulk-container">
+
+        <div class="bulk-card download-card">
+          <div class="bulk-card-content">
+            <h4>Download Consultancy Excel Template</h4>
+            <p>Download the template, fill in consultancy details, and upload it back to the system</p>
+            <button class="btn-download" (click)="downloadTemplate()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+              </svg>
+              Download Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="bulk-card upload-card">
+          <h4>Upload Updated Excel Template</h4>
+          <p>Upload the completed Excel file after filling consultancy details</p>
+
+          <div class="drop-zone" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+
+            <span *ngIf="!selectedFile" class="drop-text">Drag and drop your Excel file here</span>
+            <span *ngIf="selectedFile" class="drop-text selected-file">{{selectedFile.name}}</span>
+
+            <span class="drop-subtext">only supports .xlsx .xls .csv upto 2MB</span>
+
+            <button class="btn-browse" (click)="fileInput.click()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              </svg>
+              Browse
+            </button>
+            <input #fileInput type="file" style="display: none" accept=".xlsx,.xls,.csv"
+              (change)="onFileSelected($event)">
+          </div>
+        </div>
+
+        <div class="bulk-result" *ngIf="bulkUploadResult">
+          <h4 [class.success]="bulkUploadResult.failureCount === 0" [class.error]="bulkUploadResult.failureCount > 0">
+            Processed: {{bulkUploadResult.totalProcessed}}. Success: {{bulkUploadResult.successCount}}. Failed:
+            {{bulkUploadResult.failureCount}}.
+          </h4>
+          <div class="failure-list" *ngIf="bulkUploadResult.failureCount > 0">
+            <ul>
+              <li *ngFor="let fail of bulkUploadResult.failures">Row {{fail.rowNumber}}: {{fail.errorMessage}}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isUploading">Cancel</button>
+          <button type="button" class="btn-submit" [disabled]="!selectedFile || isUploading" (click)="onSubmitBulk()">
+            <span *ngIf="isUploading">Uploading...</span>
+            <span *ngIf="!isUploading">Submit</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

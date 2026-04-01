@@ -1,0 +1,290 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-title">
+        <i class="fas fa-user-plus icon-title"></i>
+        <span>Add New User</span>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="modal-tabs">
+      <div 
+        class="tab-item" 
+        [class.active]="activeTab === 'single'"
+        (click)="setTab('single')"
+      >
+        Single Record
+      </div>
+      <div 
+        class="tab-item" 
+        [class.active]="activeTab === 'bulk'"
+        (click)="setTab('bulk')"
+      >
+        Bulk Upload
+      </div>
+    </div>
+
+    <div class="modal-content">
+      <!-- Single Record Form -->
+      <ng-container *ngIf="activeTab === 'single'">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+          <!-- ... single form remains same ... -->
+          <div class="form-grid">
+            <!-- existing inputs... -->
+            <div class="form-group">
+              <label>User Name <span class="req">*</span></label>
+              <input 
+                type="text" 
+                formControlName="username" 
+                placeholder="Enter username"
+                [class.error]="userForm.get('username')?.invalid && userForm.get('username')?.touched"
+              >
+              <div class="error-msg" *ngIf="userForm.get('username')?.touched">
+                <span *ngIf="userForm.get('username')?.errors?.['required']">Username is required.</span>
+                <span *ngIf="userForm.get('username')?.errors?.['minlength']">Minimum 3 characters required.</span>
+                <span *ngIf="userForm.get('username')?.errors?.['maxlength']">Maximum 80 characters allowed.</span>
+                <span *ngIf="userForm.get('username')?.errors?.['pattern']">Only letters, numbers, dot, underscore, and hyphen allowed.</span>
+                <span *ngIf="backendErrors['username']">{{backendErrors['username']}}</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Password <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <input 
+                  [type]="passwordVisible ? 'text' : 'password'" 
+                  formControlName="password" 
+                  placeholder="Enter password"
+                  [class.error]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+                >
+                <button type="button" class="icon-btn" (click)="togglePassword()">
+                  <i class="fas" [ngClass]="passwordVisible ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+              <div class="error-msg" *ngIf="userForm.get('password')?.touched">
+                <span *ngIf="userForm.get('password')?.errors?.['required']">Password is required.</span>
+                <span *ngIf="userForm.get('password')?.errors?.['minlength']">Minimum 8 characters required.</span>
+                <span *ngIf="userForm.get('password')?.errors?.['maxlength']">Maximum 64 characters allowed.</span>
+                <span *ngIf="backendErrors['password']">{{backendErrors['password']}}</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email ID <span class="req">*</span></label>
+              <div class="input-with-action">
+                <input 
+                  type="email" 
+                  formControlName="email" 
+                  placeholder="email@example.com"
+                  [class.error]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+                >
+                <button 
+                  type="button" 
+                  class="btn-otp" 
+                  (click)="sendOtp()" 
+                  [disabled]="isOtpSending || otpCooldown > 0"
+                >
+                  <i class="fas fa-paper-plane" *ngIf="!isOtpSending"></i>
+                  <i class="fas fa-spinner fa-spin" *ngIf="isOtpSending"></i>
+                  {{ otpCooldown > 0 ? 'Resend (' + otpCooldown + 's)' : 'Send OTP' }}
+                </button>
+              </div>
+              <div class="error-msg" *ngIf="userForm.get('email')?.touched">
+                <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required.</span>
+                <span *ngIf="userForm.get('email')?.errors?.['email']">Please enter a valid email address.</span>
+                <span *ngIf="userForm.get('email')?.errors?.['maxlength']">Maximum 200 characters allowed.</span>
+                <span *ngIf="backendErrors['email']">{{backendErrors['email']}}</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <input 
+                type="text" 
+                formControlName="fullName" 
+                placeholder="Enter full name"
+                [class.error]="userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched"
+              >
+              <div class="error-msg" *ngIf="userForm.get('fullName')?.touched">
+                <span *ngIf="userForm.get('fullName')?.errors?.['required']">Full name is required.</span>
+                <span *ngIf="userForm.get('fullName')?.errors?.['minlength']">Minimum 2 characters required.</span>
+                <span *ngIf="userForm.get('fullName')?.errors?.['maxlength']">Maximum 80 characters allowed.</span>
+                <span *ngIf="userForm.get('fullName')?.errors?.['pattern']">Only alphabets and spaces allowed.</span>
+                <span *ngIf="backendErrors['fullName']">{{backendErrors['fullName']}}</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <input 
+                type="text" 
+                formControlName="mobile" 
+                placeholder="e.g. +919876543210"
+                [class.error]="userForm.get('mobile')?.invalid && userForm.get('mobile')?.touched"
+              >
+              <div class="error-msg" *ngIf="userForm.get('mobile')?.touched">
+                <span *ngIf="userForm.get('mobile')?.errors?.['pattern']">Invalid mobile format (e.g. +919876543210).</span>
+                <span *ngIf="backendErrors['mobile']">{{backendErrors['mobile']}}</span>
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Assign Roles <span class="req">*</span></label>
+              <div class="roles-checkbox-grid">
+                <div class="role-checkbox-item" *ngFor="let role of roles">
+                  <label class="checkbox-container">
+                    <input 
+                      type="checkbox" 
+                      [checked]="isRoleSelected(role.name)"
+                      (change)="onRoleChange(role.name, $event)"
+                    >
+                    <span class="checkmark"></span>
+                    <span class="role-label text-truncate">{{role.displayName}}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="error-msg" *ngIf="userForm.get('roles')?.touched">
+                <span *ngIf="userForm.get('roles')?.errors?.['required']">At least one role is required.</span>
+                <span *ngIf="backendErrors['roles']">{{backendErrors['roles']}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="onClose()">Cancel</button>
+            <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+              <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+              {{ isSubmitting ? 'Submitting...' : 'Create User' }}
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- Bulk Upload Section -->
+      <ng-container *ngIf="activeTab === 'bulk'">
+        <div class="bulk-container">
+
+          <div class="bulk-card download-card" style="margin-top: 0;">
+            <div class="bulk-card-content">
+              <h4>Download User Excel Template</h4>
+              <p>Download the template, fill in user details, and upload it back to the system</p>
+              <button class="btn-download" (click)="downloadTemplate()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <polyline points="9 15 12 18 15 15"></polyline>
+                </svg>
+                Download Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="bulk-card upload-card" style="margin-top: 24px;">
+            <h4>Upload Updated Excel Template</h4>
+            <p>Upload the completed Excel file after filling user details</p>
+
+            <div class="drop-zone" [class.drag-over]="isDragging" (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+
+              <span *ngIf="!selectedFile" class="drop-text">Drag and drop your Excel file here</span>
+              <span *ngIf="selectedFile" class="drop-text selected-file text-indigo-600">{{selectedFile.name}}</span>
+
+              <span class="drop-subtext">only supports .xlsx .xls .csv upto 2MB</span>
+
+              <button class="btn-browse" (click)="fileInput.click()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                </svg>
+                Browse
+              </button>
+              <input #fileInput type="file" style="display: none" accept=".xlsx,.xls,.csv"
+                (change)="onFileSelected($event)">
+            </div>
+          </div>
+
+          <div class="bulk-result" *ngIf="bulkUploadResult" style="margin-top: 16px;">
+            <h4 [class.text-green-600]="bulkUploadResult.failureCount === 0" [class.text-red-600]="bulkUploadResult.failureCount > 0"
+              style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">
+              Processed: {{bulkUploadResult.totalProcessed}}. Success: {{bulkUploadResult.successCount}}. Failed:
+              {{bulkUploadResult.failureCount}}.
+            </h4>
+            <div class="failure-list overflow-y-auto max-h-[120px] bg-red-50 p-3 rounded-lg" *ngIf="bulkUploadResult.failureCount > 0">
+              <ul class="list-disc pl-5">
+                <li *ngFor="let fail of bulkUploadResult.failures" class="text-sm text-red-700 mb-1">
+                  Row {{fail.rowNumber}}: {{fail.errorMessage}}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="modal-footer" style="padding: 24px 0 0 0; margin-top: 16px; background: transparent; border-top: 1px solid #e2e8f0;">
+            <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isUploading">Cancel</button>
+            <button type="button" class="btn-submit" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">
+              <span *ngIf="isUploading">Uploading...</span>
+              <span *ngIf="!isUploading">Submit</span>
+            </button>
+          </div>
+
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- OTP Verification Modal Overlay -->
+  <div class="otp-modal-overlay" *ngIf="showOtpModal" (click)="$event.stopPropagation()">
+    <div class="otp-modal-container glass-effect">
+      <div class="otp-header">
+        <div class="otp-icon-circle">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3>Verify Email</h3>
+        <p>Enter the 6-digit code sent to <strong>{{userForm.get('email')?.value}}</strong></p>
+      </div>
+
+      <div class="otp-input-section">
+        <input 
+          type="text" 
+          [(ngModel)]="otpCode" 
+          maxlength="6" 
+          placeholder="0 0 0 0 0 0"
+          class="otp-main-input"
+          [class.error-border]="otpError"
+        >
+        <div class="otp-error-text" *ngIf="otpError">{{otpError}}</div>
+      </div>
+
+      <div class="otp-actions">
+        <button class="btn-verify" (click)="confirmCreateUser()" [disabled]="isVerifyingOtp">
+          <i class="fas fa-spinner fa-spin" *ngIf="isVerifyingOtp"></i>
+          {{ isVerifyingOtp ? 'Verifying...' : 'Verify & Create User' }}
+        </button>
+        <button class="btn-cancel-otp" (click)="showOtpModal = false" [disabled]="isVerifyingOtp">
+          Cancel
+        </button>
+      </div>
+
+      <div class="otp-resend">
+        <span>Didn't receive code?</span>
+        <button 
+          class="btn-link-resend" 
+          (click)="sendOtp()" 
+          [disabled]="isOtpSending || otpCooldown > 0"
+        >
+          {{ otpCooldown > 0 ? 'Resend in ' + otpCooldown + 's' : 'Resend Now' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

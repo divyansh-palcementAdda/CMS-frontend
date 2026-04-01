@@ -9,11 +9,12 @@ import { ConsultancyItem, ConsultancyPageData } from '../../core/models/consulta
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AddConsultancyModalComponent } from './components/add-consultancy-modal/add-consultancy-modal.component';
 
 @Component({
   selector: 'app-consultancy-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent],
   templateUrl: './consultancy-management.component.html',
   styleUrls: ['./consultancy-management.component.scss']
 })
@@ -28,6 +29,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Actions
+  showAddModal = false;
   showDeleteModal = false;
   selectedConsultancy: ConsultancyItem | null = null;
 
@@ -53,6 +55,19 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   cancelDelete() {
     this.selectedConsultancy = null;
     this.showDeleteModal = false;
+  }
+
+  openAddModal() {
+    this.showAddModal = true;
+  }
+
+  closeAddModal() {
+    this.showAddModal = false;
+  }
+
+  onAddSuccess() {
+    this.showAddModal = false;
+    this.loadData();
   }
 
   confirmDelete() {

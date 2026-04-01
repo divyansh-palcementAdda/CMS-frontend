@@ -9,11 +9,12 @@ import { CourseItem, CoursePageData } from '../../core/models/course.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AddCourseModalComponent } from './components/add-course-modal/add-course-modal.component';
 
 @Component({
   selector: 'app-course-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddCourseModalComponent],
   templateUrl: './course-management.component.html',
   styleUrls: ['./course-management.component.scss']
 })
@@ -30,6 +31,7 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   // Actions
   showDeleteModal = false;
   selectedCourse: CourseItem | null = null;
+  showAddModal = false;
 
   constructor(
     private courseService: CourseService,
@@ -42,6 +44,18 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
 
   onEdit(id: number) {
     this.router.navigate([], { fragment: 'edit' });
+  }
+
+  openAddModal() {
+    this.showAddModal = true;
+  }
+
+  closeAddModal() {
+    this.showAddModal = false;
+  }
+
+  onAddSuccess() {
+    this.loadData();
   }
 
   onDelete(course: CourseItem) {

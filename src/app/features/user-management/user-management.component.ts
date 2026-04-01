@@ -9,11 +9,12 @@ import { UserService } from '../../core/services/user.service';
 import { UserPageData, UserItem } from '../../core/models/user.model';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AddUserModalComponent } from './components/add-user-modal/add-user-modal.component';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
 })
@@ -33,6 +34,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   private sub!: Subscription;
 
   // Actions
+  showAddModal = false;
   showDeleteModal = false;
   selectedUser: UserItem | null = null;
 
@@ -47,6 +49,14 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   onEdit(id: number) {
     this.router.navigate([], { fragment: 'edit' });
+  }
+
+  onAddUser() {
+    this.showAddModal = true;
+  }
+
+  onAddSuccess() {
+    this.fetchData();
   }
 
   onDelete(user: UserItem) {

@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule, NgIf, NgFor, NgClass } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { CourseTypeService } from '../../core/services/course-type.service';
-import { CourseTypeItem, CourseTypePageData } from '../../core/models/course-type.model';
+import { CourseTypeItem, CourseTypePageData, CreateCourseTypeDTO } from '../../core/models/course-type.model';
+import { CourseService } from '../../core/services/course.service';
+import { CourseItem } from '../../core/models/course.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -13,7 +15,7 @@ import { ConfirmationModalComponent } from '../../shared/components/confirmation
 @Component({
   selector: 'app-course-type-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, NgIf, NgFor, FormsModule, ReactiveFormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
   templateUrl: './course-type-management.component.html',
   styleUrls: ['./course-type-management.component.scss']
 })
@@ -21,23 +23,192 @@ export class CourseTypeManagementComponent implements OnInit, OnDestroy {
   pageData: CourseTypePageData | null = null;
   loading = true;
   searchTerm = '';
-  
+
   currentPage = 1;
   pageSize = 10;
-  
+
   private destroy$ = new Subject<void>();
 
   // Actions
   showDeleteModal = false;
   selectedCourseType: CourseTypeItem | null = null;
+  showAddModal = false;
+  addForm: FormGroup;
+  isSubmitting = false;
+  coursesList: CourseItem[] = [];
+
+  // Bulk Upload
+  activeTab: 'single' | 'bulk' = 'single';
+  selectedFile: File | null = null;
+  isUploading = false;
+  bulkUploadResult: any = null;
+  isDragging = false;
 
   constructor(
     private courseTypeService: CourseTypeService,
-    private router: Router
-  ) {}
+    private courseService: CourseService,
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    this.addForm = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', [Validators.required, this.wordCountValidator(150)]],
+      courseId: [null], // Optional as per user
+      status: ['Active', Validators.required]
+    });
+  }
 
   ngOnInit() {
     this.loadData();
+    this.loadCourses();
+  }
+
+  loadCourses() {
+    this.courseService.getCoursesData()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.coursesList = data.courses;
+        },
+        error: (err) => console.error('Error loading courses', err)
+      });
+  }
+
+  openAddModal() {
+    this.addForm.reset({ status: 'Active' });
+    this.activeTab = 'single';
+    this.selectedFile = null;
+    this.bulkUploadResult = null;
+    this.showAddModal = true;
+  }
+
+  setTab(tab: 'single' | 'bulk') {
+    this.activeTab = tab;
+  }
+
+  closeAddModal() {
+    this.showAddModal = false;
+  }
+
+  wordCountValidator(maxWords: number) {
+    return (control: AbstractControl) => {
+      if (!control.value) return null;
+      const words = control.value.trim().split(/\s+/).length;
+      return words > maxWords ? { maxWords: { limit: maxWords, actual: words } } : null;
+    };
+  }
+
+  onSubmit() {
+    if (this.addForm.invalid) {
+      this.addForm.markAllAsTouched();
+      return;
+    }
+    this.isSubmitting = true;
+    const formValue = this.addForm.value;
+    const payload: CreateCourseTypeDTO = {
+      name: formValue.name,
+      description: formValue.description,
+      active: formValue.status === 'Active',
+      courseId: formValue.courseId
+    };
+
+    this.courseTypeService.createCourseType(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.closeAddModal();
+          this.loadData();
+        },
+        error: (err) => {
+          console.error('Error creating course type', err);
+          this.isSubmitting = false;
+        }
+      });
+  }
+
+  // --- Bulk Upload Methods ---
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+      this.handleFile(event.dataTransfer.files[0]);
+    }
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.handleFile(event.target.files[0]);
+    }
+  }
+
+  private handleFile(file: File) {
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'];
+    if (validTypes.includes(file.type) || file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
+      this.selectedFile = file;
+      this.bulkUploadResult = null;
+    } else {
+      alert('Please upload a valid Excel or CSV file.');
+    }
+  }
+
+  onSubmitBulk() {
+    if (!this.selectedFile) return;
+
+    this.isUploading = true;
+    this.bulkUploadResult = null;
+
+    this.courseTypeService.bulkUploadCourseTypes(this.selectedFile).subscribe({
+      next: (res) => {
+        this.isUploading = false;
+        this.bulkUploadResult = res;
+        if (res.failureCount === 0) {
+          setTimeout(() => {
+            this.closeAddModal();
+            this.loadData();
+          }, 2000);
+        }
+      },
+      error: (err) => {
+        console.error('Bulk upload failed', err);
+        this.isUploading = false;
+        alert('Bulk upload failed. Please try again.');
+      }
+    });
+  }
+
+  downloadTemplate() {
+    this.courseTypeService.downloadBulkUploadTemplate().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'course-type-template.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Failed to download template', err);
+        alert('Failed to download template.');
+      }
+    });
   }
 
   onView(id: number) {
@@ -100,7 +271,7 @@ export class CourseTypeManagementComponent implements OnInit, OnDestroy {
 
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
-      list = list.filter(item => 
+      list = list.filter(item =>
         item.name.toLowerCase().includes(term) ||
         item.code.toLowerCase().includes(term)
       );

@@ -29,7 +29,7 @@ export interface ConsultancyItem {
   email: string;
   mobile: string;
   city: string;
-  status: 'Active' | 'Inactive' | 'Dormant';
+  status: 'ACTIVE' | 'INACTIVE' | 'DORMANT';
   commission: string;
 }
 

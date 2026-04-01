@@ -96,6 +96,32 @@ export class InstitutionService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  createInstitution(data: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, data);
+  }
+
+  bulkUploadInstitutions(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.apiUrl}/bulk-upload`, formData);
+  }
+
+  downloadBulkUploadTemplate(): void {
+    const url = `${this.apiUrl}/bulk-upload/template`;
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'Institution_Bulk_Upload_Template.xlsx';
+        link.click();
+        window.URL.revokeObjectURL(link.href);
+      },
+      error: (err) => {
+        console.error('Failed to download template', err);
+      }
+    });
+  }
+
   private getMockData(): InstitutionPageData {
     const mockInstitutions: InstitutionItem[] = [
       { id: 1, sNo: 1, name: 'Manipal', code: 'MNU-101', students: 12, status: 'Active', course: '2 Course' },

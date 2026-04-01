@@ -9,11 +9,12 @@ import { InstitutionService } from '../../core/services/institution.service';
 import { InstitutionPageData, InstitutionItem } from '../../core/models/institution.model';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AddInstitutionModalComponent } from './components/add-institution-modal/add-institution-modal.component';
 
 @Component({
   selector: 'app-institution-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddInstitutionModalComponent],
   templateUrl: './institution-management.component.html',
   styleUrl: './institution-management.component.scss'
 })
@@ -37,6 +38,7 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
 
   // Actions
   showDeleteModal = false;
+  showAddModal = false;
   selectedInstitution: InstitutionItem | null = null;
 
   constructor(
@@ -84,6 +86,18 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  openAddModal() {
+    this.showAddModal = true;
+  }
+
+  closeAddModal() {
+    this.showAddModal = false;
+  }
+
+  onAddSuccess() {
+    this.fetchData();
   }
 
   fetchData() {

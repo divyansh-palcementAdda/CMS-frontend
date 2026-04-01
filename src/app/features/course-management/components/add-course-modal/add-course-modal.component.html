@@ -1,0 +1,239 @@
+<div class="modal-backdrop">
+  <div class="modal-container custom-modal">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="16" rx="2" stroke="black" stroke-width="2"/>
+            <path d="M8 12H16M12 8V16" stroke="black" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h3>Add Course</h3>
+      </div>
+      <button class="close-btn" (click)="onClose()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <button class="tab-btn" [class.active]="activeTab === 'single'" (click)="switchTab('single')">Single Course</button>
+      <button class="tab-btn" [class.active]="activeTab === 'bulk'" (click)="switchTab('bulk')">Bulk Course</button>
+    </div>
+
+    <div class="modal-content">
+
+      <!-- ================= SINGLE TAB ================= -->
+      <form *ngIf="activeTab === 'single'" [formGroup]="courseForm" (ngSubmit)="onSubmitSingle()">
+
+        <div class="form-section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z"></path>
+            <path d="M8 10H16"></path>
+            <path d="M8 14H16"></path>
+            <path d="M12 6H12.01"></path>
+          </svg>
+          <h4>Basic Information</h4>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="form-group form-group-half">
+            <label>Course Name <span class="req">*</span></label>
+            <input type="text" formControlName="name" placeholder="Enter Course Name" 
+                   [class.error]="courseForm.get('name')?.invalid && courseForm.get('name')?.touched">
+            <div class="error-msg" *ngIf="courseForm.get('name')?.invalid && courseForm.get('name')?.touched">
+              <small>Course name is required (min 3 chars).</small>
+            </div>
+          </div>
+
+          <div class="form-group form-group-half">
+            <label>Course Mode <span class="req">*</span></label>
+            <div class="select-wrapper" [class.error]="courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched">
+              <select formControlName="isOnline" class="custom-select">
+                <option [ngValue]="null" disabled selected>Select Mode</option>
+                <option [ngValue]="true">Online</option>
+                <option [ngValue]="false">Offline</option>
+              </select>
+              <svg class="select-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <div class="error-msg" *ngIf="courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched">
+              <small>Mode is required.</small>
+            </div>
+          </div>
+
+          <div class="form-group form-group-half">
+            <label>Course Status <span class="req">*</span></label>
+            <div class="select-wrapper" [class.error]="courseForm.get('active')?.invalid && courseForm.get('active')?.touched">
+              <select formControlName="active" class="custom-select">
+                <option [ngValue]="true">Active</option>
+                <option [ngValue]="false">Inactive</option>
+              </select>
+              <svg class="select-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="form-group form-group-half">
+            <label>Duration <span class="req">*</span></label>
+            <div class="select-wrapper" [class.error]="courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched">
+              <select formControlName="duration" class="custom-select">
+                <option [ngValue]="null" disabled selected>Select Duration</option>
+                <option [ngValue]="1">1 yr</option>
+                <option [ngValue]="2">2 yrs</option>
+                <option [ngValue]="3">3 yrs</option>
+                <option [ngValue]="4">4 yrs</option>
+                <option [ngValue]="5">5 yrs</option>
+              </select>
+              <svg class="select-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <div class="error-msg" *ngIf="courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched">
+              <small>Duration is required.</small>
+            </div>
+          </div>
+
+          <div class="form-group form-group-half">
+            <label>Fees <span class="req">*</span></label>
+            <div class="input-with-icon" [class.error]="courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched">
+              <span class="currency-symbol">₹</span>
+              <input type="number" formControlName="fees" placeholder="0.00">
+            </div>
+            <div class="error-msg" *ngIf="courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched">
+              <small>Fees must be a positive number.</small>
+            </div>
+          </div>
+
+          <div class="form-group form-group-half">
+            <label>Course Type <span class="req">*</span></label>
+            <div class="select-wrapper" [class.error]="courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched">
+              <select formControlName="courseTypeId" class="custom-select">
+                <option [ngValue]="null" disabled selected>Select Type</option>
+                <option *ngFor="let type of courseTypes" [value]="type.id">{{type.name || type.courseTypeName}}</option>
+              </select>
+              <svg class="select-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <div class="error-msg" *ngIf="courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched">
+              <small>Course Type is required.</small>
+            </div>
+          </div>
+
+          <div class="form-group checklist-group form-group-full">
+            <label>Link Institutions (Optional)</label>
+            <div class="checklist-container">
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                   <circle cx="11" cy="11" r="8"></circle>
+                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="checklist-search" placeholder="Select Institution" [(ngModel)]="searchInstitutions"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="onSearchInstitutionsChange()">
+              </div>
+              <div class="checklist-items">
+                <label class="checklist-item" *ngFor="let inst of filteredInstitutions">
+                  <div class="checkbox">
+                    <input type="checkbox" [checked]="isSelected('institutionIds', inst.id)"
+                      (change)="toggleSelection('institutionIds', inst.id)">
+                  </div>
+                  <span>{{inst.name}} ({{inst.code}})</span>
+                </label>
+                <div *ngIf="filteredInstitutions.length === 0" class="no-results">No institutions found.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isSubmitting">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="courseForm.invalid || isSubmitting">
+            <span *ngIf="isSubmitting">Submitting...</span>
+            <span *ngIf="!isSubmitting">Submit</span>
+          </button>
+        </div>
+      </form>
+
+
+      <!-- ================= BULK TAB ================= -->
+      <div *ngIf="activeTab === 'bulk'" class="bulk-container">
+
+        <div class="bulk-card download-card">
+          <div class="bulk-card-content">
+            <h4>Download Course Excel Template</h4>
+            <p>Download the template, fill in course details, and upload it back to the system</p>
+            <button class="btn-download" (click)="downloadTemplate()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+              </svg>
+              Download Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="bulk-card upload-card">
+          <h4>Upload Updated Excel Template</h4>
+          <p>Upload the completed Excel file after filling course details</p>
+
+          <div class="drop-zone" [class.drag-over]="isDragging" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+
+            <span *ngIf="!selectedFile" class="drop-text">Drag and drop your Excel file here</span>
+            <span *ngIf="selectedFile" class="drop-text selected-file">{{selectedFile.name}}</span>
+
+            <span class="drop-subtext">only supports .xlsx .xls .csv upto 2MB</span>
+
+            <button class="btn-browse" (click)="fileInput.click()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              </svg>
+              Browse
+            </button>
+            <input #fileInput type="file" style="display: none" accept=".xlsx,.xls,.csv"
+              (change)="onFileSelected($event)">
+          </div>
+        </div>
+
+        <div class="bulk-result" *ngIf="bulkUploadResult">
+          <h4 [class.success]="bulkUploadResult.failureCount === 0" [class.error]="bulkUploadResult.failureCount > 0">
+            Processed: {{bulkUploadResult.totalProcessed}}. Success: {{bulkUploadResult.successCount}}. Failed:
+            {{bulkUploadResult.failureCount}}.
+          </h4>
+          <div class="failure-list" *ngIf="bulkUploadResult.failureCount > 0">
+            <ul>
+              <li *ngFor="let fail of bulkUploadResult.failures">Row {{fail.rowNumber}}: {{fail.errorMessage}}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 24px 0 0 0; margin-top: 0; background: transparent; border-top: 1px solid #e2e8f0;">
+          <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isUploading">Cancel</button>
+          <button type="button" class="btn-submit" [disabled]="!selectedFile || isUploading" (click)="onSubmitBulk()">
+            <span *ngIf="isUploading">Uploading...</span>
+            <span *ngIf="!isUploading">Submit</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

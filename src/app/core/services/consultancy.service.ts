@@ -11,14 +11,14 @@ import { ConsultancyDTO, ConsultancyItem, ConsultancyPageData, ConsultancyStats,
 export class ConsultancyService {
   private apiUrl = `${environment.apiUrl}/consultancies`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getConsultancyData(): Observable<ConsultancyPageData> {
     return this.http.get<any>(this.apiUrl).pipe(
       map(response => {
         // Handle both ApiResult wrap and direct array
         const data = Array.isArray(response) ? response : (response?.data || []);
-        
+
         let activeCount = 0;
         let totalCourseCount = 0;
 
@@ -45,10 +45,10 @@ export class ConsultancyService {
           totalCourses: totalCourseCount
         };
 
-        return { 
-          stats, 
-          consultancies: mappedItems, 
-          totalCount: mappedItems.length 
+        return {
+          stats,
+          consultancies: mappedItems,
+          totalCount: mappedItems.length
         };
       })
     );
@@ -59,7 +59,7 @@ export class ConsultancyService {
       map(response => {
         const data = response.data || response;
         if (!data) throw new Error('Consultancy not found');
-        
+
         return {
           ...data.basicInfo,
           financials: data.financials || { totalProjected: '0', payableAmount: '0', paidAmount: '0', unpaidAmount: '0' },
@@ -76,5 +76,31 @@ export class ConsultancyService {
 
   deleteConsultancy(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  createConsultancy(data: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, data);
+  }
+
+  bulkUploadConsultancies(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.apiUrl}/bulk-upload`, formData);
+  }
+
+  downloadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
+  }
+
+  getActiveInstitutions(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/institutions/active`);
+  }
+
+  getActiveCourses(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/courses/active`);
+  }
+
+  getActiveUsers(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/user/status/ACTIVE`);
   }
 }

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { CourseDTO, CourseDetail, CourseItem, CoursePageData, CourseStats } from '../models/course.model';
+import { CourseDTO, CourseDetail, CourseItem, CoursePageData, CourseStats, CreateCourseDTO, BulkUploadResponse } from '../models/course.model';
 
 @Injectable({
   providedIn: 'root'
@@ -171,6 +171,28 @@ export class CourseService {
 
   deleteCourse(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getAllCourses(): Observable<any[]> {
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(response => Array.isArray(response) ? response : (response?.data || response?.content || []))
+    );
+  }
+
+  createCourse(data: CreateCourseDTO): Observable<any> {
+    return this.http.post(this.apiUrl, data);
+  }
+
+  bulkUploadCourses(file: File): Observable<BulkUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkUploadResponse>(`${this.apiUrl}/bulk-upload`, formData);
+  }
+
+  downloadBulkUploadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/bulk-upload/template`, {
+      responseType: 'blob'
+    });
   }
 
   private getMockData(): CoursePageData {
