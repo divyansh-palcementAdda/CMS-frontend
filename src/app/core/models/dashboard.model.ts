@@ -22,7 +22,6 @@ export interface DashboardStats {
   totalAdmissions: number;
   totalUsers: number;
   inactiveRecords: number;
-  unmappedRecords: number;
   directAdmissions: number;
   indirectAdmissions: number;
   scholarAdmissions: number;
