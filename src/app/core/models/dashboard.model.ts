@@ -16,7 +16,7 @@ export interface DashboardStats {
   inactiveCourses: number;
   totalConsultancies: number;
   totalCourses: number;
-  courseTypes: number;
+  totalCoursesTypes: number;
   totalInstitutions: number;
   totalRoles: number;
   totalAdmissions: number;
@@ -26,6 +26,12 @@ export interface DashboardStats {
   directAdmissions: number;
   indirectAdmissions: number;
   scholarAdmissions: number;
+
+  usersWithoutConsultancy: number;
+  consultanciesWithoutUsers: number;
+  consultanciesWithoutCourses: number;
+  coursesWithoutConsultancy: number;
+  totalUnmappedRecords: number;
 }
 
 export interface ConsultancyItem {
@@ -92,8 +98,8 @@ export interface ChartData {
   topConsultancies?: TopConsultancy[];
 }
 
-export interface YearlyPoint  { year: string;  admissions: number; }
-export interface WeeklyPoint  { week: string;  admissions: number; }
+export interface YearlyPoint { year: string; admissions: number; }
+export interface WeeklyPoint { week: string; admissions: number; }
 export interface MonthlyPoint { month: string; admissions: number; }
 export interface NameValuePoint { name: string; value: number; }
 export interface TargetPoint { category: string; target: number; achieved: number; }

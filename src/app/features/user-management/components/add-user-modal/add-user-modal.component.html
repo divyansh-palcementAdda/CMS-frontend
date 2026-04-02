@@ -11,28 +11,10 @@
       </button>
     </div>
 
-    <!-- Tabs -->
-    <div class="modal-tabs">
-      <div 
-        class="tab-item" 
-        [class.active]="activeTab === 'single'"
-        (click)="setTab('single')"
-      >
-        Single Record
-      </div>
-      <div 
-        class="tab-item" 
-        [class.active]="activeTab === 'bulk'"
-        (click)="setTab('bulk')"
-      >
-        Bulk Upload
-      </div>
-    </div>
 
     <div class="modal-content">
       <!-- Single Record Form -->
-      <ng-container *ngIf="activeTab === 'single'">
-        <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
           <!-- ... single form remains same ... -->
           <div class="form-grid">
             <!-- existing inputs... -->
@@ -163,82 +145,6 @@
             </button>
           </div>
         </form>
-      </ng-container>
-
-      <!-- Bulk Upload Section -->
-      <ng-container *ngIf="activeTab === 'bulk'">
-        <div class="bulk-container">
-
-          <div class="bulk-card download-card" style="margin-top: 0;">
-            <div class="bulk-card-content">
-              <h4>Download User Excel Template</h4>
-              <p>Download the template, fill in user details, and upload it back to the system</p>
-              <button class="btn-download" (click)="downloadTemplate()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="12" y1="18" x2="12" y2="12"></line>
-                  <polyline points="9 15 12 18 15 15"></polyline>
-                </svg>
-                Download Excel
-              </button>
-            </div>
-          </div>
-
-          <div class="bulk-card upload-card" style="margin-top: 24px;">
-            <h4>Upload Updated Excel Template</h4>
-            <p>Upload the completed Excel file after filling user details</p>
-
-            <div class="drop-zone" [class.drag-over]="isDragging" (dragover)="onDragOver($event)"
-              (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
-
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-
-              <span *ngIf="!selectedFile" class="drop-text">Drag and drop your Excel file here</span>
-              <span *ngIf="selectedFile" class="drop-text selected-file text-indigo-600">{{selectedFile.name}}</span>
-
-              <span class="drop-subtext">only supports .xlsx .xls .csv upto 2MB</span>
-
-              <button class="btn-browse" (click)="fileInput.click()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                </svg>
-                Browse
-              </button>
-              <input #fileInput type="file" style="display: none" accept=".xlsx,.xls,.csv"
-                (change)="onFileSelected($event)">
-            </div>
-          </div>
-
-          <div class="bulk-result" *ngIf="bulkUploadResult" style="margin-top: 16px;">
-            <h4 [class.text-green-600]="bulkUploadResult.failureCount === 0" [class.text-red-600]="bulkUploadResult.failureCount > 0"
-              style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">
-              Processed: {{bulkUploadResult.totalProcessed}}. Success: {{bulkUploadResult.successCount}}. Failed:
-              {{bulkUploadResult.failureCount}}.
-            </h4>
-            <div class="failure-list overflow-y-auto max-h-[120px] bg-red-50 p-3 rounded-lg" *ngIf="bulkUploadResult.failureCount > 0">
-              <ul class="list-disc pl-5">
-                <li *ngFor="let fail of bulkUploadResult.failures" class="text-sm text-red-700 mb-1">
-                  Row {{fail.rowNumber}}: {{fail.errorMessage}}
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="modal-footer" style="padding: 24px 0 0 0; margin-top: 16px; background: transparent; border-top: 1px solid #e2e8f0;">
-            <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isUploading">Cancel</button>
-            <button type="button" class="btn-submit" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">
-              <span *ngIf="isUploading">Uploading...</span>
-              <span *ngIf="!isUploading">Submit</span>
-            </button>
-          </div>
-
-        </div>
-      </ng-container>
     </div>
   </div>
 

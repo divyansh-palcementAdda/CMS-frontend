@@ -11,11 +11,12 @@ import { CourseItem } from '../../core/models/course.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-course-type-management',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, FormsModule, ReactiveFormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, NgIf, NgFor, FormsModule, ReactiveFormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, BulkUploadModalComponent],
   templateUrl: './course-type-management.component.html',
   styleUrls: ['./course-type-management.component.scss']
 })
@@ -38,14 +39,10 @@ export class CourseTypeManagementComponent implements OnInit, OnDestroy {
   coursesList: CourseItem[] = [];
 
   // Bulk Upload
-  activeTab: 'single' | 'bulk' = 'single';
-  selectedFile: File | null = null;
-  isUploading = false;
-  bulkUploadResult: any = null;
-  isDragging = false;
+  showBulkUploadModal = false;
 
   constructor(
-    private courseTypeService: CourseTypeService,
+    public courseTypeService: CourseTypeService,
     private courseService: CourseService,
     private router: Router,
     private fb: FormBuilder
@@ -76,14 +73,7 @@ export class CourseTypeManagementComponent implements OnInit, OnDestroy {
 
   openAddModal() {
     this.addForm.reset({ status: 'Active' });
-    this.activeTab = 'single';
-    this.selectedFile = null;
-    this.bulkUploadResult = null;
     this.showAddModal = true;
-  }
-
-  setTab(tab: 'single' | 'bulk') {
-    this.activeTab = tab;
   }
 
   closeAddModal() {
@@ -127,88 +117,8 @@ export class CourseTypeManagementComponent implements OnInit, OnDestroy {
       });
   }
 
-  // --- Bulk Upload Methods ---
-
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = true;
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-
-    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-      this.handleFile(event.dataTransfer.files[0]);
-    }
-  }
-
-  onFileSelected(event: any) {
-    if (event.target.files && event.target.files.length > 0) {
-      this.handleFile(event.target.files[0]);
-    }
-  }
-
-  private handleFile(file: File) {
-    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'];
-    if (validTypes.includes(file.type) || file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
-      this.selectedFile = file;
-      this.bulkUploadResult = null;
-    } else {
-      alert('Please upload a valid Excel or CSV file.');
-    }
-  }
-
-  onSubmitBulk() {
-    if (!this.selectedFile) return;
-
-    this.isUploading = true;
-    this.bulkUploadResult = null;
-
-    this.courseTypeService.bulkUploadCourseTypes(this.selectedFile).subscribe({
-      next: (res) => {
-        this.isUploading = false;
-        this.bulkUploadResult = res;
-        if (res.failureCount === 0) {
-          setTimeout(() => {
-            this.closeAddModal();
-            this.loadData();
-          }, 2000);
-        }
-      },
-      error: (err) => {
-        console.error('Bulk upload failed', err);
-        this.isUploading = false;
-        alert('Bulk upload failed. Please try again.');
-      }
-    });
-  }
-
-  downloadTemplate() {
-    this.courseTypeService.downloadBulkUploadTemplate().subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'course-type-template.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => {
-        console.error('Failed to download template', err);
-        alert('Failed to download template.');
-      }
-    });
+  onBulkUploadSuccess(result: any) {
+    this.loadData();
   }
 
   onView(id: number) {

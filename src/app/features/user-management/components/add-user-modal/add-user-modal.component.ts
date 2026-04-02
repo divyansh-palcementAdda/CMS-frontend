@@ -16,7 +16,6 @@ export class AddUserModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
 
-  activeTab: 'single' | 'bulk' = 'single';
   userForm: FormGroup;
   isSubmitting = false;
   roles: any[] = [];
@@ -34,12 +33,6 @@ export class AddUserModalComponent implements OnInit {
   otpCooldown = 0;
   private cooldownInterval: any;
   
-  // Bulk Upload states
-  selectedFile: File | null = null;
-  isDragging = false;
-  uploadProgress = 0;
-  isUploading = false;
-  bulkUploadResult: BulkUserUploadResponse | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -89,11 +82,6 @@ export class AddUserModalComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'single' | 'bulk'): void {
-    this.activeTab = tab;
-    this.bulkUploadResult = null;
-    this.showOtpModal = false;
-  }
 
   togglePassword(): void {
     this.passwordVisible = !this.passwordVisible;
@@ -197,80 +185,4 @@ export class AddUserModalComponent implements OnInit {
     this.close.emit();
   }
 
-  // Bulk Upload Methods
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.validateAndSetFile(file);
-    }
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-    
-    const file = event.dataTransfer?.files[0];
-    if (file) {
-      this.validateAndSetFile(file);
-    }
-  }
-
-  validateAndSetFile(file: File): void {
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    if (ext === 'xlsx' || ext === 'xls') {
-      this.selectedFile = file;
-      this.bulkUploadResult = null;
-    } else {
-      alert('Please select only Excel files (.xlsx or .xls)');
-    }
-  }
-
-  uploadFile(): void {
-    if (!this.selectedFile) return;
-
-    this.isUploading = true;
-    this.userService.bulkUpload(this.selectedFile)
-      .pipe(finalize(() => this.isUploading = false))
-      .subscribe({
-        next: (result) => {
-          this.bulkUploadResult = result;
-          if (result.successCount > 0) {
-            this.success.emit();
-          }
-        },
-        error: (err) => {
-          console.error('Upload failed', err);
-          alert(err.error?.message || 'Bulk upload failed');
-        }
-      });
-  }
-
-  downloadTemplate(): void {
-    this.userService.downloadTemplate().subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'user_upload_template.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => console.error('Template download failed', err)
-    });
-  }
 }

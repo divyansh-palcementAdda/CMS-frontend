@@ -291,13 +291,13 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   uploadBulk(): void {
     if (!this.selectedFile) return;
     this.isUploading = true;
-    this.admissionService.bulkUploadAdmissions(this.selectedFile).subscribe({
-      next: (res) => {
+    this.admissionService.bulkUpload(this.selectedFile).subscribe({
+      next: (res: any) => {
         this.isUploading = false;
         this.bulkResponse = res;
         alert('Bulk upload completed!');
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isUploading = false;
         alert(err.error?.message || 'Bulk upload failed');
       }

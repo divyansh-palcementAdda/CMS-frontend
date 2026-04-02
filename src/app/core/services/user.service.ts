@@ -148,7 +148,7 @@ export class UserService {
   }
 
   downloadTemplate(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/template`, { responseType: 'blob' });
+    return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
   }
 
   sendOtp(email: string): Observable<any> {

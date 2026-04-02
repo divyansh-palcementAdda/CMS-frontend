@@ -10,11 +10,12 @@ import { UserPageData, UserItem } from '../../core/models/user.model';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddUserModalComponent } from './components/add-user-modal/add-user-modal.component';
+import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent, BulkUploadModalComponent],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
 })
@@ -37,8 +38,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   showAddModal = false;
   showDeleteModal = false;
   selectedUser: UserItem | null = null;
+  showBulkUploadModal = false;
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(public userService: UserService, private router: Router) { }
 
   ngOnInit() {
     this.fetchData();
@@ -56,6 +58,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   onAddSuccess() {
+    this.fetchData();
+  }
+
+  onBulkUploadSuccess(result: any) {
     this.fetchData();
   }
 

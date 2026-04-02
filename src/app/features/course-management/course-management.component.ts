@@ -10,11 +10,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddCourseModalComponent } from './components/add-course-modal/add-course-modal.component';
+import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-course-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddCourseModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddCourseModalComponent, BulkUploadModalComponent],
   templateUrl: './course-management.component.html',
   styleUrls: ['./course-management.component.scss']
 })
@@ -32,9 +33,10 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   selectedCourse: CourseItem | null = null;
   showAddModal = false;
+  showBulkUploadModal = false;
 
   constructor(
-    private courseService: CourseService,
+    public courseService: CourseService,
     private router: Router
   ) {}
 
@@ -55,6 +57,10 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   }
 
   onAddSuccess() {
+    this.loadData();
+  }
+
+  onBulkUploadSuccess(result: any) {
     this.loadData();
   }
 

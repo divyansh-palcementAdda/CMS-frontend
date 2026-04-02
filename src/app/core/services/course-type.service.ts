@@ -104,13 +104,13 @@ export class CourseTypeService {
     return name ? name.substring(0, 3).toUpperCase() : 'N/A';
   }
 
-  bulkUploadCourseTypes(file: File): Observable<BulkUploadResponse> {
+  bulkUpload(file: File): Observable<BulkUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<BulkUploadResponse>(`${this.apiUrl}/bulk-upload`, formData);
   }
 
-  downloadBulkUploadTemplate(): Observable<Blob> {
+  downloadTemplate(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/bulk-upload/template`, {
       responseType: 'blob'
     });

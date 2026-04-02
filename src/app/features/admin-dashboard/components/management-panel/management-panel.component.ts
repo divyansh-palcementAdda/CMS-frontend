@@ -41,18 +41,19 @@ export class ManagementPanelComponent {
   }
 
   private buildCards(s: DashboardStats | null): void {
+    console.log(s);
     if (!s) { this.cards = []; return; }
 
     this.cards = [
-      { name: 'Consultancy',      sub: 'Manages all consultancy services',      value: s.totalConsultancies, icon: '📋' },
-      { name: 'Courses',          sub: 'Manages course catalog',                value: s.totalCourses,       icon: '📚' },
-      { name: 'Course Type',      sub: 'Manages course categories',             value: s.courseTypes,        icon: '📄' },
-      { name: 'Institution',      sub: 'Manages partner institutions',          value: s.totalInstitutions,  icon: '🏛' },
-      { name: 'Roles',            sub: 'Manages user roles and permissions',    value: s.totalRoles,         icon: '🛡' },
-      { name: 'Admissions',       sub: 'Manages admission processes',           value: s.totalAdmissions,    icon: '🎓', path: '/admin/admission-management' },
-      { name: 'Users',            sub: 'Manages all system users',              value: s.totalUsers,         icon: '👥' },
-      { name: 'Inactive Records', sub: 'Manages soft deleted records',          value: s.inactiveRecords,    icon: '📦' },
-      { name: 'UnMapped Records', sub: 'Records without consultancy mapping',   value: s.unmappedRecords,    icon: '🔗' },
+      { name: 'Consultancy', sub: 'Manages all consultancy services', value: s.totalConsultancies, icon: '📋' },
+      { name: 'Courses', sub: 'Manages course catalog', value: s.totalCourses, icon: '📚' },
+      { name: 'Course Type', sub: 'Manages course categories', value: s.totalCoursesTypes, icon: '📄' },
+      { name: 'Institution', sub: 'Manages partner institutions', value: s.totalInstitutions, icon: '🏛' },
+      { name: 'Roles', sub: 'Manages user roles and permissions', value: s.totalRoles, icon: '🛡' },
+      { name: 'Admissions', sub: 'Manages admission processes', value: s.totalAdmissions, icon: '🎓', path: '/admin/admission-management' },
+      { name: 'Users', sub: 'Manages all system users', value: s.totalUsers, icon: '👥' },
+      { name: 'Inactive Records', sub: 'Manages soft deleted records', value: s.inactiveRecords, icon: '📦' },
+      { name: 'UnMapped Records', sub: 'Records without consultancy mapping', value: s.totalUnmappedRecords, icon: '🔗' },
     ];
   }
 }

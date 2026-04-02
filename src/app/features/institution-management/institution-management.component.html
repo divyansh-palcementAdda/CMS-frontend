@@ -27,14 +27,25 @@
                             </div>
                             <h2 class="page-title">Institution Management</h2>
                         </div>
-                        <button class="btn-primary" (click)="openAddModal()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" />
-                                <path d="M12 8V16M8 12H16" stroke="white" stroke-width="2" stroke-linecap="round" />
-                            </svg>
-                            <span>Add New Institution</span>
-                        </button>
+                        <div class="header-actions" style="display: flex; gap: 12px;">
+                            <button class="btn-secondary" (click)="showBulkUploadModal = true" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1.5px solid #E2E8F0; background: white; color: #475569; cursor: pointer; transition: all 0.2s;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Bulk Import</span>
+                            </button>
+
+                            <button class="btn-primary" (click)="openAddModal()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" />
+                                    <path d="M12 8V16M8 12H16" stroke="white" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                                <span>Add New Institution</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Stats Grid -->
@@ -211,6 +222,16 @@
                     (close)="closeAddModal()"
                     (success)="onAddSuccess()">
                 </app-add-institution-modal>
+
+                <!-- Bulk Upload Modal -->
+                <app-bulk-upload-modal
+                    *ngIf="showBulkUploadModal"
+                    [title]="'Bulk Upload Institutions'"
+                    [moduleName]="'Institution'"
+                    [service]="institutionService"
+                    (uploaded)="onBulkUploadSuccess($event)"
+                    (closed)="showBulkUploadModal = false">
+                </app-bulk-upload-modal>
             </div>
         </main>
     </div>

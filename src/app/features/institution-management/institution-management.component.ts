@@ -10,11 +10,12 @@ import { InstitutionPageData, InstitutionItem } from '../../core/models/institut
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddInstitutionModalComponent } from './components/add-institution-modal/add-institution-modal.component';
+import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-institution-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddInstitutionModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddInstitutionModalComponent, BulkUploadModalComponent],
   templateUrl: './institution-management.component.html',
   styleUrl: './institution-management.component.scss'
 })
@@ -40,9 +41,10 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   showAddModal = false;
   selectedInstitution: InstitutionItem | null = null;
+  showBulkUploadModal = false;
 
   constructor(
-    private institutionService: InstitutionService,
+    public institutionService: InstitutionService,
     private router: Router
   ) {}
 
@@ -97,6 +99,10 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   }
 
   onAddSuccess() {
+    this.fetchData();
+  }
+
+  onBulkUploadSuccess(result: any) {
     this.fetchData();
   }
 

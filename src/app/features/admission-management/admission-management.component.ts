@@ -11,6 +11,7 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AdmissionFormModalComponent } from './components/admission-form-modal/admission-form-modal.component';
+import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-admission-management',
@@ -21,7 +22,8 @@ import { AdmissionFormModalComponent } from './components/admission-form-modal/a
     SidebarComponent, 
     TopbarComponent, 
     ConfirmationModalComponent,
-    AdmissionFormModalComponent
+    AdmissionFormModalComponent,
+    BulkUploadModalComponent
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -54,9 +56,10 @@ export class AdmissionManagementComponent implements OnInit {
   showAdmissionModal: boolean = false;
   selectedAdmission: AdmissionItem | null = null;
   selectedStudentId?: number;
+  showBulkUploadModal: boolean = false;
 
   constructor(
-    private admissionService: AdmissionService,
+    public admissionService: AdmissionService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -115,6 +118,10 @@ export class AdmissionManagementComponent implements OnInit {
   closeAdmissionModal(): void {
     this.showAdmissionModal = false;
     this.selectedStudentId = undefined;
+  }
+
+  onBulkUploadSuccess(result: any) {
+    this.fetchData();
   }
 
   onDelete(admission: AdmissionItem) {

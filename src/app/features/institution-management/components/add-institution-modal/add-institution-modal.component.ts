@@ -156,8 +156,8 @@ export class AddInstitutionModalComponent implements OnInit {
     if (!this.selectedFile || this.isUploading) return;
 
     this.isUploading = true;
-    this.institutionService.bulkUploadInstitutions(this.selectedFile).subscribe({
-      next: (res) => {
+    this.institutionService.bulkUpload(this.selectedFile).subscribe({
+      next: (res: any) => {
         this.isUploading = false;
         this.bulkUploadResult = res.data || res;
         this.selectedFile = null;
@@ -168,7 +168,7 @@ export class AddInstitutionModalComponent implements OnInit {
           }, 2000);
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isUploading = false;
         alert(err.error?.message || 'Bulk upload failed');
       }
@@ -176,7 +176,7 @@ export class AddInstitutionModalComponent implements OnInit {
   }
 
   downloadTemplate(): void {
-    this.institutionService.downloadBulkUploadTemplate();
+    this.institutionService.downloadTemplate();
   }
 
   // --- Helpers ---

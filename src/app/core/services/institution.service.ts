@@ -100,26 +100,14 @@ export class InstitutionService {
     return this.http.post<any>(this.apiUrl, data);
   }
 
-  bulkUploadInstitutions(file: File): Observable<any> {
+  bulkUpload(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<any>(`${this.apiUrl}/bulk-upload`, formData);
   }
 
-  downloadBulkUploadTemplate(): void {
-    const url = `${this.apiUrl}/bulk-upload/template`;
-    this.http.get(url, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'Institution_Bulk_Upload_Template.xlsx';
-        link.click();
-        window.URL.revokeObjectURL(link.href);
-      },
-      error: (err) => {
-        console.error('Failed to download template', err);
-      }
-    });
+  downloadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
   }
 
   private getMockData(): InstitutionPageData {

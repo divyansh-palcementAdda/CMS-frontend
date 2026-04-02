@@ -10,11 +10,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddConsultancyModalComponent } from './components/add-consultancy-modal/add-consultancy-modal.component';
+import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
   selector: 'app-consultancy-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent, BulkUploadModalComponent],
   templateUrl: './consultancy-management.component.html',
   styleUrls: ['./consultancy-management.component.scss']
 })
@@ -32,8 +33,9 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   showAddModal = false;
   showDeleteModal = false;
   selectedConsultancy: ConsultancyItem | null = null;
+  showBulkUploadModal = false;
 
-  constructor(private consultancyService: ConsultancyService, private router: Router) {}
+  constructor(public consultancyService: ConsultancyService, private router: Router) {}
 
   ngOnInit() {
     this.loadData();
@@ -67,6 +69,10 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   onAddSuccess() {
     this.showAddModal = false;
+    this.loadData();
+  }
+
+  onBulkUploadSuccess(result: any) {
     this.loadData();
   }
 

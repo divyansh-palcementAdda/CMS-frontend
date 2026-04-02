@@ -185,8 +185,8 @@ export class AddCourseModalComponent implements OnInit {
     this.isUploading = true;
     this.bulkUploadResult = null;
 
-    this.courseService.bulkUploadCourses(this.selectedFile).subscribe({
-      next: (res) => {
+    this.courseService.bulkUpload(this.selectedFile).subscribe({
+      next: (res: any) => {
         this.isUploading = false;
         this.bulkUploadResult = res;
         // Optionally emit success if everything succeeded
@@ -197,7 +197,7 @@ export class AddCourseModalComponent implements OnInit {
           }, 3000); // give user time to read success message before closing
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Bulk upload failed', err);
         this.isUploading = false;
         alert('Bulk upload failed. See console for details.');
@@ -206,8 +206,8 @@ export class AddCourseModalComponent implements OnInit {
   }
 
   downloadTemplate() {
-    this.courseService.downloadBulkUploadTemplate().subscribe({
-      next: (blob) => {
+    this.courseService.downloadTemplate().subscribe({
+      next: (blob: any) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -217,7 +217,7 @@ export class AddCourseModalComponent implements OnInit {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to download template', err);
         alert('Failed to download template. Please try again later.');
       }

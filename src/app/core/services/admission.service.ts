@@ -69,26 +69,14 @@ export class AdmissionService {
     return this.http.put<any>(`${this.apiUrl}/${id}`, admission);
   }
 
-  bulkUploadAdmissions(file: File): Observable<any> {
+  bulkUpload(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<any>(`${this.apiUrl}/bulk-upload`, formData);
   }
 
-  downloadTemplate(): void {
-    this.http.get(`${this.apiUrl}/template`, { responseType: 'blob' }).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'admission-bulk-upload-template.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      error: (error) => console.error('Template download failed', error)
-    });
+  downloadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
   }
 
   updateFeeStatus(id: number | undefined, isPaid: boolean): Observable<any> {

@@ -1,0 +1,147 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-body">
+      <!-- Card 1: Template Download -->
+      <div class="bulk-card download-card" *ngIf="uploadStatus === 'IDLE'">
+        <div class="card-header">
+          <h4>Download {{ moduleName }} Excel Template</h4>
+          <p>Download the template, fill in {{ moduleName | lowercase }} details, and upload it back to the system</p>
+        </div>
+        <div class="card-action">
+          <button class="btn-download-excel" (click)="downloadTemplate()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: File Upload (Idle State) -->
+      <div class="bulk-card upload-card" *ngIf="uploadStatus === 'IDLE'">
+        <div class="card-header">
+          <h4>Upload Updated Excel Template</h4>
+          <p>Upload the completed Excel file after filling {{ moduleName | lowercase }} details</p>
+        </div>
+
+        <div class="drop-zone-wrapper">
+          <div 
+            class="drop-zone"
+            [class.active]="isDragging"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)">
+            <input #fileInput type="file" (change)="onFileSelected($event)" accept=".xlsx, .xls, .csv" hidden>
+            
+            <div class="zone-content">
+              <div class="upload-icon-arrow">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <p class="drop-title" *ngIf="!selectedFile">Drag and drop your Excel file here</p>
+              <p class="drop-title selected-file" *ngIf="selectedFile">{{ selectedFile.name }}</p>
+              <p class="drop-subtext">only supports .xlsx .xls .csv upto 2MB</p>
+              
+              <button class="btn-browse" (click)="fileInput.click()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                </svg>
+                Browse
+              </button>
+              
+              <div class="remove-action" *ngIf="selectedFile">
+                <button class="btn-remove" (click)="$event.stopPropagation(); reset()">Remove selected file</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Uploading State -->
+      <div class="uploading-state" *ngIf="uploadStatus === 'UPLOADING'">
+        <div class="loader-container">
+          <div class="loader"></div>
+        </div>
+        <h4>Uploading and processing records...</h4>
+        <p>Please wait, do not close the window.</p>
+      </div>
+
+      <!-- Results View -->
+      <div class="results-view" *ngIf="uploadResult">
+        <div class="res-summary">
+          <div class="res-card success">
+            <span class="count">{{ uploadResult.successCount }}</span>
+            <span class="label">Successful</span>
+          </div>
+          <div class="res-card failure" [class.has-errors]="uploadResult.failureCount > 0">
+            <span class="count">{{ uploadResult.failureCount }}</span>
+            <span class="label">Failed</span>
+          </div>
+          <div class="res-card total">
+            <span class="count">{{ uploadResult.totalProcessed }}</span>
+            <span class="label">Total Records</span>
+          </div>
+        </div>
+
+        <div class="failures-list" *ngIf="uploadResult.failures.length > 0">
+          <h5>Error Details</h5>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Error Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let failure of uploadResult.failures">
+                  <td class="row-num">#{{ failure.rowNumber }}</td>
+                  <td class="err-msg">{{ failure.errorMessage }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="success-message" *ngIf="uploadStatus === 'SUCCESS'">
+          <div class="check-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <p>Bulk upload completed successfully! All records have been imported.</p>
+        </div>
+      </div>
+
+      <!-- Overall Error State (Unexpected) -->
+       <div class="error-banner" *ngIf="errorMessage">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="close()">Cancel</button>
+      <button class="btn-primary" [disabled]="!selectedFile" (click)="uploadFile()" *ngIf="uploadStatus === 'IDLE'">
+        Submit
+      </button>
+      <button class="btn-primary" (click)="reset()" *ngIf="uploadResult && uploadStatus !== 'SUCCESS'">
+        Try Again
+      </button>
+      <button class="btn-success" (click)="close()" *ngIf="uploadStatus === 'SUCCESS'">
+        Done
+      </button>
+    </div>
+  </div>
+</div>

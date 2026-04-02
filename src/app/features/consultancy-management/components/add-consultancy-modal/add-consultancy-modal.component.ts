@@ -263,12 +263,12 @@ export class AddConsultancyModalComponent implements OnInit {
     this.isUploading = true;
     this.bulkUploadResult = null;
     
-    this.consultancyService.bulkUploadConsultancies(this.selectedFile).subscribe({
-      next: (res) => {
+    this.consultancyService.bulkUpload(this.selectedFile).subscribe({
+      next: (res: any) => {
         this.isUploading = false;
         this.bulkUploadResult = res; // Contains successCount, failureCount, failures[]
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isUploading = false;
         console.error(err);
         alert("Bulk upload failed entirely: " + (err.error?.message || 'Server Error'));
