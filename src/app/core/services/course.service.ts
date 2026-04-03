@@ -24,7 +24,7 @@ export class CourseService {
       map(response => this.transformCoursePageData(response)),
       catchError(err => {
         console.error('Failed to load courses data', err);
-        return of({ stats: { totalCourses: 0, activeCourses: 0, onlineCourses: 0, totalStudents: 0 }, courses: [], totalCount: 0 });
+        return of({ stats: { totalCourses: 0, activeCourses: 0, offlineCourses: 0, totalStudents: 0 }, courses: [], totalCount: 0 });
       })
     );
   }
@@ -34,23 +34,23 @@ export class CourseService {
       map(response => this.transformCoursePageData(response)),
       catchError(err => {
         console.error(`Failed to load courses for type ${typeId}`, err);
-        return of({ stats: { totalCourses: 0, activeCourses: 0, onlineCourses: 0, totalStudents: 0 }, courses: [], totalCount: 0 });
+        return of({ stats: { totalCourses: 0, activeCourses: 0, offlineCourses: 0, totalStudents: 0 }, courses: [], totalCount: 0 });
       })
     );
   }
 
   private transformCoursePageData(response: any): CoursePageData {
     const coursesData = Array.isArray(response) ? response : (response?.data || response?.content || []);
-    
+
     let activeCourses = 0;
-    let onlineCourses = 0;
+    let offlineCourses = 0;
     let totalStudents = 0;
 
     const mappedCourses: CourseItem[] = coursesData.map((course: CourseDTO, index: number) => {
       const isActive = course.active !== false;
       if (isActive) activeCourses++;
-      if (course.isOnline) onlineCourses++;
-      
+      if (!course.isOnline) offlineCourses++;
+
       const studentsCount = course.studentCount || 0;
       totalStudents += studentsCount;
 
@@ -75,7 +75,7 @@ export class CourseService {
     const stats: CourseStats = {
       totalCourses: coursesData.length,
       activeCourses,
-      onlineCourses,
+      offlineCourses,
       totalStudents
     };
 

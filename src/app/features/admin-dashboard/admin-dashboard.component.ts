@@ -100,6 +100,10 @@ export class AdminDashboardComponent implements OnInit {
     this.showDeleteModal = true;
   }
 
+  onViewAllConsultancies() {
+    this.router.navigate(['/consultancy']);
+  }
+
   // Admission Actions (from Recent Forms)
   onViewAdmission(id: number) {
     this.router.navigate(['/admissions', id]);
@@ -113,6 +117,10 @@ export class AdminDashboardComponent implements OnInit {
     this.deleteType = 'Admission';
     this.itemToDelete = item;
     this.showDeleteModal = true;
+  }
+
+  onViewAllAdmissions() {
+    this.router.navigate(['/admin/admission-management']);
   }
 
   cancelDelete() {

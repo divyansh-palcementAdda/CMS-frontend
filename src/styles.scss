@@ -291,6 +291,7 @@ button {
         background: #00B884;
         color: #FFFFFF;
       }
+
       &.unpaid {
         background: #F43F5E;
         color: #FFFFFF;
@@ -311,13 +312,13 @@ button {
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
-  
+
   &.scholarship {
     background: #EEF2FF;
     color: #4F46E5;
     border: 1px solid #E0E7FF;
   }
-  
+
   &.percent {
     background: transparent;
     color: #1E293B;
@@ -333,13 +334,13 @@ button {
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  
+
   &.active {
     background: #ECFDF5;
     color: #059669;
     border: 1px solid #D1FAE5;
   }
-  
+
   &.inactive {
     background: #FEF2F2;
     color: #EF4444;
@@ -351,7 +352,7 @@ button {
 .table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  
+
   &::-webkit-scrollbar {
     height: 4px;
   }
@@ -383,4 +384,4 @@ button {
   .search-box {
     width: 100% !important;
   }
-}
+}

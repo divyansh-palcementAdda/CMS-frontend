@@ -7,6 +7,12 @@ export interface AdmissionStats {
   tokenAmountPaid: number;
   partialfessUnpaid: number;
   tokenAmountUnpaid: number;
+
+  // Financial Status
+  totalAmountCollected: number;
+  totalAmountPending: number;
+  totalAmountDiscounted: number;
+  totalRevenueExpected: number;
 }
 
 export interface AdmissionItem {
@@ -60,6 +66,12 @@ export interface AdmissionItem {
 
   fiftyPercentFeesPaid?: boolean;
   tokenAmountPaid?: boolean;
+
+  totalCourseFees?: number;
+  finalFeesAfterDiscount?: number;
+  totalFeesPaid?: number;
+  remainingFees?: number;
+  courseDurationInMonths?: number;
 
   createdAt?: string;
   updatedAt?: string;

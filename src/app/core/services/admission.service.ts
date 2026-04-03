@@ -84,6 +84,10 @@ export class AdmissionService {
     return this.http.patch(`${this.apiUrl}/${id}/fee-status`, { fiftyPercentFeesPaid: isPaid });
   }
 
+  addFeePayment(studentId: number, request: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${studentId}/fees`, request);
+  }
+
   deleteAdmission(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
@@ -100,9 +104,16 @@ export class AdmissionService {
       discountPercentageDisplay: s.discountType === 'PERCENTAGE' ? `${s.discountValue}%` : (s.isScholar ? 'Scholarship' : '-'),
 
       // Dynamic financial fields
-      percentagePaid: s.fiftyPercentFeesPaid ? 50 : 0,
-      tokenAmount: s.tokenAmountPaid ? 5000 : 0, // Fallback if literal amount is missing
-      discountPercentage: s.discountType === 'PERCENTAGE' ? s.discountValue : 0
+      percentagePaid: s.finalFeesAfterDiscount > 0 ? (s.totalFeesPaid / s.finalFeesAfterDiscount) * 100 : 0,
+      tokenAmount: s.totalFeesPaid || 0, 
+      discountPercentage: s.discountType === 'PERCENTAGE' ? s.discountValue : 0,
+      
+      // Explicit fields
+      totalCourseFees: s.totalCourseFees,
+      finalFeesAfterDiscount: s.finalFeesAfterDiscount,
+      totalFeesPaid: s.totalFeesPaid,
+      remainingFees: s.remainingFees,
+      courseDurationInMonths: s.courseDurationInMonths
     };
   }
 }

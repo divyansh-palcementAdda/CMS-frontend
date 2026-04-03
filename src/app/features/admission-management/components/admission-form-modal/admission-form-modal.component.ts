@@ -316,13 +316,13 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
 
     this.isSaving = true;
     const data = { ...this.admissionForm.value };
-    
+
     // Cleanup: Convert empty strings to null for backend enum/number compatibility
     if (data.discountType === '') data.discountType = null;
     if (data.admittedByUserId === '') data.admittedByUserId = null;
     if (data.consultancyId === '') data.consultancyId = null;
 
-    const request = this.isEditMode 
+    const request = this.isEditMode
       ? this.admissionService.updateAdmission(this.studentId!, data)
       : this.admissionService.createAdmission(data);
 

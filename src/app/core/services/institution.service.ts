@@ -21,7 +21,7 @@ export class InstitutionService {
       map(({ institutionsRes: response, coursesRes }) => {
         const institutionsData = Array.isArray(response) ? response : (response?.data || response?.content || (response ? [response] : []));
         const coursesData = Array.isArray(coursesRes) ? coursesRes : (coursesRes?.data || coursesRes?.content || (coursesRes ? [coursesRes] : []));
-        
+
         let totalInstitutions = institutionsData.length;
         let activeInstitutions = 0;
         let totalCourses = coursesData.length;
@@ -29,9 +29,9 @@ export class InstitutionService {
 
         const mappedInstitutions: InstitutionItem[] = institutionsData.map((inst: any, index: number) => {
           const status = (typeof inst.status === 'string' && inst.status.toUpperCase() === 'ACTIVE') || inst.isActive ? 'Active' : 'Inactive';
-          
+
           if (status === 'Active') activeInstitutions++;
-          
+
           const studentsCount = inst.students || inst.studentCount || 0;
           totalStudents += studentsCount;
 
@@ -50,13 +50,13 @@ export class InstitutionService {
         });
 
         const stats: InstitutionStats = {
-          totalInstitutions: totalInstitutions > 0 ? totalInstitutions : 7,
-          activeInstitutions: activeInstitutions > 0 ? activeInstitutions : 6,
-          totalCourses: totalCourses > 0 ? totalCourses : 259,
-          totalStudents: totalStudents > 0 ? totalStudents : 7198
+          totalInstitutions: totalInstitutions > 0 ? totalInstitutions : 0,
+          activeInstitutions: activeInstitutions > 0 ? activeInstitutions : 0,
+          totalCourses: totalCourses > 0 ? totalCourses : 0,
+          totalStudents: totalStudents > 0 ? totalStudents : 0
         };
 
-        return { stats, institutions: mappedInstitutions, totalCount: totalInstitutions > 0 ? totalInstitutions : 1200 };
+        return { stats, institutions: mappedInstitutions, totalCount: totalInstitutions > 0 ? totalInstitutions : 0 };
       }),
       catchError(err => {
         console.warn('Failed to load institution data, using mock fallback', err);

@@ -11,6 +11,7 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AdmissionFormModalComponent } from './components/admission-form-modal/admission-form-modal.component';
+import { FeePaymentModalComponent } from './components/fee-payment-modal/fee-payment-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 
 @Component({
@@ -23,6 +24,7 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
     TopbarComponent, 
     ConfirmationModalComponent,
     AdmissionFormModalComponent,
+    FeePaymentModalComponent,
     BulkUploadModalComponent
   ],
   templateUrl: './admission-management.component.html',
@@ -57,6 +59,12 @@ export class AdmissionManagementComponent implements OnInit {
   selectedAdmission: AdmissionItem | null = null;
   selectedStudentId?: number;
   showBulkUploadModal: boolean = false;
+  
+  // Payment Modal State
+  showPaymentModal = false;
+  selectedStudentIdForPayment?: number;
+  selectedStudentNameForPayment = '';
+  admissionIdToDelete?: number;
 
   constructor(
     public admissionService: AdmissionService,
@@ -124,20 +132,32 @@ export class AdmissionManagementComponent implements OnInit {
     this.fetchData();
   }
 
-  onDelete(admission: AdmissionItem) {
-    this.selectedAdmission = admission;
+  onDelete(item: AdmissionItem) {
+    this.admissionIdToDelete = item.id;
+    this.selectedAdmission = item;
     this.showDeleteModal = true;
+  }
+
+  // Payment Actions
+  onPay(item: AdmissionItem) {
+    this.selectedStudentIdForPayment = item.id;
+    this.selectedStudentNameForPayment = item.fullName;
+    this.showPaymentModal = true;
+  }
+
+  onPaymentSaved() {
+    this.fetchData();
   }
 
   cancelDelete() {
     this.showDeleteModal = false;
-    this.selectedAdmission = null;
+    this.admissionIdToDelete = undefined;
   }
 
   confirmDelete() {
-    if (this.selectedAdmission && this.selectedAdmission.id) {
+    if (this.admissionIdToDelete) {
       this.loading = true;
-      this.admissionService.deleteAdmission(this.selectedAdmission.id!).subscribe({
+      this.admissionService.deleteAdmission(this.admissionIdToDelete).subscribe({
         next: () => {
           this.showDeleteModal = false;
           this.selectedAdmission = null;

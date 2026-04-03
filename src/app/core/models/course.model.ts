@@ -39,7 +39,7 @@ export interface CourseItem {
 export interface CourseStats {
   totalCourses: number;
   activeCourses: number;
-  onlineCourses: number;
+  offlineCourses: number;
   totalStudents: number;
 }
 

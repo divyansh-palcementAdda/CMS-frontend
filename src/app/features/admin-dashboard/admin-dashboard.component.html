@@ -63,13 +63,15 @@
               [consultancies]="dashboardData()?.consultancyData"
               (view)="onViewConsultancy($event)"
               (edit)="onEditConsultancy($event)"
-              (delete)="onDeleteConsultancy($event)">
+              (delete)="onDeleteConsultancy($event)"
+              (viewAll)="onViewAllConsultancies()">
             </app-consultancy-table>
             <app-recent-forms 
               [forms]="dashboardData()?.recentForms"
               (view)="onViewAdmission($event)"
               (edit)="onEditAdmission($event)"
-              (delete)="onDeleteAdmission($event)">
+              (delete)="onDeleteAdmission($event)"
+              (viewAll)="onViewAllAdmissions()">
             </app-recent-forms>
           </div>
         </div>
