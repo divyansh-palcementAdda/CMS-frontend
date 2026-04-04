@@ -51,7 +51,12 @@ export class AdmissionPanelComponent {
   constructor(private router: Router) {}
 
   navigateTo(type: string): void {
-    this.router.navigate(['/admin/admission-management'], { queryParams: { type } });
+    const queryParams: any = {};
+    if (type === 'Direct') queryParams.source = 'USER';
+    if (type === 'Indirect') queryParams.source = 'CONSULTANCY';
+    if (type === 'Scholarship') queryParams.isScholar = 'true';
+    
+    this.router.navigate(['/admin/admission-management'], { queryParams });
   }
 
   @Input() set stats(s: DashboardStats | null) {

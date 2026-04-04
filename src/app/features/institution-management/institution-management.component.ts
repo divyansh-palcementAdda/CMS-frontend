@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
@@ -45,11 +45,29 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     public institutionService: InstitutionService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.fetchData();
+    this.route.queryParams.subscribe(params => {
+      const status = params['status'];
+      if (status) {
+        this.fetchFilteredData(status);
+      } else {
+        this.fetchData();
+      }
+    });
+  }
+
+  fetchFilteredData(status: string) {
+    this.loading = true;
+    this.sub = this.institutionService.getInstitutionsByStatus(status).subscribe(data => {
+      this.pageData = data;
+      this.filteredInstitutions = data.institutions;
+      this.calculatePagination();
+      this.loading = false;
+    });
   }
 
   onView(id: number | undefined) {

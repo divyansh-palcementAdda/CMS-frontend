@@ -68,6 +68,60 @@ export class UserService {
     );
   }
 
+  getUsersByStatus(status: string): Observable<UserPageData> {
+    return this.http.get<any>(`${this.apiUrl}/status/${status.toUpperCase()}`).pipe(
+      map(response => {
+        const users = Array.isArray(response) ? response : (response?.data || []);
+
+        let activeCount = 0;
+        let adminCount = 0;
+
+        const mappedUsers: UserItem[] = users.map((u: any, index: number) => {
+          const uStatus = (typeof u.status === 'string' && u.status.toUpperCase() === 'ACTIVE') || u.isActive ? 'Active' : 'Inactive';
+          if (uStatus === 'Active') activeCount++;
+
+          let roleName = 'User';
+          let isAdmin = false;
+
+          if (Array.isArray(u.roles) && u.roles.length > 0) {
+            roleName = u.roles.map((r: any) => {
+              const rName = typeof r === 'string' ? r : (r.name || '');
+              return rName.replace('ROLE_', '').replace(/_/g, ' ');
+            }).join(', ');
+            isAdmin = u.roles.some((r: any) => {
+              const rName = typeof r === 'string' ? r : (r.name || '');
+              return rName.toUpperCase().includes('ADMIN');
+            });
+          }
+
+          if (isAdmin) adminCount++;
+
+          return {
+            id: u.userId || u.id,
+            sNo: index + 1,
+            username: u.username || '',
+            fullName: u.fullName || u.username || 'N/A',
+            email: u.email || '',
+            role: roleName,
+            status: uStatus as 'Active' | 'Inactive',
+            emailVerified: !!u.emailVerified,
+            createdAt: u.createdAt || '',
+            updatedAt: u.updatedAt || ''
+          };
+        });
+
+        const stats: UserStats = {
+          totalUsers: mappedUsers.length,
+          activeUsers: activeCount,
+          inactiveUsers: mappedUsers.length - activeCount,
+          adminUsers: adminCount
+        };
+
+        return { stats, users: mappedUsers, totalCount: mappedUsers.length };
+      })
+    );
+  }
+
   getUserById(id: number): Observable<UserItem> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => {
@@ -122,6 +176,10 @@ export class UserService {
 
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  updateUser(id: number | string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
   }
 
   toggleStatus(id: number): Observable<any> {

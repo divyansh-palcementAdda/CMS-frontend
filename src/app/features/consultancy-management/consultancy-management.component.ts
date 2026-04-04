@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConsultancyService } from '../../core/services/consultancy.service';
@@ -35,10 +35,40 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   selectedConsultancy: ConsultancyItem | null = null;
   showBulkUploadModal = false;
 
-  constructor(public consultancyService: ConsultancyService, private router: Router) {}
+  constructor(
+    public consultancyService: ConsultancyService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    this.loadData();
+    this.route.queryParams.subscribe(params => {
+      const status = params['status'];
+      if (status) {
+        this.loadFilteredData(status);
+      } else {
+        this.loadData();
+      }
+    });
+  }
+
+  loadFilteredData(status: string) {
+    this.loading = true;
+    const obs = status.toUpperCase() === 'DELETED' 
+      ? this.consultancyService.getConsultanciesByStatusAndDeleted('DELETED', true)
+      : this.consultancyService.getConsultanciesByStatus(status);
+
+    obs.pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.pageData = data;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error loading filtered consultancy data', err);
+          this.loading = false;
+        }
+      });
   }
 
   onView(id: number) {

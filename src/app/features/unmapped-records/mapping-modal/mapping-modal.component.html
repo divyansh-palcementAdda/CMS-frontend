@@ -1,0 +1,184 @@
+<div class="modal-container">
+  <div class="modal-header">
+    <div class="header-content">
+      <h2>Map Record</h2>
+      <p>Map <strong>{{ data.record.fullName || data.record.name || 'this record' }}</strong> to the appropriate
+        entities.</p>
+    </div>
+    <button class="close-btn" (click)="dialogRef.close()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="mappingForm" (ngSubmit)="submitMapping()">
+
+      <!-- Search Input (Global search for current context) -->
+      @if (data.type !== 'students') {
+      <div class="search-wrapper">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text"
+          [placeholder]="'Search ' + (data.type === 'users' || data.type === 'courses' ? 'Consultancy' : (data.type === 'consultancies-users' ? 'Users' : 'Courses')) + '...'"
+          [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" [ngModelOptions]="{standalone: true}">
+      </div>
+      @}
+
+      <!-- Mapping Content Based on Type -->
+      @switch (data.type) {
+
+      @case ('students') {
+      <div class="mapping-section">
+        <label class="section-subtitle">Admission Source</label>
+        <div class="source-options">
+          <label class="radio-card">
+            <input type="radio" value="CONSULTANCY" formControlName="admissionSource">
+            <div class="card-content">
+              <div class="icon-wrapper">
+                <span class="material-symbols-outlined">business</span>
+              </div>
+              <span class="label-text">Consultancy</span>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" value="USER" formControlName="admissionSource">
+            <div class="card-content">
+              <div class="icon-wrapper">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <span class="label-text">Internal (User)</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="dropdown-wrapper">
+          @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY') {
+          <label class="section-subtitle">Select Consultancy</label>
+          <div class="select-container">
+            <span class="material-symbols-outlined select-icon">search</span>
+            <select formControlName="consultancyId">
+              <option [ngValue]="null">Choose a consultancy...</option>
+              @for (item of consultancies; track item.id) {
+              <option [ngValue]="item.id">{{ item.name }}</option>
+              }
+            </select>
+          </div>
+          } @else {
+          <label class="section-subtitle">Select User (Counsellor)</label>
+          <div class="select-container">
+            <span class="material-symbols-outlined select-icon">person_search</span>
+            <select formControlName="admittedByUserId">
+              <option [ngValue]="null">Choose a user...</option>
+              @for (item of users; track item.id) {
+              <option [ngValue]="item.id">{{ item.name || item.fullName }}</option>
+              }
+            </select>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @case ('users') {
+      <div class="selection-section">
+        <div class="section-title">
+          <h3>Select Consultancies</h3>
+          <button type="button" class="link-btn" (click)="selectAll(consultancies)">Select All</button>
+        </div>
+        <div class="selection-list">
+          @for (item of filteredConsultancies; track item.id) {
+          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
+            <div class="checkbox-box">
+              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
+                'check_box_outline_blank' }}</span>
+            </div>
+            <div class="item-info">
+              <span class="main">{{ item.name }}</span>
+              <span class="sub">{{ item.email }}</span>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @case ('courses') {
+      <div class="selection-section">
+        <div class="section-title">
+          <h3>Select Consultancies</h3>
+          <button type="button" class="link-btn" (click)="selectAll(consultancies)">Select All</button>
+        </div>
+        <div class="selection-list">
+          @for (item of filteredConsultancies; track item.id) {
+          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
+            <div class="checkbox-box">
+              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
+                'check_box_outline_blank' }}</span>
+            </div>
+            <div class="item-info">
+              <span class="main">{{ item.name }}</span>
+              <span class="sub">{{ item.email }}</span>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @case ('consultancies-users') {
+      <div class="selection-section">
+        <div class="section-title">
+          <h3>Select Users to Map</h3>
+          <button type="button" class="link-btn" (click)="selectAll(users)">Select All</button>
+        </div>
+        <div class="selection-list">
+          @for (item of filteredUsers; track item.id) {
+          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
+            <div class="checkbox-box">
+              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
+                'check_box_outline_blank' }}</span>
+            </div>
+            <div class="item-info">
+              <span class="main">{{ item.fullName || item.name }}</span>
+              <span class="sub">{{ item.email }}</span>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @case ('consultancies-courses') {
+      <div class="selection-section">
+        <div class="section-title">
+          <h3>Select Courses to Map</h3>
+          <button type="button" class="link-btn" (click)="selectAll(courses)">Select All</button>
+        </div>
+        <div class="selection-list">
+          @for (item of filteredCourses; track item.id) {
+          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
+            <div class="checkbox-box">
+              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
+                'check_box_outline_blank' }}</span>
+            </div>
+            <div class="item-info">
+              <span class="main">{{ item.name }}</span>
+              <span class="sub">{{ item.courseType }} | {{ item.duration }}</span>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+      }
+
+      <div class="modal-footer">
+        <button type="button" class="secondary-btn" (click)="dialogRef.close()">Cancel</button>
+        <button type="submit" class="primary-btn"
+          [disabled]="loading || (data.type === 'students' ? mappingForm.invalid : selectedIds.size === 0)">
+          <span class="btn-text" *ngIf="!loading">Save Mapping</span>
+          <div class="spinner" *ngIf="loading"></div>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

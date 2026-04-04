@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { CourseService } from '../../core/services/course.service';
@@ -37,7 +37,8 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     public courseService: CourseService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   onView(id: number) {
@@ -95,7 +96,30 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadData();
+    this.route.queryParams.subscribe(params => {
+      const active = params['active'];
+      if (active !== undefined) {
+        this.loadFilteredData(active === 'true');
+      } else {
+        this.loadData();
+      }
+    });
+  }
+
+  loadFilteredData(active: boolean) {
+    this.loading = true;
+    this.courseService.getCoursesByActive(active)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.pageData = data;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error loading filtered course data', err);
+          this.loading = false;
+        }
+      });
   }
 
   loadData() {

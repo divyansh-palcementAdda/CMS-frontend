@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
@@ -18,14 +18,14 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
   selector: 'app-admission-management',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    SidebarComponent, 
-    TopbarComponent, 
+    CommonModule,
+    FormsModule,
+    SidebarComponent,
+    TopbarComponent,
     ConfirmationModalComponent,
     AdmissionFormModalComponent,
     FeePaymentModalComponent,
-    BulkUploadModalComponent
+    BulkUploadModalComponent,
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -37,7 +37,7 @@ export class AdmissionManagementComponent implements OnInit {
   loading: boolean = true;
   private sub: Subscription | null = null;
   private routeSub: Subscription | null = null;
-  
+
   // Search state
   searchSubject = new Subject<string>();
   private searchSub: Subscription | null = null;
@@ -59,7 +59,7 @@ export class AdmissionManagementComponent implements OnInit {
   selectedAdmission: AdmissionItem | null = null;
   selectedStudentId?: number;
   showBulkUploadModal: boolean = false;
-  
+
   // Payment Modal State
   showPaymentModal = false;
   selectedStudentIdForPayment?: number;
@@ -75,10 +75,19 @@ export class AdmissionManagementComponent implements OnInit {
   ngOnInit(): void {
     // Check URL for any pre-filled filters
     this.routeSub = this.route.queryParams.subscribe(params => {
-      if (params['type']) {
-        this.activeStatFilter = params['type'];
+      const type = params['type'];
+      const source = params['source'];
+      const isScholar = params['isScholar'];
+
+      if (type) {
+        this.activeStatFilter = type;
       }
-      this.fetchData();
+
+      if (source || isScholar !== undefined) {
+        this.fetchFilteredData(source, isScholar === 'true');
+      } else {
+        this.fetchData();
+      }
     });
 
     // Debounce search input
@@ -89,6 +98,18 @@ export class AdmissionManagementComponent implements OnInit {
       this.searchTerm = searchTerm;
       this.currentPage = 1;
       this.fetchData();
+    });
+  }
+  goBack() {
+    this.router.navigate(['/admin/dashboard']);
+  }
+
+  fetchFilteredData(source?: string, isScholar?: boolean): void {
+    this.loading = true;
+    this.sub = this.admissionService.getStudentsByFilter(source, isScholar).subscribe(data => {
+      this.pageData = data;
+      this.totalPages = 1;
+      this.loading = false;
     });
   }
 

@@ -21,7 +21,7 @@
                     <!-- Header Section -->
                     <div class="header-section">
                         <div class="title-container">
-                            <div class="back-btn" routerLink="/admin/dashboard">
+                            <div class="back-btn" (click)="goBack()">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="12" cy="12" r="12" fill="#6366F1" />
@@ -299,8 +299,6 @@
                                             </div>
                                         </th>
                                         <th>Course</th>
-                                        <th>Duration</th>
-                                        <!-- <th>Counseled By</th> -->
                                         <th>Discount %</th>
                                         <th>Paid</th>
                                         <th>Remaining</th>
@@ -344,7 +342,7 @@
                                             {{ item.courseName.split(' ')[0] }}<br>
                                             {{ item.courseName.split(' ').slice(1).join(' ') }}
                                         </td>
-                                        <td>{{ item.duration }}</td>
+                                        <!-- <td>{{ item.duration }}</td> -->
                                         <!-- <td>{{ item.counselorName || 'N/A' }}</td> -->
                                         <td>
                                             <span class="discount-badge" [class.scholarship]="item.isScholar"

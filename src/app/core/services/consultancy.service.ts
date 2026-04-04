@@ -54,6 +54,86 @@ export class ConsultancyService {
     );
   }
 
+  getConsultanciesByStatus(status: string): Observable<ConsultancyPageData> {
+    return this.http.get<any>(`${this.apiUrl}/status/${status.toUpperCase()}`).pipe(
+      map(response => {
+        const data = Array.isArray(response) ? response : (response?.data || []);
+        
+        let activeCount = 0;
+        let totalCourseCount = 0;
+
+        const mappedItems: ConsultancyItem[] = data.map((dto: ConsultancyDTO, index: number) => {
+          if (dto.status?.toLowerCase() === 'active') activeCount++;
+          totalCourseCount += (dto.courseCount || 0);
+
+          return {
+            id: dto.id || 0,
+            sNo: index + 1,
+            name: dto.name || 'Unknown Consultancy',
+            email: dto.email || 'N/A',
+            mobile: dto.mobile || 'N/A',
+            city: dto.city || 'N/A',
+            status: (dto.status || 'Active') as any,
+            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-'
+          };
+        });
+
+        const stats: ConsultancyStats = {
+          totalConsultancy: mappedItems.length,
+          activeConsultancy: activeCount,
+          totalProjected: '₹ 0',
+          totalCourses: totalCourseCount
+        };
+
+        return {
+          stats,
+          consultancies: mappedItems,
+          totalCount: mappedItems.length
+        };
+      })
+    );
+  }
+
+  getConsultanciesByStatusAndDeleted(status: string, deleted: boolean): Observable<ConsultancyPageData> {
+    return this.http.get<any>(`${this.apiUrl}/status/${status.toUpperCase()}/deleted/${deleted}`).pipe(
+      map(response => {
+        const data = Array.isArray(response) ? response : (response?.data || []);
+        
+        let activeCount = 0;
+        let totalCourseCount = 0;
+
+        const mappedItems: ConsultancyItem[] = data.map((dto: ConsultancyDTO, index: number) => {
+          if (dto.status?.toLowerCase() === 'active') activeCount++;
+          totalCourseCount += (dto.courseCount || 0);
+
+          return {
+            id: dto.id || 0,
+            sNo: index + 1,
+            name: dto.name || 'Unknown Consultancy',
+            email: dto.email || 'N/A',
+            mobile: dto.mobile || 'N/A',
+            city: dto.city || 'N/A',
+            status: (dto.status || 'Active') as any,
+            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-'
+          };
+        });
+
+        const stats: ConsultancyStats = {
+          totalConsultancy: mappedItems.length,
+          activeConsultancy: activeCount,
+          totalProjected: '₹ 0',
+          totalCourses: totalCourseCount
+        };
+
+        return {
+          stats,
+          consultancies: mappedItems,
+          totalCount: mappedItems.length
+        };
+      })
+    );
+  }
+
   getConsultancyById(id: number): Observable<ConsultancyDetail> {
     return this.http.get<any>(`${this.apiUrl}/${id}/detail`).pipe(
       map(response => {
@@ -80,6 +160,10 @@ export class ConsultancyService {
 
   createConsultancy(data: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
+  }
+
+  updateConsultancy(id: number | string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
   }
 
   bulkUpload(file: File): Observable<any> {

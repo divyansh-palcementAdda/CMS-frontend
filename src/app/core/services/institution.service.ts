@@ -65,6 +65,54 @@ export class InstitutionService {
     );
   }
 
+  getInstitutionsByStatus(status: string): Observable<InstitutionPageData> {
+    return forkJoin({
+      institutionsRes: this.http.get<any>(`${this.apiUrl}/status/${status.toUpperCase()}`).pipe(catchError(() => of(null))),
+      coursesRes: this.http.get<any>(`${environment.apiUrl}/courses`).pipe(catchError(() => of(null)))
+    }).pipe(
+      map(({ institutionsRes: response, coursesRes }) => {
+        const institutionsData = Array.isArray(response) ? response : (response?.data || response?.content || (response ? [response] : []));
+        const coursesData = Array.isArray(coursesRes) ? coursesRes : (coursesRes?.data || coursesRes?.content || (coursesRes ? [coursesRes] : []));
+
+        let totalInstitutions = institutionsData.length;
+        let activeInstitutions = 0;
+        let totalCourses = coursesData.length;
+        let totalStudents = 0;
+
+        const mappedInstitutions: InstitutionItem[] = institutionsData.map((inst: any, index: number) => {
+          const instStatus = (typeof inst.status === 'string' && inst.status.toUpperCase() === 'ACTIVE') || inst.isActive ? 'Active' : 'Inactive';
+
+          if (instStatus === 'Active') activeInstitutions++;
+
+          const studentsCount = inst.students || inst.studentCount || 0;
+          totalStudents += studentsCount;
+
+          let courseValue = inst.course || inst.courseCount || inst.courses?.length || 0;
+          let courseDisplay = courseValue > 0 ? `${courseValue} Course` : 'No course';
+
+          return {
+            id: inst.id || index + 1,
+            sNo: index + 1,
+            name: inst.name || inst.institutionName || 'Unknown',
+            code: inst.code || inst.institutionCode || 'N/A',
+            students: studentsCount,
+            status: instStatus as 'Active' | 'Inactive',
+            course: courseDisplay
+          };
+        });
+
+        const stats: InstitutionStats = {
+          totalInstitutions: totalInstitutions > 0 ? totalInstitutions : 0,
+          activeInstitutions: activeInstitutions > 0 ? activeInstitutions : 0,
+          totalCourses: totalCourses > 0 ? totalCourses : 0,
+          totalStudents: totalStudents > 0 ? totalStudents : 0
+        };
+
+        return { stats, institutions: mappedInstitutions, totalCount: totalInstitutions > 0 ? totalInstitutions : 0 };
+      })
+    );
+  }
+
   getInstitutionCourses(institutionId: number): Observable<any[]> {
     const url = `${this.apiUrl}/${institutionId}/courses`;
     return this.http.get<any>(url).pipe(

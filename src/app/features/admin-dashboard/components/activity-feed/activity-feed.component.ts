@@ -62,9 +62,6 @@ export class ActivityFeedComponent implements OnInit, OnDestroy {
   fetchActivities(): void {
     this.loading = true;
     this.sub = this.activityService.getRecentActivities(14).subscribe((activities) => {
-      console.log('--- Incoming Dynamic Activity Data ---');
-      console.log(activities);
-      console.log('--------------------------------------');
 
       if (activities && activities.length > 0) {
         this.mapData(activities);

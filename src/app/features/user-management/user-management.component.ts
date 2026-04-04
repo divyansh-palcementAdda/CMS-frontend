@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
@@ -40,10 +40,31 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   selectedUser: UserItem | null = null;
   showBulkUploadModal = false;
 
-  constructor(public userService: UserService, private router: Router) { }
+  constructor(
+    public userService: UserService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit() {
-    this.fetchData();
+    this.route.queryParams.subscribe(params => {
+      const status = params['status'];
+      if (status) {
+        this.fetchFilteredData(status);
+      } else {
+        this.fetchData();
+      }
+    });
+  }
+
+  fetchFilteredData(status: string) {
+    this.loading = true;
+    this.sub = this.userService.getUsersByStatus(status).subscribe(data => {
+      this.pageData = data;
+      this.filteredUsers = data.users;
+      this.calculatePagination();
+      this.loading = false;
+    });
   }
   onView(id: number) {
     this.router.navigate(['/users', id]);

@@ -96,5 +96,11 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  {
+    path: 'unmapped',
+    loadComponent: () => import('./features/unmapped-records/unmapped-records.component').then(m => m.UnmappedRecordsComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
   { path: '**', redirectTo: '/admin/dashboard' }
 ];

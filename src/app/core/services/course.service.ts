@@ -39,6 +39,16 @@ export class CourseService {
     );
   }
 
+  getCoursesByActive(active: boolean): Observable<CoursePageData> {
+    return this.http.get<any>(`${this.apiUrl}/active/${active}`).pipe(
+      map(response => this.transformCoursePageData(response)),
+      catchError(err => {
+        console.error(`Failed to load courses with active=${active}`, err);
+        return of({ stats: { totalCourses: 0, activeCourses: 0, offlineCourses: 0, totalStudents: 0 }, courses: [], totalCount: 0 });
+      })
+    );
+  }
+
   private transformCoursePageData(response: any): CoursePageData {
     const coursesData = Array.isArray(response) ? response : (response?.data || response?.content || []);
 
@@ -84,6 +94,10 @@ export class CourseService {
 
   deleteCourse(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  updateCourse(id: number | string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
   }
 
   getAllCourses(): Observable<any[]> {

@@ -1,0 +1,316 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+    <main class="main-content">
+      <div class="unmapped-page">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb">
+          <span>Dashboard</span> / <span>Unmapped Records</span> / <span class="active">{{ currentTab() | titlecase
+            }}</span>
+        </nav>
+
+        <!-- Page Header -->
+        <header class="page-header">
+          <div class="title-section">
+            <button class="back-btn" (click)="goBack()">
+              <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1 class="page-title">Unmapped Records</h1>
+          </div>
+          <button class="export-btn" (click)="exportData()">
+            <span class="material-symbols-outlined">download</span> Export CSV
+          </button>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <!-- Top Row -->
+          <div class="stat-card purple">
+            <div class="card-inner">
+              <div class="stat-icon-wrapper">
+                <span class="material-symbols-outlined">edit_note</span>
+              </div>
+              <div class="stat-content">
+                <h2 class="stat-value">{{ (stats().unmappedStudents + stats().usersWithoutConsultancy +
+                  stats().coursesWithoutConsultancy) || 0 }}</h2>
+                <span class="stat-label">Total Unmapped Records</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card cyan" (click)="setTab('users')">
+            <div class="card-inner">
+              <div class="stat-icon-wrapper">
+                <span class="material-symbols-outlined">person_search</span>
+              </div>
+              <div class="stat-content">
+                <h2 class="stat-value">{{ stats().usersWithoutConsultancy || 0 }}</h2>
+                <span class="stat-label">Unmapped Users</span>
+                <p class="stat-desc">Users having no consultancies</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card red" (click)="setTab('students')">
+            <div class="card-inner">
+              <div class="stat-icon-wrapper">
+                <span class="material-symbols-outlined">person_remove</span>
+              </div>
+              <div class="stat-content">
+                <h2 class="stat-value">{{ stats().unmappedStudents || 0 }}</h2>
+                <span class="stat-label">Unmapped Students</span>
+                <p class="stat-desc">Students not mapped with a consultancy or user.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Row -->
+          <div class="stat-card yellow" (click)="setTab('courses')">
+            <div class="card-inner">
+              <div class="stat-icon-wrapper">
+                <span class="material-symbols-outlined">menu_book</span>
+              </div>
+              <div class="stat-content">
+                <h2 class="stat-value">{{ stats().coursesWithoutConsultancy || 0 }}</h2>
+                <span class="stat-label">Unmapped Courses</span>
+                <p class="stat-desc">Courses not mapped with any consultancy.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card pink" (click)="setTab('consultancies-users')">
+            <div class="card-inner">
+              <div class="stat-icon-wrapper">
+                <span class="material-symbols-outlined">business</span>
+              </div>
+              <div class="stat-content">
+                <h2 class="stat-value">{{ stats().consultanciesWithoutUsers || 0 }}</h2>
+                <span class="stat-label">Consultancies without users</span>
+                <p class="stat-desc">Consultancies not mapped with any users.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card orange" (click)="setTab('consultancies-courses')">
+            <div class="card-inner">
+              <div class="stat-icon-wrapper">
+                <span class="material-symbols-outlined">handshake</span>
+              </div>
+              <div class="stat-content">
+                <h2 class="stat-value">{{ stats().consultanciesWithoutCourses || 0 }}</h2>
+                <span class="stat-label">Consultancies without courses</span>
+                <p class="stat-desc">Consultancies not mapped with any courses.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Pill Header -->
+        <div class="tab-pill-container">
+          @for (tab of tabs; track tab.id) {
+          <button class="tab-pill-btn" [class.active]="currentTab() === tab.id" (click)="setTab(tab.id)">
+            {{ tab.label }} <span class="tab-count">{{ stats()[tab.countKey] || 0 }}</span>
+          </button>
+          }
+        </div>
+
+        <!-- Data Table Card -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <div class="left-header">
+              <h3 class="table-title">Unmapped {{ currentTab() | titlecase }}</h3>
+              <span class="record-count">{{ data().length }} records found</span>
+            </div>
+            <div class="search-box">
+              <span class="material-symbols-outlined search-icon">search</span>
+              <input type="text" [value]="searchText()" (input)="searchText.set($any($event.target).value)"
+                placeholder="Search {{ currentTab() }}...">
+            </div>
+          </div>
+
+          <div class="table-wrapper" [class.loading]="loading()">
+            @if (loading()) {
+            <div class="loader-overlay">
+              <div class="spinner"></div>
+            </div>
+            }
+
+            <table class="figma-table">
+              <thead>
+                @switch (currentTab()) {
+                @case ('students') {
+                <tr>
+                  <th class="checkbox-col"><input type="checkbox"></th>
+                  <th>Student Name</th>
+                  <th>Contact Info</th>
+                  <th>Enrolled Course</th>
+                  <th>Discount</th>
+                  <th>Counselled By</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+                }
+                @case ('users') {
+                <tr>
+                  <th class="checkbox-col"><input type="checkbox"></th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+                }
+                @case ('courses') {
+                <tr>
+                  <th class="checkbox-col"><input type="checkbox"></th>
+                  <th>Course Name</th>
+                  <th>Course Type</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+                }
+                @case ('consultancies-users') {
+                <tr>
+                  <th class="checkbox-col"><input type="checkbox"></th>
+                  <th>Consultancy Name</th>
+                  <th>Location</th>
+                  <th>Firm Name</th>
+                  <th>Commission %</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+                }
+                @case ('consultancies-courses') {
+                <tr>
+                  <th class="checkbox-col"><input type="checkbox"></th>
+                  <th>Consultancy Name</th>
+                  <th>Location</th>
+                  <th>Firm Name</th>
+                  <th>Commission %</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+                }
+                }
+              </thead>
+              <tbody>
+                @for (item of data() | filter:searchText(); track item.id || item.email || $index) {
+                <tr>
+                  <td class="checkbox-col"><input type="checkbox"></td>
+
+                  <!-- NAME COLUMN -->
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar-circle" [style.background-color]="getAvatarColor(item.fullName || item.name)">
+                        {{ (item.fullName || item.name || '?').charAt(0) }}
+                      </div>
+                      <span class="user-name">{{ item.fullName || item.name }}</span>
+                    </div>
+                  </td>
+
+                  <!-- MIDDLE COLUMNS -->
+                  @switch (currentTab()) {
+                  @case ('students') {
+                  <td>
+                    <div class="contact-info">
+                      <div class="primary">{{ item.phoneNumber || '+91 00000 00000' }}</div>
+                      <div class="secondary">{{ item.email }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="course-badge">{{ item.courseName || 'B.Tech CS' }}</span>
+                  </td>
+                  <td>
+
+                    <span class="discount-badge" [class.scholarship]="item.isScholar" [class.percent]="!item.isScholar">
+                      @if(item.discountType === 'FLAT') { ₹ }
+                      {{ item.discountValue || 0 }}
+                      @if (item.discountType === 'PERCENTAGE') { % }
+                      @if(item.discountType === null) { - }
+
+                    </span>
+                  </td>
+                  <td>{{ item.counselorName || ' - ' }}</td>
+                  }
+                  @case ('users') {
+                  <td>
+                    <span class="role-badge" [ngClass]="getRoleClass(item.roles || 'User')">
+                      {{ item.roles || 'User' }}
+                    </span>
+                  </td>
+                  <td>{{ item.email }}</td>
+                  }
+                  @case ('courses') {
+                  <td>{{ item.courseTypeName }}</td>
+                  <td>{{ item.duration || 0 }} Years</td>
+                  }
+                  @case ('consultancies-users') {
+                  <td>
+                    <div class="contact-info">
+                      <div class="primary">{{ item.city}}, {{ item.state }}</div>
+                    </div>
+                  </td>
+                  <td>{{ item.institutionOrFirmName }}</td>
+                  <td>{{ item.commissionPercentage }}</td>
+                  }
+                  @case ('consultancies-courses') {
+                  <td>
+                    <div class="contact-info">
+                      <div class="primary">{{ item.city}}, {{ item.state }}</div>
+                    </div>
+                  </td>
+                  <td>{{ item.institutionOrFirmName }}</td>
+                  <td>{{ item.commissionPercentage }}</td>
+                  }
+                  }
+
+                  <!-- STATUS -->
+                  <td>
+                    <span class="status-badge active">Active</span>
+                  </td>
+
+                  <!-- ACTIONS -->
+                  <td>
+                    <div class="action-buttons">
+                      <button class="action-btn" title="View"><span
+                          class="material-symbols-outlined">visibility</span></button>
+                      <button class="action-btn map" (click)="openMappingModal(item)" title="Map"><span
+                          class="material-symbols-outlined">add_link</span></button>
+                      <button class="action-btn delete" title="Delete"><span
+                          class="material-symbols-outlined">delete</span></button>
+                    </div>
+                  </td>
+                </tr>
+                } @empty {
+                @if (!loading()) {
+                <tr>
+                  <td colspan="8" class="empty-state">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    <p>No unmapped {{ currentTab() }} found.</p>
+                  </td>
+                </tr>
+                }
+                }
+              </tbody>
+            </table>
+
+            <!-- Pagination Mockup -->
+            <footer class="table-footer">
+              <span class="showing-text">Showing {{ data().length }} records out of {{ data().length }} Records</span>
+              <div class="pagination">
+                <button class="page-arrow"><span class="material-symbols-outlined">chevron_left</span></button>
+                <button class="page-num active">1</button>
+                <button class="page-num">2</button>
+                <button class="page-num">3</button>
+                <button class="page-num">4</button>
+                <button class="page-arrow"><span class="material-symbols-outlined">chevron_right</span></button>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

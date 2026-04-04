@@ -359,6 +359,20 @@ button {
 }
 
 /* Flex utilities for mobile */
+/* Backdrop Blur Effect */
+.blur-backdrop {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Ensure material dialogs are centered and smooth */
+.cdk-overlay-pane {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
 @media (max-width: 768px) {
   .header-section {
     flex-direction: column !important;

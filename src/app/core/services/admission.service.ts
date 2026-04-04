@@ -55,6 +55,27 @@ export class AdmissionService {
     );
   }
 
+  getStudentsByFilter(source?: string, isScholar?: boolean): Observable<AdmissionPageData> {
+    let params = new HttpParams();
+    if (source) params = params.set('source', source);
+    if (isScholar !== undefined) params = params.set('isScholar', isScholar.toString());
+
+    return this.http.get<any>(`${this.apiUrl}/filter`, { params }).pipe(
+      map(response => {
+        const data = response?.data || [];
+        const admissions = data.map((s: any, index: number) => 
+          this.mapStudentToAdmissionItem(s, index + 1)
+        );
+
+        return {
+          stats: {} as any,
+          admissions,
+          totalCount: admissions.length
+        };
+      })
+    );
+  }
+
   getAdmissionById(id: number | string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => response?.data || response)
