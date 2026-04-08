@@ -50,7 +50,7 @@ export interface RecentForm {
   fullName?: string;
   name?: string;
   email: string;
-  admissionCourse?: string;
+  courseName?: string;
   course?: string;
   admissionDate?: string;
   discount?: number;
@@ -75,14 +75,15 @@ export interface DashboardData {
 }
 
 export interface CommissionData {
-  totalProjected: number;
-  totalCollected: number;
   totalUnpaid: number;
-  payable: number;
-  overdueAmount?: number;
-  avgDueDays?: number;
-  paidPercentage?: number;
+  overdueAmount: number;
+  avgDueDays: number;
+  paidPercentage: number;
   pendingCount: number;
+  totalCollected: number;
+  totalProjected: number;
+  totalPayable: number;
+  totalRecords: number;
 }
 
 export interface ChartData {

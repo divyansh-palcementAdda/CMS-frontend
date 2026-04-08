@@ -105,4 +105,4 @@ export interface BulkUploadResponse {
     rowNumber: number;
     errorMessage: string;
   }>;
-}
+}

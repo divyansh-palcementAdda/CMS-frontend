@@ -1,184 +1,241 @@
-<div class="modal-container">
-  <div class="modal-header">
-    <div class="header-content">
-      <h2>Map Record</h2>
-      <p>Map <strong>{{ data.record.fullName || data.record.name || 'this record' }}</strong> to the appropriate
-        entities.</p>
+<div class="modal-wrapper" [class.scholar-mode]="mappingForm.get('isScholar')?.value">
+  <div class="glass-container">
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="animate-reveal">Student Mapping</h2>
+        <p class="animate-reveal delay-1">Mapping <strong>{{ data.record.fullName || data.record.name }}</strong> to {{ mappingForm.get('admissionSource')?.value | lowercase }} track</p>
+      </div>
+      <button class="glass-close" (click)="dialogRef.close()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
-    <button class="close-btn" (click)="dialogRef.close()">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-  </div>
 
-  <div class="modal-body">
-    <form [formGroup]="mappingForm" (ngSubmit)="submitMapping()">
+    <!-- Multi-stage Selection Flow -->
+    <div class="modal-body">
+      <form [formGroup]="mappingForm" (ngSubmit)="submitMapping()">
 
-      <!-- Search Input (Global search for current context) -->
-      @if (data.type !== 'students') {
-      <div class="search-wrapper">
-        <span class="material-symbols-outlined">search</span>
-        <input type="text"
-          [placeholder]="'Search ' + (data.type === 'users' || data.type === 'courses' ? 'Consultancy' : (data.type === 'consultancies-users' ? 'Users' : 'Courses')) + '...'"
-          [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" [ngModelOptions]="{standalone: true}">
-      </div>
-      @}
-
-      <!-- Mapping Content Based on Type -->
-      @switch (data.type) {
-
-      @case ('students') {
-      <div class="mapping-section">
-        <label class="section-subtitle">Admission Source</label>
-        <div class="source-options">
-          <label class="radio-card">
-            <input type="radio" value="CONSULTANCY" formControlName="admissionSource">
-            <div class="card-content">
-              <div class="icon-wrapper">
-                <span class="material-symbols-outlined">business</span>
+        @if (currentStep === 1) {
+          <div class="flow-container">
+            
+            <!-- stage 1: Admission Source (Always Visible) -->
+            <div class="flow-stage animate-pop-in">
+              <label class="flow-label">Admission Channel</label>
+              <div class="modern-chips">
+                <label class="chip-card" [class.active]="mappingForm.get('admissionSource')?.value === 'CONSULTANCY'">
+                  <input type="radio" value="CONSULTANCY" formControlName="admissionSource">
+                  <div class="chip-overlay">
+                    <span class="material-symbols-outlined">business</span>
+                    <div class="chip-text">
+                      <span class="main">Consultancy</span>
+                      <span class="sub">Admission via partner</span>
+                    </div>
+                  </div>
+                </label>
+                <label class="chip-card" [class.active]="mappingForm.get('admissionSource')?.value === 'USER'">
+                  <input type="radio" value="USER" formControlName="admissionSource">
+                  <div class="chip-overlay">
+                    <span class="material-symbols-outlined">person_pin</span>
+                    <div class="chip-text">
+                      <span class="main">Internal</span>
+                      <span class="sub">Direct admission</span>
+                    </div>
+                  </div>
+                </label>
               </div>
-              <span class="label-text">Consultancy</span>
             </div>
-          </label>
-          <label class="radio-card">
-            <input type="radio" value="USER" formControlName="admissionSource">
-            <div class="card-content">
-              <div class="icon-wrapper">
-                <span class="material-symbols-outlined">person</span>
+
+            <!-- stage 2: Representative (Visible once Source is selected) -->
+            @if (mappingForm.get('admissionSource')?.value) {
+            <div class="flow-stage animate-slide-up">
+              <div class="stage-header">
+                <label class="flow-label">Select Representative</label>
+                <div class="search-glass">
+                  <span class="material-symbols-outlined">search</span>
+                  <input type="text" placeholder="Filter people..." [ngModel]="userSearchTerm()"
+                    (ngModelChange)="userSearchTerm.set($event)" [ngModelOptions]="{standalone: true}">
+                </div>
               </div>
-              <span class="label-text">Internal (User)</span>
+              <div class="viewport-wrapper glass-blur">
+                <cdk-virtual-scroll-viewport itemSize="64" class="glass-viewport">
+                  <div *cdkVirtualFor="let item of filteredUsers" class="glass-item"
+                    [class.active]="mappingForm.get('admittedByUserId')?.value === item.id"
+                    (click)="toggleSelection(item.id)">
+                    <div class="item-avatar">
+                      {{ (item.fullName || item.name).charAt(0) }}
+                    </div>
+                    <div class="item-details">
+                      <span class="name">{{ item.fullName || item.name }}</span>
+                      <span class="meta">{{ item.email }}</span>
+                    </div>
+                    @if (mappingForm.get('admittedByUserId')?.value === item.id) {
+                      <span class="material-symbols-outlined check-badge">check_circle</span>
+                    }
+                  </div>
+                </cdk-virtual-scroll-viewport>
+              </div>
             </div>
-          </label>
-        </div>
+            }
 
-        <div class="dropdown-wrapper">
-          @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY') {
-          <label class="section-subtitle">Select Consultancy</label>
-          <div class="select-container">
-            <span class="material-symbols-outlined select-icon">search</span>
-            <select formControlName="consultancyId">
-              <option [ngValue]="null">Choose a consultancy...</option>
-              @for (item of consultancies; track item.id) {
-              <option [ngValue]="item.id">{{ item.name }}</option>
-              }
-            </select>
+            <!-- stage 3: Consultancy (Conditional) -->
+            @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY' && mappingForm.get('admittedByUserId')?.value) {
+            <div class="flow-stage animate-slide-up">
+              <div class="stage-header">
+                <label class="flow-label">Select Consultancy Office</label>
+                <div class="search-glass">
+                  <span class="material-symbols-outlined">search</span>
+                  <input type="text" placeholder="Filter offices..." [ngModel]="consultancySearchTerm()"
+                    (ngModelChange)="consultancySearchTerm.set($event)" [ngModelOptions]="{standalone: true}">
+                </div>
+              </div>
+              <div class="viewport-wrapper glass-blur">
+                <cdk-virtual-scroll-viewport itemSize="64" class="glass-viewport">
+                  <div *cdkVirtualFor="let item of filteredConsultancies" class="glass-item"
+                    [class.active]="mappingForm.get('consultancyId')?.value === item.id"
+                    (click)="toggleSelection(item.id)">
+                    <div class="item-icon">
+                      <span class="material-symbols-outlined">apartment</span>
+                    </div>
+                    <div class="item-details">
+                      <span class="name">{{ item.name }}</span>
+                      <span class="meta">{{ item.email || 'Partner Office' }}</span>
+                    </div>
+                    @if (mappingForm.get('consultancyId')?.value === item.id) {
+                      <span class="material-symbols-outlined check-badge">verified</span>
+                    }
+                  </div>
+                  @if (filteredConsultancies.length === 0) {
+                    <div class="glass-empty">
+                      <span class="material-symbols-outlined">link_off</span>
+                      <p>No associated offices found</p>
+                    </div>
+                  }
+                </cdk-virtual-scroll-viewport>
+              </div>
+            </div>
+            }
+
+            <!-- Final Options: Scholarship / Discount -->
+            @if (mappingForm.get('admittedByUserId')?.value) {
+            <div class="flow-stage animate-slide-up">
+              <div class="options-grid">
+                <!-- Scholarship Toggle -->
+                <div class="glass-toggle-card" [class.checked]="mappingForm.get('isScholar')?.value">
+                  <div class="toggle-info">
+                    <span class="material-symbols-outlined">school</span>
+                    <div class="text">
+                      <span class="title">Scholarship Profile</span>
+                      <span class="hint">Exempts student from mapping fees</span>
+                    </div>
+                  </div>
+                  <label class="ios-switch">
+                    <input type="checkbox" formControlName="isScholar">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <!-- Discount Logic -->
+                @if (!mappingForm.get('isScholar')?.value) {
+                  <div class="glass-input-card">
+                    <div class="input-header">
+                      <span class="material-symbols-outlined">sell</span>
+                      <span class="title">Apply Discount</span>
+                    </div>
+                    <div class="dual-input">
+                      <select formControlName="discountType">
+                        <option [ngValue]="null">No Discount</option>
+                        <option value="PERCENTAGE">% Percentage</option>
+                        <option value="FLAT">₹ Fixed Amount</option>
+                      </select>
+                      @if (mappingForm.get('discountType')?.value) {
+                        <div class="input-container">
+                          <input type="number" formControlName="discountValue" placeholder="0" [class.input-error]="discountError">
+                          @if (discountError) {
+                            <div class="error-msg">{{ discountError }}</div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+            }
+
           </div>
-          } @else {
-          <label class="section-subtitle">Select User (Counsellor)</label>
-          <div class="select-container">
-            <span class="material-symbols-outlined select-icon">person_search</span>
-            <select formControlName="admittedByUserId">
-              <option [ngValue]="null">Choose a user...</option>
-              @for (item of users; track item.id) {
-              <option [ngValue]="item.id">{{ item.name || item.fullName }}</option>
-              }
-            </select>
+        }
+
+        <!-- Step 2: Fees (Only for non-scholars) -->
+        @if (currentStep === 2) {
+          <div class="payment-stage animate-pop-in">
+            <div class="stage-intro">
+               <div class="icon-blob">
+                 <span class="material-symbols-outlined">account_balance_wallet</span>
+               </div>
+               <div class="text">
+                 <h3>Admission Payment</h3>
+                 <p>Record the initial enrollment fee (optional)</p>
+               </div>
+            </div>
+
+            <div class="glass-form-grid">
+              <div class="glass-field">
+                <label>Recieved Amount</label>
+                <div class="glass-input">
+                  <span class="symbol">₹</span>
+                  <input type="number" formControlName="feeAmount" placeholder="0.00">
+                </div>
+              </div>
+              <div class="glass-field">
+                <label>Payment Mode</label>
+                <div class="glass-input">
+                  <select formControlName="paymentMode">
+                    @for (mode of paymentModes; track mode.value) {
+                      <option [value]="mode.value">{{ mode.label }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <div class="glass-field full">
+                <label>Transaction ID / Reference</label>
+                <div class="glass-input">
+                  <span class="material-symbols-outlined">tag</span>
+                  <input type="text" formControlName="referenceNo" placeholder="Enter reference number...">
+                </div>
+              </div>
+              <div class="glass-field full">
+                <label>Remarks</label>
+                <div class="glass-input">
+                  <textarea formControlName="remarks" rows="2" placeholder="Any specific details..."></textarea>
+                </div>
+              </div>
+            </div>
           </div>
+        }
+
+        <!-- Footer Actions -->
+        <div class="modal-footer">
+          <button type="button" class="glass-btn secondary" (click)="dialogRef.close()">Cancel</button>
+          
+          <div class="action-spacer"></div>
+
+          @if (currentStep === 1 && mappingForm.get('admittedByUserId')?.value) {
+            <button type="button" class="glass-btn primary" (click)="$event.preventDefault(); nextStep()">
+              {{ mappingForm.get('isScholar')?.value ? 'Finalize Mapping' : 'Continue' }}
+              <span class="material-symbols-outlined">{{ mappingForm.get('isScholar')?.value ? 'done_all' : 'arrow_forward' }}</span>
+            </button>
+          }
+
+          @if (currentStep === 2) {
+            <button type="button" class="glass-btn secondary" (click)="$event.preventDefault(); prevStep()">
+              <span class="material-symbols-outlined">arrow_back</span> Back
+            </button>
+            <button type="submit" class="glass-btn primary submit" [disabled]="loading">
+              <span *ngIf="!loading">Confirm & Map</span>
+              <div class="glass-loader" *ngIf="loading"></div>
+            </button>
           }
         </div>
-      </div>
-      }
-
-      @case ('users') {
-      <div class="selection-section">
-        <div class="section-title">
-          <h3>Select Consultancies</h3>
-          <button type="button" class="link-btn" (click)="selectAll(consultancies)">Select All</button>
-        </div>
-        <div class="selection-list">
-          @for (item of filteredConsultancies; track item.id) {
-          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
-            <div class="checkbox-box">
-              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
-                'check_box_outline_blank' }}</span>
-            </div>
-            <div class="item-info">
-              <span class="main">{{ item.name }}</span>
-              <span class="sub">{{ item.email }}</span>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      }
-
-      @case ('courses') {
-      <div class="selection-section">
-        <div class="section-title">
-          <h3>Select Consultancies</h3>
-          <button type="button" class="link-btn" (click)="selectAll(consultancies)">Select All</button>
-        </div>
-        <div class="selection-list">
-          @for (item of filteredConsultancies; track item.id) {
-          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
-            <div class="checkbox-box">
-              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
-                'check_box_outline_blank' }}</span>
-            </div>
-            <div class="item-info">
-              <span class="main">{{ item.name }}</span>
-              <span class="sub">{{ item.email }}</span>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      }
-
-      @case ('consultancies-users') {
-      <div class="selection-section">
-        <div class="section-title">
-          <h3>Select Users to Map</h3>
-          <button type="button" class="link-btn" (click)="selectAll(users)">Select All</button>
-        </div>
-        <div class="selection-list">
-          @for (item of filteredUsers; track item.id) {
-          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
-            <div class="checkbox-box">
-              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
-                'check_box_outline_blank' }}</span>
-            </div>
-            <div class="item-info">
-              <span class="main">{{ item.fullName || item.name }}</span>
-              <span class="sub">{{ item.email }}</span>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      }
-
-      @case ('consultancies-courses') {
-      <div class="selection-section">
-        <div class="section-title">
-          <h3>Select Courses to Map</h3>
-          <button type="button" class="link-btn" (click)="selectAll(courses)">Select All</button>
-        </div>
-        <div class="selection-list">
-          @for (item of filteredCourses; track item.id) {
-          <div class="selection-item" [class.selected]="selectedIds.has(item.id)" (click)="toggleSelection(item.id)">
-            <div class="checkbox-box">
-              <span class="material-symbols-outlined">{{ selectedIds.has(item.id) ? 'check_box' :
-                'check_box_outline_blank' }}</span>
-            </div>
-            <div class="item-info">
-              <span class="main">{{ item.name }}</span>
-              <span class="sub">{{ item.courseType }} | {{ item.duration }}</span>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      }
-      }
-
-      <div class="modal-footer">
-        <button type="button" class="secondary-btn" (click)="dialogRef.close()">Cancel</button>
-        <button type="submit" class="primary-btn"
-          [disabled]="loading || (data.type === 'students' ? mappingForm.invalid : selectedIds.size === 0)">
-          <span class="btn-text" *ngIf="!loading">Save Mapping</span>
-          <div class="spinner" *ngIf="loading"></div>
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>

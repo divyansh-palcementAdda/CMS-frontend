@@ -29,7 +29,7 @@ import { CommissionData } from '../../../../core/models/dashboard.model';
             <div class="chip-icon">💳</div>
             <div>
               <div class="chip-label">Payable Amount</div>
-              <div class="chip-value">₹{{ fmt(data.payable) }}</div>
+              <div class="chip-value">₹{{ fmt(data.totalPayable) }}</div>
             </div>
           </div>
           <div class="amount-chip">

@@ -27,7 +27,7 @@ import { ConsultancyItem } from '../../../../core/models/dashboard.model';
             </thead>
             <tbody>
               <ng-container *ngIf="rows.length; else emptyRows">
-                <tr *ngFor="let c of rows; let i = index; trackBy: trackById">
+                <tr *ngFor="let c of rows.slice(0,5); let i = index; trackBy: trackById">
                   <td class="hash-col">{{ i + 1 }}</td>
                   <td class="name-cell">
                     <span class="user-name">{{ c.name }}</span>

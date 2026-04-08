@@ -33,7 +33,7 @@ import { RecentForm } from '../../../../core/models/dashboard.model';
                   </td>
                   <td>{{ f.email || '—' }}</td>
                   <td>
-                    <span class="course-badge">{{ f.admissionCourse || f.course || '—' }}</span>
+                    <span class="course-badge">{{ f.courseName || f.courseName || '—' }}</span>
                   </td>
                   <td>{{ f.admissionDate | date:'dd MMM, yyyy' }}</td>
                   <td>

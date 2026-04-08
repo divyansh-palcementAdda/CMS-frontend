@@ -88,7 +88,9 @@
             <div class="info-card">
               <div class="card-title">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                  </path>
                 </svg>
                 <h3>Contact Information</h3>
               </div>
@@ -154,11 +156,12 @@
               </div>
               <div class="stat-row">
                 <span class="label">Projected Amount</span>
-                <span class="value" style="color: #10B981;">₹{{ consultancy.quickStats.projectedAmount || '0' }}</span>
+                <span class="value" style="color: #10B981;">{{ consultancy.quickStats.projectedAmount || '0' }}</span>
               </div>
               <div class="stat-row">
                 <span class="label">Status</span>
-                <span class="status-badge" [class]="consultancy.quickStats.status || 'Active'">{{ consultancy.quickStats.status || 'Active' }}</span>
+                <span class="status-badge" [class]="consultancy.quickStats.status || 'Active'">{{
+                  consultancy.quickStats.status || 'Active' }}</span>
               </div>
             </div>
 
@@ -168,7 +171,8 @@
                 <div class="fm-card blue">
                   <div class="fm-header">
                     <div class="fm-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
                         <line x1="12" y1="20" x2="12" y2="10"></line>
                         <line x1="18" y1="20" x2="18" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="16"></line>
@@ -176,36 +180,39 @@
                     </div>
                     <span>Total Projected</span>
                   </div>
-                  <div class="fm-value">₹{{ consultancy.financials.totalProjected || '0' }}</div>
+                  <div class="fm-value">{{ consultancy.financials.totalProjected || '0' }}</div>
                 </div>
                 <div class="fm-card purple">
                   <div class="fm-header">
                     <div class="fm-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
                         <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                         <line x1="12" y1="4" x2="12" y2="20"></line>
                       </svg>
                     </div>
                     <span>Payable Amount</span>
                   </div>
-                  <div class="fm-value">₹{{ consultancy.financials.payableAmount || '0' }}</div>
+                  <div class="fm-value">{{ consultancy.financials.payableAmount || '0' }}</div>
                 </div>
                 <div class="fm-card teal">
                   <div class="fm-header">
                     <div class="fm-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                       </svg>
                     </div>
                     <span>Paid Amount</span>
                   </div>
-                  <div class="fm-value">₹{{ consultancy.financials.paidAmount || '0' }}</div>
+                  <div class="fm-value">{{ consultancy.financials.paidAmount || '0' }}</div>
                 </div>
                 <div class="fm-card red">
                   <div class="fm-header">
                     <div class="fm-icon">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -213,7 +220,7 @@
                     </div>
                     <span>Unpaid Amount</span>
                   </div>
-                  <div class="fm-value">₹{{ consultancy.financials.unpaidAmount || '0' }}</div>
+                  <div class="fm-value">{{ consultancy.financials.unpaidAmount || '0' }}</div>
                 </div>
               </div>
             </div>
@@ -224,16 +231,9 @@
         <div class="chart-section mb-32">
           <h3 class="chart-title">Top 5 Courses Offered</h3>
           <div id="chart">
-            <apx-chart
-              [series]="chartOptions.series"
-              [chart]="chartOptions.chart"
-              [xaxis]="chartOptions.xaxis"
-              [plotOptions]="chartOptions.plotOptions"
-              [dataLabels]="chartOptions.dataLabels"
-              [fill]="chartOptions.fill"
-              [tooltip]="chartOptions.tooltip"
-              [yaxis]="chartOptions.yaxis"
-              [grid]="chartOptions.grid"
+            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
+              [plotOptions]="chartOptions.plotOptions" [dataLabels]="chartOptions.dataLabels" [fill]="chartOptions.fill"
+              [tooltip]="chartOptions.tooltip" [yaxis]="chartOptions.yaxis" [grid]="chartOptions.grid"
               [colors]="chartOptions.colors">
             </apx-chart>
           </div>
@@ -277,23 +277,43 @@
                 <td>{{ course.institution }}</td>
                 <td class="text-center">
                   <div class="action-tools">
-                    <div class="tool-btn" (click)="onViewCourse(course.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
-                    <div class="tool-btn" (click)="onEditCourse(course.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
-                    <div class="tool-btn" (click)="onDeleteCourse(course)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                    <div class="tool-btn" (click)="onViewCourse(course.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onEditCourse(course.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onDeleteCourse(course)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg></div>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
           <div class="table-footer">
-            <span class="record-count">Showing {{ paginatedCourses.length }} of {{ filteredCourses.length }} records</span>
+            <span class="record-count">Showing {{ paginatedCourses.length }} of {{ filteredCourses.length }}
+              records</span>
             <div class="pagination">
-              <span class="nav-btn" (click)="coursePage > 1 && changePage('course', -1)" [class.disabled]="coursePage === 1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <span class="nav-btn" (click)="coursePage > 1 && changePage('course', -1)"
+                [class.disabled]="coursePage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
               </span>
               <span class="page-link active">{{ coursePage }}</span>
-              <span class="nav-btn" (click)="coursePage < getTotalPages(filteredCourses.length, coursePageSize) && changePage('course', 1)" [class.disabled]="coursePage >= getTotalPages(filteredCourses.length, coursePageSize)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              <span class="nav-btn"
+                (click)="coursePage < getTotalPages(filteredCourses.length, coursePageSize) && changePage('course', 1)"
+                [class.disabled]="coursePage >= getTotalPages(filteredCourses.length, coursePageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
               </span>
             </div>
           </div>
@@ -332,9 +352,21 @@
                 <td><span class="status-badge Active">Active</span></td>
                 <td class="text-center">
                   <div class="action-tools">
-                    <div class="tool-btn" (click)="onViewUser(rep.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
-                    <div class="tool-btn" (click)="onEditUser(rep.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
-                    <div class="tool-btn" (click)="onDeleteUser(rep)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                    <div class="tool-btn" (click)="onViewUser(rep.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onEditUser(rep.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onDeleteUser(rep)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg></div>
                   </div>
                 </td>
               </tr>
@@ -344,11 +376,17 @@
             <span class="record-count">Showing {{ paginatedUsers.length }} of {{ filteredUsers.length }} records</span>
             <div class="pagination">
               <span class="nav-btn" (click)="userPage > 1 && changePage('user', -1)" [class.disabled]="userPage === 1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
               </span>
               <span class="page-link active">{{ userPage }}</span>
-              <span class="nav-btn" (click)="userPage < getTotalPages(filteredUsers.length, userPageSize) && changePage('user', 1)" [class.disabled]="userPage >= getTotalPages(filteredUsers.length, userPageSize)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              <span class="nav-btn"
+                (click)="userPage < getTotalPages(filteredUsers.length, userPageSize) && changePage('user', 1)"
+                [class.disabled]="userPage >= getTotalPages(filteredUsers.length, userPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
               </span>
             </div>
           </div>
@@ -388,23 +426,42 @@
                 <td><span class="status-pill active">{{ item.admissionCount }}</span></td>
                 <td class="text-center">
                   <div class="action-tools">
-                    <div class="tool-btn" (click)="onViewInstitution(item.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
-                    <div class="tool-btn" (click)="onEditInstitution(item.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
-                    <div class="tool-btn" (click)="onDeleteInstitution(item)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                    <div class="tool-btn" (click)="onViewInstitution(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onEditInstitution(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onDeleteInstitution(item)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg></div>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
           <div class="table-footer">
-            <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ filteredInstitutions.length }} records</span>
+            <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ filteredInstitutions.length }}
+              records</span>
             <div class="pagination">
               <span class="nav-btn" (click)="instPage > 1 && changePage('inst', -1)" [class.disabled]="instPage === 1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
               </span>
               <span class="page-link active">{{ instPage }}</span>
-              <span class="nav-btn" (click)="instPage < getTotalPages(filteredInstitutions.length, instPageSize) && changePage('inst', 1)" [class.disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              <span class="nav-btn"
+                (click)="instPage < getTotalPages(filteredInstitutions.length, instPageSize) && changePage('inst', 1)"
+                [class.disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
               </span>
             </div>
           </div>
@@ -448,12 +505,19 @@
                 <td><span class="tag-badge">{{ admission.discount }}</span></td>
                 <td>
                   <div class="fee-status-toggle">
-                    <div class="status-option paid" [class.active]="admission.feeStatus === 'Paid' || admission.feeStatus === 'Partial'">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <div class="status-option paid"
+                      [class.active]="admission.feeStatus === 'Paid' || admission.feeStatus === 'Partial'">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
                       <span>Paid</span>
                     </div>
                     <div class="status-option unpaid" [class.active]="admission.feeStatus === 'Unpaid'">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
                       <span>Unpaid</span>
                     </div>
                   </div>
@@ -463,23 +527,42 @@
                 <td>{{ admission.admissionDate }}</td>
                 <td class="text-center">
                   <div class="action-tools">
-                    <div class="tool-btn" (click)="onViewAdmission(admission.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
-                    <div class="tool-btn" (click)="onEditAdmission(admission.id)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></div>
-                    <div class="tool-btn" (click)="onDeleteAdmission(admission)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                    <div class="tool-btn" (click)="onViewAdmission(admission.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onEditAdmission(admission.id)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg></div>
+                    <div class="tool-btn" (click)="onDeleteAdmission(admission)"><svg viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg></div>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
           <div class="table-footer">
-            <span class="record-count">Showing {{ paginatedAdmissions.length }} of {{ filteredAdmissions.length }} records</span>
+            <span class="record-count">Showing {{ paginatedAdmissions.length }} of {{ filteredAdmissions.length }}
+              records</span>
             <div class="pagination">
               <span class="nav-btn" (click)="admPage > 1 && changePage('adm', -1)" [class.disabled]="admPage === 1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
               </span>
               <span class="page-link active">{{ admPage }}</span>
-              <span class="nav-btn" (click)="admPage < getTotalPages(filteredAdmissions.length, admPageSize) && changePage('adm', 1)" [class.disabled]="admPage >= getTotalPages(filteredAdmissions.length, admPageSize)">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              <span class="nav-btn"
+                (click)="admPage < getTotalPages(filteredAdmissions.length, admPageSize) && changePage('adm', 1)"
+                [class.disabled]="admPage >= getTotalPages(filteredAdmissions.length, admPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
               </span>
             </div>
           </div>
@@ -487,12 +570,9 @@
       </ng-container>
 
       <!-- Confirmation Modal -->
-      <app-confirmation-modal
-        *ngIf="showDeleteModal"
-        [title]="'Delete ' + deleteType"
+      <app-confirmation-modal *ngIf="showDeleteModal" [title]="'Delete ' + deleteType"
         [message]="'Are you sure you want to delete \'' + (itemToDelete?.name || itemToDelete?.studentName || itemToDelete?.institutionName || 'this item') + '\'?'"
-        (confirm)="confirmDelete()"
-        (cancel)="cancelDelete()">
+        (confirm)="confirmDelete()" (cancel)="cancelDelete()">
       </app-confirmation-modal>
     </main>
   </div>
