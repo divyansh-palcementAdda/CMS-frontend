@@ -159,7 +159,11 @@ export class UserService {
             duration: c.duration || 'N/A',
             students: c.studentCount || 0,
             status: c.status || 'Active',
-            institutionName: c.institutionName || 'N/A'
+            institutionName: c.institutionName || 'N/A',
+            mobile: c.mobile || c.alternateNo || 'N/A',
+            city: c.city || 'N/A',
+            commissionPercentage: c.commissionPercentage || 'N/A',
+
           })),
           admissionStats: userData.admissionStats || {
             directAdmissions: 0,

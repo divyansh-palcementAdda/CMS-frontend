@@ -51,7 +51,7 @@ export class ManagementPanelComponent {
   private buildCards(s: DashboardStats | null): void {
     console.log(s);
     if (!s) { this.cards = []; return; }
-
+    console.log(s.totalUnmappedRecords);
     this.cards = [
       { name: 'Consultancy', sub: 'Manages all consultancy services', value: s.totalConsultancies, icon: '📋', path: '/consultancy' },
       { name: 'Courses', sub: 'Manages course catalog', value: s.totalCourses, icon: '📚', path: '/courses' },

@@ -9,6 +9,8 @@ import { UserItem } from '../../core/models/user.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConsultancyService } from '../../core/services/consultancy.service';
+import { AdmissionService } from '../../core/services/admission.service';
+import { AdmissionItem } from '../../core/models/admission.model';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
@@ -23,6 +25,12 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   userId!: number;
   loading = true;
   user: UserItem | null = null;
+
+  // Admissions Data for tables
+  directAdmissions: AdmissionItem[] = [];
+  consultancyAdmissions: AdmissionItem[] = [];
+  totalAdmissions: AdmissionItem[] = [];
+
   private destroy$ = new Subject<void>();
 
   // Actions
@@ -30,12 +38,18 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   itemToDelete: any = null;
   deleteType: 'user' | 'consultancy' = 'user';
 
+  // Filters
+  consultancyStatusFilter: string | null = null;
+  admissionScholarFilter: boolean | null = null;
+  admissionNoConsultancyFilter: boolean | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
-    private consultancyService: ConsultancyService
-  ) {}
+    private consultancyService: ConsultancyService,
+    private admissionService: AdmissionService
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
@@ -53,7 +67,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
+          console.log("user data", data);
           this.user = data;
+          this.loadAdmissions();
           this.loading = false;
         },
         error: (err) => {
@@ -61,6 +77,109 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  loadAdmissions() {
+    // 1. Load Direct Admissions
+    this.admissionService.getStudentsByFilter('USER', undefined, this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.directAdmissions = data.admissions);
+
+    // 2. Load Consultancy Admissions
+    this.admissionService.getStudentsByFilter('CONSULTANCY', undefined, this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.consultancyAdmissions = data.admissions);
+
+    // 3. Load Total Admissions (only by this user)
+    this.admissionService.getStudentsByFilter(undefined, undefined, this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.totalAdmissions = data.admissions);
+  }
+
+  // Getters for filtered data
+  get filteredConsultancies() {
+    if (!this.user || !this.user.consultancies) return [];
+    if (!this.consultancyStatusFilter) return this.user.consultancies;
+    return this.user.consultancies.filter(c => c.status === this.consultancyStatusFilter);
+  }
+
+  get filteredTotalAdmissions() {
+    let admissions = this.totalAdmissions;
+    if (this.admissionScholarFilter !== null) {
+      admissions = admissions.filter(a => a.isScholar === this.admissionScholarFilter);
+    }
+    if (this.admissionNoConsultancyFilter) {
+      admissions = admissions.filter(a => !a.consultancyId);
+    }
+    return admissions;
+  }
+
+  // Interaction Handlers
+  onAdmissionActivityClick(type: 'direct' | 'consultancy' | 'total') {
+    const elementId = type === 'direct' ? 'direct-admissions' :
+      type === 'consultancy' ? 'consultancy-admissions' :
+        'total-admissions';
+
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  onStatClick(stat: string) {
+    if (stat === 'active' || stat === 'inactive' || stat === 'dormant' || stat === 'total_cons') {
+      const statusMap: any = { active: 'ACTIVE', inactive: 'INACTIVE', dormant: 'DORMANT' };
+      this.consultancyStatusFilter = statusMap[stat] || null;
+
+      const element = document.getElementById('consultancy-ownership');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else if (stat === 'scholar') {
+      this.admissionScholarFilter = true;
+      this.admissionNoConsultancyFilter = false;
+
+      const element = document.getElementById('total-admissions');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    else if (stat === 'coursesWithoutConsultancy') {
+      this.admissionNoConsultancyFilter = true;
+      this.admissionScholarFilter = null;
+
+      const element = document.getElementById('total-admissions');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+
+  clearConsultancyFilter() {
+    this.consultancyStatusFilter = null;
+  }
+
+  clearAdmissionFilter() {
+    this.admissionScholarFilter = null;
+    this.admissionNoConsultancyFilter = false;
+  }
+
+  onViewAdmission(id: number | undefined) {
+    if (!id) return;
+    this.router.navigate(['/admission-management', id]);
+  }
+
+  onEditAdmission(id: number | undefined) {
+    if (!id) return;
+    this.router.navigate(['/admission-management'], { fragment: 'edit', queryParams: { id } });
+  }
+
+  onDeleteAdmission(id: number | undefined) {
+    if (!id) return;
+    // Basic implementation for now
+    if (confirm('Are you sure you want to delete this admission?')) {
+      this.admissionService.deleteAdmission(id).subscribe(() => this.loadAdmissions());
+    }
   }
 
   onEdit() {
@@ -73,11 +192,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     this.showDeleteModal = true;
   }
 
-  onViewConsultancy(id: number) {
+  onViewConsultancy(id: number | undefined) {
+    if (!id) return;
     this.router.navigate(['/consultancy-management', id]);
   }
 
-  onEditConsultancy(id: number) {
+  onEditConsultancy(id: number | undefined) {
+    if (!id) return;
     this.router.navigate(['/consultancy-management'], { fragment: 'edit' });
   }
 

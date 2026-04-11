@@ -7,6 +7,9 @@ export interface UserConsultancy {
   id: number;
   name: string;
   email: string;
+  mobile?: string;
+  city?: string;
+  commissionPercentage?: number;
   duration: string;
   students: number;
   status: 'Active' | 'Inactive';
@@ -39,6 +42,13 @@ export interface UserItem {
     directAdmissions: number;
     viaConsultancy: number;
     totalAdmissions: number;
+    activeAssociates: number;
+    inactiveAssociates: number;
+    dormantAssociates: number;
+    totalConsultancies: number;
+    admissionInAllCourses: number;
+    scholarAdmissions: number;
+    coursesWithoutConsultancy: number;
   };
 }
 

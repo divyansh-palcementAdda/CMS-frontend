@@ -145,7 +145,6 @@
                   <th>Student Name</th>
                   <th>Contact Info</th>
                   <th>Enrolled Course</th>
-                  <th>Discount</th>
                   <th>Counselled By</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -222,16 +221,7 @@
                   <td>
                     <span class="course-badge">{{ item.courseName || 'B.Tech CS' }}</span>
                   </td>
-                  <td>
 
-                    <span class="discount-badge" [class.scholarship]="item.isScholar" [class.percent]="!item.isScholar">
-                      @if(item.discountType === 'FLAT') { ₹ }
-                      {{ item.discountValue || 0 }}
-                      @if (item.discountType === 'PERCENTAGE') { % }
-                      @if(item.discountType === null) { - }
-
-                    </span>
-                  </td>
                   <td>{{ item.counselorName || ' - ' }}</td>
                   }
                   @case ('users') {

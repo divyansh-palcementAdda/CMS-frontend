@@ -55,10 +55,11 @@ export class AdmissionService {
     );
   }
 
-  getStudentsByFilter(source?: string, isScholar?: boolean): Observable<AdmissionPageData> {
+  getStudentsByFilter(source?: string, isScholar?: boolean, userId?: number): Observable<AdmissionPageData> {
     let params = new HttpParams();
     if (source) params = params.set('source', source);
     if (isScholar !== undefined) params = params.set('isScholar', isScholar.toString());
+    if (userId) params = params.set('userId', userId.toString());
 
     return this.http.get<any>(`${this.apiUrl}/filter`, { params }).pipe(
       map(response => {
