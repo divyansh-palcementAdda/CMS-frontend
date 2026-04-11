@@ -138,4 +138,8 @@ export class AdmissionService {
       courseDurationInMonths: s.courseDurationInMonths
     };
   }
+  updateCommissionStatus(id: number | undefined, status: string): Observable<any> {
+    if (!id) throw new Error('Student ID is required');
+    return this.http.patch(`${this.apiUrl}/${id}/commission-status`, { status });
+  }
 }

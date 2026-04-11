@@ -1,305 +1,379 @@
-<div class="dashboard-layout">
-  <app-sidebar></app-sidebar>
+<app-sidebar></app-sidebar>
 
-  <div class="dashboard-body">
-    <app-topbar></app-topbar>
+<div class="main-content">
+  <app-topbar></app-topbar>
 
-    <main class="main-content">
-      <div *ngIf="loading" class="loading-overlay">
-        <div class="spinner"></div>
-      </div>
+  <div class="page-content">
+    <div class="container-fluid" *ngIf="detail; else loadingTpl">
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumb">
+        <span>Dashboard</span> / <span>Admission</span> / <span>All Admission</span> / <span class="active">Details</span>
+      </nav>
 
-      <ng-container *ngIf="!loading && detail">
-        <!-- Breadcrumbs & Header -->
-        <div class="page-header">
-          <div class="header-left">
-            <nav class="breadcrumbs">
-              <span class="crumb" (click)="goBack()">Dashboard</span> /
-              <span class="crumb" (click)="goBack()">Admission</span> /
-              <span class="crumb" (click)="goBack()">All Admission</span> /
-              <span class="crumb active">Details</span>
-            </nav>
-
-            <div class="title-row">
-              <div class="back-btn" (click)="goBack()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="white" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
-              </div>
-              <div class="name-id">
-                <h1>{{ detail.fullName }}</h1>
-                <span class="enroll-id">Enrollment Id: {{ detail.enrollmentId || 'N/A' }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="header-actions">
-            <button class="action-btn edit" (click)="onEdit()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-              Edit
-            </button>
-            <button class="action-btn delete" (click)="onDelete()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-              Delete
-            </button>
+      <!-- Title Section -->
+      <header class="page-header">
+        <div class="title-left">
+          <button class="back-btn" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <div class="student-title">
+            <h1>{{ detail.fullName }}</h1>
+            <span class="enrollment-id">Enrollment Id: {{ detail.enrollmentId || 'N/A' }}</span>
           </div>
         </div>
+        <div class="title-actions">
+          <button class="btn-outline-edit" (click)="onEdit()">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn-danger-delete" (click)="onDelete()">
+            <i class="fas fa-trash-alt"></i> Delete
+          </button>
+        </div>
+      </header>
 
-        <div class="detail-grid">
-          <!-- Left Column -->
-          <div class="left-col">
-            <!-- Personal Information -->
-            <div class="info-card">
-              <div class="card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                Personal Information
+      <div class="main-grid">
+        <!-- Left Column -->
+        <div class="left-col">
+          <!-- Personal Information -->
+          <section class="info-card">
+            <div class="card-header">
+              <i class="fas fa-user"></i>
+              <h2>Personal Information</h2>
+            </div>
+            <div class="card-body grid-2">
+              <div class="info-group">
+                <label>Name</label>
+                <p>{{ detail.fullName }}</p>
               </div>
-              <div class="info-grid personal">
-                <div class="info-item">
-                  <label>Name</label>
-                  <span>{{ detail.fullName }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Father's Name</label>
-                  <span>{{ detail.fatherName || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Mother's Name</label>
-                  <span>{{ detail.motherName || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Date of Birth</label>
-                  <span>{{ detail.dateOfBirth || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Age</label>
-                  <span>{{ detail.age }} years</span>
-                </div>
-                <div class="info-item">
-                  <label>Email ID</label>
-                  <span class="link">{{ detail.email || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Phone Number</label>
-                  <span>{{ detail.phoneNumber || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Alternate Number</label>
-                  <span>{{ detail.alternatePhone || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Whatsapp Number</label>
-                  <span class="status-pill active">{{ detail.whatsappPhoneNo || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>City</label>
-                  <span>{{ detail.city || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>State</label>
-                  <span>{{ detail.state || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Country</label>
-                  <span>{{ detail.country || 'N/A' }}</span>
+              <div class="info-group">
+                <label>Father's Name</label>
+                <p>{{ detail.fatherName || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Mother's Name</label>
+                <p>{{ detail.motherName || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Date of Birth</label>
+                <p>{{ detail.dateOfBirth | date: 'dd MMM yyyy' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Age</label>
+                <p>{{ detail.age }} years</p>
+              </div>
+              <div class="info-group">
+                <label>Email ID</label>
+                <p class="email-link">{{ detail.email }}</p>
+              </div>
+              <div class="info-group">
+                <label>Phone Number</label>
+                <p>{{ detail.phoneNumber || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Parent's Phone Number</label>
+                <p>{{ detail.alternatePhone || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Whatsapp Number</label>
+                <p class="whatsapp-link">{{ detail.whatsappPhoneNo || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Gender <span class="required">*</span></label>
+                <div class="radio-group">
+                  <label class="radio-item">
+                    <input type="radio" [checked]="detail.gender === 'MALE'" disabled>
+                    <span class="radio-label">Male</span>
+                  </label>
+                  <label class="radio-item">
+                    <input type="radio" [checked]="detail.gender === 'FEMALE'" disabled>
+                    <span class="radio-label">Female</span>
+                  </label>
                 </div>
               </div>
             </div>
+          </section>
 
-            <!-- Admission Information -->
-            <div class="info-card">
-              <div class="card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                Admission Information
+          <!-- Location -->
+          <section class="info-card">
+            <div class="card-header">
+              <i class="fas fa-map-marker-alt"></i>
+              <h2>Location</h2>
+            </div>
+            <div class="card-body grid-3">
+              <div class="info-group">
+                <label>Pincode</label>
+                <p>{{ detail.pincode || 'N/A' }}</p>
               </div>
-              <div class="info-grid admission">
-                <div class="info-item">
-                  <label>Source of Admission</label>
-                  <span class="status-pill active">{{ detail.admissionSource || 'Direct' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Admission Date</label>
-                  <span>{{ detail.admissionDate || 'N/A' }}</span>
-                </div>
-                <div class="info-item">
-                  <label>Course Name</label>
-                  <div class="row-flex">
-                    <span class="font-bold">{{ detail.courseName }}</span>
-                    <button class="mini-btn">View Details</button>
-                  </div>
-                </div>
-                <div class="info-item">
-                  <label>Institution Name</label>
-                  <div class="row-flex">
-                    <span class="font-bold">{{ detail.institutionName || 'N/A' }}</span>
-                    <button class="mini-btn">View Details</button>
-                  </div>
+              <div class="info-group">
+                <label>City</label>
+                <p>{{ detail.city || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>State</label>
+                <p>{{ detail.state || 'N/A' }}</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Admission Information -->
+          <section class="info-card">
+            <div class="card-header">
+              <i class="fas fa-file-alt"></i>
+              <h2>Admission Information</h2>
+            </div>
+            <div class="card-body grid-2">
+              <div class="info-group">
+                <label>Source of Admission</label>
+                <span class="badge blue-badge">{{ detail.admissionSource }}</span>
+              </div>
+              <div class="info-group">
+                <label>Date of Admission</label>
+                <p>{{ detail.admissionDate | date: 'MMMM d, yyyy' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Session</label>
+                <p>{{ detail.session || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Department/School Name</label>
+                <div class="inline-row">
+                  <p>{{ detail.institutionName || 'N/A' }}</p>
+                  <button class="view-details-sm" (click)="viewDetails('institution', detail.institutionId)">View Details</button>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <!-- Right Column -->
-          <div class="right-col">
-            <!-- User Information -->
-            <div class="info-card">
-              <div class="card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                User Information
+          <!-- Fee Details -->
+          <section class="info-card">
+            <div class="card-header">
+              <i class="fas fa-user-tag"></i>
+              <h2>Fee Details</h2>
+            </div>
+            <div class="card-body grid-2">
+              <div class="info-group">
+                <label>Overall Course Fee</label>
+                <p class="amount">₹ {{ detail.totalCourseFees | number: '1.0-0' }}</p>
               </div>
-              <div class="info-row">
-                <div class="info-item-col">
-                  <label>User Name</label>
-                  <span class="font-bold">{{ detail.fullName }}</span>
-                </div>
-                <button class="mini-btn purple">View Details</button>
+              <div class="info-group">
+                <label>Fee after Discount</label>
+                <p class="amount">₹ {{ detail.finalFeesAfterDiscount | number: '1.0-0' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Discount %</label>
+                <select class="form-select-sm" disabled>
+                  <option>{{ detail.discountType === 'PERCENTAGE' ? detail.discountValue + '%' : 'N/A' }}</option>
+                </select>
+              </div>
+              <div class="info-group">
+                <label>Discount</label>
+                <input type="text" class="form-input-sm" [value]="detail.discountValue || 0" readonly>
               </div>
             </div>
+          </section>
+        </div>
 
-            <!-- Admission Activity -->
-            <div class="info-card">
-              <div class="card-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <polyline points="16 11 18 13 22 9"></polyline>
-                </svg>
-                Admission Activity
-              </div>
-              <div class="activity-list">
-                <div class="info-row border-b">
-                  <div class="info-item-col">
-                    <label>Admitted By</label>
-                    <span class="font-bold">{{ detail.admittedByUserName || 'Sarah Martinez' }}</span>
-                  </div>
-                  <button class="mini-btn purple">View Details</button>
+        <!-- Right Column -->
+        <div class="right-col">
+          <!-- Admission Course -->
+          <section class="info-card sm-card">
+            <div class="card-header">
+              <i class="fas fa-user-graduate"></i>
+              <h2>Admission Course</h2>
+            </div>
+            <div class="card-body">
+              <div class="info-group">
+                <label>Admitted Course Name</label>
+                <div class="inline-row space-between">
+                  <p class="bold">{{ detail.courseName }}</p>
+                  <button class="view-details-btn" (click)="viewDetails('course', detail.courseId)">View Details</button>
                 </div>
-                <div class="activity-bottom">
-                  <div class="info-item-col">
-                    <label>Counselled By</label>
-                    <span class="font-bold">{{ detail.counselorName || 'Jenny Wilson' }}</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Admission Activity -->
+          <section class="info-card sm-card">
+            <div class="card-header">
+              <i class="fas fa-user-check"></i>
+              <h2>Admission Activity</h2>
+            </div>
+            <div class="card-body">
+              <div class="activity-row">
+                <div class="info-group">
+                  <label>Admitted By</label>
+                  <div class="inline-row space-between">
+                    <p>{{ detail.admittedByUserName || 'N/A' }}</p>
+                    <button class="view-details-btn" (click)="viewDetails('user', detail.admittedByUserId)">View Details</button>
                   </div>
-                  <div class="fees-status">
-                    <label>Fees Status</label>
+                </div>
+              </div>
+              <div class="activity-row mt-15">
+                <div class="info-group">
+                  <label>Counselled By</label>
+                  <div class="inline-row space-between">
+                    <p>{{ detail.counselorName || 'N/A' }}</p>
                     <div class="fee-status-toggle">
-                      <div class="status-option paid" [class.active]="detail.fiftyPercentFeesPaid"
-                        (click)="toggleFeeStatus('Paid')">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
-                          <rect x="5" y="10" width="14" height="6" rx="1" stroke="currentColor" stroke-width="2"
-                            fill="none" />
-                          <circle cx="12" cy="13" r="2" fill="currentColor" />
-                        </svg>
-                        <span>Paid</span>
-                      </div>
-                      <div class="status-option unpaid" [class.active]="!detail.fiftyPercentFeesPaid"
-                        (click)="toggleFeeStatus('Unpaid')">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
-                          <rect x="5" y="10" width="14" height="6" rx="1" stroke="currentColor" stroke-width="2"
-                            fill="none" />
-                          <line x1="5" y1="10" x2="19" y2="16" stroke="currentColor" stroke-width="2" />
-                        </svg>
-                        <span>Unpaid</span>
+                      <label>Fees Status</label>
+                      <div class="toggle-container">
+                        <span class="status-label" [class.unpaid]="!detail.fiftyPercentFeesPaid">Paid</span>
+                        <label class="switch">
+                          <input type="checkbox" [checked]="detail.fiftyPercentFeesPaid" (change)="toggleFeeStatus(detail.fiftyPercentFeesPaid || false)">
+                          <span class="slider round"></span>
+                        </label>
+                        <span class="status-badge" [class.paid]="detail.fiftyPercentFeesPaid" [class.unpaid]="!detail.fiftyPercentFeesPaid">
+                          {{ detail.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid' }}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </section>
 
-            <!-- Financial Summary -->
-            <div class="info-card transparent">
-              <div class="card-title no-bg">Financial Summary</div>
-              <div class="financial-grid">
-                <div class="fin-card blue">
-                  <div class="fin-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                      <polyline points="17 6 23 6 23 12"></polyline>
-                    </svg>
-                  </div>
-                  <div class="fin-details">
-                    <label>Percentage Paid</label>
-                    <span class="fin-value">{{ detail.percentagePaid || '70' }}%</span>
-                  </div>
+          <!-- Financial Summary -->
+          <section class="summary-section">
+            <h3>Financial Summary</h3>
+            <div class="summary-grid">
+              <div class="sum-card blue-sum">
+                <div class="sum-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="sum-info">
+                  <label>Percentage Paid</label>
+                  <div class="sum-val">{{ (detail.totalFeesPaid! / detail.finalFeesAfterDiscount!) * 100 | number: '1.0-0' }}%</div>
                 </div>
-
-                <div class="fin-card purple">
-                  <div class="fin-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                      <path d="M12 12h.01"></path>
-                    </svg>
-                  </div>
-                  <div class="fin-details">
-                    <label>Token Amount Paid</label>
-                    <span class="fin-value">₹ {{ detail.tokenAmount || '3000' }}</span>
-                  </div>
+              </div>
+              <div class="sum-card purple-sum">
+                <div class="sum-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="sum-info">
+                  <label>Token Amount Paid</label>
+                  <div class="sum-val">₹ {{ detail.totalFeesPaid! > 1000 ? 1000 : detail.totalFeesPaid | number: '1.0-0' }}</div>
                 </div>
-
-                <div class="fin-card teal">
-                  <div class="fin-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                      <path d="M15 3h6v6"></path>
-                      <path d="M9 21H3v-6"></path>
-                      <path d="M21 3l-7 7"></path>
-                      <path d="M3 21l7-7"></path>
-                    </svg>
-                  </div>
-                  <div class="fin-details">
-                    <label>Discount %</label>
-                    <span class="fin-value">{{ detail.discountPercentage || '8' }}%</span>
-                  </div>
+              </div>
+              <div class="sum-card teal-sum">
+                <div class="sum-icon"><i class="fas fa-percent"></i></div>
+                <div class="sum-info">
+                  <label>Discount %</label>
+                  <div class="sum-val">{{ detail.discountType === 'PERCENTAGE' ? detail.discountValue : '0' }}%</div>
                 </div>
-
-                <div class="fin-card red">
-                  <div class="fin-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                  </div>
-                  <div class="fin-details">
-                    <label>Scholarship</label>
-                    <span class="fin-value">{{ detail.isScholar ? 'Yes' : 'N/A' }}</span>
-                  </div>
+              </div>
+              <div class="sum-card red-sum">
+                <div class="sum-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="sum-info">
+                  <label>Scholarship</label>
+                  <div class="sum-val">{{ detail.isScholar ? 'Yes' : 'N/A' }}</div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </ng-container>
+          </section>
 
-      <!-- Confirmation Modal -->
-      <app-confirmation-modal
-        *ngIf="showDeleteModal"
-        [title]="'Delete Admission Record'"
-        [message]="'Are you sure you want to delete this admission record for \'' + detail?.fullName + '\'?'"
-        (confirm)="confirmDelete()"
-        (cancel)="cancelDelete()">
-      </app-confirmation-modal>
-    </main>
+          <!-- Fee Summary -->
+          <section class="summary-section">
+            <h3>Fee Summary</h3>
+            <div class="summary-grid">
+              <div class="sum-card-basic blue-border">
+                <label>Total Fees Paid</label>
+                <div class="sum-val-lg blue-text">₹{{ detail.totalFeesPaid | number: '1.0-0' }}</div>
+              </div>
+              <div class="sum-card-basic red-border">
+                <label>Remaining Fee</label>
+                <div class="sum-val-lg red-text">₹{{ detail.remainingFees | number: '1.0-0' }}</div>
+              </div>
+              <div class="sum-card-basic teal-border">
+                <label>Token Amount</label>
+                <div class="sum-val-lg teal-text">{{ detail.totalFeesPaid! >= 1000 ? 'Paid' : 'Unpaid' }}</div>
+              </div>
+              <div class="sum-card-basic purple-border">
+                <label>Scholarship Details</label>
+                <div class="scholarship-box">
+                  <span class="scholar-label">Scholarship</span>
+                  <span class="scholar-amount">{{ detail.isScholar ? 'Merit' : 'None' }}</span>
+                  <span class="scholar-footer">₹ 15,000</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Commission Status -->
+          <section class="info-card sm-card">
+            <div class="card-header">
+              <h2>Commission Status</h2>
+            </div>
+            <div class="card-body">
+              <div class="commission-row">
+                <label>Payment status</label>
+                <span class="status-pill warning">{{ detail.fiftyPercentFeesPaid ? 'Partially Paid' : 'Unpaid' }}</span>
+              </div>
+              <div class="commission-row mt-10">
+                <label>Commission Status</label>
+                <select class="form-select" [ngModel]="detail.commissionStatus" (ngModelChange)="updateCommissionStatus($event)">
+                  <option value="PENDING">Pending</option>
+                  <option value="CALCULATED">Calculated</option>
+                  <option value="PAID">Paid</option>
+                </select>
+              </div>
+              <div class="commission-footer mt-15">
+                <div class="comm-box blue-comm">
+                  <label><i class="fas fa-wallet"></i> Commission Amount</label>
+                  <div class="comm-val">₹ {{ detail.commissionAmount || 0 | number: '1.0-0' }}</div>
+                </div>
+                <div class="comm-box teal-comm">
+                  <label><i class="fas fa-calendar-alt"></i> Commission Paid Date</label>
+                  <div class="comm-val">{{ detail.commissionPaidDate || 'N/A' }}</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Fee History -->
+      <section class="fee-history-section">
+        <h3>Fee History</h3>
+        <div class="history-table-container">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Amount Paid</th>
+                <th>Payment Date</th>
+                <th>Payment Mode</th>
+                <th>Reference No.</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let fee of detail.feeHistory; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td class="bold">₹ {{ fee.amountPaid | number: '1.0-0' }}</td>
+                <td>{{ fee.paymentDate | date: 'MMM d, yyyy' }}</td>
+                <td><span class="mode-pill">{{ fee.paymentMode }}</span></td>
+                <td>{{ fee.referenceNo || 'N/A' }}</td>
+                <td><span class="remarks-pill">upto 50 words</span></td>
+              </tr>
+              <tr *ngIf="!detail.feeHistory || detail.feeHistory.length === 0">
+                <td colspan="6" class="text-center">No fee history found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading Admission Details...</p>
+      </div>
+    </ng-template>
+
+    <!-- Delete Confirmation Modal -->
+    <app-confirmation-modal
+      *ngIf="showDeleteModal"
+      title="Delete Admission"
+      message="Are you sure you want to delete this admission record? This action cannot be undone."
+      (confirm)="confirmDelete()"
+      (cancel)="cancelDelete()"
+    ></app-confirmation-modal>
   </div>
 </div>

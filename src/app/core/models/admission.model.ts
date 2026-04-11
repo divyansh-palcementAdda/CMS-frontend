@@ -89,6 +89,17 @@ export interface AdmissionItem {
   percentagePaid?: number;
   tokenAmount?: number;
   discountPercentage?: number;
+
+  feeHistory?: StudentFee[];
+}
+
+export interface StudentFee {
+  id?: number;
+  amountPaid: number;
+  paymentDate: string;
+  paymentMode: string;
+  referenceNo?: string;
+  remarks?: string;
 }
 
 export interface AdmissionPageData {

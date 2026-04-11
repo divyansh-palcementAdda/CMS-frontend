@@ -60,7 +60,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   }
 
   onEdit() {
-    this.router.navigate([], { fragment: 'edit' });
+    this.router.navigate(['/admission-management'], { fragment: 'edit', queryParams: { id: this.admissionId } });
   }
 
   onDelete() {
@@ -89,28 +89,76 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['/admission-management']);
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/admission-management']);
+    }
   }
 
-  toggleFeeStatus(status: 'Paid' | 'Unpaid') {
+  viewDetails(type: 'course' | 'institution' | 'user' | 'consultancy', id?: number) {
+    if (!id) return;
+    switch (type) {
+      case 'course':
+        this.router.navigate(['/course-management', id]);
+        break;
+      case 'institution':
+        this.router.navigate(['/institution-management', id]);
+        break;
+      case 'user':
+        this.router.navigate(['/user-management', id]);
+        break;
+      case 'consultancy':
+        this.router.navigate(['/consultancy-management', id]);
+        break;
+    }
+  }
+
+  toggleFeeStatus(currentStatus: boolean) {
     if (!this.detail) return;
-    const isPaid = status === 'Paid';
+    const newStatus = !currentStatus;
 
     this.loading = true;
-    this.admissionService.updateFeeStatus(this.detail.id, isPaid)
+    this.admissionService.updateFeeStatus(this.detail.id, newStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          if (this.detail) {
-            this.detail.feeStatus = status;
-            this.detail.fiftyPercentFeesPaid = isPaid;
-            this.detail.feeStatus = isPaid ? 'Paid' : 'Unpaid';
-          }
-          this.loading = false;
           this.loadData();
         },
         error: (err) => {
           console.error('Error updating fee status', err);
+          this.loading = false;
+        }
+      });
+  }
+
+  updateCommissionStatus(newStatus: string) {
+    if (!this.detail) return;
+
+    // Validation Logic
+    if (this.detail.commissionStatus === 'PENDING') {
+      alert('Please mark this student as partial fees paid before updating commission status.');
+      return;
+    }
+
+    if (this.detail.commissionStatus === 'PAID' && newStatus === 'PAID') return;
+    
+    // Allow transition but enforce rules
+    if (newStatus === 'PAID' && this.detail.commissionStatus !== 'CALCULATED') {
+       alert('Commission can only be marked as Paid if it is in Calculated status.');
+       return;
+    }
+
+    this.loading = true;
+    this.admissionService.updateCommissionStatus(this.detail.id, newStatus)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loadData();
+        },
+        error: (err: any) => {
+          const errorMsg = err?.error?.message || 'Error updating commission status';
+          alert(errorMsg);
           this.loading = false;
         }
       });
