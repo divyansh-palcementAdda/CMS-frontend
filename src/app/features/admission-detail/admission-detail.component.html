@@ -7,14 +7,19 @@
     <div class="container-fluid" *ngIf="detail; else loadingTpl">
       <!-- Breadcrumbs -->
       <nav class="breadcrumb">
-        <span>Dashboard</span> / <span>Admission</span> / <span>All Admission</span> / <span class="active">Details</span>
+        <span>Dashboard</span> / <span>Admission</span> / <span>All Admission</span> / <span
+          class="active">Details</span>
       </nav>
 
       <!-- Title Section -->
       <header class="page-header">
         <div class="title-left">
           <button class="back-btn" (click)="goBack()">
-            <i class="fas fa-arrow-left"></i>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#6366F1" />
+              <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
           </button>
           <div class="student-title">
             <h1>{{ detail.fullName }}</h1>
@@ -22,7 +27,10 @@
           </div>
         </div>
         <div class="title-actions">
-          <button class="btn-outline-edit" (click)="onEdit()">
+          <button class="btn-primary-fees" (click)="openAddFees()">
+            <i class="fas fa-plus-circle"></i> Add Fees
+          </button>
+          <button class="btn-outline-edit" (click)="onEdit(detail.id!)">
             <i class="fas fa-edit"></i> Edit
           </button>
           <button class="btn-danger-delete" (click)="onDelete()">
@@ -138,7 +146,8 @@
                 <label>Department/School Name</label>
                 <div class="inline-row">
                   <p>{{ detail.institutionName || 'N/A' }}</p>
-                  <button class="view-details-sm" (click)="viewDetails('institution', detail.institutionId)">View Details</button>
+                  <button class="view-details-sm" (click)="viewDetails('institution', detail.institutionId)">View
+                    Details</button>
                 </div>
               </div>
             </div>
@@ -160,14 +169,12 @@
                 <p class="amount">₹ {{ detail.finalFeesAfterDiscount | number: '1.0-0' }}</p>
               </div>
               <div class="info-group">
-                <label>Discount %</label>
-                <select class="form-select-sm" disabled>
-                  <option>{{ detail.discountType === 'PERCENTAGE' ? detail.discountValue + '%' : 'N/A' }}</option>
-                </select>
+                <label>Discount Details</label>
+                <p>{{ detail.discountType === 'PERCENTAGE' ? detail.discountValue + '%' : 'Flat' }}</p>
               </div>
               <div class="info-group">
-                <label>Discount</label>
-                <input type="text" class="form-input-sm" [value]="detail.discountValue || 0" readonly>
+                <label>Discount Amount</label>
+                <p class="amount">₹ {{ calculatedDiscountAmount | number: '1.0-0' }}</p>
               </div>
             </div>
           </section>
@@ -186,7 +193,8 @@
                 <label>Admitted Course Name</label>
                 <div class="inline-row space-between">
                   <p class="bold">{{ detail.courseName }}</p>
-                  <button class="view-details-btn" (click)="viewDetails('course', detail.courseId)">View Details</button>
+                  <button class="view-details-btn" (click)="viewDetails('course', detail.courseId)">View
+                    Details</button>
                 </div>
               </div>
             </div>
@@ -204,7 +212,8 @@
                   <label>Admitted By</label>
                   <div class="inline-row space-between">
                     <p>{{ detail.admittedByUserName || 'N/A' }}</p>
-                    <button class="view-details-btn" (click)="viewDetails('user', detail.admittedByUserId)">View Details</button>
+                    <button class="view-details-btn" (click)="viewDetails('user', detail.admittedByUserId)">View
+                      Details</button>
                   </div>
                 </div>
               </div>
@@ -218,10 +227,12 @@
                       <div class="toggle-container">
                         <span class="status-label" [class.unpaid]="!detail.fiftyPercentFeesPaid">Paid</span>
                         <label class="switch">
-                          <input type="checkbox" [checked]="detail.fiftyPercentFeesPaid" (change)="toggleFeeStatus(detail.fiftyPercentFeesPaid || false)">
+                          <input type="checkbox" [checked]="detail.fiftyPercentFeesPaid"
+                            (change)="toggleFeeStatus(detail.fiftyPercentFeesPaid || false)">
                           <span class="slider round"></span>
                         </label>
-                        <span class="status-badge" [class.paid]="detail.fiftyPercentFeesPaid" [class.unpaid]="!detail.fiftyPercentFeesPaid">
+                        <span class="status-badge" [class.paid]="detail.fiftyPercentFeesPaid"
+                          [class.unpaid]="!detail.fiftyPercentFeesPaid">
                           {{ detail.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid' }}
                         </span>
                       </div>
@@ -240,14 +251,15 @@
                 <div class="sum-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="sum-info">
                   <label>Percentage Paid</label>
-                  <div class="sum-val">{{ (detail.totalFeesPaid! / detail.finalFeesAfterDiscount!) * 100 | number: '1.0-0' }}%</div>
+                  <div class="sum-val">{{ (detail.totalFeesPaid! / detail.finalFeesAfterDiscount!) * 100 | number:
+                    '1.0-0' }}%</div>
                 </div>
               </div>
               <div class="sum-card purple-sum">
                 <div class="sum-icon"><i class="fas fa-money-bill-wave"></i></div>
                 <div class="sum-info">
                   <label>Token Amount Paid</label>
-                  <div class="sum-val">₹ {{ detail.totalFeesPaid! > 1000 ? 1000 : detail.totalFeesPaid | number: '1.0-0' }}</div>
+                  <div class="sum-val">₹ 350</div>
                 </div>
               </div>
               <div class="sum-card teal-sum">
@@ -271,6 +283,15 @@
           <section class="summary-section">
             <h3>Fee Summary</h3>
             <div class="summary-grid">
+              <div class="sum-card-basic blue-border" *ngIf="detail.totalFeesPaid! > 0 && detail.feeHistory && detail.feeHistory.length > 0">
+                <label>Provisional Paid</label>
+                <div class="provisional-row">
+                  <div class="sum-val-lg blue-text">₹{{ detail.feeHistory[0].amountPaid | number: '1.0-0' }}</div>
+                  <button class="view-details-sm" (click)="scrollToHistory()" title="View all payments">
+                    History <i class="fas fa-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
               <div class="sum-card-basic blue-border">
                 <label>Total Fees Paid</label>
                 <div class="sum-val-lg blue-text">₹{{ detail.totalFeesPaid | number: '1.0-0' }}</div>
@@ -287,29 +308,25 @@
                 <label>Scholarship Details</label>
                 <div class="scholarship-box">
                   <span class="scholar-label">Scholarship</span>
-                  <span class="scholar-amount">{{ detail.isScholar ? 'Merit' : 'None' }}</span>
-                  <span class="scholar-footer">₹ 15,000</span>
+                  <span class="scholar-amount">{{ detail.isScholar ? detail.scholarshipDetails : 'None' }}</span>
                 </div>
               </div>
             </div>
           </section>
 
           <!-- Commission Status -->
-          <section class="info-card sm-card">
+          <section class="info-card sm-card" *ngIf="detail.admissionSource === 'CONSULTANCY'">
             <div class="card-header">
               <h2>Commission Status</h2>
             </div>
             <div class="card-body">
-              <div class="commission-row">
-                <label>Payment status</label>
-                <span class="status-pill warning">{{ detail.fiftyPercentFeesPaid ? 'Partially Paid' : 'Unpaid' }}</span>
-              </div>
               <div class="commission-row mt-10">
                 <label>Commission Status</label>
-                <select class="form-select" [ngModel]="detail.commissionStatus" (ngModelChange)="updateCommissionStatus($event)">
-                  <option value="PENDING">Pending</option>
+                <select class="form-select" [ngModel]="detail.commissionStatus"
+                  (ngModelChange)="updateCommissionStatus($event)" [disabled]="detail.commissionStatus === 'PENDING'">
+                  <option value="PENDING" *ngIf="detail.commissionStatus === 'PENDING'">Pending</option>
                   <option value="CALCULATED">Calculated</option>
-                  <option value="PAID">Paid</option>
+                  <option value="PAID" *ngIf="detail.commissionStatus !== 'PENDING'">Paid</option>
                 </select>
               </div>
               <div class="commission-footer mt-15">
@@ -317,7 +334,7 @@
                   <label><i class="fas fa-wallet"></i> Commission Amount</label>
                   <div class="comm-val">₹ {{ detail.commissionAmount || 0 | number: '1.0-0' }}</div>
                 </div>
-                <div class="comm-box teal-comm">
+                <div class="comm-box teal-comm" *ngIf="detail.commissionStatus === 'PAID'">
                   <label><i class="fas fa-calendar-alt"></i> Commission Paid Date</label>
                   <div class="comm-val">{{ detail.commissionPaidDate || 'N/A' }}</div>
                 </div>
@@ -328,7 +345,7 @@
       </div>
 
       <!-- Fee History -->
-      <section class="fee-history-section">
+      <section class="fee-history-section" id="feeHistorySection">
         <h3>Fee History</h3>
         <div class="history-table-container">
           <table class="history-table">
@@ -349,7 +366,7 @@
                 <td>{{ fee.paymentDate | date: 'MMM d, yyyy' }}</td>
                 <td><span class="mode-pill">{{ fee.paymentMode }}</span></td>
                 <td>{{ fee.referenceNo || 'N/A' }}</td>
-                <td><span class="remarks-pill">upto 50 words</span></td>
+                <td><span class="remarks-pill">{{ fee.remarks || 'N/A' }}</span></td>
               </tr>
               <tr *ngIf="!detail.feeHistory || detail.feeHistory.length === 0">
                 <td colspan="6" class="text-center">No fee history found</td>
@@ -367,13 +384,14 @@
       </div>
     </ng-template>
 
-    <!-- Delete Confirmation Modal -->
-    <app-confirmation-modal
-      *ngIf="showDeleteModal"
-      title="Delete Admission"
-      message="Are you sure you want to delete this admission record? This action cannot be undone."
-      (confirm)="confirmDelete()"
-      (cancel)="cancelDelete()"
-    ></app-confirmation-modal>
+    <app-fee-payment-modal [isVisible]="showFeeModal" [studentId]="detail?.id" [studentName]="detail?.fullName || ''"
+      [totalCourseFees]="detail?.totalCourseFees || 0" [discountAmount]="calculatedDiscountAmount"
+      [alreadyPaidAmount]="detail?.totalFeesPaid || 0" [triggeredBySync]="isSyncMode" (close)="showFeeModal = false"
+      (saved)="onFeeSaved($event)">
+    </app-fee-payment-modal>
+
+    <app-admission-form-modal [isVisible]="showAdmissionModal" [studentId]="selectedStudentId"
+      (close)="closeAdmissionModal()" (saved)="onAdmissionSaved()">
+    </app-admission-form-modal>
   </div>
 </div>

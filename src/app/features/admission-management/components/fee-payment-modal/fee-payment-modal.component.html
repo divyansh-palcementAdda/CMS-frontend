@@ -31,6 +31,37 @@
             </div>
           </div>
 
+          <!-- Threshold Hint (Sync Case) -->
+          <div class="threshold-hint-wrapper" *ngIf="triggeredBySync">
+            <div class="threshold-hint-card" [class.reached]="remainingToThreshold === 0">
+              <div class="hint-header">
+                <svg *ngIf="remainingToThreshold > 0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <svg *ngIf="remainingToThreshold === 0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>50% Fee Status Tracking</span>
+              </div>
+              <div class="hint-body">
+                <div class="hint-row">
+                  <span>Target (50%):</span>
+                  <strong>₹ {{ thresholdAmount | number:'1.0-0' }}</strong>
+                </div>
+                <div class="hint-row" *ngIf="remainingToThreshold > 0">
+                  <span>Remaining:</span>
+                  <span class="rem-val">₹ {{ remainingToThreshold | number:'1.0-0' }}</span>
+                </div>
+                <div class="hint-success" *ngIf="remainingToThreshold === 0">
+                  Target reached! Student will be marked as Paid.
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Payment Mode -->
           <div class="input-group">
             <label>Payment Mode <span class="required">*</span></label>

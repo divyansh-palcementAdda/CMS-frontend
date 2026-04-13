@@ -6,15 +6,18 @@ import { SidebarComponent } from '../../shared/components/sidebar/sidebar.compon
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { AdmissionService } from '../../core/services/admission.service';
 import { AdmissionItem } from '../../core/models/admission.model';
+import { FeePaymentModalComponent } from '../admission-management/components/fee-payment-modal/fee-payment-modal.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { NotificationService } from '../../core/services/notification.service';
+import { AdmissionFormModalComponent } from '../admission-management/components/admission-form-modal/admission-form-modal.component';
 
-import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+// Notification service imported via core services
 
 @Component({
   selector: 'app-admission-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, FeePaymentModalComponent, AdmissionFormModalComponent],
   templateUrl: './admission-detail.component.html',
   styleUrls: ['./admission-detail.component.scss']
 })
@@ -23,14 +26,18 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   loading = true;
   detail: AdmissionItem | null = null;
   private destroy$ = new Subject<void>();
+  showFeeModal = false;
+  isSyncMode = false;
+  showAdmissionModal = false;
+  selectedStudentId: number | null = null;
 
   // Actions
-  showDeleteModal = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private admissionService: AdmissionService
+    private admissionService: AdmissionService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit() {
@@ -59,33 +66,47 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
       });
   }
 
-  onEdit() {
-    this.router.navigate(['/admission-management'], { fragment: 'edit', queryParams: { id: this.admissionId } });
+  onEdit(id: number) {
+    this.selectedStudentId = id;
+    this.showAdmissionModal = true;
   }
 
-  onDelete() {
-    this.showDeleteModal = true;
+  closeAdmissionModal() {
+    this.showAdmissionModal = false;
+    this.selectedStudentId = null;
   }
 
-  cancelDelete() {
-    this.showDeleteModal = false;
+  onAdmissionSaved() {
+    this.closeAdmissionModal();
+    this.loadData();
   }
 
-  confirmDelete() {
-    this.loading = true;
-    this.admissionService.deleteAdmission(this.admissionId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.showDeleteModal = false;
-          this.router.navigate(['/admission-management']);
-        },
-        error: (err) => {
-          console.error('Error deleting admission', err);
-          this.loading = false;
-          this.showDeleteModal = false;
-        }
-      });
+  async onDelete() {
+    if (!this.detail) return;
+    
+    const confirmed = await this.notificationService.confirm(
+      'Confirm Deletion',
+      'Are you sure you want to delete this admission? This action cannot be undone.',
+      'Delete',
+      'Cancel'
+    );
+
+    if (confirmed) {
+      this.loading = true;
+      this.admissionService.deleteAdmission(this.admissionId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.notificationService.success('Deleted', 'Admission has been deleted successfully.');
+            this.router.navigate(['/admission-management']);
+          },
+          error: (err) => {
+            console.error('Error deleting admission', err);
+            this.notificationService.error('Delete Failed', 'An error occurred while deleting the admission.');
+            this.loading = false;
+          }
+        });
+    }
   }
 
   goBack() {
@@ -100,33 +121,73 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
     if (!id) return;
     switch (type) {
       case 'course':
-        this.router.navigate(['/course-management', id]);
+        this.router.navigate(['/courses', id]);
         break;
       case 'institution':
-        this.router.navigate(['/institution-management', id]);
+        this.router.navigate(['/institutions', id]);
         break;
       case 'user':
-        this.router.navigate(['/user-management', id]);
+        this.router.navigate(['/users', id]);
         break;
       case 'consultancy':
-        this.router.navigate(['/consultancy-management', id]);
+        this.router.navigate(['/consultancy', id]);
         break;
     }
   }
 
-  toggleFeeStatus(currentStatus: boolean) {
+  async toggleFeeStatus(currentStatus: boolean) {
     if (!this.detail) return;
-    const newStatus = !currentStatus;
 
+    // If marking as UNPAID (current is Paid)
+    if (currentStatus) {
+      const confirmed = await this.notificationService.confirm(
+        'Confirm Unpaid Status',
+        'Are you sure you want to mark this student as Unpaid? This will also reset any calculated commission.',
+        'Mark Unpaid',
+        'Cancel'
+      );
+      if (confirmed) {
+        this.updateFeeStatusServiceCall(false);
+      }
+      return;
+    }
+
+    // If marking as PAID (current is Unpaid)
+    // We open the modal first to record payment and check threshold
+    this.isSyncMode = true;
+    this.showFeeModal = true;
+  }
+
+  openAddFees() {
+    this.isSyncMode = false;
+    this.showFeeModal = true;
+  }
+
+  onFeeSaved(isThresholdMet: boolean) {
+    this.showFeeModal = false;
+    
+    // Auto-update status ONLY if triggered by the toggle sync AND threshold met
+    if (this.isSyncMode && isThresholdMet) {
+      this.updateFeeStatusServiceCall(true);
+    } else {
+      // Just reload data to show the new fee history entry (or if they saved anyway)
+      this.loadData();
+    }
+  }
+
+  private updateFeeStatusServiceCall(newStatus: boolean) {
+    if (!this.detail) return;
     this.loading = true;
-    this.admissionService.updateFeeStatus(this.detail.id, newStatus)
+    this.admissionService.updateFeeStatus(this.detail.id!, newStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.loadData();
+          this.notificationService.success('Status Updated', `Student marked as ${newStatus ? 'Paid' : 'Unpaid'} successfully.`);
         },
         error: (err) => {
           console.error('Error updating fee status', err);
+          this.notificationService.error('Update Failed', err.error?.message || 'Could not update fee status');
           this.loading = false;
         }
       });
@@ -135,17 +196,35 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   updateCommissionStatus(newStatus: string) {
     if (!this.detail) return;
 
-    // Validation Logic
-    if (this.detail.commissionStatus === 'PENDING') {
-      alert('Please mark this student as partial fees paid before updating commission status.');
+    const currentStatus = this.detail.commissionStatus;
+
+    // Redundant update check
+    if (currentStatus === newStatus) return;
+
+    // Rule 1: Cannot mark PENDING manually from any state
+    if (newStatus === 'PENDING') {
+      this.notificationService.warning('Manual Action Restricted', 'Commission status can only be reset to "Pending" automatically by the system (e.g., when fees are unpaid).');
+      this.loadData();
       return;
     }
 
-    if (this.detail.commissionStatus === 'PAID' && newStatus === 'PAID') return;
-    
-    // Allow transition but enforce rules
-    if (newStatus === 'PAID' && this.detail.commissionStatus !== 'CALCULATED') {
-       alert('Commission can only be marked as Paid if it is in Calculated status.');
+    // Rule 2: Cannot transition FROM Pending manually
+    if (currentStatus === 'PENDING') {
+      this.notificationService.warning('Manual Action Restricted', 'Status can only move from "Pending" to "Calculated" automatically once 50% fees are paid.');
+      this.loadData();
+      return;
+    }
+
+    // Rule 3: Valid manual transitions (CALCULATED <-> PAID)
+    if (currentStatus === 'CALCULATED' && newStatus !== 'PAID') {
+       this.notificationService.warning('Invalid Action', 'From "Calculated" status, you can only mark the commission as "Paid".');
+       this.loadData();
+       return;
+    }
+
+    if (currentStatus === 'PAID' && newStatus !== 'CALCULATED') {
+       this.notificationService.warning('Invalid Action', 'From "Paid" status, you can only move back to "Calculated".');
+       this.loadData();
        return;
     }
 
@@ -154,14 +233,30 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          this.notificationService.success('Success', 'Commission status updated successfully.');
           this.loadData();
         },
         error: (err: any) => {
           const errorMsg = err?.error?.message || 'Error updating commission status';
-          alert(errorMsg);
-          this.loading = false;
+          this.notificationService.error('Update Failed', errorMsg);
+          this.loadData(); // Reset to server state
         }
       });
+  }
+
+  get calculatedDiscountAmount(): number {
+    if (!this.detail) return 0;
+    if (this.detail.discountType === 'PERCENTAGE') {
+      return ((this.detail.totalCourseFees || 0) * (this.detail.discountValue || 0)) / 100;
+    }
+    return this.detail.discountValue || 0;
+  }
+
+  scrollToHistory() {
+    const element = document.getElementById('feeHistorySection');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   ngOnDestroy() {

@@ -16,7 +16,7 @@ import { UserService } from '../../../../core/services/user.service';
 })
 export class AdmissionFormModalComponent implements OnInit, OnChanges {
   @Input() isVisible = false;
-  @Input() studentId?: number;
+  @Input() studentId?: number | null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 

@@ -65,24 +65,19 @@ $red-danger: #EF4444;
     gap: 20px !important;
 
     .back-btn {
-      width: 44px !important;
-      height: 44px !important;
-      border-radius: 50% !important;
-      background: #7C3AED !important;
-      color: white !important;
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       cursor: pointer !important;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2) !important;
+      transition: transform 0.2s !important;
+      box-shadow: none !important;
 
       &:hover {
-        transform: scale(1.05) !important;
-        box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3) !important;
+        transform: scale(1.1) !important;
       }
-
-      svg { width: 22px !important; height: 22px !important; }
     }
 
     .name-id {
