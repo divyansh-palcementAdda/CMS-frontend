@@ -28,13 +28,31 @@
         </div>
         <div class="title-actions">
           <button class="btn-primary-fees" (click)="openAddFees()">
-            <i class="fas fa-plus-circle"></i> Add Fees
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Add Fees
           </button>
           <button class="btn-outline-edit" (click)="onEdit(detail.id!)">
-            <i class="fas fa-edit"></i> Edit
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Edit
           </button>
           <button class="btn-danger-delete" (click)="onDelete()">
-            <i class="fas fa-trash-alt"></i> Delete
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            Delete
           </button>
         </div>
       </header>
@@ -156,7 +174,11 @@
           <!-- Fee Details -->
           <section class="info-card">
             <div class="card-header">
-              <i class="fas fa-user-tag"></i>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+              </svg>
               <h2>Fee Details</h2>
             </div>
             <div class="card-body grid-2">
@@ -170,9 +192,10 @@
               </div>
               <div class="info-group">
                 <label>Discount Details</label>
-                <p>{{ detail.discountType === 'PERCENTAGE' ? detail.discountValue + '%' : 'Flat' }}</p>
+                <p>{{ detail.discountType === 'PERCENTAGE' ? 'Percentage' : (detail.discountType === 'FLAT' ? 'Flat' :
+                  'N/A') }}</p>
               </div>
-              <div class="info-group">
+              <div class="info-group" *ngIf="detail.discountType">
                 <label>Discount Amount</label>
                 <p class="amount">₹ {{ calculatedDiscountAmount | number: '1.0-0' }}</p>
               </div>
@@ -185,7 +208,11 @@
           <!-- Admission Course -->
           <section class="info-card sm-card">
             <div class="card-header">
-              <i class="fas fa-user-graduate"></i>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
               <h2>Admission Course</h2>
             </div>
             <div class="card-body">
@@ -203,7 +230,12 @@
           <!-- Admission Activity -->
           <section class="info-card sm-card">
             <div class="card-header">
-              <i class="fas fa-user-check"></i>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
               <h2>Admission Activity</h2>
             </div>
             <div class="card-body">
@@ -213,6 +245,17 @@
                   <div class="inline-row space-between">
                     <p>{{ detail.admittedByUserName || 'N/A' }}</p>
                     <button class="view-details-btn" (click)="viewDetails('user', detail.admittedByUserId)">View
+                      Details</button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="detail.admissionSource === 'CONSULTANCY'" class="activity-row">
+                <div class="info-group">
+                  <label>Consultancy Name</label>
+                  <div class="inline-row space-between">
+                    <p>{{ detail.consultancyName || 'N/A' }}</p>
+                    <button class="view-details-btn" (click)="viewDetails('consultancy', detail.consultancyId)">View
                       Details</button>
                   </div>
                 </div>
@@ -227,8 +270,8 @@
                       <div class="toggle-container">
                         <span class="status-label" [class.unpaid]="!detail.fiftyPercentFeesPaid">Paid</span>
                         <label class="switch">
-                          <input type="checkbox" [checked]="detail.fiftyPercentFeesPaid"
-                            (change)="toggleFeeStatus(detail.fiftyPercentFeesPaid || false)">
+                          <input type="checkbox" #feeToggle [checked]="detail.fiftyPercentFeesPaid"
+                            (click)="toggleFeeStatus($event)">
                           <span class="slider round"></span>
                         </label>
                         <span class="status-badge" [class.paid]="detail.fiftyPercentFeesPaid"
@@ -248,7 +291,12 @@
             <h3>Financial Summary</h3>
             <div class="summary-grid">
               <div class="sum-card blue-sum">
-                <div class="sum-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="sum-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path fill="currentColor"
+                      d="M1 4.25C1 3.56 1.56 3 2.25 3h9.5c.69 0 1.25.56 1.25 1.25v5.5c0 .69-.56 1.25-1.25 1.25h-9.5C1.56 11 1 10.44 1 9.75zm3 .25V4H3v.5a.5.5 0 0 1-.5.5H2v1h.5A1.5 1.5 0 0 0 4 4.5M9 7a2 2 0 1 0-4 0a2 2 0 0 0 4 0m2-3h-1v.5A1.5 1.5 0 0 0 11.5 6h.5V5h-.5a.5.5 0 0 1-.5-.5zM4 9.5A1.5 1.5 0 0 0 2.5 8H2v1h.5a.5.5 0 0 1 .5.5v.5h1zm7 .5v-.5a.5.5 0 0 1 .5-.5h.5V8h-.5A1.5 1.5 0 0 0 10 9.5v.5zm-6.5 3a1.5 1.5 0 0 1-1.427-1.036Q3.281 12 3.5 12h8.25A2.25 2.25 0 0 0 14 9.75V5.085A1.5 1.5 0 0 1 15 6.5v3.25A3.25 3.25 0 0 1 11.75 13z" />
+                  </svg>
+                </div>
                 <div class="sum-info">
                   <label>Percentage Paid</label>
                   <div class="sum-val">{{ (detail.totalFeesPaid! / detail.finalFeesAfterDiscount!) * 100 | number:
@@ -256,21 +304,41 @@
                 </div>
               </div>
               <div class="sum-card purple-sum">
-                <div class="sum-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <div class="sum-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="12" y1="15" x2="12" y2="9"></line>
+                    <path d="M10 9h2a2 2 0 1 1 0 4h-2V9z"></path>
+                  </svg>
+                </div>
                 <div class="sum-info">
-                  <label>Token Amount Paid</label>
+                  <label>Registration Fees</label>
                   <div class="sum-val">₹ 350</div>
                 </div>
               </div>
               <div class="sum-card teal-sum">
-                <div class="sum-icon"><i class="fas fa-percent"></i></div>
+                <div class="sum-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="5" x2="5" y2="19"></line>
+                    <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                    <circle cx="17.5" cy="17.5" r="2.5"></circle>
+                  </svg>
+                </div>
                 <div class="sum-info">
                   <label>Discount %</label>
                   <div class="sum-val">{{ detail.discountType === 'PERCENTAGE' ? detail.discountValue : '0' }}%</div>
                 </div>
               </div>
               <div class="sum-card red-sum">
-                <div class="sum-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="sum-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                  </svg>
+                </div>
                 <div class="sum-info">
                   <label>Scholarship</label>
                   <div class="sum-val">{{ detail.isScholar ? 'Yes' : 'N/A' }}</div>
@@ -283,12 +351,17 @@
           <section class="summary-section">
             <h3>Fee Summary</h3>
             <div class="summary-grid">
-              <div class="sum-card-basic blue-border" *ngIf="detail.totalFeesPaid! > 0 && detail.feeHistory && detail.feeHistory.length > 0">
+              <div class="sum-card-basic blue-border"
+                *ngIf="detail.totalFeesPaid! > 0 && detail.feeHistory && detail.feeHistory.length > 0">
                 <label>Provisional Paid</label>
                 <div class="provisional-row">
                   <div class="sum-val-lg blue-text">₹{{ detail.feeHistory[0].amountPaid | number: '1.0-0' }}</div>
                   <button class="view-details-sm" (click)="scrollToHistory()" title="View all payments">
-                    History <i class="fas fa-chevron-down"></i>
+                    History
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -301,8 +374,8 @@
                 <div class="sum-val-lg red-text">₹{{ detail.remainingFees | number: '1.0-0' }}</div>
               </div>
               <div class="sum-card-basic teal-border">
-                <label>Token Amount</label>
-                <div class="sum-val-lg teal-text">{{ detail.totalFeesPaid! >= 1000 ? 'Paid' : 'Unpaid' }}</div>
+                <label>Registration Fees</label>
+                <div class="sum-val-lg teal-text">{{ detail.tokenAmountPaid ? 'Paid' : 'Unpaid' }}</div>
               </div>
               <div class="sum-card-basic purple-border">
                 <label>Scholarship Details</label>
@@ -331,12 +404,29 @@
               </div>
               <div class="commission-footer mt-15">
                 <div class="comm-box blue-comm">
-                  <label><i class="fas fa-wallet"></i> Commission Amount</label>
+                  <label>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      style="margin-right: 4px; vertical-align: middle;">
+                      <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                      <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                      <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+                    </svg>
+                    Commission Amount
+                  </label>
                   <div class="comm-val">₹ {{ detail.commissionAmount || 0 | number: '1.0-0' }}</div>
                 </div>
                 <div class="comm-box teal-comm" *ngIf="detail.commissionStatus === 'PAID'">
-                  <label><i class="fas fa-calendar-alt"></i> Commission Paid Date</label>
-                  <div class="comm-val">{{ detail.commissionPaidDate || 'N/A' }}</div>
+                  <label>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      style="margin-right: 4px; vertical-align: middle;">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Commission Paid Date
+                  </label>
+                  <div class="comm-val">{{ detail.commissionPaidDate | date: 'MMMM d, yyyy' }}</div>
                 </div>
               </div>
             </div>

@@ -20,13 +20,15 @@ export class AdmissionService {
     statFilter?: string,
     courseId?: number,
     sortColumn?: string,
-    sortDirection?: string
+    sortDirection?: string,
+    tab?: string
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
     if (search) params = params.set('search', search);
+    if (tab) params = params.set('tab', tab);
     if (statFilter) params = params.set('statFilter', statFilter);
     if (courseId) params = params.set('courseId', courseId.toString());
     if (sortColumn) params = params.set('sortColumn', sortColumn);

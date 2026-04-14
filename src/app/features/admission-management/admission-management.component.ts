@@ -44,6 +44,7 @@ export class AdmissionManagementComponent implements OnInit {
 
   // Filters & Sorting
   activeStatFilter: string = '';
+  activeTabFilter: string = '';
   selectedCourseId: number | undefined = undefined;
   sortColumn: string = '';
   sortDirection: string = '';
@@ -78,6 +79,10 @@ export class AdmissionManagementComponent implements OnInit {
       const type = params['type'];
       const source = params['source'];
       const isScholar = params['isScholar'];
+      const tab = params['tab'];
+      console.log('Query Params:', params);
+
+      this.activeTabFilter = tab || '';
 
       if (type) {
         this.activeStatFilter = type;
@@ -108,7 +113,7 @@ export class AdmissionManagementComponent implements OnInit {
     this.loading = true;
     this.sub = this.admissionService.getStudentsByFilter(source, isScholar).subscribe(data => {
       this.pageData = data;
-      this.totalPages = 1;
+      this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
       this.loading = false;
     });
   }
@@ -122,13 +127,31 @@ export class AdmissionManagementComponent implements OnInit {
       this.activeStatFilter,
       this.selectedCourseId,
       this.sortColumn,
-      this.sortDirection
+      this.sortDirection,
+      this.activeTabFilter
     ).subscribe(data => {
       this.pageData = data;
       this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
       this.loading = false;
-      console.log('--- Admission Data Loaded ---', data);
     });
+  }
+
+  private applyTabFilter(admissions: AdmissionItem[]): AdmissionItem[] {
+    if (!this.activeTabFilter) return admissions;
+
+    if (this.activeTabFilter === 'applications') {
+      return admissions.filter(item => 
+        (item.totalFeesPaid || 0) === 0 && 
+        (item.remainingFees === item.finalFeesAfterDiscount) &&
+        (!item.feeHistory || item.feeHistory.length === 0)
+      );
+    }
+
+    if (this.activeTabFilter === 'Admission') {
+      return admissions.filter(item => (item.totalFeesPaid || 0) > 0);
+    }
+
+    return admissions;
   }
   onView(id: number) {
     this.router.navigate(['/admissions', id]);

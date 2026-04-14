@@ -15,7 +15,7 @@ export class AddConsultancyModalComponent implements OnInit {
   @Output() success = new EventEmitter<void>();
 
   activeTab: 'single' | 'bulk' = 'single';
-  
+
   // Single Form State
   consultancyForm!: FormGroup;
   lookupData = {
@@ -39,7 +39,7 @@ export class AddConsultancyModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private consultancyService: ConsultancyService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -49,8 +49,8 @@ export class AddConsultancyModalComponent implements OnInit {
   private initForm(): void {
     this.consultancyForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      pan: ['', [Validators.required, Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
+      email: ['', [Validators.email]],
+      pan: ['', [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
       mobile: ['', [Validators.required, Validators.pattern('^[6-9]\\d{9}$')]],
       alternateNo: ['', [Validators.pattern('^[6-9]\\d{9}$')]],
       sameAsMobileAlt: [false],
@@ -58,8 +58,7 @@ export class AddConsultancyModalComponent implements OnInit {
       sameAsMobileWa: [false],
       city: ['', [Validators.required]],
       state: ['', [Validators.required]],
-      permanentAddress: ['', [Validators.maxLength(255)]],
-      currentAddress: ['', [Validators.maxLength(255)]],
+      address: ['', [Validators.maxLength(255)]],
       institutionOrFirmName: ['', [Validators.required]],
       commissionPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       status: ['ACTIVE', [Validators.required]],
@@ -97,7 +96,7 @@ export class AddConsultancyModalComponent implements OnInit {
 
   private fetchDropdownData(): void {
     this.isLoadingLookups = true;
-    
+
     // Fire requests concurrently if possible, or serially
     this.consultancyService.getActiveInstitutions().subscribe({
       next: (res) => { this.lookupData.institutions = res.data || res; },
@@ -153,8 +152,8 @@ export class AddConsultancyModalComponent implements OnInit {
   get filteredUsers() {
     let filtered = this.lookupData.users;
     if (this.searchUsers) {
-        const term = this.searchUsers.toLowerCase();
-        filtered = filtered.filter(u => (u.fullName || u.email).toLowerCase().includes(term));
+      const term = this.searchUsers.toLowerCase();
+      filtered = filtered.filter(u => (u.fullName || u.email).toLowerCase().includes(term));
     }
     return filtered;
   }
@@ -178,7 +177,7 @@ export class AddConsultancyModalComponent implements OnInit {
   }
 
   // --- Single Methods ---
-  
+
   onSubmitSingle(): void {
     if (this.consultancyForm.invalid) {
       this.consultancyForm.markAllAsTouched();
@@ -262,7 +261,7 @@ export class AddConsultancyModalComponent implements OnInit {
 
     this.isUploading = true;
     this.bulkUploadResult = null;
-    
+
     this.consultancyService.bulkUpload(this.selectedFile).subscribe({
       next: (res: any) => {
         this.isUploading = false;

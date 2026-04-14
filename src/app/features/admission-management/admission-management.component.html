@@ -299,19 +299,9 @@
                                             </div>
                                         </th>
                                         <th>Course</th>
-                                        <th>Discount %</th>
-                                        <th>Paid</th>
-                                        <th>Remaining</th>
-                                        <th (click)="sortBy('fiftyPercentFeesPaid')" class="text-center"
-                                            style="cursor: pointer; user-select: none;">
-                                            <div
-                                                style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                                                Fee Status <span
-                                                    [style.opacity]="sortColumn === 'fiftyPercentFeesPaid' ? '1' : '0.3'"
-                                                    style="font-size: 12px; font-weight: bold;">{{ sortColumn ===
-                                                    'fiftyPercentFeesPaid' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕'
-                                                    }}</span></div>
-                                        </th>
+                                        <th>Partial Fee Status</th>
+                                        <th>Commission Status</th>
+                                        <th>Provisional Amount</th>
                                         <th (click)="sortBy('session')" style="cursor: pointer; user-select: none;">
                                             <div style="display: flex; align-items: center; gap: 4px;">Session <span
                                                     [style.opacity]="sortColumn === 'session' ? '1' : '0.3'"
@@ -342,53 +332,12 @@
                                             {{ item.courseName.split(' ')[0] }}<br>
                                             {{ item.courseName.split(' ').slice(1).join(' ') }}
                                         </td>
-                                        <!-- <td>{{ item.duration }}</td> -->
-                                        <!-- <td>{{ item.counselorName || 'N/A' }}</td> -->
                                         <td>
-                                            <span class="discount-badge" [class.scholarship]="item.isScholar"
-                                                [class.percent]="!item.isScholar">
-                                                {{ item.discountPercentageDisplay }}
-                                            </span>
+                                            {{item.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid'}}
                                         </td>
-                                        <td class="text-bold">{{ (item.totalFeesPaid || 0) |
+                                        <td class="text-bold">{{item.commissionStatus}}</td>
+                                        <td class="text-bold text-danger">{{ (item.feeHistory?.[0]?.amountPaid || 0) |
                                             currency:'INR':'symbol':'1.0-0' }}</td>
-                                        <td class="text-bold text-danger">{{ (item.remainingFees || 0) |
-                                            currency:'INR':'symbol':'1.0-0' }}</td>
-                                        <td class="text-center">
-                                            <div class="fee-status-toggle">
-                                                <div class="status-option paid"
-                                                    [class.active]="item.feeStatus === 'Paid'"
-                                                    (click)="toggleFeeStatus(item, 'Paid')">
-                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
-                                                        <rect x="5" y="10" width="14" height="6" rx="1"
-                                                            stroke="currentColor" stroke-width="2" fill="none" />
-                                                        <circle cx="12" cy="13" r="2" fill="currentColor" />
-                                                    </svg>
-                                                    <span>Paid</span>
-                                                </div>
-                                                <div class="status-option unpaid"
-                                                    [class.active]="item.feeStatus === 'Unpaid'"
-                                                    (click)="toggleFeeStatus(item, 'Unpaid')">
-                                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path
-                                                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z" />
-                                                        <rect x="5" y="10" width="14" height="6" rx="1"
-                                                            stroke="currentColor" stroke-width="2" fill="none" />
-                                                        <line x1="5" y1="10" x2="19" y2="16" stroke="currentColor"
-                                                            stroke-width="2" />
-                                                    </svg>
-                                                    <span>Unpaid</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <!-- <td>
-                                            <span class="status-pill" [class.active]="item.status === 'Active'"
-                                                [class.inactive]="item.status !== 'Active'">
-                                                {{ item.status }}
-                                            </span>
-                                        </td> -->
                                         <td>{{ item.session }}</td>
                                         <td>{{ item.admissionDate }}</td>
                                         <td class="text-center">

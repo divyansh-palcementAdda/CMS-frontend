@@ -135,25 +135,47 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  async toggleFeeStatus(currentStatus: boolean) {
+  async toggleFeeStatus(event: Event) {
     if (!this.detail) return;
+    
+    // Safety cast for the input element
+    const target = event.target as HTMLInputElement;
+    
+    // Prevent the checkbox from toggling visually until we confirm the action
+    event.preventDefault();
 
-    // If marking as UNPAID (current is Paid)
-    if (currentStatus) {
-      const confirmed = await this.notificationService.confirm(
-        'Confirm Unpaid Status',
-        'Are you sure you want to mark this student as Unpaid? This will also reset any calculated commission.',
-        'Mark Unpaid',
-        'Cancel'
-      );
-      if (confirmed) {
-        this.updateFeeStatusServiceCall(false);
+    // Use the actual model state to decide next action
+    // !! ensures we handle null/undefined as false
+    const isCurrentlyPaid = !!this.detail.fiftyPercentFeesPaid;
+
+    // If marking as UNPAID (currently is Paid)
+    if (isCurrentlyPaid) {
+      // Validation: Check if the user has already paid the 50% threshold
+      // If so, we restrict marking as Unpaid manually to prevent data inconsistency
+      const netFees = (this.detail.totalCourseFees || 0) - this.calculatedDiscountAmount;
+      const threshold = netFees * 0.5;
+      const totalPaid = this.detail.totalFeesPaid || 0;
+
+      if (totalPaid >= threshold) {
+        this.notificationService.warning(
+          'Action Restricted',
+          `This student cannot be marked as Unpaid manually because they have already submitted ₹${totalPaid}, which meets the 50% threshold (₹${threshold}).`
+        );
+        return;
       }
+
+      // User requested: No modal when toggling to unpaid
+      this.updateFeeStatusServiceCall(false);
       return;
     }
 
-    // If marking as PAID (current is Unpaid)
-    // We open the modal first to record payment and check threshold
+    // If marking as PAID (currently is Unpaid)
+    // 1. Manually ensure the checkbox stays OFF visually for now
+    if (target) {
+      target.checked = false;
+    }
+
+    // 2. We open the modal first to record payment and check threshold
     this.isSyncMode = true;
     this.showFeeModal = true;
   }
@@ -188,7 +210,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('Error updating fee status', err);
           this.notificationService.error('Update Failed', err.error?.message || 'Could not update fee status');
-          this.loading = false;
+          this.loadData(); // Force re-sync with server state
         }
       });
   }
