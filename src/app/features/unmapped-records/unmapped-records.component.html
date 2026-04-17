@@ -33,7 +33,8 @@
               </div>
               <div class="stat-content">
                 <h2 class="stat-value">{{ (stats().unmappedStudents + stats().usersWithoutConsultancy +
-                  stats().coursesWithoutConsultancy) || 0 }}</h2>
+                  stats().coursesWithoutConsultancy + stats().consultanciesWithoutUsers +
+                  stats().consultanciesWithoutCourses) || 0 }}</h2>
                 <span class="stat-label">Total Unmapped Records</span>
               </div>
             </div>

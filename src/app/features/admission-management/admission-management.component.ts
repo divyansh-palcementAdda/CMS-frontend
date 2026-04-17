@@ -44,7 +44,8 @@ export class AdmissionManagementComponent implements OnInit {
 
   // Filters & Sorting
   activeStatFilter: string = '';
-  activeTabFilter: string = '';
+  activeTabFilter: string = '';   // 'Admission' | 'applications' | ''
+  activeStatusFilter: string = ''; // 'CANCELLED' | '' etc. 
   selectedCourseId: number | undefined = undefined;
   sortColumn: string = '';
   sortDirection: string = '';
@@ -74,15 +75,16 @@ export class AdmissionManagementComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Check URL for any pre-filled filters
+    // Read URL query params and apply as initial filters
     this.routeSub = this.route.queryParams.subscribe(params => {
       const type = params['type'];
       const source = params['source'];
       const isScholar = params['isScholar'];
       const tab = params['tab'];
-      console.log('Query Params:', params);
+      const status = params['status'];
 
       this.activeTabFilter = tab || '';
+      this.activeStatusFilter = status || '';
 
       if (type) {
         this.activeStatFilter = type;
@@ -128,7 +130,8 @@ export class AdmissionManagementComponent implements OnInit {
       this.selectedCourseId,
       this.sortColumn,
       this.sortDirection,
-      this.activeTabFilter
+      this.activeTabFilter,
+      this.activeStatusFilter
     ).subscribe(data => {
       this.pageData = data;
       this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
@@ -136,12 +139,43 @@ export class AdmissionManagementComponent implements OnInit {
     });
   }
 
+  /** Switch tab in-page and sync URL */
+  setTab(tab: string): void {
+    this.activeTabFilter = tab;
+    this.activeStatusFilter = '';
+    this.currentPage = 1;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: tab || null, status: null },
+      queryParamsHandling: 'merge'
+    });
+    this.fetchData();
+  }
+
+  /** Toggle a status filter and sync URL */
+  setStatus(status: string): void {
+    this.activeStatusFilter = this.activeStatusFilter === status ? '' : status;
+    this.currentPage = 1;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { status: this.activeStatusFilter || null },
+      queryParamsHandling: 'merge'
+    });
+    this.fetchData();
+  }
+
+  get activeTabLabel(): string {
+    if (this.activeTabFilter === 'applications') return 'Applications (Enrolments)';
+    if (this.activeTabFilter === 'Admission') return 'Admissions';
+    return 'All Records';
+  }
+
   private applyTabFilter(admissions: AdmissionItem[]): AdmissionItem[] {
     if (!this.activeTabFilter) return admissions;
 
     if (this.activeTabFilter === 'applications') {
-      return admissions.filter(item => 
-        (item.totalFeesPaid || 0) === 0 && 
+      return admissions.filter(item =>
+        (item.totalFeesPaid || 0) === 0 &&
         (item.remainingFees === item.finalFeesAfterDiscount) &&
         (!item.feeHistory || item.feeHistory.length === 0)
       );

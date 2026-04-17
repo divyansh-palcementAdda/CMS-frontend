@@ -6,6 +6,9 @@ export interface ApiResult<T> {
 }
 
 export interface DashboardStats {
+  scholarApplications: number;
+  indirectApplications: number;
+  directApplications: number;
   activeAssociates: number;
   inactiveAssociates: number;
   dormantAssociates: number;
@@ -25,6 +28,9 @@ export interface DashboardStats {
   directAdmissions: number;
   indirectAdmissions: number;
   scholarAdmissions: number;
+  cancelledAdmissions: number;
+  cancelledEnrolments: number;
+  totalEnrolments: number;
 
   usersWithoutConsultancy: number;
   consultanciesWithoutUsers: number;

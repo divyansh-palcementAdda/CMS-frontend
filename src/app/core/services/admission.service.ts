@@ -21,18 +21,20 @@ export class AdmissionService {
     courseId?: number,
     sortColumn?: string,
     sortDirection?: string,
-    tab?: string
+    tab?: string,
+    statusFilter?: string   // e.g. 'CANCELLED'
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
-    if (search) params = params.set('search', search);
-    if (tab) params = params.set('tab', tab);
-    if (statFilter) params = params.set('statFilter', statFilter);
-    if (courseId) params = params.set('courseId', courseId.toString());
-    if (sortColumn) params = params.set('sortColumn', sortColumn);
+    if (search)        params = params.set('search', search);
+    if (tab)           params = params.set('tab', tab);
+    if (statFilter)    params = params.set('statFilter', statFilter);
+    if (courseId)      params = params.set('courseId', courseId.toString());
+    if (sortColumn)    params = params.set('sortColumn', sortColumn);
     if (sortDirection) params = params.set('sortDirection', sortDirection);
+    if (statusFilter)  params = params.set('statusFilter', statusFilter);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {

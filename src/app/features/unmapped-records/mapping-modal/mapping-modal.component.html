@@ -1,241 +1,762 @@
-<div class="modal-wrapper" [class.scholar-mode]="mappingForm.get('isScholar')?.value">
-  <div class="glass-container">
-    <div class="modal-header">
-      <div class="header-content">
-        <h2 class="animate-reveal">Student Mapping</h2>
-        <p class="animate-reveal delay-1">Mapping <strong>{{ data.record.fullName || data.record.name }}</strong> to {{ mappingForm.get('admissionSource')?.value | lowercase }} track</p>
+<div class="mm-root">
+
+  <!-- ═══════════════════════ HEADER ═══════════════════════ -->
+  <header class="mm-header" [style.--accent]="config.color">
+    <div class="mm-header__left">
+      <div class="mm-type-badge" [style.background]="config.gradient">
+        <span class="material-symbols-outlined">{{ config.icon }}</span>
       </div>
-      <button class="glass-close" (click)="dialogRef.close()">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <div class="mm-header__text">
+        <h2>{{ config.title }}</h2>
+        <p>{{ recordName }}</p>
+      </div>
     </div>
 
-    <!-- Multi-stage Selection Flow -->
-    <div class="modal-body">
-      <form [formGroup]="mappingForm" (ngSubmit)="submitMapping()">
+    <!-- Step indicator (students only) -->
+    @if (isStudents && !showConfirm) {
+      <div class="mm-steps">
+        <div class="mm-step" [class.is-active]="currentStep === 1" [class.is-done]="currentStep > 1">
+          <div class="mm-step__dot">
+            @if (currentStep > 1) { <span class="material-symbols-outlined">check</span> }
+            @else { 1 }
+          </div>
+          <span class="mm-step__label">Details</span>
+        </div>
+        <div class="mm-step__line"></div>
+        <div class="mm-step" [class.is-active]="currentStep === 2">
+          <div class="mm-step__dot">2</div>
+          <span class="mm-step__label">Payment</span>
+        </div>
+      </div>
+    }
 
-        @if (currentStep === 1) {
-          <div class="flow-container">
-            
-            <!-- stage 1: Admission Source (Always Visible) -->
-            <div class="flow-stage animate-pop-in">
-              <label class="flow-label">Admission Channel</label>
-              <div class="modern-chips">
-                <label class="chip-card" [class.active]="mappingForm.get('admissionSource')?.value === 'CONSULTANCY'">
-                  <input type="radio" value="CONSULTANCY" formControlName="admissionSource">
-                  <div class="chip-overlay">
-                    <span class="material-symbols-outlined">business</span>
-                    <div class="chip-text">
-                      <span class="main">Consultancy</span>
-                      <span class="sub">Admission via partner</span>
-                    </div>
-                  </div>
-                </label>
-                <label class="chip-card" [class.active]="mappingForm.get('admissionSource')?.value === 'USER'">
-                  <input type="radio" value="USER" formControlName="admissionSource">
-                  <div class="chip-overlay">
-                    <span class="material-symbols-outlined">person_pin</span>
-                    <div class="chip-text">
-                      <span class="main">Internal</span>
-                      <span class="sub">Direct admission</span>
-                    </div>
-                  </div>
-                </label>
+    <button class="mm-close" (click)="dialogRef.close()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <!-- ═════════════════════════ BODY ════════════════════════ -->
+  <div class="mm-body">
+
+    <!-- ─────────────── CONFIRMATION PANEL ─────────────── -->
+    @if (showConfirm) {
+      <div class="mm-confirm animate-in">
+        <div class="mm-confirm__hero">
+          <div class="mm-confirm__icon" [style.background]="config.gradient">
+            <span class="material-symbols-outlined">fact_check</span>
+          </div>
+          <div>
+            <h3>Confirm Mapping</h3>
+            <p>Review the selections below before finalising.</p>
+          </div>
+        </div>
+        <div class="mm-summary">
+          @for (item of summaryItems; track item.label) {
+            <div class="mm-summary__row">
+              <div class="mm-summary__icon">
+                <span class="material-symbols-outlined">{{ item.icon }}</span>
+              </div>
+              <div class="mm-summary__content">
+                <span class="mm-summary__label">{{ item.label }}</span>
+                <span class="mm-summary__value">{{ item.value }}</span>
               </div>
             </div>
+          }
+        </div>
+      </div>
+    }
 
-            <!-- stage 2: Representative (Visible once Source is selected) -->
-            @if (mappingForm.get('admissionSource')?.value) {
-            <div class="flow-stage animate-slide-up">
-              <div class="stage-header">
-                <label class="flow-label">Select Representative</label>
-                <div class="search-glass">
-                  <span class="material-symbols-outlined">search</span>
-                  <input type="text" placeholder="Filter people..." [ngModel]="userSearchTerm()"
-                    (ngModelChange)="userSearchTerm.set($event)" [ngModelOptions]="{standalone: true}">
+    <!-- ─────────────── STUDENT STEP 1 ─────────────── -->
+    @else if (isStudents && currentStep === 1) {
+      <div class="mm-flow animate-in" [formGroup]="mappingForm">
+
+        <!-- Stage 1: Admission Source -->
+        <div class="mm-stage">
+          <p class="mm-stage__label">
+            <span class="material-symbols-outlined">fork_right</span>
+            Admission Channel
+          </p>
+          <div class="mm-chips">
+            <label class="mm-chip" [class.is-active]="mappingForm.get('admissionSource')?.value === 'CONSULTANCY'">
+              <input type="radio" value="CONSULTANCY" formControlName="admissionSource">
+              <div class="mm-chip__face">
+                <span class="material-symbols-outlined">apartment</span>
+                <div>
+                  <strong>Consultancy</strong>
+                  <small>Admission via partner agency</small>
                 </div>
               </div>
-              <div class="viewport-wrapper glass-blur">
-                <cdk-virtual-scroll-viewport itemSize="64" class="glass-viewport">
-                  <div *cdkVirtualFor="let item of filteredUsers" class="glass-item"
-                    [class.active]="mappingForm.get('admittedByUserId')?.value === item.id"
-                    (click)="toggleSelection(item.id)">
-                    <div class="item-avatar">
-                      {{ (item.fullName || item.name).charAt(0) }}
-                    </div>
-                    <div class="item-details">
-                      <span class="name">{{ item.fullName || item.name }}</span>
-                      <span class="meta">{{ item.email }}</span>
-                    </div>
-                    @if (mappingForm.get('admittedByUserId')?.value === item.id) {
-                      <span class="material-symbols-outlined check-badge">check_circle</span>
-                    }
-                  </div>
-                </cdk-virtual-scroll-viewport>
+            </label>
+            <label class="mm-chip" [class.is-active]="mappingForm.get('admissionSource')?.value === 'USER'">
+              <input type="radio" value="USER" formControlName="admissionSource">
+              <div class="mm-chip__face">
+                <span class="material-symbols-outlined">person_pin</span>
+                <div>
+                  <strong>Internal</strong>
+                  <small>Direct admission by user</small>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Stage 2: Select Representative -->
+        @if (mappingForm.get('admissionSource')?.value) {
+          <div class="mm-stage animate-in">
+            <div class="mm-stage__bar">
+              <p class="mm-stage__label">
+                <span class="material-symbols-outlined">badge</span>
+                Select Representative
+                @if (mappingForm.get('admittedByUserId')?.value) {
+                  <span class="mm-stage__badge" [style.background]="config.color + '20'" [style.color]="config.color">Selected</span>
+                }
+              </p>
+              <div class="mm-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search users…"
+                       [ngModel]="userSearch()" (ngModelChange)="userSearch.set($event)"
+                       [ngModelOptions]="{standalone: true}">
               </div>
             </div>
-            }
-
-            <!-- stage 3: Consultancy (Conditional) -->
-            @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY' && mappingForm.get('admittedByUserId')?.value) {
-            <div class="flow-stage animate-slide-up">
-              <div class="stage-header">
-                <label class="flow-label">Select Consultancy Office</label>
-                <div class="search-glass">
-                  <span class="material-symbols-outlined">search</span>
-                  <input type="text" placeholder="Filter offices..." [ngModel]="consultancySearchTerm()"
-                    (ngModelChange)="consultancySearchTerm.set($event)" [ngModelOptions]="{standalone: true}">
+            <div class="mm-list-box">
+              @if (dropdownLoading) {
+                <div class="mm-list__loading">
+                  <div class="mm-spinner"></div>
+                  <span>Loading users…</span>
                 </div>
-              </div>
-              <div class="viewport-wrapper glass-blur">
-                <cdk-virtual-scroll-viewport itemSize="64" class="glass-viewport">
-                  <div *cdkVirtualFor="let item of filteredConsultancies" class="glass-item"
-                    [class.active]="mappingForm.get('consultancyId')?.value === item.id"
-                    (click)="toggleSelection(item.id)">
-                    <div class="item-icon">
-                      <span class="material-symbols-outlined">apartment</span>
-                    </div>
-                    <div class="item-details">
-                      <span class="name">{{ item.name }}</span>
-                      <span class="meta">{{ item.email || 'Partner Office' }}</span>
-                    </div>
-                    @if (mappingForm.get('consultancyId')?.value === item.id) {
-                      <span class="material-symbols-outlined check-badge">verified</span>
-                    }
-                  </div>
-                  @if (filteredConsultancies.length === 0) {
-                    <div class="glass-empty">
-                      <span class="material-symbols-outlined">link_off</span>
-                      <p>No associated offices found</p>
+              }
+              @else if (filteredUsers.length === 0) {
+                <div class="mm-list__empty">
+                  <span class="material-symbols-outlined">person_search</span>
+                  <p>No users found</p>
+                </div>
+              }
+              @else {
+                <div class="mm-list">
+                  @for (u of filteredUsers; track u.id) {
+                    <div class="mm-list__item"
+                         [class.is-active]="mappingForm.get('admittedByUserId')?.value === u.id"
+                         (click)="selectRepresentative(u.id)"
+                         [style.--item-color]="config.color">
+                      <div class="mm-avatar" [style.background]="config.color + '20'" [style.color]="config.color">
+                        {{ (u.fullName || u.username || '?').charAt(0).toUpperCase() }}
+                      </div>
+                      <div class="mm-list__info">
+                        <span class="mm-list__name">{{ u.fullName || u.username }}</span>
+                        <span class="mm-list__meta">{{ u.email }}</span>
+                      </div>
+                      @if (mappingForm.get('admittedByUserId')?.value === u.id) {
+                        <span class="mm-check material-symbols-outlined" [style.color]="config.color">check_circle</span>
+                      }
                     </div>
                   }
-                </cdk-virtual-scroll-viewport>
+                </div>
+              }
+            </div>
+            @if (mappingForm.get('admittedByUserId')?.touched && !mappingForm.get('admittedByUserId')?.value) {
+              <p class="mm-field-error">
+                <span class="material-symbols-outlined">error</span>
+                A representative is required.
+              </p>
+            }
+          </div>
+        }
+
+        <!-- Stage 3: Select Consultancy (Consultancy channel only) -->
+        @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY' && mappingForm.get('admittedByUserId')?.value) {
+          <div class="mm-stage animate-in">
+            <div class="mm-stage__bar">
+              <p class="mm-stage__label">
+                <span class="material-symbols-outlined">apartment</span>
+                Select Consultancy
+                @if (filteredConsultancies.length === 0 && availableConsultancyIds.size === 0) {
+                  <span class="mm-stage__tag warn">No linked consultancies</span>
+                }
+              </p>
+              <div class="mm-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search consultancies…"
+                       [ngModel]="conSearch()" (ngModelChange)="conSearch.set($event)"
+                       [ngModelOptions]="{standalone: true}">
               </div>
             </div>
-            }
-
-            <!-- Final Options: Scholarship / Discount -->
-            @if (mappingForm.get('admittedByUserId')?.value) {
-            <div class="flow-stage animate-slide-up">
-              <div class="options-grid">
-                <!-- Scholarship Toggle -->
-                <div class="glass-toggle-card" [class.checked]="mappingForm.get('isScholar')?.value">
-                  <div class="toggle-info">
-                    <span class="material-symbols-outlined">school</span>
-                    <div class="text">
-                      <span class="title">Scholarship Profile</span>
-                      <span class="hint">Exempts student from mapping fees</span>
-                    </div>
-                  </div>
-                  <label class="ios-switch">
-                    <input type="checkbox" formControlName="isScholar">
-                    <span class="slider"></span>
-                  </label>
+            <div class="mm-list-box">
+              @if (filteredConsultancies.length === 0) {
+                <div class="mm-list__empty">
+                  <span class="material-symbols-outlined">link_off</span>
+                  <p>No consultancies linked to this representative</p>
                 </div>
-
-                <!-- Discount Logic -->
-                @if (!mappingForm.get('isScholar')?.value) {
-                  <div class="glass-input-card">
-                    <div class="input-header">
-                      <span class="material-symbols-outlined">sell</span>
-                      <span class="title">Apply Discount</span>
-                    </div>
-                    <div class="dual-input">
-                      <select formControlName="discountType">
-                        <option [ngValue]="null">No Discount</option>
-                        <option value="PERCENTAGE">% Percentage</option>
-                        <option value="FLAT">₹ Fixed Amount</option>
-                      </select>
-                      @if (mappingForm.get('discountType')?.value) {
-                        <div class="input-container">
-                          <input type="number" formControlName="discountValue" placeholder="0" [class.input-error]="discountError">
-                          @if (discountError) {
-                            <div class="error-msg">{{ discountError }}</div>
-                          }
-                        </div>
+              }
+              @else {
+                <div class="mm-list">
+                  @for (c of filteredConsultancies; track c.id) {
+                    <div class="mm-list__item"
+                         [class.is-active]="mappingForm.get('consultancyId')?.value === c.id"
+                         (click)="selectConsultancyForStudent(c.id)"
+                         [style.--item-color]="config.color">
+                      <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
+                        <span class="material-symbols-outlined">apartment</span>
+                      </div>
+                      <div class="mm-list__info">
+                        <span class="mm-list__name">{{ c.name }}</span>
+                        <span class="mm-list__meta">{{ c.email || 'Partner Office' }}</span>
+                      </div>
+                      @if (mappingForm.get('consultancyId')?.value === c.id) {
+                        <span class="mm-check material-symbols-outlined" [style.color]="config.color">verified</span>
                       }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            @if (mappingForm.get('consultancyId')?.touched && !mappingForm.get('consultancyId')?.value) {
+              <p class="mm-field-error">
+                <span class="material-symbols-outlined">error</span>
+                A consultancy is required.
+              </p>
+            }
+          </div>
+        }
+
+        <!-- Stage 4: Scholar / Discount (after rep selected) -->
+        @if (mappingForm.get('admittedByUserId')?.value) {
+          <div class="mm-stage animate-in">
+            <p class="mm-stage__label">
+              <span class="material-symbols-outlined">tune</span>
+              Admission Options
+            </p>
+            <div class="mm-options-grid">
+
+              <!-- Scholar Toggle -->
+              <div class="mm-toggle-card" [class.is-on]="mappingForm.get('isScholar')?.value">
+                <div class="mm-toggle-card__info">
+                  <div class="mm-toggle-card__icon">
+                    <span class="material-symbols-outlined">school</span>
+                  </div>
+                  <div>
+                    <strong>Scholarship Profile</strong>
+                    <small>Exempts student from enrollment fees</small>
+                  </div>
+                </div>
+                <label class="mm-switch">
+                  <input type="checkbox" formControlName="isScholar">
+                  <span class="mm-switch__track"></span>
+                </label>
+              </div>
+
+              <!-- Discount (hidden for scholars) -->
+              @if (!mappingForm.get('isScholar')?.value) {
+                <div class="mm-discount-card">
+                  <div class="mm-discount-card__header">
+                    <span class="material-symbols-outlined">sell</span>
+                    <strong>Apply Discount</strong>
+                  </div>
+                  <div class="mm-discount-row">
+                    <select formControlName="discountType" class="mm-select">
+                      <option [ngValue]="null">No Discount</option>
+                      <option value="PERCENTAGE">% Percentage</option>
+                      <option value="FLAT">₹ Fixed Amount</option>
+                    </select>
+                    @if (mappingForm.get('discountType')?.value) {
+                      <div class="mm-discount-input-wrap">
+                        <input type="number" formControlName="discountValue"
+                               class="mm-input" [class.is-error]="discountError"
+                               placeholder="0" min="0">
+                        @if (discountError) {
+                          <p class="mm-field-error inline">
+                            <span class="material-symbols-outlined">error</span>
+                            {{ discountError }}
+                          </p>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+      </div>
+    }
+
+    <!-- ─────────────── STUDENT STEP 2: FEES ─────────────── -->
+    @else if (isStudents && currentStep === 2) {
+      <div class="mm-fees animate-in" [formGroup]="mappingForm">
+        <div class="mm-fees__hero">
+          <div class="mm-fees__icon">
+            <span class="material-symbols-outlined">account_balance_wallet</span>
+          </div>
+          <div>
+            <h3>Admission Payment</h3>
+            <p>Record the enrollment fee received. This step is optional — you can skip if payment is pending.</p>
+          </div>
+        </div>
+        <div class="mm-fee-grid">
+          <div class="mm-field">
+            <label class="mm-label">Amount Received</label>
+            <div class="mm-input-wrap">
+              <span class="mm-input-prefix">₹</span>
+              <input type="number" formControlName="feeAmount" class="mm-input with-prefix" placeholder="0.00" min="0">
+            </div>
+          </div>
+          <div class="mm-field">
+            <label class="mm-label">Payment Mode</label>
+            <select formControlName="paymentMode" class="mm-select full">
+              @for (m of paymentModes; track m.value) {
+                <option [value]="m.value">{{ m.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="mm-field span-2">
+            <label class="mm-label">Transaction / Reference ID</label>
+            <div class="mm-input-wrap">
+              <span class="material-symbols-outlined mm-input-icon">tag</span>
+              <input type="text" formControlName="referenceNo" class="mm-input with-icon" placeholder="Enter reference number…">
+            </div>
+          </div>
+          <div class="mm-field span-2">
+            <label class="mm-label">Remarks</label>
+            <textarea formControlName="remarks" class="mm-textarea" rows="2" placeholder="Any additional details…"></textarea>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ─────────────── USERS → CONSULTANCIES ─────────────── -->
+    @else if (isUsers) {
+      <div class="mm-generic animate-in">
+        <div class="mm-generic__header">
+          <p class="mm-stage__label">
+            <span class="material-symbols-outlined">apartment</span>
+            Select Consultancies
+            @if (selectedConsultancyIds.size > 0) {
+              <span class="mm-count-badge" [style.background]="config.color">{{ selectedConsultancyIds.size }} selected</span>
+            }
+          </p>
+          <div class="mm-generic__actions">
+            <div class="mm-search">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Search consultancies…"
+                     [ngModel]="conSearch()" (ngModelChange)="conSearch.set($event)"
+                     [ngModelOptions]="{standalone: true}">
+            </div>
+            <button class="mm-select-all-btn" (click)="selectAllConsultancies()" [style.color]="config.color">
+              {{ filteredConsultancies.every(c => isConSelected(c.id)) ? 'Deselect All' : 'Select All' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected chips -->
+        @if (selectedConsultancyIds.size > 0) {
+          <div class="mm-chips-preview">
+            @for (id of selectedConsultancyArray; track id) {
+              <div class="mm-tag" [style.background]="config.color + '15'" [style.color]="config.color">
+                <span>{{ getConName(id) }}</span>
+                <button (click)="removeConsultancy(id)">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="mm-list-box">
+          <div class="mm-list">
+            @for (c of filteredConsultancies; track c.id) {
+              <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)"
+                   (click)="toggleConsultancy(c.id)" [style.--item-color]="config.color">
+                <div class="mm-checkbox" [class.is-checked]="isConSelected(c.id)" [style.--chk]="config.color">
+                  @if (isConSelected(c.id)) {
+                    <span class="material-symbols-outlined">check</span>
+                  }
+                </div>
+                <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
+                  <span class="material-symbols-outlined">apartment</span>
+                </div>
+                <div class="mm-list__info">
+                  <span class="mm-list__name">{{ c.name }}</span>
+                  <span class="mm-list__meta">{{ c.email || c.city || 'Partner Agency' }}</span>
+                </div>
+              </div>
+            }
+            @if (filteredConsultancies.length === 0) {
+              <div class="mm-list__empty">
+                <span class="material-symbols-outlined">search_off</span>
+                <p>No consultancies found</p>
+              </div>
+            }
+          </div>
+        </div>
+        @if (selectedConsultancyIds.size === 0) {
+          <p class="mm-hint-error">
+            <span class="material-symbols-outlined">info</span>
+            Select at least one consultancy to continue.
+          </p>
+        }
+      </div>
+    }
+
+    <!-- ─────────────── COURSES → CONSULTANCIES ─────────────── -->
+    @else if (isCourses) {
+      <div class="mm-generic animate-in">
+        <div class="mm-generic__header">
+          <p class="mm-stage__label">
+            <span class="material-symbols-outlined">apartment</span>
+            Select Consultancies
+            @if (selectedConsultancyIds.size > 0) {
+              <span class="mm-count-badge" [style.background]="config.color">{{ selectedConsultancyIds.size }} selected</span>
+            }
+          </p>
+          <div class="mm-generic__actions">
+            <div class="mm-search">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Search…"
+                     [ngModel]="conSearch()" (ngModelChange)="conSearch.set($event)"
+                     [ngModelOptions]="{standalone: true}">
+            </div>
+            <button class="mm-select-all-btn" (click)="selectAllConsultancies()" [style.color]="config.color">
+              {{ filteredConsultancies.every(c => isConSelected(c.id)) ? 'Deselect All' : 'Select All' }}
+            </button>
+          </div>
+        </div>
+        @if (selectedConsultancyIds.size > 0) {
+          <div class="mm-chips-preview">
+            @for (id of selectedConsultancyArray; track id) {
+              <div class="mm-tag" [style.background]="config.color + '15'" [style.color]="config.color">
+                <span>{{ getConName(id) }}</span>
+                <button (click)="removeConsultancy(id)"><span class="material-symbols-outlined">close</span></button>
+              </div>
+            }
+          </div>
+        }
+        <div class="mm-list-box">
+          <div class="mm-list">
+            @for (c of filteredConsultancies; track c.id) {
+              <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)"
+                   (click)="toggleConsultancy(c.id)" [style.--item-color]="config.color">
+                <div class="mm-checkbox" [class.is-checked]="isConSelected(c.id)" [style.--chk]="config.color">
+                  @if (isConSelected(c.id)) { <span class="material-symbols-outlined">check</span> }
+                </div>
+                <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
+                  <span class="material-symbols-outlined">apartment</span>
+                </div>
+                <div class="mm-list__info">
+                  <span class="mm-list__name">{{ c.name }}</span>
+                  <span class="mm-list__meta">{{ c.email || c.city || 'Partner Agency' }}</span>
+                </div>
+              </div>
+            }
+            @if (filteredConsultancies.length === 0) {
+              <div class="mm-list__empty">
+                <span class="material-symbols-outlined">search_off</span><p>No results</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ─────────────── CONSULTANCIES → USERS ─────────────── -->
+    @else if (isConsultanciesUsers) {
+      <div class="mm-generic animate-in">
+        <div class="mm-generic__header">
+          <p class="mm-stage__label">
+            <span class="material-symbols-outlined">group</span>
+            Select Representatives
+            @if (selectedUserIds.size > 0) {
+              <span class="mm-count-badge" [style.background]="config.color">{{ selectedUserIds.size }} selected</span>
+            }
+          </p>
+          <div class="mm-generic__actions">
+            <div class="mm-search">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Search users…"
+                     [ngModel]="userSearch()" (ngModelChange)="userSearch.set($event)"
+                     [ngModelOptions]="{standalone: true}">
+            </div>
+            <button class="mm-select-all-btn" (click)="selectAllUsers()" [style.color]="config.color">
+              {{ filteredUsers.every(u => isUserSelected(u.id)) ? 'Deselect All' : 'Select All' }}
+            </button>
+          </div>
+        </div>
+        @if (selectedUserIds.size > 0) {
+          <div class="mm-chips-preview">
+            @for (id of selectedUserArray; track id) {
+              <div class="mm-tag" [style.background]="config.color + '15'" [style.color]="config.color">
+                <span>{{ getUserName(id) }}</span>
+                <button (click)="removeUser(id)"><span class="material-symbols-outlined">close</span></button>
+              </div>
+            }
+          </div>
+        }
+        <div class="mm-list-box">
+          <div class="mm-list">
+            @for (u of filteredUsers; track u.id) {
+              <div class="mm-list__item checkbox" [class.is-active]="isUserSelected(u.id)"
+                   (click)="toggleUser(u.id)" [style.--item-color]="config.color">
+                <div class="mm-checkbox" [class.is-checked]="isUserSelected(u.id)" [style.--chk]="config.color">
+                  @if (isUserSelected(u.id)) { <span class="material-symbols-outlined">check</span> }
+                </div>
+                <div class="mm-avatar" [style.background]="config.color + '20'" [style.color]="config.color">
+                  {{ (u.fullName || u.username || '?').charAt(0).toUpperCase() }}
+                </div>
+                <div class="mm-list__info">
+                  <span class="mm-list__name">{{ u.fullName || u.username }}</span>
+                  <span class="mm-list__meta">{{ u.email }}</span>
+                </div>
+              </div>
+            }
+            @if (filteredUsers.length === 0) {
+              <div class="mm-list__empty">
+                <span class="material-symbols-outlined">person_search</span><p>No users found</p>
+              </div>
+            }
+          </div>
+        </div>
+        @if (selectedUserIds.size === 0) {
+          <p class="mm-hint-error">
+            <span class="material-symbols-outlined">info</span>
+            Select at least one representative to continue.
+          </p>
+        }
+      </div>
+    }
+
+
+    <!-- ─────────────── CONSULTANCIES → COURSES + INSTITUTIONS ─────────────── -->
+    @else if (isConsultanciesCourses) {
+      <div class="mm-dual animate-in">
+
+        <!-- ── Courses Panel ───────────────────────────────────────────── -->
+        <div class="mm-dual__panel">
+          <div class="mm-generic__header">
+            <p class="mm-stage__label">
+              <span class="material-symbols-outlined">menu_book</span>
+              Courses
+              @if (selectedCourseIds.size > 0) {
+                <span class="mm-count-badge" [style.background]="config.color">{{ selectedCourseIds.size }}</span>
+              }
+            </p>
+            <div class="mm-generic__actions">
+              <div class="mm-search compact">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search courses…"
+                       [ngModel]="courseSearch()" (ngModelChange)="courseSearch.set($event)"
+                       [ngModelOptions]="{standalone: true}">
+              </div>
+              <button class="mm-select-all-btn" (click)="selectAllCourses()" [style.color]="config.color">
+                {{ filteredCourses.every(c => isCourseSelected(c.id)) ? 'Deselect All' : 'Select All' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Active filter banner: filtered by institutions -->
+          @if (coursesFilteredByInst) {
+            <div class="mm-filter-banner">
+              <span class="material-symbols-outlined">filter_list</span>
+              <span>Showing courses available in <strong>{{ selectedInstitutionIds.size }}</strong> selected institution{{ selectedInstitutionIds.size > 1 ? 's' : '' }}</span>
+              <button class="mm-filter-clear" (click)="selectedInstitutionIds.clear()">
+                <span class="material-symbols-outlined">close</span> Clear
+              </button>
+            </div>
+          }
+
+          @if (selectedCourseIds.size > 0) {
+            <div class="mm-chips-preview compact">
+              @for (id of selectedCourseArray; track id) {
+                <div class="mm-tag sm" [style.background]="config.color + '15'" [style.color]="config.color">
+                  <span>{{ getCourseName(id) }}</span>
+                  <button (click)="removeCourse(id)"><span class="material-symbols-outlined">close</span></button>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="mm-list-box">
+            @if (dropdownLoading) {
+              <div class="mm-list__loading">
+                <div class="mm-spinner"></div><span>Loading courses…</span>
+              </div>
+            } @else if (relationshipLoading && filteredCourses.length === 0) {
+              <div class="mm-list__loading">
+                <div class="mm-spinner"></div><span>Mapping relationships…</span>
+              </div>
+            } @else {
+              <div class="mm-list">
+                @for (c of filteredCourses; track c.id) {
+                  <div class="mm-list__item checkbox sm" [class.is-active]="isCourseSelected(c.id)"
+                       (click)="toggleCourse(c.id)" [style.--item-color]="config.color">
+                    <div class="mm-checkbox" [class.is-checked]="isCourseSelected(c.id)" [style.--chk]="config.color">
+                      @if (isCourseSelected(c.id)) { <span class="material-symbols-outlined">check</span> }
+                    </div>
+                    <div class="mm-list__info">
+                      <span class="mm-list__name">{{ c.name }}</span>
+                      <span class="mm-list__meta">{{ c.courseTypeName || '—' }}</span>
                     </div>
                   </div>
                 }
+                @if (filteredCourses.length === 0) {
+                  <div class="mm-list__empty sm">
+                    <span class="material-symbols-outlined">
+                      {{ coursesFilteredByInst ? 'filter_list_off' : 'search_off' }}
+                    </span>
+                    <p>{{ coursesFilteredByInst ? 'No courses in selected institution(s)' : 'No courses found' }}</p>
+                  </div>
+                }
               </div>
-            </div>
             }
-
           </div>
-        }
-
-        <!-- Step 2: Fees (Only for non-scholars) -->
-        @if (currentStep === 2) {
-          <div class="payment-stage animate-pop-in">
-            <div class="stage-intro">
-               <div class="icon-blob">
-                 <span class="material-symbols-outlined">account_balance_wallet</span>
-               </div>
-               <div class="text">
-                 <h3>Admission Payment</h3>
-                 <p>Record the initial enrollment fee (optional)</p>
-               </div>
-            </div>
-
-            <div class="glass-form-grid">
-              <div class="glass-field">
-                <label>Recieved Amount</label>
-                <div class="glass-input">
-                  <span class="symbol">₹</span>
-                  <input type="number" formControlName="feeAmount" placeholder="0.00">
-                </div>
-              </div>
-              <div class="glass-field">
-                <label>Payment Mode</label>
-                <div class="glass-input">
-                  <select formControlName="paymentMode">
-                    @for (mode of paymentModes; track mode.value) {
-                      <option [value]="mode.value">{{ mode.label }}</option>
-                    }
-                  </select>
-                </div>
-              </div>
-              <div class="glass-field full">
-                <label>Transaction ID / Reference</label>
-                <div class="glass-input">
-                  <span class="material-symbols-outlined">tag</span>
-                  <input type="text" formControlName="referenceNo" placeholder="Enter reference number...">
-                </div>
-              </div>
-              <div class="glass-field full">
-                <label>Remarks</label>
-                <div class="glass-input">
-                  <textarea formControlName="remarks" rows="2" placeholder="Any specific details..."></textarea>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-
-        <!-- Footer Actions -->
-        <div class="modal-footer">
-          <button type="button" class="glass-btn secondary" (click)="dialogRef.close()">Cancel</button>
-          
-          <div class="action-spacer"></div>
-
-          @if (currentStep === 1 && mappingForm.get('admittedByUserId')?.value) {
-            <button type="button" class="glass-btn primary" (click)="$event.preventDefault(); nextStep()">
-              {{ mappingForm.get('isScholar')?.value ? 'Finalize Mapping' : 'Continue' }}
-              <span class="material-symbols-outlined">{{ mappingForm.get('isScholar')?.value ? 'done_all' : 'arrow_forward' }}</span>
-            </button>
-          }
-
-          @if (currentStep === 2) {
-            <button type="button" class="glass-btn secondary" (click)="$event.preventDefault(); prevStep()">
-              <span class="material-symbols-outlined">arrow_back</span> Back
-            </button>
-            <button type="submit" class="glass-btn primary submit" [disabled]="loading">
-              <span *ngIf="!loading">Confirm & Map</span>
-              <div class="glass-loader" *ngIf="loading"></div>
-            </button>
-          }
         </div>
-      </form>
-    </div>
+
+        <div class="mm-dual__divider">
+          <span class="material-symbols-outlined">
+            {{ relationshipLoading ? 'sync' : 'compare_arrows' }}
+          </span>
+        </div>
+
+        <!-- ── Institutions Panel ──────────────────────────────────────── -->
+        <div class="mm-dual__panel">
+          <div class="mm-generic__header">
+            <p class="mm-stage__label">
+              <span class="material-symbols-outlined">account_balance</span>
+              Institutions
+              @if (selectedInstitutionIds.size > 0) {
+                <span class="mm-count-badge" [style.background]="config.color">{{ selectedInstitutionIds.size }}</span>
+              }
+            </p>
+            <div class="mm-search compact">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Search institutions…"
+                     [ngModel]="instSearch()" (ngModelChange)="instSearch.set($event)"
+                     [ngModelOptions]="{standalone: true}">
+            </div>
+          </div>
+
+          <!-- Active filter banner: filtered by courses -->
+          @if (institutionsFilteredByCourse) {
+            <div class="mm-filter-banner">
+              <span class="material-symbols-outlined">filter_list</span>
+              <span>Showing institutions offering <strong>{{ selectedCourseIds.size }}</strong> selected course{{ selectedCourseIds.size > 1 ? 's' : '' }}</span>
+              <button class="mm-filter-clear" (click)="selectedCourseIds.clear()">
+                <span class="material-symbols-outlined">close</span> Clear
+              </button>
+            </div>
+          }
+
+          @if (selectedInstitutionIds.size > 0) {
+            <div class="mm-chips-preview compact">
+              @for (id of selectedInstitutionArray; track id) {
+                <div class="mm-tag sm" [style.background]="config.color + '15'" [style.color]="config.color">
+                  <span>{{ getInstName(id) }}</span>
+                  <button (click)="removeInstitution(id)"><span class="material-symbols-outlined">close</span></button>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="mm-list-box">
+            @if (dropdownLoading) {
+              <div class="mm-list__loading">
+                <div class="mm-spinner"></div><span>Loading institutions…</span>
+              </div>
+            } @else if (relationshipLoading && filteredInstitutions.length === 0) {
+              <div class="mm-list__loading">
+                <div class="mm-spinner"></div><span>Mapping relationships…</span>
+              </div>
+            } @else {
+              <div class="mm-list">
+                @for (i of filteredInstitutions; track i.id) {
+                  <div class="mm-list__item checkbox sm" [class.is-active]="isInstSelected(i.id)"
+                       (click)="toggleInstitution(i.id)" [style.--item-color]="config.color">
+                    <div class="mm-checkbox" [class.is-checked]="isInstSelected(i.id)" [style.--chk]="config.color">
+                      @if (isInstSelected(i.id)) { <span class="material-symbols-outlined">check</span> }
+                    </div>
+                    <div class="mm-list__info">
+                      <span class="mm-list__name">{{ i.name }}</span>
+                      <span class="mm-list__meta">{{ i.code || '—' }}</span>
+                    </div>
+                  </div>
+                }
+                @if (filteredInstitutions.length === 0) {
+                  <div class="mm-list__empty sm">
+                    <span class="material-symbols-outlined">
+                      {{ institutionsFilteredByCourse ? 'filter_list_off' : 'search_off' }}
+                    </span>
+                    <p>{{ institutionsFilteredByCourse ? 'No institutions offer selected course(s)' : 'No institutions found' }}</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (selectedCourseIds.size === 0) {
+        <p class="mm-hint-error">
+          <span class="material-symbols-outlined">info</span>
+          Select at least one course to continue.
+        </p>
+      }
+    }
+
+
   </div>
+  <!-- /mm-body -->
+
+  <!-- ═════════════════════════ FOOTER ══════════════════════ -->
+  <footer class="mm-footer">
+    <button class="mm-btn secondary" (click)="dialogRef.close()">
+      <span class="material-symbols-outlined">close</span>
+      Cancel
+    </button>
+
+    <div class="mm-footer__right">
+      <!-- Back button -->
+      @if (showConfirm || (isStudents && currentStep === 2)) {
+        <button class="mm-btn ghost" (click)="goBack()">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Back
+        </button>
+      }
+
+      <!-- Skip fees (students step 2 only) -->
+      @if (isStudents && currentStep === 2 && !showConfirm) {
+        <button class="mm-btn ghost" (click)="skipFees()">
+          Skip
+          <span class="material-symbols-outlined">skip_next</span>
+        </button>
+      }
+
+      <!-- Confirm / Submit -->
+      @if (showConfirm) {
+        <button class="mm-btn primary" [class.is-loading]="loading"
+                [disabled]="loading" (click)="submitMapping()"
+                [style.background]="config.gradient">
+          @if (loading) {
+            <div class="mm-btn__spinner"></div>
+            <span>Mapping…</span>
+          } @else {
+            <span class="material-symbols-outlined">done_all</span>
+            <span>Confirm & Map</span>
+          }
+        </button>
+      } @else {
+        <button class="mm-btn primary" [disabled]="!canProceed"
+                (click)="advanceStep()" [style.background]="config.gradient">
+          @if (isStudents && !mappingForm.get('isScholar')?.value && currentStep === 1) {
+            <span>Continue to Payment</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          } @else if (isStudents && mappingForm.get('isScholar')?.value) {
+            <span class="material-symbols-outlined">done_all</span>
+            <span>Review & Confirm</span>
+          } @else {
+            <span class="material-symbols-outlined">fact_check</span>
+            <span>Review & Confirm</span>
+          }
+        </button>
+      }
+    </div>
+  </footer>
+
 </div>
