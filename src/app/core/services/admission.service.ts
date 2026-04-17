@@ -13,6 +13,15 @@ export class AdmissionService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * Single unified filter API — maps ALL 14 filter combinations to
+   * GET /api/students with query params:
+   *   tab          → 'Admission' | 'applications'
+   *   source       → 'USER' | 'CONSULTANCY'
+   *   isScholar    → 'true' | 'false'
+   *   statusFilter → 'CANCELLED'
+   *   search, statFilter, courseId, sortColumn, sortDirection, page, size
+   */
   getAdmissionsData(
     page: number = 1,
     size: number = 10,
@@ -22,7 +31,9 @@ export class AdmissionService {
     sortColumn?: string,
     sortDirection?: string,
     tab?: string,
-    statusFilter?: string   // e.g. 'CANCELLED'
+    statusFilter?: string,
+    source?: string,
+    isScholar?: string
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -35,6 +46,8 @@ export class AdmissionService {
     if (sortColumn)    params = params.set('sortColumn', sortColumn);
     if (sortDirection) params = params.set('sortDirection', sortDirection);
     if (statusFilter)  params = params.set('statusFilter', statusFilter);
+    if (source)        params = params.set('source', source);
+    if (isScholar != null && isScholar !== '') params = params.set('isScholar', isScholar);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -46,7 +59,7 @@ export class AdmissionService {
         const stats = payload.stats || {};
         const students = payload.admissions || [];
 
-        const admissions = students.map((s: any, index: number) => 
+        const admissions = students.map((s: any, index: number) =>
           this.mapStudentToAdmissionItem(s, (page - 1) * size + index + 1)
         );
 
@@ -59,6 +72,7 @@ export class AdmissionService {
     );
   }
 
+  /** @deprecated Use getAdmissionsData() with source/isScholar params instead */
   getStudentsByFilter(source?: string, isScholar?: boolean, userId?: number): Observable<AdmissionPageData> {
     let params = new HttpParams();
     if (source) params = params.set('source', source);
@@ -68,7 +82,7 @@ export class AdmissionService {
     return this.http.get<any>(`${this.apiUrl}/filter`, { params }).pipe(
       map(response => {
         const data = response?.data || [];
-        const admissions = data.map((s: any, index: number) => 
+        const admissions = data.map((s: any, index: number) =>
           this.mapStudentToAdmissionItem(s, index + 1)
         );
 
@@ -131,9 +145,9 @@ export class AdmissionService {
 
       // Dynamic financial fields
       percentagePaid: s.finalFeesAfterDiscount > 0 ? (s.totalFeesPaid / s.finalFeesAfterDiscount) * 100 : 0,
-      tokenAmount: s.totalFeesPaid || 0, 
+      tokenAmount: s.totalFeesPaid || 0,
       discountPercentage: s.discountType === 'PERCENTAGE' ? s.discountValue : 0,
-      
+
       // Explicit fields
       totalCourseFees: s.totalCourseFees,
       finalFeesAfterDiscount: s.finalFeesAfterDiscount,
@@ -142,6 +156,7 @@ export class AdmissionService {
       courseDurationInMonths: s.courseDurationInMonths
     };
   }
+
   updateCommissionStatus(id: number | undefined, status: string): Observable<any> {
     if (!id) throw new Error('Student ID is required');
     return this.http.patch(`${this.apiUrl}/${id}/commission-status`, { status });

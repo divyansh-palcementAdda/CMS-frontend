@@ -1,18 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
 import { AdmissionService } from '../../core/services/admission.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
-
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AdmissionFormModalComponent } from './components/admission-form-modal/admission-form-modal.component';
 import { FeePaymentModalComponent } from './components/fee-payment-modal/fee-payment-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
+
+/**
+ * ActiveFilters — mirrors every query param that can come in from the route.
+ * All 14 filter combinations are driven purely by these fields.
+ */
+interface ActiveFilters {
+  tab: string;           // '' | 'Admission' | 'applications'
+  statusFilter: string;  // '' | 'CANCELLED'
+  source: string;        // '' | 'USER' | 'CONSULTANCY'
+  isScholar: string;     // '' | 'true' | 'false'
+  statFilter: string;    // '' | 'DIRECT' | 'INDIRECT' | 'SCHOLAR' | ...
+}
 
 @Component({
   selector: 'app-admission-management',
@@ -30,42 +41,44 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
 })
-export class AdmissionManagementComponent implements OnInit {
+export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   pageData: AdmissionPageData | null = null;
   searchTerm: string = '';
   loading: boolean = true;
+
   private sub: Subscription | null = null;
   private routeSub: Subscription | null = null;
-
-  // Search state
-  searchSubject = new Subject<string>();
   private searchSub: Subscription | null = null;
+  private searchSubject = new Subject<string>();
 
-  // Filters & Sorting
-  activeStatFilter: string = '';
-  activeTabFilter: string = '';   // 'Admission' | 'applications' | ''
-  activeStatusFilter: string = ''; // 'CANCELLED' | '' etc. 
-  selectedCourseId: number | undefined = undefined;
+  // ── Active filters (all driven by queryParams) ────────────────────────
+  filters: ActiveFilters = {
+    tab: '',
+    statusFilter: '',
+    source: '',
+    isScholar: '',
+    statFilter: ''
+  };
+
+  // ── Sorting ───────────────────────────────────────────────────────────
   sortColumn: string = '';
   sortDirection: string = '';
 
-  // Pagination
+  // ── Pagination ────────────────────────────────────────────────────────
   currentPage: number = 1;
   pageSize: number = 10;
   totalPages: number = 1;
 
-  // Actions
+  // ── Modal state ───────────────────────────────────────────────────────
   showDeleteModal: boolean = false;
   showAdmissionModal: boolean = false;
+  showBulkUploadModal: boolean = false;
+  showPaymentModal: boolean = false;
   selectedAdmission: AdmissionItem | null = null;
   selectedStudentId?: number;
-  showBulkUploadModal: boolean = false;
-
-  // Payment Modal State
-  showPaymentModal = false;
   selectedStudentIdForPayment?: number;
-  selectedStudentNameForPayment = '';
+  selectedStudentNameForPayment: string = '';
   admissionIdToDelete?: number;
 
   constructor(
@@ -74,129 +87,152 @@ export class AdmissionManagementComponent implements OnInit {
     private router: Router
   ) { }
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────
+
   ngOnInit(): void {
-    // Read URL query params and apply as initial filters
+    // Subscribe to queryParams — whenever the URL changes, re-read filters and fetch
     this.routeSub = this.route.queryParams.subscribe(params => {
-      const type = params['type'];
-      const source = params['source'];
-      const isScholar = params['isScholar'];
-      const tab = params['tab'];
-      const status = params['status'];
-
-      this.activeTabFilter = tab || '';
-      this.activeStatusFilter = status || '';
-
-      if (type) {
-        this.activeStatFilter = type;
-      }
-
-      if (source || isScholar !== undefined) {
-        this.fetchFilteredData(source, isScholar === 'true');
-      } else {
-        this.fetchData();
-      }
+      this.filters = {
+        tab:          params['tab']          || '',
+        statusFilter: params['status']       || '',
+        source:       params['source']       || '',
+        isScholar:    params['isScholar']    || '',
+        statFilter:   params['statFilter']   || ''
+      };
+      this.currentPage = 1;
+      this.fetchData();
     });
 
-    // Debounce search input
+    // Debounced search
     this.searchSub = this.searchSubject.pipe(
-      debounceTime(500),
+      debounceTime(400),
       distinctUntilChanged()
-    ).subscribe(searchTerm => {
-      this.searchTerm = searchTerm;
+    ).subscribe(term => {
+      this.searchTerm = term;
       this.currentPage = 1;
       this.fetchData();
     });
   }
-  goBack() {
-    this.router.navigate(['/admin/dashboard']);
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+    this.routeSub?.unsubscribe();
+    this.searchSub?.unsubscribe();
   }
 
-  fetchFilteredData(source?: string, isScholar?: boolean): void {
-    this.loading = true;
-    this.sub = this.admissionService.getStudentsByFilter(source, isScholar).subscribe(data => {
-      this.pageData = data;
-      this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
-      this.loading = false;
-    });
-  }
+  // ── Data Fetching ─────────────────────────────────────────────────────
 
+  /**
+   * Single unified fetch — all filter combinations are forwarded to the
+   * backend via getAdmissionsData(). No client-side post-filtering.
+   */
   fetchData(): void {
     this.loading = true;
+    this.sub?.unsubscribe();
+
     this.sub = this.admissionService.getAdmissionsData(
       this.currentPage,
       this.pageSize,
       this.searchTerm,
-      this.activeStatFilter,
-      this.selectedCourseId,
+      this.filters.statFilter,
+      undefined,              // courseId — not used yet
       this.sortColumn,
       this.sortDirection,
-      this.activeTabFilter,
-      this.activeStatusFilter
-    ).subscribe(data => {
-      this.pageData = data;
-      this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
-      this.loading = false;
+      this.filters.tab,
+      this.filters.statusFilter,
+      this.filters.source,
+      this.filters.isScholar
+    ).subscribe({
+      next: data => {
+        this.pageData = data;
+        this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error fetching admissions', err);
+        this.loading = false;
+      }
     });
   }
 
-  /** Switch tab in-page and sync URL */
+  // ── Filter / Tab controls ─────────────────────────────────────────────
+
+  /** Switch the tab and clear source/scholar/status filters. Sync to URL. */
   setTab(tab: string): void {
-    this.activeTabFilter = tab;
-    this.activeStatusFilter = '';
-    this.currentPage = 1;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { tab: tab || null, status: null },
+      queryParams: {
+        tab: tab || null,
+        status: null,
+        source: null,
+        isScholar: null
+      },
       queryParamsHandling: 'merge'
     });
-    this.fetchData();
+    // routeSub handles fetchData automatically
   }
 
-  /** Toggle a status filter and sync URL */
+  /** Dismiss / clear the status filter from URL. */
   setStatus(status: string): void {
-    this.activeStatusFilter = this.activeStatusFilter === status ? '' : status;
-    this.currentPage = 1;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { status: this.activeStatusFilter || null },
+      queryParams: { status: status || null },
       queryParamsHandling: 'merge'
     });
-    this.fetchData();
   }
+
+  /** Legacy stat card filter (DIRECT / INDIRECT / SCHOLAR / etc.) */
+  onStatFilter(filter: string): void {
+    const newFilter = this.filters.statFilter === filter ? '' : filter;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { statFilter: newFilter || null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  // ── Computed labels ───────────────────────────────────────────────────
 
   get activeTabLabel(): string {
-    if (this.activeTabFilter === 'applications') return 'Applications (Enrolments)';
-    if (this.activeTabFilter === 'Admission') return 'Admissions';
-    return 'All Records';
+    const labels: Record<string, string> = {
+      'Admission': 'Admissions',
+      'applications': 'Applications'
+    };
+    return labels[this.filters.tab] ?? 'All Records';
   }
 
-  private applyTabFilter(admissions: AdmissionItem[]): AdmissionItem[] {
-    if (!this.activeTabFilter) return admissions;
-
-    if (this.activeTabFilter === 'applications') {
-      return admissions.filter(item =>
-        (item.totalFeesPaid || 0) === 0 &&
-        (item.remainingFees === item.finalFeesAfterDiscount) &&
-        (!item.feeHistory || item.feeHistory.length === 0)
-      );
-    }
-
-    if (this.activeTabFilter === 'Admission') {
-      return admissions.filter(item => (item.totalFeesPaid || 0) > 0);
-    }
-
-    return admissions;
+  /** Human-readable description of all active filters for the header badge */
+  get activeFilterSummary(): string {
+    const parts: string[] = [];
+    if (this.filters.source === 'USER')       parts.push('Direct');
+    if (this.filters.source === 'CONSULTANCY') parts.push('Via Consultancy');
+    if (this.filters.isScholar === 'true')    parts.push('Scholar');
+    if (this.filters.statusFilter)            parts.push(this.filters.statusFilter);
+    return parts.join(' · ');
   }
-  onView(id: number) {
+
+  get hasActiveFilters(): boolean {
+    return !!(this.filters.source || this.filters.isScholar || this.filters.statusFilter);
+  }
+
+  // ── Navigation ────────────────────────────────────────────────────────
+
+  goBack(): void {
+    this.router.navigate(['/admin/dashboard']);
+  }
+
+  onView(id: number): void {
     this.router.navigate(['/admissions', id]);
   }
+
+  // ── Admission Modal ───────────────────────────────────────────────────
 
   openAddAdmission(): void {
     this.selectedStudentId = undefined;
     this.showAdmissionModal = true;
   }
 
-  onEdit(id: number) {
+  onEdit(id: number): void {
     this.selectedStudentId = id;
     this.showAdmissionModal = true;
   }
@@ -206,73 +242,80 @@ export class AdmissionManagementComponent implements OnInit {
     this.selectedStudentId = undefined;
   }
 
-  onBulkUploadSuccess(result: any) {
+  onBulkUploadSuccess(_result: any): void {
     this.fetchData();
   }
 
-  onDelete(item: AdmissionItem) {
+  // ── Delete ────────────────────────────────────────────────────────────
+
+  onDelete(item: AdmissionItem): void {
     this.admissionIdToDelete = item.id;
     this.selectedAdmission = item;
     this.showDeleteModal = true;
   }
 
-  // Payment Actions
-  onPay(item: AdmissionItem) {
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.admissionIdToDelete = undefined;
+  }
+
+  confirmDelete(): void {
+    if (!this.admissionIdToDelete) return;
+    this.loading = true;
+    this.admissionService.deleteAdmission(this.admissionIdToDelete).subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.selectedAdmission = null;
+        this.admissionIdToDelete = undefined;
+        this.fetchData();
+      },
+      error: err => {
+        console.error('Error deleting admission', err);
+        this.loading = false;
+        this.showDeleteModal = false;
+      }
+    });
+  }
+
+  // ── Fee Payment ───────────────────────────────────────────────────────
+
+  onPay(item: AdmissionItem): void {
     this.selectedStudentIdForPayment = item.id;
     this.selectedStudentNameForPayment = item.fullName;
     this.showPaymentModal = true;
   }
 
-  onPaymentSaved() {
+  onPaymentSaved(): void {
     this.fetchData();
   }
 
-  cancelDelete() {
-    this.showDeleteModal = false;
-    this.admissionIdToDelete = undefined;
+  // ── Fee Status Toggle ─────────────────────────────────────────────────
+
+  toggleFeeStatus(item: AdmissionItem, newStatus: string): void {
+    if (item.feeStatus === newStatus) return;
+    const prevStatus = item.feeStatus;
+    item.feeStatus = newStatus;
+
+    this.admissionService.updateFeeStatus(item.id, newStatus === 'Paid').subscribe({
+      next: res => {
+        if (res === null) {
+          item.feeStatus = prevStatus;
+          console.warn('Backend update failed, reverting optimistic UI change.');
+        }
+      }
+    });
   }
 
-  confirmDelete() {
-    if (this.admissionIdToDelete) {
-      this.loading = true;
-      this.admissionService.deleteAdmission(this.admissionIdToDelete).subscribe({
-        next: () => {
-          this.showDeleteModal = false;
-          this.selectedAdmission = null;
-          this.fetchData();
-        },
-        error: (err) => {
-          console.error('Error deleting admission', err);
-          this.loading = false;
-          this.showDeleteModal = false;
-        }
-      });
-    }
-  }
+  // ── Search ────────────────────────────────────────────────────────────
 
   onSearchChange(): void {
     this.searchSubject.next(this.searchTerm);
   }
 
-  onPageSizeChange(): void {
-    this.pageSize = Number(this.pageSize);
-    this.currentPage = 1;
-    this.fetchData();
-  }
-
-  onStatFilter(filter: string): void {
-    if (this.activeStatFilter === filter) {
-      this.activeStatFilter = ''; // toggle off
-    } else {
-      this.activeStatFilter = filter;
-    }
-    this.currentPage = 1;
-    this.fetchData();
-  }
+  // ── Sorting ───────────────────────────────────────────────────────────
 
   sortBy(column: string): void {
     if (this.sortColumn === column) {
-      // Toggle direction
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.sortColumn = column;
@@ -282,8 +325,16 @@ export class AdmissionManagementComponent implements OnInit {
     this.fetchData();
   }
 
+  // ── Pagination ────────────────────────────────────────────────────────
+
   get paginatedAdmissions(): AdmissionItem[] {
-    return this.pageData ? this.pageData.admissions : [];
+    return this.pageData?.admissions ?? [];
+  }
+
+  onPageSizeChange(): void {
+    this.pageSize = Number(this.pageSize);
+    this.currentPage = 1;
+    this.fetchData();
   }
 
   goToPage(page: number): void {
@@ -294,43 +345,6 @@ export class AdmissionManagementComponent implements OnInit {
   }
 
   getPagesArray(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
-  }
-
-  toggleFeeStatus(item: AdmissionItem, newStatus: string): void {
-    if (item.feeStatus === newStatus) return;
-
-    // Optimistically update the UI
-    const prevStatus = item.feeStatus;
-    item.feeStatus = newStatus;
-
-    // Persist to backend
-    this.admissionService.updateFeeStatus(item.id, newStatus === 'Paid').subscribe({
-      next: (res) => {
-        // If the request fails or is null handled in service, we might want to revert:
-        if (res === null) {
-          item.feeStatus = prevStatus;
-          console.warn('Backend update failed, reverting optimistic UI change.');
-        } else {
-          console.log(`Successfully updated fee status for student ${item.id} to ${newStatus}`);
-        }
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.sub) {
-      this.sub.unsubscribe();
-    }
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
-    if (this.searchSub) {
-      this.searchSub.unsubscribe();
-    }
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 }

@@ -58,7 +58,7 @@ export class ManagementPanelComponent {
       { name: 'Course Type', sub: 'Manages course categories', value: s.totalCoursesTypes, icon: '📄', path: '/course-types' },
       { name: 'Institution', sub: 'Manages partner institutions', value: s.totalInstitutions, icon: '🏛', path: '/institutions' },
       { name: 'Roles', sub: 'Manages user roles and permissions', value: s.totalRoles, icon: '🛡', path: '/roles' },
-      { name: 'Admissions', sub: 'Manages admission processes', value: s.totalAdmissions, icon: '🎓', path: '/admin/admission-management' },
+      { name: 'Admissions', sub: 'Manages admission processes', value: s.totalAdmissions, icon: '🎓', path: '/admin/admission-management', queryParams: { tab: 'Admission' } },
       { name: 'Users', sub: 'Manages all system users', value: s.totalUsers, icon: '👥', path: '/users' },
       { name: 'Inactive Records', sub: 'Manages soft deleted records', value: s.inactiveRecords, icon: '📦', path: '/consultancy', queryParams: { status: 'DELETED' } },
       { name: 'UnMapped Records', sub: 'Records without consultancy mapping', value: s.totalUnmappedRecords, icon: '🔗', path: '/unmapped' },

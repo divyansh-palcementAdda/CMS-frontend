@@ -100,9 +100,18 @@ export class AdmissionPanelComponent {
 
     switch (type) {
       // Admission tab
-      case 'Direct': queryParams['source'] = 'USER'; break;
-      case 'Indirect': queryParams['source'] = 'CONSULTANCY'; break;
-      case 'Scholarship': queryParams['isScholar'] = 'true'; break;
+      case 'Direct': 
+        queryParams['source'] = 'USER'; 
+        queryParams['tab'] = 'Admission'; 
+        break;
+      case 'Indirect': 
+        queryParams['source'] = 'CONSULTANCY'; 
+        queryParams['tab'] = 'Admission'; 
+        break;
+      case 'Scholarship': 
+        queryParams['isScholar'] = 'true'; 
+        queryParams['tab'] = 'Admission'; 
+        break;
 
       // Applications tab
       case 'Direct Applications':

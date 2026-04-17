@@ -120,7 +120,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   onViewAllAdmissions() {
-    this.router.navigate(['/admin/admission-management']);
+    this.router.navigate(['/admin/admission-management'], { queryParams: { tab: 'applications' } });
   }
 
   cancelDelete() {
