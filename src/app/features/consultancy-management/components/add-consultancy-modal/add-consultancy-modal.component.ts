@@ -26,6 +26,11 @@ export class AddConsultancyModalComponent implements OnInit {
   isLoadingLookups = false;
   isSubmitting = false;
 
+  // Year Selection State
+  currentYear = new Date().getFullYear();
+  availableYears = Array.from({ length: 11 }, (_, i) => this.currentYear - 5 + i); // range: [curr-5, curr+5]
+  showYearDropdown = false;
+
   // Bulk Upload State
   selectedFile: File | null = null;
   bulkUploadResult: any = null;
@@ -61,10 +66,18 @@ export class AddConsultancyModalComponent implements OnInit {
       address: ['', [Validators.maxLength(255)]],
       institutionOrFirmName: ['', [Validators.required]],
       commissionPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      status: ['ACTIVE', [Validators.required]],
       courseIds: [[]],
       institutionIds: [[]],
-      representativeIds: [[], [Validators.required]]
+      representativeIds: [[], [Validators.required]],
+      years: [[]]
+    });
+
+    // Handle initial status based logic
+    this.handleStatusChange(this.consultancyForm.get('status')?.value);
+
+    // Status change listener
+    this.consultancyForm.get('status')?.valueChanges.subscribe(status => {
+      this.handleStatusChange(status);
     });
 
     // Handle "Same as Mobile Number" logic
@@ -158,13 +171,40 @@ export class AddConsultancyModalComponent implements OnInit {
     return filtered;
   }
 
-  toggleSelection(controlName: string, id: number) {
+  toggleSelection(controlName: string, id: any) {
     const control = this.consultancyForm.get(controlName);
     const currentValues = control?.value || [];
+    if (this.isYearRestricted(id)) return;
+
     if (currentValues.includes(id)) {
-      control?.setValue(currentValues.filter((v: number) => v !== id));
+      control?.setValue(currentValues.filter((v: any) => v !== id));
     } else {
       control?.setValue([...currentValues, id]);
+    }
+  }
+
+  isYearRestricted(year: number): boolean {
+    const status = this.consultancyForm.get('status')?.value;
+    if (status === 'INACTIVE') return true;
+    if (status === 'DORMANT' && year === this.currentYear) return true;
+    return false;
+  }
+
+  private handleStatusChange(status: string) {
+    const yearsControl = this.consultancyForm.get('years');
+    const currentValues = yearsControl?.value || [];
+
+    if (status === 'ACTIVE') {
+      // 2026 or present year is selected automatically
+      if (!currentValues.includes(this.currentYear)) {
+        yearsControl?.setValue([...currentValues, this.currentYear]);
+      }
+    } else if (status === 'DORMANT') {
+      // Restricted from selecting present year
+      yearsControl?.setValue(currentValues.filter((y: number) => y !== this.currentYear));
+    } else if (status === 'INACTIVE') {
+      // Not able to select years at all
+      yearsControl?.setValue([]);
     }
   }
 

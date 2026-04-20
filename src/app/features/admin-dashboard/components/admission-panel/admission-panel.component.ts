@@ -100,17 +100,17 @@ export class AdmissionPanelComponent {
 
     switch (type) {
       // Admission tab
-      case 'Direct': 
-        queryParams['source'] = 'USER'; 
-        queryParams['tab'] = 'Admission'; 
+      case 'Direct':
+        queryParams['source'] = 'USER';
+        queryParams['tab'] = 'Admission';
         break;
-      case 'Indirect': 
-        queryParams['source'] = 'CONSULTANCY'; 
-        queryParams['tab'] = 'Admission'; 
+      case 'Indirect':
+        queryParams['source'] = 'CONSULTANCY';
+        queryParams['tab'] = 'Admission';
         break;
-      case 'Scholarship': 
-        queryParams['isScholar'] = 'true'; 
-        queryParams['tab'] = 'Admission'; 
+      case 'Scholarship':
+        queryParams['isScholar'] = 'true';
+        queryParams['tab'] = 'Admission';
         break;
 
       // Applications tab
@@ -144,12 +144,13 @@ export class AdmissionPanelComponent {
       };
       return;
     }
+    console.log(s);
 
     this.displayStats = {
       // Admission counts from model
-      direct: s.directAdmissions ?? 0,
-      indirect: s.indirectAdmissions ?? 0,
-      scholar: s.scholarAdmissions ?? 0,
+      direct: s.directStudents ?? 0,
+      indirect: s.indirectStudents ?? 0,
+      scholar: s.scholarStudents ?? 0,
 
       // Application counts — reuse the same breakdown fields
       // (backend filters by tab='applications' to return enrolment subset)

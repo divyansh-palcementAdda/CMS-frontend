@@ -229,6 +229,72 @@
           </div>
         </div>
 
+        <!-- Categorized Stat Cards -->
+        <div class="categorized-stats">
+          <div class="stat-premium-card blue" (click)="scrollToTable('total-apps')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Total Applications</span>
+                <span class="value">{{ consultancy.totalApplications?.length || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#6366F1" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16M8 17H12" stroke="#6366F1" stroke-width="2" stroke-linecap="round" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#6366F1" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="stat-premium-card red" (click)="scrollToTable('cancelled-apps')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Cancelled Applications</span>
+                <span class="value">{{ consultancy.cancelledApplications?.length || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#EF4444" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16M8 17H12" stroke="#EF4444" stroke-width="2" stroke-linecap="round" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#EF4444" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="stat-premium-card green" (click)="scrollToTable('total-adms')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Total Admissions</span>
+                <span class="value">{{ consultancy.totalAdmissions?.length || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#10B981" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16" stroke="#10B981" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="17" cy="17" r="3" stroke="#10B981" stroke-width="2" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#10B981" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="stat-premium-card orange" (click)="scrollToTable('cancelled-adms')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Cancelled Admissions</span>
+                <span class="value">{{ consultancy.cancelledAdmissions?.length || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#F59E0B" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="17" cy="17" r="3" stroke="#F59E0B" stroke-width="2" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#F59E0B" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Chart Section -->
         <div class="chart-section mb-32">
           <h3 class="chart-title">Top 5 Courses Offered</h3>
@@ -240,6 +306,405 @@
             </apx-chart>
           </div>
         </div>
+
+        <!-- Yearly Admission Table -->
+        <div class="table-card mb-32">
+          <div class="table-header-row">
+            <h3>Following Year Admission</h3>
+          </div>
+          <div class="yearly-table-wrapper">
+            <table>
+              <thead class="blue-header">
+                <tr>
+                  <th>S.No</th>
+                  <th>Year</th>
+                  <th>Total Applications</th>
+                  <th>Cancelled Applications</th>
+                  <th>Confirm Admissions</th>
+                  <th>Cancelled Admissions</th>
+                  <th>Courses</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of paginatedYearlyAdmissions; let i = index">
+                  <td>{{ (yearlyPage - 1) * yearlyPageSize + i + 1 }}</td>
+                  <td class="bold-text">{{ record.year }}</td>
+                  <td>
+                    <span class="count-badge applications">{{ record.totalApplications || 0 }}</span>
+                  </td>
+                  <td>
+                    <span class="count-badge cancelled-app">{{ record.cancelledApplications || 0 }}</span>
+                  </td>
+                  <td>
+                    <span class="count-badge confirmed">{{ record.confirmedAdmissions || 0 }}</span>
+                  </td>
+                  <td>
+                    <span class="count-badge cancelled-adm">{{ record.cancelledAdmissions || 0 }}</span>
+                  </td>
+                  <td>
+                    <div class="course-dropdown-btn">
+                      {{ record.courseCount || 0 }} Course
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="!consultancy.yearlyAdmissions || consultancy.yearlyAdmissions.length === 0">
+                  <td colspan="7" class="text-center py-32">No yearly data available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedYearlyAdmissions.length }} records out of {{
+              consultancy.yearlyAdmissions?.length || 0 }} Records</span>
+            <div class="pagination">
+              <span class="nav-btn" (click)="yearlyPage > 1 && changePage('yearly', -1)"
+                [class.disabled]="yearlyPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </span>
+              <ng-container
+                *ngFor="let p of [].constructor(getTotalPages(consultancy.yearlyAdmissions?.length || 0, yearlyPageSize)); let i = index">
+                <span class="page-link" [class.active]="yearlyPage === i + 1" (click)="yearlyPage = i + 1">{{ i + 1
+                  }}</span>
+              </ng-container>
+              <span class="nav-btn"
+                (click)="yearlyPage < getTotalPages(consultancy.yearlyAdmissions?.length || 0, yearlyPageSize) && changePage('yearly', 1)"
+                [class.disabled]="yearlyPage >= getTotalPages(consultancy.yearlyAdmissions?.length || 0, yearlyPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Categorized Student Tables -->
+        <div id="total-apps" class="table-card mb-32">
+          <div class="table-header-row">
+            <h3>Total Applications</h3>
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead class="blue-header">
+                <tr>
+                  <th>S.NO</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>Fee Status</th>
+                  <th>Commission Status</th>
+                  <th>Provisional Amount</th>
+                  <th>Session</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of paginatedTotalApplications; let i = index">
+                  <td>{{ (totalAppPage - 1) * totalAppPageSize + i + 1 }}</td>
+                  <td class="bold-text">{{ item.studentName }}</td>
+                  <td>{{ item.courseName }}</td>
+                  <td><span class="status-badge"
+                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
+                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="status-badge" [class.Active]="item.commissionStatus === 'Paid'"
+                      [class.Partial]="item.commissionStatus === 'Pending'">{{ item.commissionStatus }}</span></td>
+                  <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
+                  <td>{{ item.session }}</td>
+                  <td class="text-center">
+                    <div class="action-tools">
+                      <div class="tool-btn" (click)="onViewAdmission(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg></div>
+                      <div class="tool-btn" (click)="onEditAdmission(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg></div>
+                      <div class="tool-btn" (click)="onDeleteAdmission(item)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="paginatedTotalApplications.length === 0">
+                  <td colspan="8" class="empty-state">No applications found</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedTotalApplications.length }} of {{
+              filteredTotalApplications.length }} records</span>
+            <div class="pagination">
+              <span class="nav-btn" (click)="totalAppPage > 1 && changePage('totalApp', -1)"
+                [class.disabled]="totalAppPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </span>
+              <span class="page-link active">{{ totalAppPage }}</span>
+              <span class="nav-btn"
+                (click)="totalAppPage < getTotalPages(filteredTotalApplications.length, totalAppPageSize) && changePage('totalApp', 1)"
+                [class.disabled]="totalAppPage >= getTotalPages(filteredTotalApplications.length, totalAppPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div id="cancelled-apps" class="table-card mb-32">
+          <div class="table-header-row">
+            <h3>Cancelled Applications</h3>
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead class="red-header">
+                <tr>
+                  <th>S.NO</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>Fee Status</th>
+                  <th>Commission Status</th>
+                  <th>Provisional Amount</th>
+                  <th>Session</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of paginatedCancelledApplications; let i = index">
+                  <td>{{ (cancelledAppPage - 1) * cancelledAppPageSize + i + 1 }}</td>
+                  <td class="bold-text">{{ item.studentName }}</td>
+                  <td>{{ item.courseName }}</td>
+                  <td><span class="status-badge"
+                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
+                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="status-badge Partial">Cancelled</span></td>
+                  <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
+                  <td>{{ item.session }}</td>
+                  <td class="text-center">
+                    <div class="action-tools">
+                      <div class="tool-btn" (click)="onViewAdmission(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="paginatedCancelledApplications.length === 0">
+                  <td colspan="8" class="empty-state">No cancelled applications found</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedCancelledApplications.length }} of {{
+              filteredCancelledApplications.length }} records</span>
+            <div class="pagination">
+              <span class="nav-btn" (click)="cancelledAppPage > 1 && changePage('cancelledApp', -1)"
+                [class.disabled]="cancelledAppPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </span>
+              <span class="page-link active">{{ cancelledAppPage }}</span>
+              <span class="nav-btn"
+                (click)="cancelledAppPage < getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize) && changePage('cancelledApp', 1)"
+                [class.disabled]="cancelledAppPage >= getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div id="total-adms" class="table-card mb-32">
+          <div class="table-header-row">
+            <h3>Total Admissions</h3>
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead class="green-header">
+                <tr>
+                  <th>S.NO</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>Fee Status</th>
+                  <th>Commission Status</th>
+                  <th>Provisional Amount</th>
+                  <th>Session</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of paginatedTotalAdmissions; let i = index">
+                  <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>
+                  <td class="bold-text">{{ item.studentName }}</td>
+                  <td>{{ item.courseName }}</td>
+                  <td><span class="status-badge"
+                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
+                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="status-badge" [class.Active]="item.commissionStatus === 'Paid'"
+                      [class.Partial]="item.commissionStatus === 'Pending'">{{ item.commissionStatus }}</span></td>
+                  <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
+                  <td>{{ item.session }}</td>
+                  <td class="text-center">
+                    <div class="action-tools">
+                      <div class="tool-btn" (click)="onViewAdmission(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg></div>
+                      <div class="tool-btn" (click)="onEditAdmission(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="paginatedTotalAdmissions.length === 0">
+                  <td colspan="8" class="empty-state">No admissions found</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedTotalAdmissions.length }} of {{
+              filteredTotalAdmissions.length }} records</span>
+            <div class="pagination">
+              <span class="nav-btn" (click)="totalAdmPage > 1 && changePage('totalAdm', -1)"
+                [class.disabled]="totalAdmPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </span>
+              <span class="page-link active">{{ totalAdmPage }}</span>
+              <span class="nav-btn"
+                (click)="totalAdmPage < getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize) && changePage('totalAdm', 1)"
+                [class.disabled]="totalAdmPage >= getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div id="cancelled-adms" class="table-card mb-32">
+          <div class="table-header-row">
+            <h3>Cancelled Admissions</h3>
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead class="orange-header">
+                <tr>
+                  <th>S.NO</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>Fee Status</th>
+                  <th>Commission Status</th>
+                  <th>Provisional Amount</th>
+                  <th>Session</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of paginatedCancelledAdmissions; let i = index">
+                  <td>{{ (cancelledAdmPage - 1) * cancelledAdmPageSize + i + 1 }}</td>
+                  <td class="bold-text">{{ item.studentName }}</td>
+                  <td>{{ item.courseName }}</td>
+                  <td><span class="status-badge"
+                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
+                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="status-badge Partial">Cancelled</span></td>
+                  <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
+                  <td>{{ item.session }}</td>
+                  <td class="text-center">
+                    <div class="action-tools">
+                      <div class="tool-btn" (click)="onViewAdmission(item.id)"><svg viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="paginatedCancelledAdmissions.length === 0">
+                  <td colspan="8" class="empty-state">No cancelled admissions found</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedCancelledAdmissions.length }} of {{
+              filteredCancelledAdmissions.length }} records</span>
+            <div class="pagination">
+              <span class="nav-btn" (click)="cancelledAdmPage > 1 && changePage('cancelledAdm', -1)"
+                [class.disabled]="cancelledAdmPage === 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </span>
+              <span class="page-link active">{{ cancelledAdmPage }}</span>
+              <span class="nav-btn"
+                (click)="cancelledAdmPage < getTotalPages(filteredCancelledAdmissions.length, cancelledAdmPageSize) && changePage('cancelledAdm', 1)"
+                [class.disabled]="cancelledAdmPage >= getTotalPages(filteredCancelledAdmissions.length, cancelledAdmPageSize)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
 
         <!-- Tables Section -->
         <div class="table-card mb-32">
@@ -320,6 +785,9 @@
             </div>
           </div>
         </div>
+
+
+
 
         <div class="table-card mb-32">
           <div class="table-header-row">
@@ -470,7 +938,7 @@
         </div>
 
         <!-- Final Table -->
-        <div class="table-card mb-32">
+        <!-- <div class="table-card mb-32">
           <div class="table-header-row">
             <h3>All Admission</h3>
             <div class="table-tools">
@@ -568,7 +1036,9 @@
               </span>
             </div>
           </div>
-        </div>
+        </div> -->
+
+
       </ng-container>
 
       <!-- Confirmation Modal -->

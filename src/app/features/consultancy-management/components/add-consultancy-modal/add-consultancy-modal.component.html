@@ -127,6 +127,40 @@
             </select>
           </div>
 
+          <div class="form-group full-width">
+            <label>Admissions in Following Year</label>
+            <div class="year-multi-select" [class.disabled]="consultancyForm.get('status')?.value === 'INACTIVE'">
+              <div class="select-box" (click)="consultancyForm.get('status')?.value !== 'INACTIVE' && (showYearDropdown = !showYearDropdown)">
+                <div class="selected-chips">
+                  <div class="year-chip" *ngFor="let year of consultancyForm.get('years')?.value">
+                    <span>Year {{ year }}</span>
+                    <svg (click)="toggleSelection('years', year); $event.stopPropagation()" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </div>
+                  <span class="placeholder" *ngIf="(consultancyForm.get('years')?.value || []).length === 0">Select Years</span>
+                </div>
+                <svg [class.open]="showYearDropdown" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+
+              <div class="dropdown-list" *ngIf="showYearDropdown">
+                <div class="list-item" *ngFor="let year of availableYears" 
+                     [class.disabled-item]="isYearRestricted(year)"
+                     (click)="toggleSelection('years', year)">
+                  <div class="checkbox-custom" [class.active]="isSelected('years', year)">
+                    <svg *ngIf="isSelected('years', year)" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <span>Year {{ year }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="form-group checklist-group">
             <label>Link Courses</label>
             <div class="checklist-container">

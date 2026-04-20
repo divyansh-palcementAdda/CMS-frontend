@@ -425,6 +425,7 @@ $red-danger: #EF4444;
 
   &.Active { background: #ECFDF5 !important; color: #059669 !important; }
   &.Inactive { background: #FEF2F2 !important; color: #DC2626 !important; }
+  &.Partial { background: #FFF7ED !important; color: #F59E0B !important; }
 }
 
 .tag-badge {
@@ -449,7 +450,168 @@ $red-danger: #EF4444;
   }
 }
 
-/* Responsiveness */
-@media (max-width: 1200px) {
-  .content-grid { grid-template-columns: 1fr !important; }
+/* Yearly Table Specific Styles */
+.count-badge {
+  padding: 6px 16px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  display: inline-block !important;
+
+  &.applications { background: #EEF2FF !important; color: #6366F1 !important; }
+  &.cancelled-app { background: #FEF2F2 !important; color: #EF4444 !important; }
+  &.confirmed { background: #E0F2FE !important; color: #0EA5E9 !important; }
+  &.cancelled-adm { background: #FFF7ED !important; color: #F97316 !important; }
+}
+
+.course-dropdown-btn {
+  background: #4F46E5 !important;
+  color: white !important;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+
+  &:hover { background: #4338CA !important; }
+}
+
+.py-32 { padding-top: 32px !important; padding-bottom: 32px !important; }
+.mb-32 { margin-bottom: 32px !important; }
+
+/* Fee Status Toggle Styling (Enhancement) */
+.fee-status-toggle {
+  display: flex !important;
+  background: #f8fafc !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  width: fit-content !important;
+
+  .status-option {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #94a3b8 !important;
+    cursor: default !important;
+    transition: all 0.2s ease !important;
+
+    svg {
+      width: 14px !important;
+      height: 14px !important;
+    }
+
+    &.active {
+      &.paid {
+        background: white !important;
+        color: #10b981 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+      }
+      &.unpaid {
+        background: white !important;
+        color: #ef4444 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+      }
+    }
+  }
+}
+
+/* Categorized Stats Section */
+.categorized-stats {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 24px !important;
+  margin-bottom: 32px !important;
+}
+
+.stat-premium-card {
+  background: white !important;
+  border: 1.5px solid #F1F5F9 !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+
+  &::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 5px !important;
+    height: 100% !important;
+  }
+
+  &:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  &.blue { &::before { background: #6366F1 !important; } .icon svg rect { fill-opacity: 0.1; } }
+  &.red { &::before { background: #EF4444 !important; } }
+  &.green { &::before { background: #10B981 !important; } }
+  &.orange { &::before { background: #F59E0B !important; } }
+
+  .card-content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    .label {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #64748B !important;
+      line-height: 1.2 !important;
+    }
+
+    .value {
+      font-size: 32px !important;
+      font-weight: 800 !important;
+      color: #0F172A !important;
+      line-height: 1 !important;
+    }
+  }
+
+  .icon {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+/* Categorized Table Header Colors */
+thead.blue-header { background: #6366F1 !important; }
+thead.red-header { background: #EF4444 !important; }
+thead.green-header { background: #10B981 !important; }
+thead.orange-header { background: #F59E0B !important; }
+
+.table-wrapper {
+  overflow-x: auto !important;
+}
+
+.empty-state {
+  text-align: center !important;
+  padding: 48px !important;
+  color: #94A3B8 !important;
+  font-size: 15px !important;
+  font-style: italic !important;
+}
+
+.bold-text {
+  font-weight: 700 !important;
+  color: #1E293B !important;
 }

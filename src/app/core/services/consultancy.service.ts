@@ -58,7 +58,7 @@ export class ConsultancyService {
     return this.http.get<any>(`${this.apiUrl}/status/${status.toUpperCase()}`).pipe(
       map(response => {
         const data = Array.isArray(response) ? response : (response?.data || []);
-        
+
         let activeCount = 0;
         let totalCourseCount = 0;
 
@@ -98,7 +98,7 @@ export class ConsultancyService {
     return this.http.get<any>(`${this.apiUrl}/status/${status.toUpperCase()}/deleted/${deleted}`).pipe(
       map(response => {
         const data = Array.isArray(response) ? response : (response?.data || []);
-        
+
         let activeCount = 0;
         let totalCourseCount = 0;
 
@@ -141,14 +141,65 @@ export class ConsultancyService {
         if (!data) throw new Error('Consultancy not found');
 
         return {
-          ...data.basicInfo,
-          financials: data.financials || { totalProjected: '0', payableAmount: '0', paidAmount: '0', unpaidAmount: '0' },
-          quickStats: data.quickStats || { totalCourses: 0, projectedAmount: '0', status: 'Active' },
+          ...data.basicInfo, // ✅ FIXED
+
+          financials: data.financials || {
+            totalProjected: '0',
+            payableAmount: '0',
+            paidAmount: '0',
+            unpaidAmount: '0'
+          },
+
+          quickStats: data.quickStats || {
+            totalCourses: 0,
+            projectedAmount: '0',
+            status: 'Active'
+          },
+
           topCourses: data.topCourses || [],
-          courses: (data.courses || []).map((c: any, index: number) => ({ ...c, sNo: index + 1 })),
-          representatives: (data.representatives || []).map((r: any, index: number) => ({ ...r, sNo: index + 1 })),
-          institutionsOverview: (data.institutionsOverview || []).map((i: any, index: number) => ({ ...i, sNo: index + 1 })),
-          allAdmissions: (data.allAdmissions || []).map((a: any, index: number) => ({ ...a, sNo: index + 1 }))
+
+          courses: (data.courses || []).map((c: any, index: number) => ({
+            ...c,
+            sNo: index + 1
+          })),
+
+          representatives: (data.representatives || []).map((r: any, index: number) => ({
+            ...r,
+            sNo: index + 1
+          })),
+
+          institutionsOverview: (data.institutionsOverview || []).map((i: any, index: number) => ({
+            ...i,
+            sNo: index + 1
+          })),
+
+          allAdmissions: (data.allAdmissions || []).map((a: any, index: number) => ({
+            ...a,
+            sNo: index + 1
+          })),
+
+          // ✅ ADD THESE (MISSING EARLIER)
+          totalAdmissions: (data.totalAdmissions || []).map((a: any, index: number) => ({
+            ...a,
+            sNo: index + 1
+          })),
+
+          totalApplications: (data.totalApplications || []).map((a: any, index: number) => ({
+            ...a,
+            sNo: index + 1
+          })),
+
+          cancelledApplications: (data.cancelledApplications || []).map((a: any, index: number) => ({
+            ...a,
+            sNo: index + 1
+          })),
+
+          cancelledAdmissions: (data.cancelledAdmissions || []).map((a: any, index: number) => ({
+            ...a,
+            sNo: index + 1
+          })),
+
+          yearlyAdmissions: data.yearlyAdmissions || []
         };
       })
     );

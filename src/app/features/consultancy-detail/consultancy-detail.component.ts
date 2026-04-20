@@ -51,6 +51,25 @@ export class ConsultancyDetailComponent implements OnInit {
   admPage = 1;
   admPageSize = 5;
 
+  totalAppSearch = '';
+  totalAppPage = 1;
+  totalAppPageSize = 5;
+
+  cancelledAppSearch = '';
+  cancelledAppPage = 1;
+  cancelledAppPageSize = 5;
+
+  totalAdmSearch = '';
+  totalAdmPage = 1;
+  totalAdmPageSize = 5;
+
+  cancelledAdmSearch = '';
+  cancelledAdmPage = 1;
+  cancelledAdmPageSize = 5;
+
+  yearlyPage = 1;
+  yearlyPageSize = 5;
+
   // Actions
   showDeleteModal = false;
   itemToDelete: any = null;
@@ -151,6 +170,16 @@ export class ConsultancyDetailComponent implements OnInit {
     this.loading = true;
     this.consultancyService.getConsultancyById(id).subscribe({
       next: (data) => {
+        // Safe initialization of categorized lists
+        data.totalApplications = data.totalApplications || [];
+        data.cancelledApplications = data.cancelledApplications || [];
+        data.totalAdmissions = data.totalAdmissions || [];
+        data.cancelledAdmissions = data.cancelledAdmissions || [];
+        console.log(data);
+        console.log(data.totalApplications);
+        console.log(data.cancelledApplications);
+        console.log(data.totalAdmissions);
+        console.log(data.cancelledAdmissions);
         this.consultancy = data;
         this.updateChartData(data);
         this.loading = false;
@@ -228,12 +257,75 @@ export class ConsultancyDetailComponent implements OnInit {
     return this.filteredAdmissions.slice(start, start + this.admPageSize);
   }
 
+  // Total Applications
+  get filteredTotalApplications() {
+    if (!this.consultancy?.totalApplications) return [];
+    return this.consultancy.totalApplications.filter(a =>
+      a.studentName?.toLowerCase().includes(this.totalAppSearch.toLowerCase()) ||
+      a.courseName?.toLowerCase().includes(this.totalAppSearch.toLowerCase())
+    );
+  }
+  get paginatedTotalApplications() {
+    const start = (this.totalAppPage - 1) * this.totalAppPageSize;
+    return this.filteredTotalApplications.slice(start, start + this.totalAppPageSize);
+  }
+
+  // Cancelled Applications
+  get filteredCancelledApplications() {
+    if (!this.consultancy?.cancelledApplications) return [];
+    return this.consultancy.cancelledApplications.filter(a =>
+      a.studentName?.toLowerCase().includes(this.cancelledAppSearch.toLowerCase()) ||
+      a.courseName?.toLowerCase().includes(this.cancelledAppSearch.toLowerCase())
+    );
+  }
+  get paginatedCancelledApplications() {
+    const start = (this.cancelledAppPage - 1) * this.cancelledAppPageSize;
+    return this.filteredCancelledApplications.slice(start, start + this.cancelledAppPageSize);
+  }
+
+  // Total Admissions
+  get filteredTotalAdmissions() {
+    if (!this.consultancy?.totalAdmissions) return [];
+    return this.consultancy.totalAdmissions.filter(a =>
+      a.studentName?.toLowerCase().includes(this.totalAdmSearch.toLowerCase()) ||
+      a.courseName?.toLowerCase().includes(this.totalAdmSearch.toLowerCase())
+    );
+  }
+  get paginatedTotalAdmissions() {
+    const start = (this.totalAdmPage - 1) * this.totalAdmPageSize;
+    return this.filteredTotalAdmissions.slice(start, start + this.totalAdmPageSize);
+  }
+
+  // Cancelled Admissions
+  get filteredCancelledAdmissions() {
+    if (!this.consultancy?.cancelledAdmissions) return [];
+    return this.consultancy.cancelledAdmissions.filter(a =>
+      a.studentName?.toLowerCase().includes(this.cancelledAdmSearch.toLowerCase()) ||
+      a.courseName?.toLowerCase().includes(this.cancelledAdmSearch.toLowerCase())
+    );
+  }
+  get paginatedCancelledAdmissions() {
+    const start = (this.cancelledAdmPage - 1) * this.cancelledAdmPageSize;
+    return this.filteredCancelledAdmissions.slice(start, start + this.cancelledAdmPageSize);
+  }
+
+  get paginatedYearlyAdmissions() {
+    if (!this.consultancy?.yearlyAdmissions) return [];
+    const start = (this.yearlyPage - 1) * this.yearlyPageSize;
+    return this.consultancy.yearlyAdmissions.slice(start, start + this.yearlyPageSize);
+  }
+
   // Pagination Controls
-  changePage(table: 'course' | 'user' | 'inst' | 'adm', direction: number) {
+  changePage(table: 'course' | 'user' | 'inst' | 'adm' | 'yearly' | 'totalApp' | 'cancelledApp' | 'totalAdm' | 'cancelledAdm', direction: number) {
     if (table === 'course') this.coursePage += direction;
     if (table === 'user') this.userPage += direction;
     if (table === 'inst') this.instPage += direction;
     if (table === 'adm') this.admPage += direction;
+    if (table === 'yearly') this.yearlyPage += direction;
+    if (table === 'totalApp') this.totalAppPage += direction;
+    if (table === 'cancelledApp') this.cancelledAppPage += direction;
+    if (table === 'totalAdm') this.totalAdmPage += direction;
+    if (table === 'cancelledAdm') this.cancelledAdmPage += direction;
   }
 
   getTotalPages(total: number, size: number) {
@@ -242,6 +334,13 @@ export class ConsultancyDetailComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/consultancy-management']);
+  }
+
+  scrollToTable(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   onEdit() {

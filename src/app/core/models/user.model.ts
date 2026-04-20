@@ -49,7 +49,45 @@ export interface UserItem {
     admissionInAllCourses: number;
     scholarAdmissions: number;
     coursesWithoutConsultancy: number;
+
+    // Added for Application System
+    activeAdmissions: number;
+    activeApplications: number;
+    cancelledAdmissions: number;
+    cancelledApplications: number;
+
+    // Secondary Source Breakdown
+    scholarApplications: number;
+    directApplications: number;
+    viaConsultancyApplications: number;
+
+    // Consultancy Status Breakdown
+    activeConsultancies: number;
+    inactiveConsultancies: number;
+    dormantConsultancies: number;
   };
+}
+
+export interface UserAdmissionDetail {
+  id: number;
+  studentName: string;
+  courseName: string;
+  duration: string;
+  discount: string;
+  feeStatus: string;
+  status: string;
+  session: string;
+  admissionDate: string;
+  commissionAmount: number;
+  commissionStatus: string;
+}
+
+export interface UserDetail {
+  basicInfo: UserItem;
+  totalApplications: UserAdmissionDetail[];
+  totalAdmissions: UserAdmissionDetail[];
+  cancelledApplications: UserAdmissionDetail[];
+  cancelledAdmissions: UserAdmissionDetail[];
 }
 
 export interface UserStats {

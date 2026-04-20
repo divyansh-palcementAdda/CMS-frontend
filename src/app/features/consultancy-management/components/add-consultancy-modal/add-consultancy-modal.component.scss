@@ -432,3 +432,116 @@
     }
   }
 }
+
+/* Year Multi-Select Styles */
+.year-multi-select {
+  position: relative;
+  width: 100%;
+  margin-top: 4px;
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    .select-box { background: #f1f5f9 !important; }
+  }
+
+  .select-box {
+    min-height: 48px;
+    padding: 8px 16px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover { border-color: #6366f1; }
+
+    .selected-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      
+      .year-chip {
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 500;
+
+        svg {
+          cursor: pointer;
+          &:hover { color: #dc2626; }
+        }
+      }
+
+      .placeholder { color: #94a3b8; font-size: 14px; }
+    }
+
+    svg {
+      transition: transform 0.2s ease;
+      color: #64748b;
+      &.open { transform: rotate(180deg); }
+    }
+  }
+
+  .dropdown-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 8px;
+
+    .list-item {
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(.disabled-item) { background: #f8fafc; }
+
+      &.disabled-item {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f8fafc;
+        span { color: #94a3b8; }
+      }
+
+      .checkbox-custom {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #cbd5e1;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        &.active {
+          background: #6366f1;
+          border-color: #6366f1;
+        }
+      }
+
+      span { font-size: 14px; font-weight: 500; color: #334155; }
+    }
+  }
+}
+
+.full-width { grid-column: span 2 !important; }

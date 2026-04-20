@@ -93,11 +93,11 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     // Subscribe to queryParams — whenever the URL changes, re-read filters and fetch
     this.routeSub = this.route.queryParams.subscribe(params => {
       this.filters = {
-        tab:          params['tab']          || '',
-        statusFilter: params['status']       || '',
-        source:       params['source']       || '',
-        isScholar:    params['isScholar']    || '',
-        statFilter:   params['statFilter']   || ''
+        tab: params['tab'] || '',
+        statusFilter: params['status'] || '',
+        source: params['source'] || '',
+        isScholar: params['isScholar'] || '',
+        statFilter: params['statFilter'] || ''
       };
       this.currentPage = 1;
       this.fetchData();
@@ -145,6 +145,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: data => {
         this.pageData = data;
+        console.log(data);
         this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
         this.loading = false;
       },
@@ -204,10 +205,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   /** Human-readable description of all active filters for the header badge */
   get activeFilterSummary(): string {
     const parts: string[] = [];
-    if (this.filters.source === 'USER')       parts.push('Direct');
+    if (this.filters.source === 'USER') parts.push('Direct');
     if (this.filters.source === 'CONSULTANCY') parts.push('Via Consultancy');
-    if (this.filters.isScholar === 'true')    parts.push('Scholar');
-    if (this.filters.statusFilter)            parts.push(this.filters.statusFilter);
+    if (this.filters.isScholar === 'true') parts.push('Scholar');
+    if (this.filters.statusFilter) parts.push(this.filters.statusFilter);
     return parts.join(' · ');
   }
 

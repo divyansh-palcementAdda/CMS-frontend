@@ -98,6 +98,17 @@ export interface ConsultancyAdmission {
   status: 'Active' | 'Inactive';
   session: string;
   admissionDate: string;
+  commissionAmount?: number;
+  commissionStatus?: string;
+}
+
+export interface YearlyAdmission {
+  year: number;
+  totalApplications: number;
+  cancelledApplications: number;
+  confirmedAdmissions: number;
+  cancelledAdmissions: number;
+  courseCount: number;
 }
 
 export interface ConsultancyDetail extends ConsultancyDTO {
@@ -112,4 +123,9 @@ export interface ConsultancyDetail extends ConsultancyDTO {
   representatives: ConsultancyRepresentative[];
   institutionsOverview: ConsultancyInstitutionOverview[];
   allAdmissions: ConsultancyAdmission[];
+  yearlyAdmissions?: YearlyAdmission[];
+  totalApplications?: ConsultancyAdmission[];
+  cancelledApplications?: ConsultancyAdmission[];
+  totalAdmissions?: ConsultancyAdmission[];
+  cancelledAdmissions?: ConsultancyAdmission[];
 }

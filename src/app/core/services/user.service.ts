@@ -178,6 +178,12 @@ export class UserService {
     );
   }
 
+  getUserDetail(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/detail`).pipe(
+      map(res => res.data || res)
+    );
+  }
+
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

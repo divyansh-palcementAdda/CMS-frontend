@@ -25,9 +25,9 @@ export interface DashboardStats {
   totalAdmissions: number;
   totalUsers: number;
   inactiveRecords: number;
-  directAdmissions: number;
-  indirectAdmissions: number;
-  scholarAdmissions: number;
+  directStudents: number;
+  indirectStudents: number;
+  scholarStudents: number;
   cancelledAdmissions: number;
   cancelledEnrolments: number;
   totalEnrolments: number;

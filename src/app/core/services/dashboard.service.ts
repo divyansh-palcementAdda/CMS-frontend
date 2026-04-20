@@ -23,7 +23,7 @@ export class DashboardService {
     const yearlyAdmissions = Array.isArray(d.yearlyAdmissions)
       ? d.yearlyAdmissions.map((y: any) => ({
           year: String(y?.year ?? ''),
-          admissions: this.asNumber(y?.admissions ?? y?.count)
+          admissions: this.asNumber(y?.confirmedAdmissions ?? y?.admissions ?? y?.count)
         }))
       : undefined;
 

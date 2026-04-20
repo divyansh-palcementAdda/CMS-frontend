@@ -142,7 +142,6 @@
                 @switch (currentTab()) {
                 @case ('students') {
                 <tr>
-                  <th class="checkbox-col"><input type="checkbox"></th>
                   <th>Student Name</th>
                   <th>Contact Info</th>
                   <th>Enrolled Course</th>
@@ -153,7 +152,6 @@
                 }
                 @case ('users') {
                 <tr>
-                  <th class="checkbox-col"><input type="checkbox"></th>
                   <th>Name</th>
                   <th>Role</th>
                   <th>Email</th>
@@ -163,7 +161,6 @@
                 }
                 @case ('courses') {
                 <tr>
-                  <th class="checkbox-col"><input type="checkbox"></th>
                   <th>Course Name</th>
                   <th>Course Type</th>
                   <th>Duration</th>
@@ -173,7 +170,6 @@
                 }
                 @case ('consultancies-users') {
                 <tr>
-                  <th class="checkbox-col"><input type="checkbox"></th>
                   <th>Consultancy Name</th>
                   <th>Location</th>
                   <th>Firm Name</th>
@@ -184,7 +180,6 @@
                 }
                 @case ('consultancies-courses') {
                 <tr>
-                  <th class="checkbox-col"><input type="checkbox"></th>
                   <th>Consultancy Name</th>
                   <th>Location</th>
                   <th>Firm Name</th>
@@ -196,9 +191,8 @@
                 }
               </thead>
               <tbody>
-                @for (item of data() | filter:searchText(); track item.id || item.email || $index) {
+                @for (item of paginatedData(); track item.id || item.email || $index) {
                 <tr>
-                  <td class="checkbox-col"><input type="checkbox"></td>
 
                   <!-- NAME COLUMN -->
                   <td>
@@ -265,12 +259,15 @@
                   <!-- ACTIONS -->
                   <td>
                     <div class="action-buttons">
-                      <button class="action-btn" title="View"><span
-                          class="material-symbols-outlined">visibility</span></button>
-                      <button class="action-btn map" (click)="openMappingModal(item)" title="Map"><span
-                          class="material-symbols-outlined">add_link</span></button>
-                      <button class="action-btn delete" title="Delete"><span
-                          class="material-symbols-outlined">delete</span></button>
+                      <button class="action-btn" title="View" (click)="onViewRecord(item)">
+                        <span class="material-symbols-outlined">visibility</span>
+                      </button>
+                      <button class="action-btn map" (click)="openMappingModal(item)" title="Map">
+                        <span class="material-symbols-outlined">add_link</span>
+                      </button>
+                      <button class="action-btn delete" title="Delete" (click)="onDeleteRecord(item)">
+                        <span class="material-symbols-outlined">delete</span>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -287,17 +284,34 @@
               </tbody>
             </table>
 
-            <!-- Pagination Mockup -->
+            <!-- Dynamic Pagination -->
             <footer class="table-footer">
-              <span class="showing-text">Showing {{ data().length }} records out of {{ data().length }} Records</span>
+              <span class="showing-text">
+                Showing {{ paginatedData().length }} records out of {{ filteredData().length }} Records
+              </span>
+              @if (totalPages() > 1) {
               <div class="pagination">
-                <button class="page-arrow"><span class="material-symbols-outlined">chevron_left</span></button>
-                <button class="page-num active">1</button>
-                <button class="page-num">2</button>
-                <button class="page-num">3</button>
-                <button class="page-num">4</button>
-                <button class="page-arrow"><span class="material-symbols-outlined">chevron_right</span></button>
+                <button class="page-arrow" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">
+                  <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                
+                @for (page of getPageNumbers(); track page) {
+                  @if (page !== '...') {
+                    <button class="page-num" 
+                            [class.active]="currentPage() === page"
+                            (click)="changePage(+$any(page))">
+                      {{ page }}
+                    </button>
+                  } @else {
+                    <span class="pagination-dots">...</span>
+                  }
+                }
+
+                <button class="page-arrow" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">
+                  <span class="material-symbols-outlined">chevron_right</span>
+                </button>
               </div>
+              }
             </footer>
           </div>
         </div>
