@@ -684,6 +684,7 @@
       &.red-header tr { background: #EF4444; }
       &.green-header tr { background: #10B981; }
       &.orange-header tr { background: #F59E0B; }
+      &.purple-header tr { background: #8B5CF6; }
     }
 
     tbody tr {
@@ -774,7 +775,7 @@
   gap: 8px;
 
   .nav-btn {
-    width: 32px;
+    padding: 6px 12px;
     height: 32px;
     display: flex;
     align-items: center;
@@ -783,45 +784,41 @@
     cursor: pointer;
     background: white;
     border: 1px solid #E2E8F0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
     transition: all 0.2s;
 
-    &:hover:not(.disabled) {
+    &:hover:not(:disabled) {
       background: #F1F5F9;
+      border-color: #CBD5E1;
+      color: #1E293B;
     }
 
-    &.disabled {
+    &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      background: #F8FAFC;
     }
   }
 
-  .page-link {
-    font-size: 14px;
+  .page-info {
+    font-size: 13px;
     font-weight: 600;
     color: #64748B;
-    padding: 0 12px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    cursor: pointer;
-
-    &.active {
-      background: #6366F1;
-      color: white;
-    }
+    padding: 0 8px;
   }
 }
 
 .empty-state {
   text-align: center;
-  padding: 48px;
+  padding: 48px !important;
   color: #94A3B8;
   font-style: italic;
 }
 
 .mb-32 { margin-bottom: 32px; }
+
 
 @media (max-width: 768px) {
   .info-fields-grid {

@@ -40,8 +40,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   selectedUser: UserItem | null = null;
   showBulkUploadModal = false;
 
+  // Filtering & Sorting
+  currentFilter: 'ALL' | 'ACTIVE' | 'INACTIVE' | 'ADMIN' = 'ALL';
+  sortOrder: 'asc' | 'desc' | 'none' = 'asc';
+
   constructor(
-    public userService: UserService, 
+    public userService: UserService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
@@ -57,12 +61,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  fetchFilteredData(status: string) {
+  fetchFilteredData(status: string | null) {
     this.loading = true;
-    this.sub = this.userService.getUsersByStatus(status).subscribe(data => {
+    const filterStatus = status ? status.toUpperCase() : 'ALL';
+    
+    // Convert status to internal filter type
+    if (filterStatus === 'ACTIVE') this.currentFilter = 'ACTIVE';
+    else if (filterStatus === 'INACTIVE') this.currentFilter = 'INACTIVE';
+    else this.currentFilter = 'ALL';
+
+    this.sub = this.userService.getUsersData().subscribe(data => {
       this.pageData = data;
-      this.filteredUsers = data.users;
-      this.calculatePagination();
+      this.applyFiltersAndSort();
       this.loading = false;
     });
   }
@@ -71,10 +81,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   onEdit(id: number) {
-    this.router.navigate([], { fragment: 'edit' });
+    this.selectedUser = this.pageData?.users.find(u => u.id === id) || null;
+    this.showAddModal = true;
   }
 
   onAddUser() {
+    this.selectedUser = null;
     this.showAddModal = true;
   }
 
@@ -117,26 +129,72 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.sub = this.userService.getUsersData().subscribe(data => {
       this.pageData = data;
-      this.filteredUsers = data.users;
-      this.calculatePagination();
+      this.applyFiltersAndSort();
       this.loading = false;
     });
-    console.log(this.pageData);
+  }
+
+  setFilter(filter: 'ALL' | 'ACTIVE' | 'INACTIVE' | 'ADMIN') {
+    this.currentFilter = filter;
+    this.currentPage = 1;
+    this.applyFiltersAndSort();
+  }
+
+  toggleSort() {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.applyFiltersAndSort();
   }
 
   onSearchChange() {
+    this.currentPage = 1;
+    this.applyFiltersAndSort();
+  }
+
+  applyFiltersAndSort() {
     if (!this.pageData) return;
+
+    let users = [...this.pageData.users];
+
+    // 1. Search Filter
     const term = this.searchTerm.toLowerCase().trim();
-    if (!term) {
-      this.filteredUsers = this.pageData.users;
-    } else {
-      this.filteredUsers = this.pageData.users.filter(u =>
+    if (term) {
+      users = users.filter(u =>
         (u.fullName || '').toLowerCase().includes(term) ||
         (u.email || '').toLowerCase().includes(term) ||
-        ((u.role as string) || '').toLowerCase().includes(term)
+        (u.role || '').toLowerCase().includes(term)
       );
     }
-    this.currentPage = 1;
+
+    // 2. Status/Admin Filter
+    if (this.currentFilter === 'ACTIVE') {
+      users = users.filter(u => u.status === 'Active');
+    } else if (this.currentFilter === 'INACTIVE') {
+      users = users.filter(u => u.status === 'Inactive');
+    } else if (this.currentFilter === 'ADMIN') {
+      users = users.filter(u => 
+        (u.role || '').toUpperCase().includes('ADMIN') || 
+        u.roles?.some(r => r.name.toUpperCase().includes('ADMIN'))
+      );
+    }
+
+    // 3. Sorting (Admins on top ALWAYS, then by name)
+    users.sort((a, b) => {
+      const aIsAdmin = (a.role || '').toUpperCase().includes('ADMIN') || a.roles?.some(r => r.name.toUpperCase().includes('ADMIN'));
+      const bIsAdmin = (b.role || '').toUpperCase().includes('ADMIN') || b.roles?.some(r => r.name.toUpperCase().includes('ADMIN'));
+
+      if (aIsAdmin && !bIsAdmin) return -1;
+      if (!aIsAdmin && bIsAdmin) return 1;
+
+      // Same category, sort by name
+      const nameA = (a.fullName || '').toLowerCase();
+      const nameB = (b.fullName || '').toLowerCase();
+      
+      if (this.sortOrder === 'asc') return nameA.localeCompare(nameB);
+      if (this.sortOrder === 'desc') return nameB.localeCompare(nameA);
+      return 0;
+    });
+
+    this.filteredUsers = users;
     this.calculatePagination();
   }
 
@@ -148,23 +206,40 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.paginatedUsers = this.filteredUsers.slice(startIndex, startIndex + this.pageSize);
   }
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
+  goToPage(page: number | string) {
+    if (typeof page === 'number' && page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.calculatePagination();
     }
   }
 
-  getPagesArray(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      pages.push(i);
+  getPaginationRange(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: (number | string)[] = [];
+    const delta = 1; // Number of pages around current
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) range.push(i);
+      return range;
     }
-    return pages;
+
+    range.push(1);
+    if (current > delta + 2) range.push('...');
+
+    const start = Math.max(2, current - delta);
+    const end = Math.min(total - 1, current + delta);
+
+    for (let i = start; i <= end; i++) range.push(i);
+
+    if (current < total - delta - 1) range.push('...');
+    range.push(total);
+
+    return range;
   }
 
   getRoleClass(roleStr: string | undefined): string {
-    if (!roleStr) return 'student';
+    if (!roleStr) return 'NA';
     // Use the first role for styling if there are multiple
     const firstRole = roleStr.split(',')[0].trim().toLowerCase();
     // Replace spaces with dashes

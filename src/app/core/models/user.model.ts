@@ -1,6 +1,7 @@
 export interface UserRole {
   roleId: number;
   name: string;
+  rawName?: string; // Original backend name for forms
 }
 
 export interface UserConsultancy {
@@ -33,9 +34,13 @@ export interface UserItem {
   // Stats from Figma
   directAdmissions?: number;
   viaConsultancy?: number;
-  totalAdmissions?: number;
-
   consultancies?: UserConsultancy[];
+  
+  // Flattened stats for table display
+  totalAdmissions?: number;
+  totalApplications?: number;
+  cancelledAdmissions?: number;
+  cancelledApplications?: number;
 
   // Dynamic stats from backend
   admissionStats?: {
@@ -80,6 +85,10 @@ export interface UserAdmissionDetail {
   admissionDate: string;
   commissionAmount: number;
   commissionStatus: string;
+  // New fields for filtering
+  isScholler?: any;
+  source?: any;
+  totalFeesPaid?: number;
 }
 
 export interface UserDetail {

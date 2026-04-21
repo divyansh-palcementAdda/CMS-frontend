@@ -221,9 +221,23 @@
                   }
                   @case ('users') {
                   <td>
-                    <span class="role-badge" [ngClass]="getRoleClass(item.roles || 'User')">
-                      {{ item.roles || 'User' }}
-                    </span>
+                    <div class="roles-container" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      @for (role of item.roles; track role.roleId) {
+                        <span class="role-badge" [ngClass]="getRoleClass(role.name)">
+                          {{ role.name }}
+                        </span>
+                      }
+                      @if ((!item.roles || item.roles.length === 0) && item.role) {
+                        <span class="role-badge" [ngClass]="getRoleClass(item.role)">
+                          {{ item.role }}
+                        </span>
+                      }
+                      @if ((!item.roles || item.roles.length === 0) && !item.role) {
+                        <span class="role-badge" [ngClass]="getRoleClass('User')">
+                          User
+                        </span>
+                      }
+                    </div>
                   </td>
                   <td>{{ item.email }}</td>
                   }

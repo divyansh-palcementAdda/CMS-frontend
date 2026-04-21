@@ -13,11 +13,12 @@ import { AdmissionService } from '../../core/services/admission.service';
 import { AdmissionItem } from '../../core/models/admission.model';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AddUserModalComponent } from '../user-management/components/add-user-modal/add-user-modal.component';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent],
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss']
 })
@@ -26,12 +27,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   loading = true;
   user: UserItem | null = null;
   userDetail: UserDetail | null = null;
-
+  showAddModal = false;
   // Categorized Student Lists
   totalApplications = signal<UserAdmissionDetail[]>([]);
-  totalAdmissionsSignal = signal<UserAdmissionDetail[]>([]); // Renamed to avoid numbering conflict
+  totalAdmissionsSignal = signal<UserAdmissionDetail[]>([]);
   cancelledApplications = signal<UserAdmissionDetail[]>([]);
   cancelledAdmissions = signal<UserAdmissionDetail[]>([]);
+  masterList = signal<UserAdmissionDetail[]>([]); // All admissions + applications
 
   // Search & Pagination States
   totalAppSearch = '';
@@ -50,6 +52,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   cancelledAdmPage = 1;
   cancelledAdmPageSize = 5;
 
+  masterSearch = '';
+  masterPage = 1;
+  masterPageSize = 5;
+
+  consPage = 1;
+  consPageSize = 5;
+
   private destroy$ = new Subject<void>();
 
   // Actions
@@ -59,8 +68,14 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   // Filters
   consultancyStatusFilter: string | null = null;
-  admissionScholarFilter: boolean | null = null;
-  admissionNoConsultancyFilter: boolean | null = null;
+
+  // Admission Filters
+  admFilterSource: string | null = null;
+  admFilterScholar: boolean | null = null;
+
+  // Application Filters
+  appFilterSource: string | null = null;
+  appFilterScholar: boolean | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -86,14 +101,21 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: UserDetail) => {
-          console.log("user detail data", data);
           this.userDetail = data;
           this.user = data.basicInfo;
-
           this.totalApplications.set(data.totalApplications || []);
           this.totalAdmissionsSignal.set(data.totalAdmissions || []);
           this.cancelledApplications.set(data.cancelledApplications || []);
           this.cancelledAdmissions.set(data.cancelledAdmissions || []);
+
+          // Combine for master list
+          const all = [
+            ...(data.totalApplications || []),
+            ...(data.totalAdmissions || []),
+            ...(data.cancelledApplications || []),
+            ...(data.cancelledAdmissions || [])
+          ];
+          this.masterList.set(all);
 
           this.loading = false;
         },
@@ -115,10 +137,20 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   // Pagination & Filtering Getters
   get filteredTotalApplications() {
     const search = this.totalAppSearch.toLowerCase();
-    return this.totalApplications().filter(item =>
-      item.studentName.toLowerCase().includes(search) ||
-      item.courseName.toLowerCase().includes(search)
-    );
+    return this.totalApplications().filter(item => {
+      const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
+
+      const itemSource = (item.source || '').toLowerCase();
+      const matchesSource = !this.appFilterSource || itemSource === this.appFilterSource.toLowerCase();
+
+      const isScholarItem = item.isScholler === true || item.isScholler === 'true' || item.isScholler === 1 || item.isScholler === 'YES';
+      const matchesScholar = this.appFilterScholar === null || (isScholarItem === this.appFilterScholar);
+
+      // Strict fee check: Application must have totalFeesPaid == 0
+      const matchesFee = (item.totalFeesPaid || 0) === 0;
+
+      return matchesSearch && matchesSource && matchesScholar && matchesFee;
+    });
   }
   get paginatedTotalApplications() {
     const start = (this.totalAppPage - 1) * this.totalAppPageSize;
@@ -139,10 +171,22 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   get filteredTotalAdmissions() {
     const search = this.totalAdmSearch.toLowerCase();
-    return this.totalAdmissionsSignal().filter(item =>
-      item.studentName.toLowerCase().includes(search) ||
-      item.courseName.toLowerCase().includes(search)
-    );
+    return this.totalAdmissionsSignal().filter(item => {
+      const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
+
+      // Robust source matching
+      const itemSource = (item.source || '').toLowerCase();
+      const matchesSource = !this.admFilterSource || itemSource === this.admFilterSource.toLowerCase();
+
+      // Robust scholar matching (handle boolean, string "true"/"false", or 1/0)
+      const isScholarItem = item.isScholler === true || item.isScholler === 'true' || item.isScholler === 1 || item.isScholler === 'YES';
+      const matchesScholar = this.admFilterScholar === null || (isScholarItem === this.admFilterScholar);
+
+      // Strict fee check: Admission must have totalFeesPaid > 0
+      const matchesFee = (item.totalFeesPaid || 0) > 0;
+
+      return matchesSearch && matchesSource && matchesScholar && matchesFee;
+    });
   }
   get paginatedTotalAdmissions() {
     const start = (this.totalAdmPage - 1) * this.totalAdmPageSize;
@@ -161,6 +205,23 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     return this.filteredCancelledAdmissions.slice(start, start + this.cancelledAdmPageSize);
   }
 
+  get filteredMasterList() {
+    const search = this.masterSearch.toLowerCase();
+    return this.masterList().filter(item =>
+      item.studentName.toLowerCase().includes(search) ||
+      item.courseName.toLowerCase().includes(search)
+    );
+  }
+  get paginatedMasterList() {
+    const start = (this.masterPage - 1) * this.masterPageSize;
+    return this.filteredMasterList.slice(start, start + this.masterPageSize);
+  }
+
+  get paginatedConsultancies() {
+    const start = (this.consPage - 1) * this.consPageSize;
+    return this.filteredConsultancies.slice(start, start + this.consPageSize);
+  }
+
   getTotalPages(count: number, size: number) {
     return Math.ceil(count / size) || 1;
   }
@@ -170,8 +231,16 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     if (type === 'cancelledApp') this.cancelledAppPage += delta;
     if (type === 'totalAdm') this.totalAdmPage += delta;
     if (type === 'cancelledAdm') this.cancelledAdmPage += delta;
+    if (type === 'master') this.masterPage += delta;
+    if (type === 'cons') this.consPage += delta;
   }
-
+  getRoleClass(roleStr: string | undefined): string {
+    if (!roleStr) return 'NA';
+    // Use the first role for styling if there are multiple
+    const firstRole = roleStr.split(',')[0].trim().toLowerCase();
+    // Replace spaces with dashes
+    return firstRole.replace(/\s+/g, '-');
+  }
   get filteredConsultancies() {
     if (!this.user || !this.user.consultancies) return [];
     if (!this.consultancyStatusFilter) return this.user.consultancies;
@@ -187,12 +256,47 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
 
   onStatClick(stat: string) {
-    if (stat === 'active' || stat === 'inactive' || stat === 'dormant' || stat === 'total_cons') {
-      const statusMap: any = { active: 'ACTIVE', inactive: 'INACTIVE', dormant: 'DORMANT' };
+    // Reset filters
+    this.clearAdmissionFilter();
+    this.clearApplicationFilter();
+    this.clearConsultancyFilter();
+
+    const statusMap: any = {
+      active: 'ACTIVE',
+      inactive: 'INACTIVE',
+      dormant: 'DORMANT'
+    };
+
+    if (statusMap[stat] || stat === 'total_cons') {
       this.consultancyStatusFilter = statusMap[stat] || null;
       this.scrollToTable('consultancy-ownership');
-    } else if (stat === 'scholar') {
+    }
+    else if (stat === 'total_all') {
+      this.scrollToTable('master-table');
+    }
+    else if (stat === 'scholar_adm') {
+      this.admFilterScholar = true;
       this.scrollToTable('total-adms');
+    }
+    else if (stat === 'direct_adm') {
+      this.admFilterSource = 'USER';
+      this.scrollToTable('total-adms');
+    }
+    else if (stat === 'cons_adm') {
+      this.admFilterSource = 'CONSULTANCY';
+      this.scrollToTable('total-adms');
+    }
+    else if (stat === 'scholar_app') {
+      this.appFilterScholar = true;
+      this.scrollToTable('total-apps');
+    }
+    else if (stat === 'direct_app') {
+      this.appFilterSource = 'USER';
+      this.scrollToTable('total-apps');
+    }
+    else if (stat === 'cons_app') {
+      this.appFilterSource = 'CONSULTANCY';
+      this.scrollToTable('total-apps');
     }
   }
 
@@ -200,9 +304,14 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     this.consultancyStatusFilter = null;
   }
 
+  clearApplicationFilter() {
+    this.appFilterSource = null;
+    this.appFilterScholar = null;
+  }
+
   clearAdmissionFilter() {
-    this.admissionScholarFilter = null;
-    this.admissionNoConsultancyFilter = false;
+    this.admFilterSource = null;
+    this.admFilterScholar = null;
   }
 
   onViewAdmission(id: number | undefined) {
@@ -223,7 +332,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
 
   onEdit() {
-    this.router.navigate([], { fragment: 'edit' });
+    this.showAddModal = true;
   }
 
   onDelete() {

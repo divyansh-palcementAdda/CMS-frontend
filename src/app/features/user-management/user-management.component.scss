@@ -61,6 +61,13 @@ $text-light: #64748B;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
       }
 
+      &.active-filter {
+        border-color: #6366F1;
+        background: #EEF2FF;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
+      }
+
       .stat-info {
         .stat-label {
           font-size: 14px;
@@ -87,7 +94,7 @@ $text-light: #64748B;
         &.purple-filled {
           background: #EEF2FF;
           color: #6366F1;
-          
+
           svg {
             fill: #6366F1;
           }
@@ -168,9 +175,41 @@ $text-light: #64748B;
               color: $text-dark;
               border-bottom: 1px solid $card-border;
               vertical-align: middle;
+              cursor: pointer;
 
-              &.text-center {
+              &.user-counts {
                 text-align: center !important;
+                font-weight: 700;
+                font-size: 14px;
+              }
+
+              &:nth-child(3) {
+                // Total Admissions
+                color: #10B981;
+                // background-color: #9effa3;
+
+
+              }
+
+              &:nth-child(4) {
+                // Total Applications
+                color: #3B82F6;
+                // background-color: #435FFF;
+
+              }
+
+              &:nth-child(5) {
+                // Cancelled Admissions
+                color: #F97316;
+                // background-color: #435FFF;
+
+              }
+
+              &:nth-child(6) {
+                // Cancelled Applications
+                color: #EF4444;
+                // background-color: #435FFF;
+
               }
 
               .status-pill {
@@ -179,7 +218,7 @@ $text-light: #64748B;
                 border-radius: 4px;
                 font-size: 12px;
                 font-weight: 500;
-                
+
                 &.active {
                   background: #D1FAE5;
                   color: #059669;
@@ -199,8 +238,15 @@ $text-light: #64748B;
                 background: #F1F5F9;
                 color: #475569;
 
-                &.admin { background: #FDF4FF; color: #C026D3; }
-                &.manager { background: #EEF2FF; color: #6366F1; }
+                &.admin {
+                  background: #FDF4FF;
+                  color: #C026D3;
+                }
+
+                &.representative {
+                  background: #EEF2FF;
+                  color: #6366F1;
+                }
               }
             }
           }

@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="modal-header">
       <div class="header-title">
-        <i class="fas fa-user-plus icon-title"></i>
-        <span>Add New User</span>
+        <i class="fas" [ngClass]="userId ? 'fa-user-edit' : 'fa-user-plus'"></i>
+        <span>{{ userId ? 'Edit User' : 'Add New User' }}</span>
       </div>
       <button class="btn-close" (click)="onClose()">
         <i class="fas fa-times"></i>
@@ -36,12 +36,12 @@
             </div>
 
             <div class="form-group">
-              <label>Password <span class="req">*</span></label>
+              <label>Password <span class="req" *ngIf="!userId">*</span></label>
               <div class="input-with-icon">
                 <input 
                   [type]="passwordVisible ? 'text' : 'password'" 
                   formControlName="password" 
-                  placeholder="Enter password"
+                  [placeholder]="userId ? 'Leave blank to keep unchanged' : 'Enter password'" 
                   [class.error]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
                 >
                 <button type="button" class="icon-btn" (click)="togglePassword()">
@@ -66,6 +66,7 @@
                   [class.error]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
                 >
                 <button 
+                  *ngIf="!userId || isEmailChanged"
                   type="button" 
                   class="btn-otp" 
                   (click)="sendOtp()" 
@@ -141,7 +142,7 @@
             <button type="button" class="btn-cancel" (click)="onClose()">Cancel</button>
             <button type="submit" class="btn-submit" [disabled]="isSubmitting">
               <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
-              {{ isSubmitting ? 'Submitting...' : 'Create User' }}
+              {{ isSubmitting ? 'Submitting...' : (userId ? 'Update User' : 'Create User') }}
             </button>
           </div>
         </form>
@@ -174,7 +175,7 @@
       <div class="otp-actions">
         <button class="btn-verify" (click)="confirmCreateUser()" [disabled]="isVerifyingOtp">
           <i class="fas fa-spinner fa-spin" *ngIf="isVerifyingOtp"></i>
-          {{ isVerifyingOtp ? 'Verifying...' : 'Verify & Create User' }}
+          {{ isVerifyingOtp ? 'Verifying...' : (userId ? 'Verify & Update' : 'Verify & Create') }}
         </button>
         <button class="btn-cancel-otp" (click)="showOtpModal = false" [disabled]="isVerifyingOtp">
           Cancel

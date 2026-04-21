@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../../../core/services/user.service';
@@ -16,9 +16,13 @@ export class AddUserModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
 
+  @Input() userId: number | null = null;
+  @Input() userToEdit: any | null = null;
   userForm: FormGroup;
   isSubmitting = false;
   roles: any[] = [];
+  originalEmail: string = '';
+  isEmailChanged = false;
   
   // New UI states
   passwordVisible = false;
@@ -67,7 +71,54 @@ export class AddUserModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('AddUserModal initialized. UserId:', this.userId, 'UserToEdit:', this.userToEdit);
     this.loadRoles();
+    
+    if (this.userToEdit) {
+      this.userId = this.userToEdit.id;
+      this.patchFormData(this.userToEdit);
+    } else if (this.userId) {
+      this.loadUserData(this.userId);
+    }
+
+    // Monitor email changes
+    this.userForm.get('email')?.valueChanges.subscribe(value => {
+      if (this.userId) {
+        this.isEmailChanged = value !== this.originalEmail;
+      }
+    });
+  }
+
+  patchFormData(user: any): void {
+    console.log('Patching form with data:', user);
+    this.originalEmail = user.email;
+    // Map roles objects to raw names for checkbox matching
+    const roleNames = user.roles?.map((r: any) => r.rawName || r.name) || [];
+    
+    this.userForm.patchValue({
+      username: user.username,
+      email: user.email,
+      fullName: user.fullName,
+      mobile: user.mobile,
+      roles: roleNames
+    });
+
+    // Make password optional for edit mode
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.get('password')?.updateValueAndValidity();
+    
+    // Ensure form state is updated
+    this.userForm.markAsPristine();
+  }
+
+  loadUserData(id: number): void {
+    console.log('Fetching data for user:', id);
+    this.userService.getUserById(id).subscribe({
+      next: (user) => {
+        this.patchFormData(user);
+      },
+      error: (err) => console.error('Error loading user data', err)
+    });
   }
 
   loadRoles(): void {
@@ -141,15 +192,53 @@ export class AddUserModalComponent implements OnInit {
       return;
     }
     
-    // Open OTP Verification Modal
-    this.showOtpModal = true;
-    this.otpError = '';
-    this.otpCode = '';
+    // Check if we need OTP:
+    // 1. New user registration
+    // 2. Existing user changing their email
+    const needsOtp = !this.userId || this.isEmailChanged;
+
+    if (needsOtp) {
+      this.showOtpModal = true;
+      this.otpError = '';
+      this.otpCode = '';
+    } else {
+      this.confirmUpdateUser();
+    }
+  }
+
+  confirmUpdateUser(otp?: string): void {
+    this.isSubmitting = true;
+    const updateData = { ...this.userForm.value };
+    if (otp) updateData.otp = otp;
+
+    this.userService.updateUser(this.userId!, updateData)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: () => {
+          this.showOtpModal = false;
+          this.success.emit();
+          this.onClose();
+        },
+        error: (err) => {
+          console.error('Error updating user', err);
+          if (err.status === 400 && err.error?.errors) {
+            this.backendErrors = err.error.errors;
+            this.showOtpModal = false;
+          } else {
+            this.otpError = err.error?.message || 'Update failed';
+          }
+        }
+      });
   }
 
   confirmCreateUser(): void {
     if (!this.otpCode || this.otpCode.length !== 6) {
       this.otpError = 'Please enter a valid 6-digit OTP';
+      return;
+    }
+
+    if (this.userId && this.isEmailChanged) {
+      this.confirmUpdateUser(this.otpCode);
       return;
     }
 
