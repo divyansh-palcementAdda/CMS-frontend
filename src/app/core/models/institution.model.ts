@@ -6,6 +6,11 @@ export interface InstitutionItem {
   students: number;
   status: 'Active' | 'Inactive';
   course: string;
+  deleted: boolean;
+  totalAdmissions?: number;
+  totalApplications?: number;
+  cancelledAdmissions?: number;
+  cancelledApplications?: number;
 }
 
 export interface InstitutionStats {
@@ -46,6 +51,16 @@ export interface InstitutionDetail {
     totalStudents: number;
     totalConsultancies: number;
     status: string;
+    totalAdmissions: number;
+    totalApplications: number;
+    cancelledAdmissions: number;
+    cancelledApplications: number;
+    scholarAdmissions?: number;
+    scholarApplications?: number;
+    directAdmissions?: number;
+    directApplications?: number;
+    consAdmissions?: number;
+    consApplications?: number;
   };
   enrollmentTrends: Array<{
     label: string;
@@ -93,6 +108,10 @@ export interface InstitutionDetail {
     label: string;
     value: number;
   }>;
+  totalApplications: any[];
+  totalAdmissions: any[];
+  cancelledApplications: any[];
+  cancelledAdmissions: any[];
 }
 
 export interface CreateInstitutionDTO {

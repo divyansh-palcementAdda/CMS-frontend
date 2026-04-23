@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import { BulkUploadResponse } from '../../../../core/models/course.model';
 export class AddCourseModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
+  @Input() editId: number | null = null;
 
   activeTab: 'single' | 'bulk' = 'single';
   
@@ -47,6 +48,10 @@ export class AddCourseModalComponent implements OnInit {
   ngOnInit() {
     this.loadCourseTypes();
     this.loadInstitutions();
+    
+    if (this.editId) {
+      this.loadCourseForEdit();
+    }
   }
 
   initForm() {
@@ -57,7 +62,25 @@ export class AddCourseModalComponent implements OnInit {
       duration: [null, [Validators.required]],
       fees: [null, [Validators.required, Validators.min(0)]],
       courseTypeId: [null, [Validators.required]],
-      institutionIds: [[]]
+      institutionIds: [[]],
+      consultancyIds: [[]]
+    });
+  }
+
+  loadCourseForEdit() {
+    if (!this.editId) return;
+    this.courseService.getCourseById(this.editId).subscribe(course => {
+      if (course) {
+        this.courseForm.patchValue({
+          name: course.name,
+          isOnline: !!course.isOnline,
+          active: !!course.active,
+          duration: course.duration,
+          fees: course.fees,
+          courseTypeId: course.courseTypeId,
+          institutionIds: course.institutionIds || []
+        });
+      }
     });
   }
 
@@ -81,6 +104,7 @@ export class AddCourseModalComponent implements OnInit {
   }
 
   switchTab(tab: 'single' | 'bulk') {
+    if (this.editId && tab === 'bulk') return; // Prevent bulk in edit mode
     this.activeTab = tab;
     this.bulkUploadResult = null;
     this.selectedFile = null;
@@ -127,17 +151,31 @@ export class AddCourseModalComponent implements OnInit {
       courseTypeId: Number(this.courseForm.value.courseTypeId)
     };
 
-    this.courseService.createCourse(payload).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.success.emit();
-        this.onClose();
-      },
-      error: (err) => {
-        console.error('Failed to create course', err);
-        this.isSubmitting = false;
-      }
-    });
+    if (this.editId) {
+      this.courseService.updateCourse(this.editId, payload).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.success.emit();
+          this.onClose();
+        },
+        error: (err) => {
+          console.error('Failed to update course', err);
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      this.courseService.createCourse(payload).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.success.emit();
+          this.onClose();
+        },
+        error: (err) => {
+          console.error('Failed to create course', err);
+          this.isSubmitting = false;
+        }
+      });
+    }
   }
 
   // --- Bulk Flow ---

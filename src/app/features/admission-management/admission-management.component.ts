@@ -101,6 +101,12 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       };
       this.currentPage = 1;
       this.fetchData();
+
+      // Check for incoming edit request
+      const editId = params['id'];
+      if (editId && this.route.snapshot.fragment === 'edit') {
+        this.onEdit(+editId);
+      }
     });
 
     // Debounced search

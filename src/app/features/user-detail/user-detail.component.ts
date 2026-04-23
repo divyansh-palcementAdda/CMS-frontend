@@ -316,12 +316,12 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   onViewAdmission(id: number | undefined) {
     if (!id) return;
-    this.router.navigate(['/admission-management', id]);
+    this.router.navigate(['/admissions', id]);
   }
 
   onEditAdmission(id: number | undefined) {
     if (!id) return;
-    this.router.navigate(['/admission-management'], { fragment: 'edit', queryParams: { id } });
+    this.router.navigate(['/admin/admission-management'], { fragment: 'edit', queryParams: { id } });
   }
 
   onDeleteAdmission(id: number | undefined) {
@@ -343,12 +343,12 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   onViewConsultancy(id: number | undefined) {
     if (!id) return;
-    this.router.navigate(['/consultancy-management', id]);
+    this.router.navigate(['/consultancy', id]);
   }
 
   onEditConsultancy(id: number | undefined) {
     if (!id) return;
-    this.router.navigate(['/consultancy-management'], { fragment: 'edit' });
+    this.router.navigate(['/consultancy'], { fragment: 'edit', queryParams: { id } });
   }
 
   onDeleteConsultancy(consultancy: any) {

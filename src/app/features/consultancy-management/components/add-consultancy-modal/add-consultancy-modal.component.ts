@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConsultancyService } from '../../../../core/services/consultancy.service';
@@ -11,10 +11,12 @@ import { ConsultancyService } from '../../../../core/services/consultancy.servic
   styleUrls: ['./add-consultancy-modal.component.scss']
 })
 export class AddConsultancyModalComponent implements OnInit {
+  @Input() consultancyId: number | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
 
   activeTab: 'single' | 'bulk' = 'single';
+  isLoading = false;
 
   // Single Form State
   consultancyForm!: FormGroup;
@@ -49,6 +51,43 @@ export class AddConsultancyModalComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.fetchDropdownData();
+    if (this.consultancyId) {
+      this.loadConsultancyData();
+      this.activeTab = 'single';
+    }
+  }
+
+  private loadConsultancyData(): void {
+    if (!this.consultancyId) return;
+    this.isLoading = true;
+    this.consultancyService.getConsultancyById(this.consultancyId).subscribe({
+      next: (data: any) => {
+        const basicInfo = data.basicInfo || data;
+        this.consultancyForm.patchValue({
+          name: basicInfo.name,
+          email: basicInfo.email,
+          pan: basicInfo.pan,
+          mobile: basicInfo.mobile,
+          alternateNo: basicInfo.alternateNo,
+          whatsappNo: basicInfo.whatsappNo,
+          city: basicInfo.city,
+          state: basicInfo.state,
+          address: basicInfo.address,
+          institutionOrFirmName: basicInfo.institutionOrFirmName,
+          commissionPercentage: basicInfo.commissionPercentage,
+          status: basicInfo.status || 'ACTIVE',
+          courseIds: data.courses?.map((c: any) => c.id) || [],
+          institutionIds: data.institutionsOverview?.map((i: any) => i.id) || [],
+          representativeIds: data.representatives?.map((r: any) => r.id) || [],
+          years: data.yearlyAdmissions?.map((y: any) => y.year) || []
+        });
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading consultancy data', err);
+        this.isLoading = false;
+      }
+    });
   }
 
   private initForm(): void {
@@ -229,7 +268,11 @@ export class AddConsultancyModalComponent implements OnInit {
     delete payload.sameAsMobileAlt; // cleanup non-backend field
     delete payload.sameAsMobileWa;
 
-    this.consultancyService.createConsultancy(payload).subscribe({
+    const request = this.consultancyId 
+      ? this.consultancyService.updateConsultancy(this.consultancyId, payload)
+      : this.consultancyService.createConsultancy(payload);
+
+    request.subscribe({
       next: () => {
         this.isSubmitting = false;
         this.success.emit();
@@ -237,7 +280,7 @@ export class AddConsultancyModalComponent implements OnInit {
       error: (err) => {
         this.isSubmitting = false;
         console.error(err);
-        alert('Failed to create consultancy. ' + (err.error?.message || 'Check inputs.'));
+        alert(`Failed to ${this.consultancyId ? 'update' : 'create'} consultancy. ` + (err.error?.message || 'Check inputs.'));
       }
     });
   }

@@ -1,18 +1,69 @@
 .topbar {
-  height: 52px;
+  height: 64px;
   background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   padding: 0 24px;
   flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  position: relative; // Required for absolute centering of desktop logo
+}
+
+.topbar-left-desktop {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none; // Allow clicks through to background if needed
+
+  .desktop-logo-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  .desktop-logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    background: linear-gradient(135deg, #7c3aed, #435fff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+}
+
+.topbar-left-mobile {
+  display: none;
+  align-items: center;
+  gap: 10px;
+
+  .mobile-logo-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  .mobile-logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    background: linear-gradient(135deg, #7c3aed, #435fff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .role-chips {
@@ -21,44 +72,78 @@
 }
 
 .role-chip {
-  padding: 4px 14px;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border-radius: 10px;
   font-size: 12px;
-  font-weight: 500;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
+  font-weight: 600;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
   cursor: pointer;
   transition: all 0.2s;
 
+  &:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
   &.active {
-    background: #7c3aed;
+    background: linear-gradient(135deg, #7c3aed, #435fff);
     color: white;
-    border-color: #7c3aed;
+    border: none;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
   }
 }
 
 .avatar-wrap {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 12px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f8fafc;
+  }
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c3aed, #435fff);
   color: white;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.15);
 }
 
 .avatar-caret {
-  font-size: 11px;
-  color: #6b7280;
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  .topbar-left-mobile {
+    display: flex;
+  }
+
+  .topbar-left-desktop {
+    display: none;
+  }
+
+  .role-chips {
+    display: none;
+  }
 }

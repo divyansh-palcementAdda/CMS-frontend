@@ -194,6 +194,62 @@ $text-light: #64748B;
         }
       }
     }
+
+    .pagination-section {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid $card-border;
+
+      .showing-text {
+        font-size: 14px;
+        color: $text-light;
+        font-weight: 500;
+      }
+
+      .pagination-controls {
+        display: flex;
+        gap: 8px;
+
+        .page-btn {
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+          border: 1px solid $card-border;
+          background: white;
+          color: $text-dark;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover:not(:disabled) {
+            border-color: $primary;
+            color: $primary;
+            background: $primary-light;
+          }
+
+          &.active {
+            background: $primary;
+            color: white;
+            border-color: $primary;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+          }
+
+          &.nav-btn {
+            color: $text-light;
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
   }
 }
 

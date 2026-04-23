@@ -218,6 +218,50 @@
           </div>
         }
 
+        <!-- Stage 4: Consultancy Setup (Optional course/institution sync) -->
+        @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY' && mappingForm.get('consultancyId')?.value) {
+          <div class="mm-stage animate-in">
+            <p class="mm-stage__label">
+              <span class="material-symbols-outlined">settings_suggest</span>
+              Partner Setup
+              <span class="mm-stage__badge info">Sync Relationships</span>
+            </p>
+            <div class="mm-partner-setup">
+              <div class="mm-partner-field">
+                <label>Authorized Courses</label>
+                <div class="mm-partner-chips">
+                  @for (id of selectedCourseArray; track id) {
+                    <div class="mm-partner-chip">
+                      <span>{{ getCourseName(id) }}</span>
+                      <button (click)="removeCourse(id)"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                  }
+                  <button class="mm-add-btn" (click)="loadDropdowns(); type = 'consultancies-courses'; currentStep = 1">
+                    <span class="material-symbols-outlined">add</span>
+                    Manage
+                  </button>
+                </div>
+              </div>
+              
+              <div class="mm-partner-field">
+                <label>Linked Institutions</label>
+                <div class="mm-partner-chips">
+                  @for (id of selectedInstitutionArray; track id) {
+                    <div class="mm-partner-chip inst">
+                      <span>{{ getInstName(id) }}</span>
+                      <button (click)="removeInstitution(id)"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+            <p class="mm-hint">
+              <span class="material-symbols-outlined">info</span>
+              The consultancy will be marked as <strong>ACTIVE</strong> upon mapping.
+            </p>
+          </div>
+        }
+
         <!-- Stage 4: Scholar / Discount (after rep selected) -->
         @if (mappingForm.get('admittedByUserId')?.value) {
           <div class="mm-stage animate-in">

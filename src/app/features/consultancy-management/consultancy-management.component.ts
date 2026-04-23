@@ -34,6 +34,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   selectedConsultancy: ConsultancyItem | null = null;
   showBulkUploadModal = false;
+  editingConsultancyId: number | null = null;
 
   constructor(
     public consultancyService: ConsultancyService, 
@@ -44,6 +45,12 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const status = params['status'];
+      const editId = params['id'];
+
+      if (editId && this.route.snapshot.fragment === 'edit') {
+        this.onEdit(+editId);
+      }
+
       if (status) {
         this.loadFilteredData(status);
       } else {
@@ -76,7 +83,8 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   }
 
   onEdit(id: number) {
-    this.router.navigate([], { fragment: 'edit' });
+    this.editingConsultancyId = id;
+    this.showAddModal = true;
   }
 
   onDelete(consultancy: ConsultancyItem) {
@@ -90,11 +98,13 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   }
 
   openAddModal() {
+    this.editingConsultancyId = null;
     this.showAddModal = true;
   }
 
   closeAddModal() {
     this.showAddModal = false;
+    this.editingConsultancyId = null;
   }
 
   onAddSuccess() {

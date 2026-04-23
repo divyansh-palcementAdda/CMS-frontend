@@ -173,6 +173,8 @@ export class ConsultancyService {
             sNo: index + 1
           })),
 
+          institutions: data.institutions || [],
+
           allAdmissions: (data.allAdmissions || []).map((a: any, index: number) => ({
             ...a,
             sNo: index + 1

@@ -18,15 +18,24 @@ export interface NavItem {
   template: `
     <aside class="sidebar" [class.collapsed]="collapsed()">
       <div class="sidebar-logo-area">
-        <span class="sidebar-logo-text" *ngIf="!collapsed()">LOGO</span>
-        <button class="sidebar-collapse-btn" (click)="toggleCollapse()">◀</button>
+        <a routerLink="/admin/dashboard" class="logo-container">
+          <img src="/assets/logo.png" alt="Logo" class="logo-img">
+          <!-- <span class="logo-text" *ngIf="!collapsed()">RU CMS</span> -->
+        </a>
+        <button class="sidebar-collapse-btn" (click)="toggleCollapse()">
+          <svg width="100%" height="100%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 0C12.6522 0 15.1957 1.05357 17.0711 2.92893C18.9464 4.8043 20 7.34784 20 10C20 11.3132 19.7413 12.6136 19.2388 13.8268C18.7362 15.0401 17.9997 16.1425 17.0711 17.0711C15.1957 18.9464 12.6522 20 10 20C7.34784 20 4.8043 18.9464 2.92893 17.0711C1.05357 15.1957 0 12.6522 0 10C0 8.68678 0.258658 7.38642 0.761205 6.17317C1.26375 4.95991 2.00035 3.85752 2.92893 2.92893C3.85752 2.00035 4.95991 1.26375 6.17317 0.761204C7.38642 0.258657 8.68678 0 10 0ZM13.4 14.6L8.8 10L13.4 5.4L12 4L6 10L12 16L13.4 14.6Z" fill="currentColor" />
+          </svg>
+          </button>
       </div>
+
       <nav class="sidebar-nav">
         <ul class="sidebar-menu">
           <li *ngFor="let item of navItems" class="sidebar-menu-item">
             <a [routerLink]="item.path" 
                [queryParams]="item.queryParams"
                routerLinkActive="active"
+               [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
                class="sidebar-menu-link" [title]="item.label">
               <span class="nav-icon" [innerHTML]="item.icon"></span>
               <span class="nav-label" *ngIf="!collapsed()">{{ item.label }}</span>

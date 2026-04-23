@@ -25,7 +25,8 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   filteredInstitutions: InstitutionItem[] = [];
   paginatedInstitutions: InstitutionItem[] = [];
   searchTerm: string = '';
-  
+  sortOrder: 'asc' | 'desc' | 'none' = 'asc';
+
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
@@ -34,7 +35,6 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   private courseSub?: Subscription;
 
   expandedInstId: number | null = null;
-  coursesForExpandedInst: { id: number, name: string }[] = [];
   loadingCourses = false;
 
   // Actions
@@ -42,12 +42,17 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   showAddModal = false;
   selectedInstitution: InstitutionItem | null = null;
   showBulkUploadModal = false;
+  editingInstitutionId: number | null = null;
+  showCourseModal = false;
+  selectedInstName: string = '';
+  groupedCourses: { [key: string]: any[] } = {};
+  courseTypes: string[] = [];
 
   constructor(
     public institutionService: InstitutionService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -63,12 +68,49 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   fetchFilteredData(status: string) {
     this.loading = true;
     this.sub = this.institutionService.getInstitutionsByStatus(status).subscribe(data => {
+      console.log(data);
       this.pageData = data;
       this.filteredInstitutions = data.institutions;
       this.calculatePagination();
       this.loading = false;
     });
   }
+
+
+  toggleSort() {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.applyFiltersAndSort();
+  }
+
+
+  applyFiltersAndSort() {
+    if (!this.pageData) return;
+
+    let result = [...this.pageData.institutions];
+
+    // Filter by search
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      result = result.filter(inst =>
+        inst.name.toLowerCase().includes(term) ||
+        inst.code.toLowerCase().includes(term) ||
+        inst.course.toLowerCase().includes(term)
+      );
+    }
+
+    // Sort by name (A-Z / Z-A)
+    if (this.sortOrder === 'asc') {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (this.sortOrder === 'desc') {
+      result.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    this.filteredInstitutions = result;
+    this.currentPage = 1;
+    this.calculatePagination();
+  }
+
+
 
   onView(id: number | undefined) {
     if (id) {
@@ -77,7 +119,9 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   }
 
   onEdit(id: number | undefined) {
-    this.router.navigate([], { fragment: 'edit' });
+    if (id) {
+      this.showAddModal = true;
+    }
   }
 
   onDelete(inst: InstitutionItem) {
@@ -127,6 +171,7 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   fetchData() {
     this.loading = true;
     this.sub = this.institutionService.getInstitutionsData().subscribe(data => {
+      console.log(data);
       this.pageData = data;
       this.filteredInstitutions = data.institutions;
       this.calculatePagination();
@@ -140,8 +185,8 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
     if (!term) {
       this.filteredInstitutions = this.pageData.institutions;
     } else {
-      this.filteredInstitutions = this.pageData.institutions.filter(inst => 
-        inst.name.toLowerCase().includes(term) || 
+      this.filteredInstitutions = this.pageData.institutions.filter(inst =>
+        inst.name.toLowerCase().includes(term) ||
         inst.code.toLowerCase().includes(term) ||
         inst.course.toLowerCase().includes(term)
       );
@@ -153,7 +198,7 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredInstitutions.length / this.pageSize) || 1;
     if (this.currentPage > this.totalPages) this.currentPage = 1;
-    
+
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.paginatedInstitutions = this.filteredInstitutions.slice(startIndex, startIndex + this.pageSize);
   }
@@ -173,38 +218,44 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
     return pages;
   }
 
-  toggleCourseDropdown(inst: InstitutionItem, event: Event) {
+  openCourseModal(inst: InstitutionItem, event: Event) {
     event.stopPropagation();
     if (inst.course === 'No course') return;
-    
-    // Toggle close if already open
-    if (this.expandedInstId === inst.id) {
-      this.expandedInstId = null;
-      return;
-    }
-    
+
+    this.selectedInstName = inst.name;
     const id = inst.id || 0;
     this.expandedInstId = id;
+    this.showCourseModal = true;
     this.loadingCourses = true;
-    this.coursesForExpandedInst = [];
-    
+    this.groupedCourses = {};
+    this.courseTypes = [];
+
     if (this.courseSub) {
       this.courseSub.unsubscribe();
     }
-    
+
     this.courseSub = this.institutionService.getInstitutionCourses(id).subscribe(courses => {
-      // Avoid race conditions
       if (this.expandedInstId === id) {
-        this.coursesForExpandedInst = courses;
+        // Group courses by courseTypeName
+        const grouped = courses.reduce((acc: any, course: any) => {
+          const type = course.courseTypeName || course.courseType || 'General';
+          if (!acc[type]) acc[type] = [];
+          acc[type].push(course);
+          return acc;
+        }, {});
+
+        this.groupedCourses = grouped;
+        this.courseTypes = Object.keys(grouped).sort();
         this.loadingCourses = false;
       }
     });
   }
 
-  @HostListener('document:click', ['$event'])
-  onClickOutside(event: Event) {
-    // Close dropdown when clicking anywhere else on document
+  closeCourseModal() {
+    this.showCourseModal = false;
     this.expandedInstId = null;
+    this.groupedCourses = {};
+    this.courseTypes = [];
   }
 
   ngOnDestroy() {

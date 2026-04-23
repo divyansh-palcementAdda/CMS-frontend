@@ -14,12 +14,14 @@ import { BulkUploadResponse } from '../../../../core/models/institution.model';
 })
 export class AddInstitutionModalComponent implements OnInit {
   @Input() isVisible = false;
+  @Input() institutionId: number | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
 
   activeTab: 'single' | 'bulk' = 'single';
   institutionForm: FormGroup;
   isSubmitting = false;
+  isLoading = false;
 
   // Relational data
   availableCourses: any[] = [];
@@ -58,8 +60,40 @@ export class AddInstitutionModalComponent implements OnInit {
     });
   }
 
+  ngOnChanges(changes: any): void {
+    if (changes['isVisible']?.currentValue === true) {
+      if (this.institutionId) {
+        this.loadInstitutionData();
+      } else {
+        this.institutionForm.reset({ status: 'ACTIVE', country: 'India' });
+        this.selectedCourseIds.clear();
+      }
+    }
+  }
+
   ngOnInit(): void {
     this.loadInitialData();
+  }
+
+  loadInstitutionData(): void {
+    if (!this.institutionId) return;
+    this.isLoading = true;
+    this.institutionService.getInstitutionById(this.institutionId).subscribe({
+      next: (data) => {
+        this.isLoading = false;
+        this.institutionForm.patchValue({
+          ...data,
+          status: data.status || 'ACTIVE'
+        });
+        if (data.courseIds) {
+          this.selectedCourseIds = new Set(data.courseIds);
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Failed to load institution details', err);
+      }
+    });
   }
 
   loadInitialData(): void {
@@ -76,7 +110,7 @@ export class AddInstitutionModalComponent implements OnInit {
   // --- Single Record Handlers ---
   filterCourses(): void {
     const term = this.courseSearchTerm.toLowerCase();
-    this.filteredCourses = this.availableCourses.filter(c => 
+    this.filteredCourses = this.availableCourses.filter(c =>
       c.name.toLowerCase().includes(term)
     );
   }
@@ -105,7 +139,11 @@ export class AddInstitutionModalComponent implements OnInit {
       courseIds: Array.from(this.selectedCourseIds)
     };
 
-    this.institutionService.createInstitution(payload).subscribe({
+    const request = this.institutionId
+      ? this.institutionService.updateInstitution(this.institutionId, payload)
+      : this.institutionService.createInstitution(payload);
+
+    request.subscribe({
       next: () => {
         this.isSubmitting = false;
         this.resetAndClose();
@@ -113,8 +151,8 @@ export class AddInstitutionModalComponent implements OnInit {
       },
       error: (err) => {
         this.isSubmitting = false;
-        console.error('Failed to create institution', err);
-        alert(err.error?.message || 'Failed to create institution');
+        console.error(`Failed to ${this.institutionId ? 'update' : 'create'} institution`, err);
+        alert(err.error?.message || `Failed to ${this.institutionId ? 'update' : 'create'} institution`);
       }
     });
   }
@@ -163,8 +201,8 @@ export class AddInstitutionModalComponent implements OnInit {
         this.selectedFile = null;
         if (this.bulkUploadResult?.failureCount === 0) {
           setTimeout(() => {
-             this.success.emit();
-             this.resetAndClose();
+            this.success.emit();
+            this.resetAndClose();
           }, 2000);
         }
       },

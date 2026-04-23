@@ -1221,3 +1221,116 @@
   .mm-fee-grid { grid-template-columns: 1fr; }
   .mm-field.span-2 { grid-column: span 1; }
 }
+
+// ─── Partner Setup (student flow) ──────────────────────────────────────────────
+.mm-partner-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 14px;
+  background: var(--mm-bg);
+  border-radius: var(--mm-radius-md);
+  border: 1px dashed var(--mm-border);
+}
+
+.mm-partner-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--mm-muted-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.mm-partner-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.mm-partner-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--mm-border);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--mm-text);
+  box-shadow: var(--mm-shadow-sm);
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    color: var(--mm-muted-light);
+    transition: color 0.2s;
+    &:hover { color: var(--mm-error); }
+    .material-symbols-outlined { font-size: 14px; }
+  }
+
+  &.inst {
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--mm-border));
+    background: color-mix(in srgb, var(--accent) 3%, #fff);
+  }
+}
+
+.mm-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--accent);
+  background: color-mix(in srgb, var(--accent) 5%, #fff);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--accent);
+    color: #fff;
+    border-style: solid;
+  }
+
+  .material-symbols-outlined { font-size: 16px; }
+}
+
+.mm-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: var(--mm-muted);
+  font-weight: 500;
+
+  .material-symbols-outlined { font-size: 14px; color: var(--mm-success); }
+  strong { color: var(--mm-success); }
+}
+
+.mm-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--mm-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: mmSpin 0.8s linear infinite;
+}
+
+@keyframes mmSpin {
+  to { transform: rotate(360deg); }
+}

@@ -132,10 +132,11 @@
                     <th class="text-center">S.NO</th>
                     <th>Course Name</th>
                     <th>Course Type</th>
-                    <th>Duration</th>
-                    <th class="text-center">Students</th>
+                    <th>Total Addmissions</th>
+                    <th>Total Applications</th>
+                    <th>Cancelled Addmissions</th>
+                    <th>Cancelled Applications</th>
                     <th class="text-center">Status</th>
-                    <th class="text-center">Institution</th>
                     <th class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -147,20 +148,14 @@
                       <span class="course-type filter-pill" [ngClass]="item.courseType.toLowerCase()">{{ item.courseType
                         }}</span>
                     </td>
-                    <td>{{ item.duration }}</td>
-                    <td class="text-center text-bold">{{ item.students }}</td>
+                    <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                    <td class="text-center text-bold">{{ item.totalApplications }}</td>
+                    <td class="text-center text-bold">{{ item.cancelledAdmissions }}</td>
+                    <td class="text-center text-bold">{{ item.cancelledApplications }}</td>
                     <td class="text-center">
                       <span class="status-pill active">{{ item.status }}</span>
                     </td>
-                    <td class="text-center">
-                      <span class="inst-badge" [ngClass]="item.hasInstitutions ? 'has-inst' : 'no-inst'">
-                        {{ item.institutionsText }}
-                        <svg *ngIf="item.hasInstitutions" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </span>
-                    </td>
+
                     <td class="text-center">
                       <div class="action-icons">
                         <button class="icon-btn view" title="View" (click)="onView(item.id)">
@@ -185,7 +180,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="paginatedCourses.length === 0">
-                    <td colspan="8" class="text-center py-4 text-gray-500">No courses found matching "{{searchTerm}}"
+                    <td colspan="9" class="text-center py-4 text-gray-500">No courses found matching "{{searchTerm}}"
                     </td>
                   </tr>
                 </tbody>
@@ -194,8 +189,11 @@
 
             <!-- Standardized Pagination -->
             <div class="pagination-section" *ngIf="!loading && pageData">
-              <span class="showing-text">Showing {{ paginatedCourses.length }} records out of {{ pageData.totalCount }}
-                Courses</span>
+              <span class="showing-text">
+                Showing {{ (currentPage - 1) * pageSize + 1 }} to 
+                {{ Math.min(currentPage * pageSize, filteredCourses.length) }} 
+                of {{ filteredCourses.length }} Courses
+              </span>
               <div class="pagination-controls">
                 <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -223,7 +221,7 @@
           (cancel)="cancelDelete()">
         </app-confirmation-modal>
 
-        <app-add-course-modal *ngIf="showAddModal" (close)="closeAddModal()" (success)="onAddSuccess()">
+        <app-add-course-modal *ngIf="showAddModal" [editId]="editCourseId" (close)="closeAddModal()" (success)="onAddSuccess()">
         </app-add-course-modal>
 
         <!-- Bulk Upload Modal -->

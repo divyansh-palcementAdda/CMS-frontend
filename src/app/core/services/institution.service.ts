@@ -45,7 +45,12 @@ export class InstitutionService {
             code: inst.code || inst.institutionCode || 'N/A',
             students: studentsCount,
             status: status as 'Active' | 'Inactive',
-            course: courseDisplay
+            course: courseDisplay,
+            deleted: inst.deleted || false,
+            totalAdmissions: inst.totalAdmissions || 0,
+            totalApplications: inst.totalApplications || 0,
+            cancelledAdmissions: inst.cancelledAdmissions || 0,
+            cancelledApplications: inst.cancelledApplications || 0
           };
         });
 
@@ -97,7 +102,12 @@ export class InstitutionService {
             code: inst.code || inst.institutionCode || 'N/A',
             students: studentsCount,
             status: instStatus as 'Active' | 'Inactive',
-            course: courseDisplay
+            course: courseDisplay,
+            deleted: inst.deleted || false,
+            totalAdmissions: inst.totalAdmissions || 0,
+            totalApplications: inst.totalApplications || 0,
+            cancelledAdmissions: inst.cancelledAdmissions || 0,
+            cancelledApplications: inst.cancelledApplications || 0
           };
         });
 
@@ -144,8 +154,26 @@ export class InstitutionService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  getInstitutionById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(res => res.data || res)
+    );
+  }
+
   createInstitution(data: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
+  }
+
+  updateInstitution(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
+  }
+
+  restoreRecord(id: number, type: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/restore/${id}?type=${type}`, {});
+  }
+
+  deletePermanent(id: number, type: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/permanent/${id}?type=${type}`);
   }
 
   bulkUpload(file: File): Observable<any> {
@@ -160,16 +188,7 @@ export class InstitutionService {
 
   private getMockData(): InstitutionPageData {
     const mockInstitutions: InstitutionItem[] = [
-      { id: 1, sNo: 1, name: 'Manipal', code: 'MNU-101', students: 12, status: 'Active', course: '2 Course' },
-      { id: 2, sNo: 2, name: 'Harvard', code: 'MD-103', students: 34, status: 'Active', course: '1 Course' },
-      { id: 3, sNo: 3, name: 'Stanford', code: 'ENG-104', students: 56, status: 'Active', course: '2 Course' },
-      { id: 4, sNo: 4, name: 'Yale', code: 'DS-105', students: 44, status: 'Active', course: 'No course' },
-      { id: 5, sNo: 5, name: 'Princeton', code: 'AD-106', students: 120, status: 'Active', course: '3 Course' },
-      { id: 6, sNo: 6, name: 'Johns Hopkins', code: 'LAW-107', students: 678, status: 'Active', course: '4 Course' },
-      { id: 7, sNo: 7, name: 'NIT', code: 'PSY-108', students: 45, status: 'Active', course: '2 Course' },
-      { id: 8, sNo: 8, name: 'Manipal', code: 'AD-107', students: 89, status: 'Active', course: 'No course' },
-      { id: 9, sNo: 9, name: 'GSITS', code: 'PSY-109', students: 32, status: 'Active', course: '6 Course' },
-      { id: 10, sNo: 10, name: 'IIT', code: 'CS-102', students: 90, status: 'Active', course: '1 Course' }
+
     ];
 
     return {

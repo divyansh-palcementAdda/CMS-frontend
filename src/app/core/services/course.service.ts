@@ -19,6 +19,12 @@ export class CourseService {
     );
   }
 
+  getCourseById(id: number): Observable<CourseDTO> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(response => response.data)
+    );
+  }
+
   getCoursesData(): Observable<CoursePageData> {
     return this.http.get<any>(this.apiUrl).pipe(
       map(response => this.transformCoursePageData(response)),
@@ -78,7 +84,11 @@ export class CourseService {
         status: isActive ? 'Active' : 'Inactive',
         institutionCount: instCount,
         institutionsText,
-        hasInstitutions
+        hasInstitutions,
+        totalApplications: course.totalApplications || 0,
+        totalAdmissions: course.totalAdmissions || 0,
+        cancelledApplications: course.cancelledApplications || 0,
+        cancelledAdmissions: course.cancelledAdmissions || 0
       };
     });
 

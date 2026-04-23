@@ -228,7 +228,7 @@
         </app-confirmation-modal>
 
         <!-- Add Consultancy Modal -->
-        <app-add-consultancy-modal *ngIf="showAddModal" (close)="closeAddModal()" (success)="onAddSuccess()"></app-add-consultancy-modal>
+        <app-add-consultancy-modal *ngIf="showAddModal" [consultancyId]="editingConsultancyId" (close)="closeAddModal()" (success)="onAddSuccess()"></app-add-consultancy-modal>
 
         <!-- Bulk Upload Modal -->
         <app-bulk-upload-modal

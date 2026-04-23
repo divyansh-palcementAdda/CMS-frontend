@@ -121,6 +121,7 @@ export interface ConsultancyDetail extends ConsultancyDTO {
   topCourses: ConsultancyChartData[];
   courses: ConsultancyCourse[];
   representatives: ConsultancyRepresentative[];
+  institutions: any[];
   institutionsOverview: ConsultancyInstitutionOverview[];
   allAdmissions: ConsultancyAdmission[];
   yearlyAdmissions?: YearlyAdmission[];

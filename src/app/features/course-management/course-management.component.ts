@@ -23,6 +23,7 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   pageData: CoursePageData | null = null;
   loading = true;
   searchTerm = '';
+  Math = Math;
   
   currentPage = 1;
   pageSize = 10;
@@ -34,6 +35,7 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   selectedCourse: CourseItem | null = null;
   showAddModal = false;
   showBulkUploadModal = false;
+  editCourseId: number | null = null;
 
   constructor(
     public courseService: CourseService,
@@ -46,15 +48,18 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   }
 
   onEdit(id: number) {
-    this.router.navigate([], { fragment: 'edit' });
+    this.editCourseId = id;
+    this.showAddModal = true;
   }
 
   openAddModal() {
+    this.editCourseId = null;
     this.showAddModal = true;
   }
 
   closeAddModal() {
     this.showAddModal = false;
+    this.editCourseId = null;
   }
 
   onAddSuccess() {
@@ -163,7 +168,22 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   }
 
   getPagesArray(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const maxVisible = 5;
+    let start = Math.max(1, current - Math.floor(maxVisible / 2));
+    let end = Math.min(total, start + maxVisible - 1);
+
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    start = Math.max(1, start);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
   }
 
   goToPage(page: number) {

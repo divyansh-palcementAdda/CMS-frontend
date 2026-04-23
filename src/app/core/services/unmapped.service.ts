@@ -41,4 +41,24 @@ export class UnmappedService {
       responseType: 'blob'
     });
   }
+
+  mapStudent(id: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/map/student`, { id, type: 'students', data });
+  }
+
+  mapUser(id: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/map/user`, { id, type: 'users', data });
+  }
+
+  mapCourse(id: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/map/course`, { id, type: 'courses', data });
+  }
+
+  mapConsultancyUsers(id: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/map/consultancy/users`, { id, type: 'consultancies-users', data });
+  }
+
+  mapConsultancyCourses(id: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/map/consultancy/courses`, { id, type: 'consultancies-courses', data });
+  }
 }

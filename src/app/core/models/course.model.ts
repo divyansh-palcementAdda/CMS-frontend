@@ -10,6 +10,11 @@ export interface CourseDTO {
   consultancyCount?: number;
   duration?: number;
   fees?: number;
+  totalApplications?: number;
+  totalAdmissions?: number;
+  cancelledApplications?: number;
+  cancelledAdmissions?: number;
+  institutionIds?: number[];
 }
 
 export interface CreateCourseDTO {
@@ -34,6 +39,10 @@ export interface CourseItem {
   institutionCount: number;
   institutionsText: string;
   hasInstitutions: boolean;
+  totalApplications: number;
+  totalAdmissions: number;
+  cancelledApplications: number;
+  cancelledAdmissions: number;
 }
 
 export interface CourseStats {

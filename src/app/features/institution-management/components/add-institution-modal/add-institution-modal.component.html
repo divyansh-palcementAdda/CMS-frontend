@@ -7,7 +7,7 @@
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 10v6M2 10v6M12 2 2 7l10 5 10-5-10-5zM12 22V12" />
         </svg>
-        <h3>Add New Institution</h3>
+        <h3>{{ institutionId ? 'Edit Institution' : 'Add New Institution' }}</h3>
       </div>
       <button class="close-btn" (click)="resetAndClose()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -19,7 +19,7 @@
     </div>
 
     <!-- Tabs -->
-    <div class="modal-tabs">
+    <div class="modal-tabs" *ngIf="!institutionId">
       <div class="tab-item" [class.active]="activeTab === 'single'" (click)="switchTab('single')">
         Add Single Record
       </div>
@@ -222,8 +222,8 @@
 
           <div class="modal-footer">
             <button type="button" class="btn-cancel" (click)="resetAndClose()">Cancel</button>
-            <button type="submit" class="btn-submit" [disabled]="isSubmitting">
-              {{ isSubmitting ? 'Adding...' : 'Add Institution' }}
+            <button type="submit" class="btn-submit" [disabled]="isSubmitting || isLoading">
+              {{ isSubmitting ? (institutionId ? 'Updating...' : 'Adding...') : (institutionId ? 'Update Institution' : 'Add Institution') }}
             </button>
           </div>
         </form>

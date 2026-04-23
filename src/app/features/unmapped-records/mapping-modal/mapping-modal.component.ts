@@ -10,6 +10,7 @@ import { CourseService } from '../../../core/services/course.service';
 import { UserService } from '../../../core/services/user.service';
 import { AdmissionService } from '../../../core/services/admission.service';
 import { InstitutionService } from '../../../core/services/institution.service';
+import { UnmappedService } from '../../../core/services/unmapped.service';
 
 export type MappingType = 'students' | 'users' | 'courses' | 'consultancies-users' | 'consultancies-courses';
 
@@ -99,11 +100,13 @@ export class MappingModalComponent implements OnInit {
     private userService: UserService,
     private studentService: AdmissionService,
     private courseService: CourseService,
-    private institutionService: InstitutionService
+    private institutionService: InstitutionService,
+    private unmappedService: UnmappedService
   ) {}
 
   // ── Convenience getters ────────────────────────────────────────────────────
   get type(): MappingType  { return this.data.type; }
+  set type(v: MappingType) { this.data.type = v; }
   get record(): any        { return this.data.record; }
   get config(): ModalConfig { return this.modalConfig[this.type]; }
   get isStudents(): boolean          { return this.type === 'students'; }
@@ -157,6 +160,8 @@ export class MappingModalComponent implements OnInit {
 
   resetStudentSelections(): void {
     this.availableConsultancyIds.clear();
+    this.selectedCourseIds.clear();
+    this.selectedInstitutionIds.clear();
     this.mappingForm.patchValue({ admittedByUserId: null, consultancyId: null }, { emitEvent: false });
   }
 
@@ -389,7 +394,21 @@ export class MappingModalComponent implements OnInit {
 
   selectConsultancyForStudent(cId: number): void {
     const cur = this.mappingForm.get('consultancyId')?.value;
-    this.mappingForm.patchValue({ consultancyId: cur === cId ? null : cId });
+    if (cur === cId) {
+      this.mappingForm.patchValue({ consultancyId: null });
+      this.selectedCourseIds.clear();
+      this.selectedInstitutionIds.clear();
+      return;
+    }
+    this.mappingForm.patchValue({ consultancyId: cId });
+    this.selectedCourseIds.clear();
+    this.selectedInstitutionIds.clear();
+    
+    // Load consultancy details to pre-fill its courses and institutions
+    this.consultancyService.getConsultancyById(cId).subscribe(con => {
+      if (con.courses)     con.courses.forEach((c: any) => this.selectedCourseIds.add(c.id));
+      if (con.institutions) con.institutions.forEach((i: any) => this.selectedInstitutionIds.add(i.id));
+    });
   }
 
   // ── Multi-select toggles ───────────────────────────────────────────────────
@@ -531,7 +550,13 @@ export class MappingModalComponent implements OnInit {
 
   private doStudentMap(studentId: any): void {
     const fv = this.mappingForm.getRawValue();
-    this.studentService.updateAdmission(studentId, { ...this.record, ...fv, id: studentId }).subscribe({
+    const payload = {
+      ...fv,
+      courseIds: Array.from(this.selectedCourseIds),
+      institutionIds: Array.from(this.selectedInstitutionIds)
+    };
+    
+    this.unmappedService.mapStudent(studentId, payload).subscribe({
       next: () => {
         if (fv.feeAmount && fv.feeAmount > 0) {
           this.studentService.addFeePayment(studentId, {
@@ -547,27 +572,22 @@ export class MappingModalComponent implements OnInit {
   }
 
   private doUserMap(userId: any): void {
-    const rec = this.record;
-    let roles = ['USER'];
-    if (Array.isArray(rec.roles)) roles = rec.roles.map((r: any) => typeof r === 'string' ? r : (r.name || 'USER'));
-    else if (rec.role) roles = rec.role.split(',').map((r: string) => `ROLE_${r.trim().toUpperCase().replace(/\s+/g, '_')}`);
-    this.userService.updateUser(userId, { ...rec, roles, consultancyIds: Array.from(this.selectedConsultancyIds), password: rec.password || '' })
+    this.unmappedService.mapUser(userId, { consultancyIds: Array.from(this.selectedConsultancyIds) })
       .subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
   private doCourseMap(courseId: any): void {
-    this.courseService.updateCourse(courseId, { ...this.record, consultancyIds: Array.from(this.selectedConsultancyIds) })
+    this.unmappedService.mapCourse(courseId, { consultancyIds: Array.from(this.selectedConsultancyIds) })
       .subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
   private doConsultancyUsersMap(consultancyId: any): void {
-    this.consultancyService.updateConsultancy(consultancyId, { ...this.record, representativeIds: Array.from(this.selectedUserIds) })
+    this.unmappedService.mapConsultancyUsers(consultancyId, { representativeIds: Array.from(this.selectedUserIds) })
       .subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
   private doConsultancyCoursesMap(consultancyId: any): void {
-    this.consultancyService.updateConsultancy(consultancyId, {
-      ...this.record,
+    this.unmappedService.mapConsultancyCourses(consultancyId, {
       courseIds:       Array.from(this.selectedCourseIds),
       institutionIds:  Array.from(this.selectedInstitutionIds)
     }).subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });

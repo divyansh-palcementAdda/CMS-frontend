@@ -8,7 +8,8 @@
       <div class="detail-container" *ngIf="detail">
         <!-- Breadcrumbs -->
         <nav class="breadcrumbs">
-          <span (click)="goBack()">Dashboard</span> / <span (click)="goBack()">Institution</span> / <span (click)="goBack()">All Institution</span> / <span class="active">Details</span>
+          <span (click)="goBack()">Dashboard</span> / <span (click)="goBack()">Institution</span> / <span
+            (click)="goBack()">All Institution</span> / <span class="active">Details</span>
         </nav>
 
         <!-- Header -->
@@ -34,7 +35,8 @@
             </button>
             <button class="action-btn delete" (click)="onDelete()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+                <path
+                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
               </svg>
               Delete
             </button>
@@ -46,7 +48,8 @@
           <div class="card-header-box">
             <div class="header-title">
               <svg class="icon-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 21h18M3 7v1a3 3 0 006 0V7m6 0v1a3 3 0 006 0V7m-9 0h6m-6 0a3 3 0 01-6 0m6 0v14m-6 0v-7a3 3 0 016 0v7" />
+                <path
+                  d="M3 21h18M3 7v1a3 3 0 006 0V7m6 0v1a3 3 0 006 0V7m-9 0h6m-6 0a3 3 0 01-6 0m6 0v14m-6 0v-7a3 3 0 016 0v7" />
               </svg>
               <h2>Basic Information</h2>
             </div>
@@ -62,11 +65,11 @@
             </div>
             <div class="info-item">
               <label>Institution Type</label>
-              <span class="status-pill active">{{ detail.basicInfo.institutionType }}</span>
+              <span class="status-badge active">{{ detail.basicInfo.institutionType }}</span>
             </div>
             <div class="info-item">
               <label>Status</label>
-              <span class="status-pill active">{{ detail.basicInfo.status }}</span>
+              <span class="status-badge active">{{ detail.basicInfo.status }}</span>
             </div>
 
             <div class="info-item">
@@ -110,21 +113,643 @@
           </div>
         </div>
 
-        <!-- All Courses Table -->
-        <div class="table-card table-only" style="padding: 24px">
-          <div class="table-header">
-            <h3 class="table-title">All Courses</h3>
-            <div class="search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+
+
+        <div class="categorized-stats">
+          <div class="stat-premium-card blue" (click)="onStatClick('total_cons')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Total Consultancies</span>
+                <div class="value">{{ detail.quickStats.totalConsultancies || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card blue" (click)="onStatClick('total_all')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Total Students</span>
+                <div class="value">{{ detail.quickStats.totalStudents || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card green" (click)="onStatClick('scholar_adm')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Scholar Admissions</span>
+                <div class="value">{{ detail.quickStats.scholarAdmissions || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M12 14l9-5-9-5-9 5 9 5zM12 14l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.083M12 14A11.952 11.952 0 0 0 5.175 17.057a12.083 12.083 0 0 1 .665-6.479" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card green" (click)="onStatClick('direct_adm')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Direct Admissions</span>
+                <div class="value">{{ detail.quickStats.directAdmissions || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <polyline points="17 11 19 13 23 9" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card green" (click)="onStatClick('cons_adm')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Consultancy Admissions</span>
+                <div class="value">{{ detail.quickStats.consAdmissions || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                  <path d="M16 3.13a4 4 0 010 7.75" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card orange" (click)="onStatClick('scholar_app')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Scholar Applications</span>
+                <div class="value">{{ detail.quickStats.scholarApplications || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                  <path d="M12 14v6.5" />
+                  <path d="M4.5 9.5v5a2.5 2.5 0 005 0v-5" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card orange" (click)="onStatClick('direct_app')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Direct Applications</span>
+                <div class="value">{{ detail.quickStats.directApplications || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="16" y1="13" x2="8" y2="13" />
+                  <line x1="16" y1="17" x2="8" y2="17" />
+                  <polyline points="10 9 9 9 8 9" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-premium-card orange" (click)="onStatClick('cons_app')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Consultancy Applications</span>
+                <div class="value">{{ detail.quickStats.consApplications || 0 }}</div>
+              </div>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="tables-section">
+
+          <!-- Master Admissions & Applications Table -->
+          <div id="master-table" class="table-card mb-32">
+            <div class="table-header-row">
+              <h3>Total Admissions & Applications</h3>
+              <div class="table-tools">
+                <div class="search-box">
+                  <input type="text" placeholder="Search Master List" [(ngModel)]="masterSearch">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead class="header-blue">
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Fee Status</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Session</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of paginatedMasterList; let i = index">
+                    <td>{{ (masterPage - 1) * masterPageSize + i + 1 }}</td>
+                    <td class="bold-text">{{ item.studentName }}</td>
+                    <td>{{ item.courseName }}</td>
+                    <td>
+                      <span class="status-badge"
+                        [class.active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
+                        [class.inactive]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span>
+                    </td>
+                    <td>{{ item.source }}</td>
+                    <td>
+                      <span class="status-badge" [class.active]="item.status === 'ACTIVE'"
+                        [class.inactive]="item.status === 'CANCELLED'">{{ item.status }}</span>
+                    </td>
+                    <td>{{ item.session }}</td>
+                    <td class="text-center">
+                      <div class="action-tools">
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg></div>
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="paginatedMasterList.length === 0">
+                    <td colspan="8" class="empty-state">No records found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="record-count">Showing {{ paginatedMasterList.length }} of {{ filteredMasterList.length }}
+                records</span>
+              <div class="pagination">
+                <button class="nav-btn" (click)="masterPage = 1" [disabled]="masterPage === 1">First</button>
+                <button class="nav-btn" (click)="changePage('master', -1)" [disabled]="masterPage === 1">Prev</button>
+                <span class="page-info">Page {{ masterPage }} of {{ getTotalPages(filteredMasterList.length,
+                  masterPageSize) }}</span>
+                <button class="nav-btn" (click)="changePage('master', 1)"
+                  [disabled]="masterPage >= getTotalPages(filteredMasterList.length, masterPageSize)">Next</button>
+                <button class="nav-btn" (click)="masterPage = getTotalPages(filteredMasterList.length, masterPageSize)"
+                  [disabled]="masterPage >= getTotalPages(filteredMasterList.length, masterPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Applications Table -->
+          <div id="total-apps" class="table-card mb-32">
+            <div class="table-header-row">
+              <h3>Total Applications (Active) <span *ngIf="appFilterSource || appFilterScholar"
+                  class="active-filter">({{ appFilterSource || 'Scholar' }})</span></h3>
+              <div class="table-tools">
+                <button *ngIf="appFilterSource || appFilterScholar" class="btn-clear"
+                  (click)="clearApplicationFilter()">Clear Filter</button>
+                <div class="search-box">
+                  <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead class="header-cyan">
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Fee Status</th>
+                    <th>Source</th>
+                    <th>Session</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of paginatedTotalApplications; let i = index">
+                    <td>{{ (totalAppPage - 1) * totalAppPageSize + i + 1 }}</td>
+                    <td class="bold-text">{{ item.studentName }}</td>
+                    <td>{{ item.courseName }}</td>
+                    <td><span class="status-badge"
+                        [class.active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
+                        [class.inactive]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                    <td>{{ item.source || 'N/A' }}</td>
+                    <td>{{ item.session }}</td>
+                    <td class="text-center">
+                      <div class="action-tools">
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg></div>
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg></div>
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                          </svg></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="paginatedTotalApplications.length === 0">
+                    <td colspan="8" class="empty-state">No applications found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="record-count">Showing {{ paginatedTotalApplications.length }} of {{
+                filteredTotalApplications.length }} records</span>
+              <div class="pagination">
+                <button class="nav-btn" (click)="totalAppPage = 1" [disabled]="totalAppPage === 1">First</button>
+                <button class="nav-btn" (click)="changePage('totalApp', -1)"
+                  [disabled]="totalAppPage === 1">Prev</button>
+                <span class="page-info">Page {{ totalAppPage }} of {{ getTotalPages(filteredTotalApplications.length,
+                  totalAppPageSize) }}</span>
+                <button class="nav-btn" (click)="changePage('totalApp', 1)"
+                  [disabled]="totalAppPage >= getTotalPages(filteredTotalApplications.length, totalAppPageSize)">Next</button>
+                <button class="nav-btn"
+                  (click)="totalAppPage = getTotalPages(filteredTotalApplications.length, totalAppPageSize)"
+                  [disabled]="totalAppPage >= getTotalPages(filteredTotalApplications.length, totalAppPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cancelled Applications Table -->
+          <div id="cancelled-apps" class="table-card mb-32">
+            <div class="table-header-row">
+              <h3>Cancelled Applications</h3>
+              <div class="table-tools">
+                <div class="search-box">
+                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead class="header-red">
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Fee Status</th>
+                    <th>Commission Status</th>
+                    <th>Commission Amnt</th>
+                    <th>Session</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of paginatedCancelledApplications; let i = index">
+                    <td>{{ (cancelledAppPage - 1) * cancelledAppPageSize + i + 1 }}</td>
+                    <td class="bold-text">{{ item.studentName }}</td>
+                    <td>{{ item.courseName }}</td>
+                    <td><span class="status-badge inactive">{{ item.feeStatus }}</span></td>
+                    <td><span class="status-badge inactive">Cancelled</span></td>
+                    <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
+                    <td>{{ item.session }}</td>
+                    <td class="text-center">
+                      <div class="action-tools">
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg></div>
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg></div>
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                          </svg></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="record-count">Showing {{ paginatedCancelledApplications.length }} of {{
+                filteredCancelledApplications.length }} records</span>
+              <div class="pagination">
+                <button class="nav-btn" (click)="cancelledAppPage = 1"
+                  [disabled]="cancelledAppPage === 1">First</button>
+                <button class="nav-btn" (click)="changePage('cancelledApp', -1)"
+                  [disabled]="cancelledAppPage === 1">Prev</button>
+                <span class="page-info">Page {{ cancelledAppPage }} of {{
+                  getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize) }}</span>
+                <button class="nav-btn" (click)="changePage('cancelledApp', 1)"
+                  [disabled]="cancelledAppPage >= getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)">Next</button>
+                <button class="nav-btn"
+                  (click)="cancelledAppPage = getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)"
+                  [disabled]="cancelledAppPage >= getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Admissions Table -->
+          <div id="total-adms" class="table-card mb-32">
+            <div class="table-header-row">
+              <h3>Total Admissions (Active) <span *ngIf="admFilterSource || admFilterScholar" class="active-filter">({{
+                  admFilterSource || 'Scholar' }})</span></h3>
+              <div class="table-tools">
+                <button *ngIf="admFilterSource || admFilterScholar" class="btn-clear"
+                  (click)="clearAdmissionFilter()">Clear Filter</button>
+                <div class="search-box">
+                  <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead class="header-teal">
+                <tr>
+                  <th>S.NO</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>Fee Status</th>
+                  <th>Source</th>
+                  <th>Session</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+                <tbody>
+                  <tr *ngFor="let item of paginatedTotalAdmissions; let i = index">
+                    <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>
+                    <td class="bold-text">{{ item.studentName }}</td>
+                    <td>{{ item.courseName }}</td>
+                    <td><span class="status-badge active">{{ item.feeStatus }}</span></td>
+                    <td>{{ item.source || 'N/A' }}</td>
+                    <td>{{ item.session }}</td>
+                    <td class="text-center">
+                      <div class="action-tools">
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg></div>
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg></div>
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                          </svg></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="paginatedTotalAdmissions.length === 0">
+                    <td colspan="7" class="empty-state">No admissions found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="record-count">Showing {{ paginatedTotalAdmissions.length }} of {{
+                filteredTotalAdmissions.length }} records</span>
+              <div class="pagination">
+                <button class="nav-btn" (click)="totalAdmPage = 1" [disabled]="totalAdmPage === 1">First</button>
+                <button class="nav-btn" (click)="changePage('totalAdm', -1)"
+                  [disabled]="totalAdmPage === 1">Prev</button>
+                <span class="page-info">Page {{ totalAdmPage }} of {{ getTotalPages(filteredTotalAdmissions.length,
+                  totalAdmPageSize) }}</span>
+                <button class="nav-btn" (click)="changePage('totalAdm', 1)"
+                  [disabled]="totalAdmPage >= getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)">Next</button>
+                <button class="nav-btn"
+                  (click)="totalAdmPage = getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)"
+                  [disabled]="totalAdmPage >= getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cancelled Admissions Table -->
+          <div id="cancelled-adms" class="table-card mb-32">
+            <div class="table-header-row">
+              <h3>Cancelled Admissions</h3>
+              <div class="table-tools">
+                <div class="search-box">
+                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead class="header-orange">
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Fee Status</th>
+                    <th>Commission</th>
+                    <th>Session</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of paginatedCancelledAdmissions; let i = index">
+                    <td>{{ (cancelledAdmPage - 1) * cancelledAdmPageSize + i + 1 }}</td>
+                    <td class="bold-text">{{ item.studentName }}</td>
+                    <td>{{ item.courseName }}</td>
+                    <td><span class="status-badge inactive">{{ item.feeStatus }}</span></td>
+                    <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
+                    <td>{{ item.session }}</td>
+                    <td class="text-center">
+                      <div class="action-tools">
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg></div>
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg></div>
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                          </svg></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="record-count">Showing {{ paginatedCancelledAdmissions.length }} of {{
+                filteredCancelledAdmList.length }} records</span>
+              <div class="pagination">
+                <button class="nav-btn" (click)="cancelledAdmPage = 1"
+                  [disabled]="cancelledAdmPage === 1">First</button>
+                <button class="nav-btn" (click)="changePage('cancelledAdm', -1)"
+                  [disabled]="cancelledAdmPage === 1">Prev</button>
+                <span class="page-info">Page {{ cancelledAdmPage }} of {{
+                  getTotalPages(filteredCancelledAdmList.length, cancelledAdmPageSize) }}</span>
+                <button class="nav-btn" (click)="changePage('cancelledAdm', 1)"
+                  [disabled]="cancelledAdmPage >= getTotalPages(filteredCancelledAdmList.length, cancelledAdmPageSize)">Next</button>
+                <button class="nav-btn"
+                  (click)="cancelledAdmPage = getTotalPages(filteredCancelledAdmList.length, cancelledAdmPageSize)"
+                  [disabled]="cancelledAdmPage >= getTotalPages(filteredCancelledAdmList.length, cancelledAdmPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Consultancy Ownership Table -->
+          <div class="table-card" id="consultancy-ownership">
+            <div class="table-header-row">
+              <h3>Consultancy Ownership <span *ngIf="consultancyStatusFilter" class="active-filter">({{
+                  consultancyStatusFilter }})</span></h3>
+              <button *ngIf="consultancyStatusFilter" class="btn-clear" (click)="clearConsultancyFilter()">Clear
+                Filter</button>
+            </div>
+            <div class="table-wrapper">
+              <table class="custom-table">
+                <thead class="header-purple">
+                  <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Email Id</th>
+                    <th>Mobile Number</th>
+                    <th>City</th>
+                    <th>Status</th>
+                    <th>Commission %</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let c of paginatedConsultancies; let i = index">
+                    <td class="s-no">{{ (consPage - 1) * consPageSize + i + 1 }}</td>
+                    <td class="bold">{{ c.name }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>{{ c.mobile || '—' }}</td>
+                    <td>{{ c.city || '—' }}</td>
+                    <td>
+                      <span class="status-badge" [ngClass]="c.status.toLowerCase()">{{ c.status }}</span>
+                    </td>
+                    <td class="bold blue-text">{{ c.commission ? c.commission + '%' : '—' }}</td>
+                    <td>
+                      <div class="action-tools">
+                        <div class="tool-btn view" (click)="onViewConsultancy(c.id)" title="View">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        </div>
+                        <div class="tool-btn edit" (click)="onEditConsultancy(c.id)" title="Edit">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </div>
+                        <div class="tool-btn delete" (click)="onDeleteConsultancy(c)" title="Delete">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                          </svg>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span class="record-count">Showing {{ paginatedConsultancies.length }} of {{ filteredConsultancies.length
+                }} records</span>
+              <div class="pagination">
+                <button class="nav-btn" (click)="consPage = 1" [disabled]="consPage === 1">First</button>
+                <button class="nav-btn" (click)="changePage('cons', -1)" [disabled]="consPage === 1">Prev</button>
+                <span class="page-info">Page {{ consPage }} of {{ getTotalPages(filteredConsultancies.length,
+                  consPageSize) }}</span>
+                <button class="nav-btn" (click)="changePage('cons', 1)"
+                  [disabled]="consPage >= getTotalPages(filteredConsultancies.length, consPageSize)">Next</button>
+                <button class="nav-btn" (click)="consPage = getTotalPages(filteredConsultancies.length, consPageSize)"
+                  [disabled]="consPage >= getTotalPages(filteredConsultancies.length, consPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+        <!-- All Courses Table -->
+        <div class="table-card table-only" style="padding: 24px">
+          <div class="table-header-row">
+            <h3 class="table-title">All Courses</h3>
+            <div class="table-tools">
+              <div class="search-box">
+                <input type="text" placeholder="Search Courses" [(ngModel)]="coursesSearch">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" placeholder="Search Courses">
+              </div>
             </div>
           </div>
           <div class="table-wrapper">
             <table>
-              <thead>
+              <thead class="header-cyan">
                 <tr>
                   <th class="text-center">S.No</th>
                   <th>Course Name</th>
@@ -137,32 +762,32 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let course of detail.courses; let i = index">
-                  <td class="text-center">{{ i + 1 }}</td>
+                <tr *ngFor="let course of paginatedCourses; let i = index">
+                  <td class="text-center">{{ (coursesPage - 1) * coursesPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ course.name }}</td>
-                  <td><span class="status-pill active">{{ course.type }}</span></td>
+                  <td><span class="status-badge active">{{ course.type }}</span></td>
                   <td>{{ course.duration }}</td>
                   <td>{{ course.students }}</td>
-                  <td><span class="status-pill active">{{ course.status }}</span></td>
+                  <td><span class="status-badge active">{{ course.status }}</span></td>
                   <td>{{ course.institution }}</td>
                   <td>
-                    <div class="action-icons">
-                      <button class="icon-btn view" title="View" (click)="onViewCourse(course.id)">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                          <path
-                            d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Z" />
+                    <div class="action-tools">
+                      <button class="tool-btn view" title="View" (click)="onViewCourse(course.id)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
                         </svg>
                       </button>
-                      <button class="icon-btn edit" title="Edit" (click)="onEditCourse(course.id)">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                          <path
-                            d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-528q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
+                      <button class="tool-btn edit" title="Edit" (click)="onEditCourse(course.id)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                       </button>
-                      <button class="icon-btn delete" title="Delete" (click)="onDeleteCourse(course)">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                      <button class="tool-btn delete" title="Delete" (click)="onDeleteCourse(course)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path
-                            d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+                            d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                         </svg>
                       </button>
                     </div>
@@ -171,179 +796,31 @@
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- All Admission Table -->
-        <div class="table-card table-only" style="padding: 24px">
-          <div class="table-header">
-            <h3 class="table-title">All Admission</h3>
-            <div class="search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" placeholder="Search Admission">
+          <div class="table-footer mt-16">
+            <span class="record-count">Showing {{ paginatedCourses.length }} of {{ filteredCourses.length }}
+              records</span>
+            <div class="pagination">
+              <button class="nav-btn" (click)="coursesPage = 1" [disabled]="coursesPage === 1">First</button>
+              <button class="nav-btn" (click)="changePage('courses', -1)" [disabled]="coursesPage === 1">Prev</button>
+              <span class="page-info">Page {{ coursesPage }} of {{ getTotalPages(filteredCourses.length,
+                coursesPageSize) }}</span>
+              <button class="nav-btn" (click)="changePage('courses', 1)"
+                [disabled]="coursesPage >= getTotalPages(filteredCourses.length, coursesPageSize)">Next</button>
+              <button class="nav-btn" (click)="coursesPage = getTotalPages(filteredCourses.length, coursesPageSize)"
+                [disabled]="coursesPage >= getTotalPages(filteredCourses.length, coursesPageSize)">Last</button>
             </div>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th class="text-center">S.No</th>
-                  <th>Student Name</th>
-                  <th>Course</th>
-                  <th>Duration</th>
-                  <th>Discount %</th>
-                  <th>Fee Status</th>
-                  <th>Status</th>
-                  <th>Admission Date</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let admission of detail.admissions; let i = index">
-                  <td class="text-center">{{ i + 1 }}</td>
-                  <td class="bold-text">{{ admission.studentName }}</td>
-                  <td>{{ admission.courseName }}</td>
-                  <td>{{ admission.duration }}</td>
-                  <td>
-                    <span class="discount-badge" [class.scholarship]="admission.discount === 'Scholarship'">
-                      {{ admission.discount }}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="fee-status-toggle">
-                        <div class="status-option paid" [class.active]="admission.feeStatus === 'Paid'">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
-                                <rect x="5" y="10" width="14" height="6" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <circle cx="12" cy="13" r="2" fill="currentColor"/>
-                            </svg>
-                            <span>Paid</span>
-                        </div>
-                        <div class="status-option unpaid" [class.active]="admission.feeStatus === 'Unpaid'">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
-                                <rect x="5" y="10" width="14" height="6" rx="1" stroke="currentColor" stroke-width="2" fill="none"/>
-                                <line x1="5" y1="10" x2="19" y2="16" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                            <span>Unpaid</span>
-                        </div>
-                    </div>
-                  </td>
-                  <td><span class="status-pill active">{{ admission.status }}</span></td>
-                  <td>{{ admission.admissionDate }}</td>
-                  <td>
-                    <div class="action-icons">
-                        <button class="icon-btn view" title="View" (click)="onViewAdmission(admission.id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Z" />
-                            </svg>
-                        </button>
-                        <button class="icon-btn edit" title="Edit" (click)="onEditAdmission(admission.id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-528q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
-                            </svg>
-                        </button>
-                        <button class="icon-btn delete" title="Delete" (click)="onDeleteAdmission(admission)">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                            </svg>
-                        </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="pagination-section">
-            <span class="showing-text">Showing {{ detail.admissions.length }} records</span>
-            <div class="pagination-controls">
-                <button class="page-btn nav-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn nav-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- All Consultancies Table -->
-        <div class="table-card table-only" style="padding: 24px">
-          <div class="table-header">
-            <h3 class="table-title">All Consultancies</h3>
-            <div class="search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" placeholder="Search Consultancy">
-            </div>
-          </div>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th class="text-center">S.No</th>
-                  <th>Name</th>
-                  <th>Email Id</th>
-                  <th>Mobile Number</th>
-                  <th>City</th>
-                  <th>Status</th>
-                  <th>Commission %</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let con of detail.consultancies; let i = index">
-                  <td class="text-center">{{ i + 1 }}</td>
-                  <td class="bold-text">{{ con.name }}</td>
-                  <td class="email-text">{{ con.email }}</td>
-                  <td>{{ con.mobile }}</td>
-                  <td>{{ con.city }}</td>
-                  <td><span class="status-pill active">{{ con.status }}</span></td>
-                  <td class="blue-text font-bold">{{ con.commission }}</td>
-                  <td>
-                    <div class="action-icons">
-                        <button class="icon-btn view" title="View" (click)="onViewConsultancy(con.id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Z" />
-                            </svg>
-                        </button>
-                        <button class="icon-btn edit" title="Edit" (click)="onEditConsultancy(con.id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-528q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
-                            </svg>
-                        </button>
-                        <button class="icon-btn delete" title="Delete" (click)="onDeleteConsultancy(con)">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                            </svg>
-                        </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
         <!-- Softly Deleted Records -->
         <div class="table-card table-only" style="padding: 24px">
-          <div class="table-header">
+          <div class="table-header-row">
             <h3 class="table-title danger-text">Softly Deleted Records</h3>
           </div>
           <div class="table-wrapper">
             <table>
-              <thead>
-                <tr class="danger-header">
+              <thead class="header-red">
+                <tr>
                   <th class="text-center">S.No</th>
                   <th>Record Name</th>
                   <th>Type</th>
@@ -355,54 +832,66 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let record of detail.softlyDeletedRecords; let i = index">
-                  <td class="text-center">{{ i + 1 }}</td>
+                <tr *ngFor="let record of paginatedSoftlyDeleted; let i = index">
+                  <td class="text-center">{{ (deletedPage - 1) * deletedPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ record.recordName }}</td>
                   <td>{{ record.type }}</td>
                   <td>{{ record.deletedOn }}</td>
                   <td>
                     <div class="user-cell">
                       <span class="user-name">{{ record.deletedBy }}</span>
-                      <span class="user-email">michaelchen@gmail.com</span>
                     </div>
                   </td>
-                  <td><span class="status-pill inactive">{{ record.status }}</span></td>
+                  <td><span class="status-badge inactive">{{ record.status }}</span></td>
                   <td>{{ record.institution }}</td>
                   <td>
-                    <div class="action-icons">
-                        <button class="icon-btn restore" title="Restore">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v240H560v-80h110q-32-46-81.5-73T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/>
-                            </svg>
-                        </button>
-                        <button class="icon-btn delete" title="Delete Permanent">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                                <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                            </svg>
-                        </button>
+                    <div class="action-tools">
+                      <button class="tool-btn restore" title="Restore" (click)="onRestoreRecord(record)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path
+                            d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v240H560v-80h110q-32-46-81.5-73T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z" />
+                        </svg>
+                      </button>
+                      <button class="tool-btn delete" title="Delete Permanent" (click)="onDeletePermanent(record)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path
+                            d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                        </svg>
+                      </button>
                     </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <div class="table-footer mt-16">
+            <span class="record-count">Showing {{ paginatedSoftlyDeleted.length }} of {{ filteredSoftlyDeleted.length }}
+              records</span>
+            <div class="pagination">
+              <button class="nav-btn" (click)="deletedPage = 1" [disabled]="deletedPage === 1">First</button>
+              <button class="nav-btn" (click)="changePage('deleted', -1)" [disabled]="deletedPage === 1">Prev</button>
+              <span class="page-info">Page {{ deletedPage }} of {{ getTotalPages(filteredSoftlyDeleted.length,
+                deletedPageSize) }}</span>
+              <button class="nav-btn" (click)="changePage('deleted', 1)"
+                [disabled]="deletedPage >= getTotalPages(filteredSoftlyDeleted.length, deletedPageSize)">Next</button>
+              <button class="nav-btn"
+                (click)="deletedPage = getTotalPages(filteredSoftlyDeleted.length, deletedPageSize)"
+                [disabled]="deletedPage >= getTotalPages(filteredSoftlyDeleted.length, deletedPageSize)">Last</button>
+            </div>
+          </div>
         </div>
 
         <!-- Top 5 Consultancy Chart -->
         <div class="chart-card">
-          <div class="card-header">
-            <h2>Top 5 Consultancy</h2>
+          <div class="card-header-box">
+            <div class="header-title">
+              <h2>Top 5 Consultancy</h2>
+            </div>
           </div>
           <div class="chart-content">
-            <apx-chart 
-              [series]="chartOptions.series!" 
-              [chart]="chartOptions.chart!" 
-              [xaxis]="chartOptions.xaxis!" 
-              [yaxis]="chartOptions.yaxis!"
-              [plotOptions]="chartOptions.plotOptions!" 
-              [dataLabels]="chartOptions.dataLabels!" 
-              [colors]="['#6366F1']"
-              [grid]="chartOptions.grid!">
+            <apx-chart [series]="chartOptions.series!" [chart]="chartOptions.chart!" [xaxis]="chartOptions.xaxis!"
+              [yaxis]="chartOptions.yaxis!" [plotOptions]="chartOptions.plotOptions!"
+              [dataLabels]="chartOptions.dataLabels!" [colors]="['#6366F1']" [grid]="chartOptions.grid!">
             </apx-chart>
           </div>
         </div>
@@ -416,11 +905,9 @@
   </div>
 
   <!-- Confirmation Modal -->
-  <app-confirmation-modal
-    *ngIf="showDeleteModal"
+  <app-confirmation-modal *ngIf="showDeleteModal"
     [title]="deleteType === 'institution' ? 'Delete Institution' : 'Delete Item'"
     [message]="'Are you sure you want to delete \'' + (itemToDelete?.name || itemToDelete?.studentName || 'this item') + '\'?'"
-    (confirm)="confirmDelete()"
-    (cancel)="cancelDelete()">
+    (confirm)="confirmDelete()" (cancel)="cancelDelete()">
   </app-confirmation-modal>
 </div>

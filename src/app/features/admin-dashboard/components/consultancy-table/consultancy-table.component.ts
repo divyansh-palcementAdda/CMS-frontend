@@ -17,7 +17,6 @@ import { ConsultancyItem } from '../../../../core/models/dashboard.model';
               <tr>
                 <th class="hash-col">S.No</th>
                 <th>Name</th>
-                <th>Email Id</th>
                 <th>Mobile Number</th>
                 <th>City</th>
                 <th>Status</th>
@@ -32,7 +31,6 @@ import { ConsultancyItem } from '../../../../core/models/dashboard.model';
                   <td class="name-cell">
                     <span class="user-name">{{ c.name }}</span>
                   </td>
-                  <td>{{ c.email }}</td>
                   <td>{{ c.mobile || c.phone || '—' }}</td>
                   <td>{{ c.city }}</td>
                   <td>
