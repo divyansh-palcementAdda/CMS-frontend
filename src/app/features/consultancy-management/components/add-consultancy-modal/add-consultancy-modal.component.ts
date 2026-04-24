@@ -1,7 +1,8 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConsultancyService } from '../../../../core/services/consultancy.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-consultancy-modal',
@@ -15,11 +16,16 @@ export class AddConsultancyModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
 
+  private fb = inject(FormBuilder);
+  private consultancyService = inject(ConsultancyService);
+  private toastr = inject(ToastrService);
+
   activeTab: 'single' | 'bulk' = 'single';
   isLoading = false;
 
   // Single Form State
   consultancyForm!: FormGroup;
+  backendErrors: { [key: string]: string } = {};
   lookupData = {
     institutions: [] as any[],
     courses: [] as any[],
@@ -43,10 +49,7 @@ export class AddConsultancyModalComponent implements OnInit {
   searchInstitutions = '';
   searchUsers = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private consultancyService: ConsultancyService
-  ) { }
+  constructor() { }
 
   ngOnInit(): void {
     this.initForm();
@@ -105,6 +108,7 @@ export class AddConsultancyModalComponent implements OnInit {
       address: ['', [Validators.maxLength(255)]],
       institutionOrFirmName: ['', [Validators.required]],
       commissionPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      status: ['ACTIVE', [Validators.required]],
       courseIds: [[]],
       institutionIds: [[]],
       representativeIds: [[], [Validators.required]],
@@ -260,12 +264,14 @@ export class AddConsultancyModalComponent implements OnInit {
   onSubmitSingle(): void {
     if (this.consultancyForm.invalid) {
       this.consultancyForm.markAllAsTouched();
+      this.toastr.warning('Please check all required fields', 'Form Invalid');
       return;
     }
 
     this.isSubmitting = true;
+    this.backendErrors = {};
     const payload = { ...this.consultancyForm.value };
-    delete payload.sameAsMobileAlt; // cleanup non-backend field
+    delete payload.sameAsMobileAlt;
     delete payload.sameAsMobileWa;
 
     const request = this.consultancyId 
@@ -275,12 +281,19 @@ export class AddConsultancyModalComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.isSubmitting = false;
+        this.toastr.success(`Consultancy ${this.consultancyId ? 'updated' : 'created'} successfully!`, 'Success');
         this.success.emit();
       },
       error: (err) => {
         this.isSubmitting = false;
         console.error(err);
-        alert(`Failed to ${this.consultancyId ? 'update' : 'create'} consultancy. ` + (err.error?.message || 'Check inputs.'));
+        
+        if (err.error?.errors) {
+          this.backendErrors = err.error.errors;
+          this.toastr.error('Validation failed. Please check individual fields.', 'Error');
+        } else {
+          this.toastr.error(err.error?.detail || err.error?.message || 'Server error occurred', 'Operation Failed');
+        }
       }
     });
   }
@@ -298,10 +311,11 @@ export class AddConsultancyModalComponent implements OnInit {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        this.toastr.info('Template download started', 'Downloading');
       },
       error: (err) => {
         console.error("Failed to download template", err);
-        alert("Failed to string template.");
+        this.toastr.error('Failed to download template. Please try again later.', 'Error');
       }
     });
   }
@@ -328,14 +342,15 @@ export class AddConsultancyModalComponent implements OnInit {
     if (file) {
       const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv');
       if (file.size > 2 * 1024 * 1024) {
-        alert("File must be smaller than 2MB");
+        this.toastr.warning("File must be smaller than 2MB", 'File Too Large');
         return;
       }
       if (!isExcel) {
-        alert("Only .xlsx, .xls, and .csv files are supported.");
+        this.toastr.warning("Only .xlsx, .xls, and .csv files are supported.", 'Unsupported Format');
         return;
       }
       this.selectedFile = file;
+      this.toastr.success(`${file.name} selected successfully`, 'File Selected');
     }
   }
 
@@ -349,11 +364,19 @@ export class AddConsultancyModalComponent implements OnInit {
       next: (res: any) => {
         this.isUploading = false;
         this.bulkUploadResult = res; // Contains successCount, failureCount, failures[]
+        if (res.failureCount === 0) {
+          this.toastr.success(`Successfully uploaded ${res.successCount} consultancies!`, 'Bulk Upload Success');
+          setTimeout(() => {
+            this.success.emit();
+          }, 2000);
+        } else {
+          this.toastr.warning(`Uploaded ${res.successCount} with ${res.failureCount} errors.`, 'Partial Success');
+        }
       },
       error: (err: any) => {
         this.isUploading = false;
         console.error(err);
-        alert("Bulk upload failed entirely: " + (err.error?.message || 'Server Error'));
+        this.toastr.error(err.error?.message || 'Bulk upload failed entirely', 'Server Error');
       }
     });
   }

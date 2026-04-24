@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../../../core/services/user.service';
 import { CreateUserDTO, BulkUserUploadResponse } from '../../../../core/models/user.model';
 import { finalize } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-user-modal',
@@ -18,6 +19,11 @@ export class AddUserModalComponent implements OnInit {
 
   @Input() userId: number | null = null;
   @Input() userToEdit: any | null = null;
+
+  private fb = inject(FormBuilder);
+  private userService = inject(UserService);
+  private toastr = inject(ToastrService);
+
   userForm: FormGroup;
   isSubmitting = false;
   roles: any[] = [];
@@ -38,10 +44,7 @@ export class AddUserModalComponent implements OnInit {
   private cooldownInterval: any;
   
 
-  constructor(
-    private fb: FormBuilder,
-    private userService: UserService
-  ) {
+  constructor() {
     this.userForm = this.fb.group({
       username: ['', [
         Validators.required, 
@@ -165,11 +168,11 @@ export class AddUserModalComponent implements OnInit {
       next: () => {
         this.isOtpSending = false;
         this.startCooldown();
-        alert('OTP sent to your email!');
+        this.toastr.success('OTP sent to your email!', 'OTP Sent');
       },
       error: (err) => {
         this.isOtpSending = false;
-        alert(err.error?.message || 'Failed to send OTP');
+        this.toastr.error(err.error?.message || 'Failed to send OTP', 'Error');
       }
     });
   }
@@ -189,6 +192,7 @@ export class AddUserModalComponent implements OnInit {
     this.backendErrors = {};
     if (this.userForm.invalid) {
       this.userForm.markAllAsTouched();
+      this.toastr.warning('Please fill all required fields correctly', 'Form Invalid');
       return;
     }
     
@@ -215,16 +219,19 @@ export class AddUserModalComponent implements OnInit {
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: () => {
+          this.toastr.success('User updated successfully', 'Success');
           this.showOtpModal = false;
           this.success.emit();
           this.onClose();
         },
         error: (err) => {
           console.error('Error updating user', err);
-          if (err.status === 400 && err.error?.errors) {
+          if (err.error?.errors) {
             this.backendErrors = err.error.errors;
             this.showOtpModal = false;
+            this.toastr.error('Validation failed', 'Error');
           } else {
+            this.toastr.error(err.error?.detail || err.error?.message || 'Update failed', 'Error');
             this.otpError = err.error?.message || 'Update failed';
           }
         }
@@ -254,16 +261,19 @@ export class AddUserModalComponent implements OnInit {
       .pipe(finalize(() => this.isVerifyingOtp = false))
       .subscribe({
         next: () => {
+          this.toastr.success('User created successfully', 'Success');
           this.showOtpModal = false;
           this.success.emit();
           this.onClose();
         },
         error: (err) => {
           console.error('Error creating user', err);
-          if (err.status === 400 && err.error?.errors) {
+          if (err.error?.errors) {
             this.backendErrors = err.error.errors;
-            this.showOtpModal = false; // Close OTP modal to show field errors
+            this.showOtpModal = false;
+            this.toastr.error('Validation failed', 'Error');
           } else {
+            this.toastr.error(err.error?.detail || err.error?.message || 'Creation failed', 'Error');
             this.otpError = err.error?.message || 'Verification failed. Please try again.';
           }
         }

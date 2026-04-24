@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { InstitutionService } from '../../../../core/services/institution.service';
 import { CourseService } from '../../../../core/services/course.service';
 import { BulkUploadResponse } from '../../../../core/models/institution.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-institution-modal',
@@ -18,8 +19,14 @@ export class AddInstitutionModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() success = new EventEmitter<void>();
 
+  private fb = inject(FormBuilder);
+  private institutionService = inject(InstitutionService);
+  private courseService = inject(CourseService);
+  private toastr = inject(ToastrService);
+
   activeTab: 'single' | 'bulk' = 'single';
   institutionForm: FormGroup;
+  backendErrors: { [key: string]: string } = {};
   isSubmitting = false;
   isLoading = false;
 
@@ -37,11 +44,7 @@ export class AddInstitutionModalComponent implements OnInit {
 
   institutionTypes = ['University', 'College', 'Vocational', 'Language School', 'Other'];
 
-  constructor(
-    private fb: FormBuilder,
-    private institutionService: InstitutionService,
-    private courseService: CourseService
-  ) {
+  constructor() {
     this.institutionForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       code: ['', [Validators.required]],
@@ -130,10 +133,12 @@ export class AddInstitutionModalComponent implements OnInit {
   onSubmit(): void {
     if (this.institutionForm.invalid || this.isSubmitting) {
       this.markFormGroupTouched(this.institutionForm);
+      this.toastr.warning('Please check all required fields', 'Form Invalid');
       return;
     }
 
     this.isSubmitting = true;
+    this.backendErrors = {};
     const payload = {
       ...this.institutionForm.value,
       courseIds: Array.from(this.selectedCourseIds)
@@ -146,13 +151,19 @@ export class AddInstitutionModalComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.isSubmitting = false;
+        this.toastr.success(`Institution ${this.institutionId ? 'updated' : 'created'} successfully!`, 'Success');
         this.resetAndClose();
         this.success.emit();
       },
       error: (err) => {
         this.isSubmitting = false;
-        console.error(`Failed to ${this.institutionId ? 'update' : 'create'} institution`, err);
-        alert(err.error?.message || `Failed to ${this.institutionId ? 'update' : 'create'} institution`);
+        console.error(err);
+        if (err.error?.errors) {
+          this.backendErrors = err.error.errors;
+          this.toastr.error('Validation failed. Please check individual fields.', 'Error');
+        } else {
+          this.toastr.error(err.error?.detail || err.error?.message || 'Server error occurred', 'Operation Failed');
+        }
       }
     });
   }
@@ -183,11 +194,12 @@ export class AddInstitutionModalComponent implements OnInit {
   private validateAndSetFile(file: File): void {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (ext !== 'xlsx' && ext !== 'xls' && ext !== 'csv') {
-      alert('Only Excel (.xlsx, .xls) or CSV files are allowed');
+      this.toastr.warning('Only Excel (.xlsx, .xls) or CSV files are allowed', 'Invalid File');
       return;
     }
     this.selectedFile = file;
     this.bulkUploadResult = null;
+    this.toastr.success(`${file.name} selected successfully`, 'File Selected');
   }
 
   onSubmitBulk(): void {
@@ -200,15 +212,18 @@ export class AddInstitutionModalComponent implements OnInit {
         this.bulkUploadResult = res.data || res;
         this.selectedFile = null;
         if (this.bulkUploadResult?.failureCount === 0) {
+          this.toastr.success(`Successfully uploaded ${this.bulkUploadResult?.successCount} institutions!`, 'Bulk Upload Success');
           setTimeout(() => {
             this.success.emit();
             this.resetAndClose();
           }, 2000);
+        } else {
+          this.toastr.warning(`Uploaded ${this.bulkUploadResult?.successCount} with ${this.bulkUploadResult?.failureCount} errors.`, 'Partial Success');
         }
       },
       error: (err: any) => {
         this.isUploading = false;
-        alert(err.error?.message || 'Bulk upload failed');
+        this.toastr.error(err.error?.message || 'Bulk upload failed', 'Error');
       }
     });
   }

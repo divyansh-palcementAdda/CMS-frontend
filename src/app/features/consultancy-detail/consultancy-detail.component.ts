@@ -171,15 +171,15 @@ export class ConsultancyDetailComponent implements OnInit {
     this.consultancyService.getConsultancyById(id).subscribe({
       next: (data) => {
         // Safe initialization of categorized lists
-        data.totalApplications = data.totalApplications || [];
-        data.cancelledApplications = data.cancelledApplications || [];
-        data.totalAdmissions = data.totalAdmissions || [];
-        data.cancelledAdmissions = data.cancelledAdmissions || [];
+        data.totalApplicationsList = data.totalApplicationsList || [];
+        data.cancelledApplicationsList = data.cancelledApplicationsList || [];
+        data.totalAdmissionsList = data.totalAdmissionsList || [];
+        data.cancelledAdmissionsList = data.cancelledAdmissionsList || [];
         console.log(data);
-        console.log(data.totalApplications);
-        console.log(data.cancelledApplications);
-        console.log(data.totalAdmissions);
-        console.log(data.cancelledAdmissions);
+        console.log(data.totalApplicationsList);
+        console.log(data.cancelledApplicationsList);
+        console.log(data.totalAdmissionsList);
+        console.log(data.cancelledAdmissionsList);
         this.consultancy = data;
         this.updateChartData(data);
         this.loading = false;
@@ -259,8 +259,8 @@ export class ConsultancyDetailComponent implements OnInit {
 
   // Total Applications
   get filteredTotalApplications() {
-    if (!this.consultancy?.totalApplications) return [];
-    return this.consultancy.totalApplications.filter(a =>
+    if (!this.consultancy?.totalApplicationsList) return [];
+    return this.consultancy.totalApplicationsList.filter(a =>
       a.studentName?.toLowerCase().includes(this.totalAppSearch.toLowerCase()) ||
       a.courseName?.toLowerCase().includes(this.totalAppSearch.toLowerCase())
     );
@@ -272,8 +272,8 @@ export class ConsultancyDetailComponent implements OnInit {
 
   // Cancelled Applications
   get filteredCancelledApplications() {
-    if (!this.consultancy?.cancelledApplications) return [];
-    return this.consultancy.cancelledApplications.filter(a =>
+    if (!this.consultancy?.cancelledApplicationsList) return [];
+    return this.consultancy.cancelledApplicationsList.filter(a =>
       a.studentName?.toLowerCase().includes(this.cancelledAppSearch.toLowerCase()) ||
       a.courseName?.toLowerCase().includes(this.cancelledAppSearch.toLowerCase())
     );
@@ -285,8 +285,8 @@ export class ConsultancyDetailComponent implements OnInit {
 
   // Total Admissions
   get filteredTotalAdmissions() {
-    if (!this.consultancy?.totalAdmissions) return [];
-    return this.consultancy.totalAdmissions.filter(a =>
+    if (!this.consultancy?.totalAdmissionsList) return [];
+    return this.consultancy.totalAdmissionsList.filter(a =>
       a.studentName?.toLowerCase().includes(this.totalAdmSearch.toLowerCase()) ||
       a.courseName?.toLowerCase().includes(this.totalAdmSearch.toLowerCase())
     );
@@ -298,8 +298,8 @@ export class ConsultancyDetailComponent implements OnInit {
 
   // Cancelled Admissions
   get filteredCancelledAdmissions() {
-    if (!this.consultancy?.cancelledAdmissions) return [];
-    return this.consultancy.cancelledAdmissions.filter(a =>
+    if (!this.consultancy?.cancelledAdmissionsList) return [];
+    return this.consultancy.cancelledAdmissionsList.filter(a =>
       a.studentName?.toLowerCase().includes(this.cancelledAdmSearch.toLowerCase()) ||
       a.courseName?.toLowerCase().includes(this.cancelledAdmSearch.toLowerCase())
     );

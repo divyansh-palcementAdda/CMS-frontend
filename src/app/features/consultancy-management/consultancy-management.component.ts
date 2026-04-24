@@ -23,6 +23,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   pageData: ConsultancyPageData | null = null;
   loading = true;
   searchTerm = '';
+  selectedFilter: string = 'TOTAL';
   
   currentPage = 1;
   pageSize = 10;
@@ -150,9 +151,42 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
       });
   }
 
+  setFilter(filter: string) {
+    this.selectedFilter = filter;
+    this.currentPage = 1;
+  }
+
   get filteredConsultancies(): ConsultancyItem[] {
     if (!this.pageData) return [];
     let list = this.pageData.consultancies;
+
+    // Apply Status/Metric Filter
+    switch (this.selectedFilter) {
+      case 'ACTIVE':
+        list = list.filter(item => item.status === 'ACTIVE');
+        break;
+      case 'INACTIVE':
+        list = list.filter(item => item.status === 'INACTIVE');
+        break;
+      case 'DORMANT':
+        list = list.filter(item => item.status === 'DORMANT');
+        break;
+      case 'ADMISSIONS':
+        list = list.filter(item => item.totalAdmissions > 0);
+        break;
+      case 'APPLICATIONS':
+        list = list.filter(item => item.totalApplications > 0);
+        break;
+      case 'CANCELLED_ADMISSIONS':
+        list = list.filter(item => item.totalCancelledAdmissions > 0);
+        break;
+      case 'CANCELLED_APPLICATIONS':
+        list = list.filter(item => item.totalCancelledApplications > 0);
+        break;
+      default:
+        // 'TOTAL' - no filtering
+        break;
+    }
 
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
@@ -175,8 +209,35 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     return Math.ceil(this.filteredConsultancies.length / this.pageSize) || 1;
   }
 
-  getPagesArray(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  getVisiblePages(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      
+      if (current > 3) {
+        pages.push('...');
+      }
+
+      const start = Math.max(2, current - 1);
+      const end = Math.min(total - 1, current + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 2) {
+        pages.push('...');
+      }
+
+      pages.push(total);
+    }
+
+    return pages;
   }
 
   goToPage(page: number) {

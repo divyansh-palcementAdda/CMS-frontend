@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { CourseService } from '../../../../core/services/course.service';
 import { CourseTypeService } from '../../../../core/services/course-type.service';
 import { InstitutionService } from '../../../../core/services/institution.service';
 import { BulkUploadResponse } from '../../../../core/models/course.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-course-modal',
@@ -19,12 +19,19 @@ export class AddCourseModalComponent implements OnInit {
   @Output() success = new EventEmitter<void>();
   @Input() editId: number | null = null;
 
+  private fb = inject(FormBuilder);
+  private courseService = inject(CourseService);
+  private courseTypeService = inject(CourseTypeService);
+  private institutionService = inject(InstitutionService);
+  private toastr = inject(ToastrService);
+
   activeTab: 'single' | 'bulk' = 'single';
-  
+
   // Single form
   courseForm!: FormGroup;
+  backendErrors: { [key: string]: string } = {};
   isSubmitting = false;
-  
+
   courseTypes: any[] = [];
   institutions: any[] = [];
   filteredInstitutions: any[] = [];
@@ -36,19 +43,13 @@ export class AddCourseModalComponent implements OnInit {
   bulkUploadResult: BulkUploadResponse | null = null;
   isDragging = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private courseService: CourseService,
-    private courseTypeService: CourseTypeService,
-    private institutionService: InstitutionService
-  ) {
-    this.initForm();
-  }
+  constructor() { }
 
   ngOnInit() {
+    this.initForm();
     this.loadCourseTypes();
     this.loadInstitutions();
-    
+
     if (this.editId) {
       this.loadCourseForEdit();
     }
@@ -115,7 +116,7 @@ export class AddCourseModalComponent implements OnInit {
   toggleSelection(controlName: string, id: number) {
     const control = this.courseForm.get(controlName);
     const currentValues = control?.value || [];
-    
+
     if (currentValues.includes(id)) {
       control?.setValue(currentValues.filter((v: number) => v !== id));
     } else {
@@ -130,7 +131,7 @@ export class AddCourseModalComponent implements OnInit {
 
   onSearchInstitutionsChange() {
     const term = this.searchInstitutions.toLowerCase();
-    this.filteredInstitutions = this.institutions.filter(inst => 
+    this.filteredInstitutions = this.institutions.filter(inst =>
       inst.name.toLowerCase().includes(term) || inst.code.toLowerCase().includes(term)
     );
   }
@@ -138,10 +139,12 @@ export class AddCourseModalComponent implements OnInit {
   onSubmitSingle() {
     if (this.courseForm.invalid) {
       this.courseForm.markAllAsTouched();
+      this.toastr.warning('Please check all required fields', 'Form Invalid');
       return;
     }
 
     this.isSubmitting = true;
+    this.backendErrors = {};
     const payload = {
       ...this.courseForm.value,
       isOnline: this.courseForm.value.isOnline === 'true' || this.courseForm.value.isOnline === true,
@@ -151,31 +154,28 @@ export class AddCourseModalComponent implements OnInit {
       courseTypeId: Number(this.courseForm.value.courseTypeId)
     };
 
-    if (this.editId) {
-      this.courseService.updateCourse(this.editId, payload).subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.success.emit();
-          this.onClose();
-        },
-        error: (err) => {
-          console.error('Failed to update course', err);
-          this.isSubmitting = false;
+    const request = this.editId
+      ? this.courseService.updateCourse(this.editId, payload)
+      : this.courseService.createCourse(payload);
+
+    request.subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.toastr.success(`Course ${this.editId ? 'updated' : 'created'} successfully!`, 'Success');
+        this.success.emit();
+        this.onClose();
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        console.error(err);
+        if (err.error?.errors) {
+          this.backendErrors = err.error.errors;
+          this.toastr.error('Validation failed. Please check individual fields.', 'Error');
+        } else {
+          this.toastr.error(err.error?.detail || err.error?.message || 'Server error occurred', 'Operation Failed');
         }
-      });
-    } else {
-      this.courseService.createCourse(payload).subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.success.emit();
-          this.onClose();
-        },
-        error: (err) => {
-          console.error('Failed to create course', err);
-          this.isSubmitting = false;
-        }
-      });
-    }
+      }
+    });
   }
 
   // --- Bulk Flow ---
@@ -196,7 +196,7 @@ export class AddCourseModalComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
-    
+
     if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
       this.handleFile(event.dataTransfer.files[0]);
     }
@@ -212,8 +212,9 @@ export class AddCourseModalComponent implements OnInit {
     const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'];
     if (validTypes.includes(file.type) || file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
       this.selectedFile = file;
+      this.toastr.success(`${file.name} selected successfully`, 'File Selected');
     } else {
-      alert('Please upload a valid Excel or CSV file.');
+      this.toastr.warning('Please upload a valid Excel or CSV file.', 'Invalid File');
     }
   }
 
@@ -227,18 +228,20 @@ export class AddCourseModalComponent implements OnInit {
       next: (res: any) => {
         this.isUploading = false;
         this.bulkUploadResult = res;
-        // Optionally emit success if everything succeeded
         if (res.failureCount === 0) {
+          this.toastr.success(`Successfully uploaded ${res.successCount} courses!`, 'Bulk Upload Success');
           setTimeout(() => {
             this.success.emit();
             this.onClose();
-          }, 3000); // give user time to read success message before closing
+          }, 3000);
+        } else {
+          this.toastr.warning(`Uploaded ${res.successCount} with ${res.failureCount} errors.`, 'Partial Success');
         }
       },
       error: (err: any) => {
         console.error('Bulk upload failed', err);
         this.isUploading = false;
-        alert('Bulk upload failed. See console for details.');
+        this.toastr.error(err.error?.message || 'Bulk upload failed', 'Error');
       }
     });
   }
@@ -254,10 +257,11 @@ export class AddCourseModalComponent implements OnInit {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        this.toastr.info('Template download started', 'Downloading');
       },
       error: (err: any) => {
         console.error('Failed to download template', err);
-        alert('Failed to download template. Please try again later.');
+        this.toastr.error('Failed to download template. Please try again later.', 'Error');
       }
     });
   }

@@ -43,15 +43,16 @@
           <div class="form-group form-group-half">
             <label>Course Name <span class="req">*</span></label>
             <input type="text" formControlName="name" placeholder="Enter Course Name" 
-                   [class.error]="courseForm.get('name')?.invalid && courseForm.get('name')?.touched">
-            <div class="error-msg" *ngIf="courseForm.get('name')?.invalid && courseForm.get('name')?.touched">
-              <small>Course name is required (min 3 chars).</small>
+                   [class.error]="(courseForm.get('name')?.invalid && courseForm.get('name')?.touched) || backendErrors['name']">
+            <div class="error-msg" *ngIf="(courseForm.get('name')?.invalid && courseForm.get('name')?.touched) || backendErrors['name']">
+              <small *ngIf="courseForm.get('name')?.invalid && courseForm.get('name')?.touched">Course name is required (min 3 chars).</small>
+              <small *ngIf="backendErrors['name']">{{ backendErrors['name'] }}</small>
             </div>
           </div>
 
           <div class="form-group form-group-half">
             <label>Course Mode <span class="req">*</span></label>
-            <div class="select-wrapper" [class.error]="courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched">
+            <div class="select-wrapper" [class.error]="(courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched) || backendErrors['isOnline']">
               <select formControlName="isOnline" class="custom-select">
                 <option [ngValue]="null" disabled selected>Select Mode</option>
                 <option [ngValue]="true">Online</option>
@@ -61,14 +62,15 @@
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <div class="error-msg" *ngIf="courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched">
-              <small>Mode is required.</small>
+            <div class="error-msg" *ngIf="(courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched) || backendErrors['isOnline']">
+              <small *ngIf="courseForm.get('isOnline')?.invalid && courseForm.get('isOnline')?.touched">Mode is required.</small>
+              <small *ngIf="backendErrors['isOnline']">{{ backendErrors['isOnline'] }}</small>
             </div>
           </div>
 
           <div class="form-group form-group-half">
             <label>Course Status <span class="req">*</span></label>
-            <div class="select-wrapper" [class.error]="courseForm.get('active')?.invalid && courseForm.get('active')?.touched">
+            <div class="select-wrapper" [class.error]="(courseForm.get('active')?.invalid && courseForm.get('active')?.touched) || backendErrors['active']">
               <select formControlName="active" class="custom-select">
                 <option [ngValue]="true">Active</option>
                 <option [ngValue]="false">Inactive</option>
@@ -77,11 +79,14 @@
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
+            <div class="error-msg" *ngIf="backendErrors['active']">
+              <small>{{ backendErrors['active'] }}</small>
+            </div>
           </div>
 
           <div class="form-group form-group-half">
             <label>Duration <span class="req">*</span></label>
-            <div class="select-wrapper" [class.error]="courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched">
+            <div class="select-wrapper" [class.error]="(courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched) || backendErrors['duration']">
               <select formControlName="duration" class="custom-select">
                 <option [ngValue]="null" disabled selected>Select Duration</option>
                 <option [ngValue]="1">1 yr</option>
@@ -94,25 +99,27 @@
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <div class="error-msg" *ngIf="courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched">
-              <small>Duration is required.</small>
+            <div class="error-msg" *ngIf="(courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched) || backendErrors['duration']">
+              <small *ngIf="courseForm.get('duration')?.invalid && courseForm.get('duration')?.touched">Duration is required.</small>
+              <small *ngIf="backendErrors['duration']">{{ backendErrors['duration'] }}</small>
             </div>
           </div>
 
           <div class="form-group form-group-half">
             <label>Fees <span class="req">*</span></label>
-            <div class="input-with-icon" [class.error]="courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched">
+            <div class="input-with-icon" [class.error]="(courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched) || backendErrors['fees']">
               <span class="currency-symbol">₹</span>
               <input type="number" formControlName="fees" placeholder="0.00">
             </div>
-            <div class="error-msg" *ngIf="courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched">
-              <small>Fees must be a positive number.</small>
+            <div class="error-msg" *ngIf="(courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched) || backendErrors['fees']">
+              <small *ngIf="courseForm.get('fees')?.invalid && courseForm.get('fees')?.touched">Fees must be a positive number.</small>
+              <small *ngIf="backendErrors['fees']">{{ backendErrors['fees'] }}</small>
             </div>
           </div>
 
           <div class="form-group form-group-half">
             <label>Course Type <span class="req">*</span></label>
-            <div class="select-wrapper" [class.error]="courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched">
+            <div class="select-wrapper" [class.error]="(courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched) || backendErrors['courseTypeId']">
               <select formControlName="courseTypeId" class="custom-select">
                 <option [ngValue]="null" disabled selected>Select Type</option>
                 <option *ngFor="let type of courseTypes" [value]="type.id">{{type.name || type.courseTypeName}}</option>
@@ -121,8 +128,9 @@
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <div class="error-msg" *ngIf="courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched">
-              <small>Course Type is required.</small>
+            <div class="error-msg" *ngIf="(courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched) || backendErrors['courseTypeId']">
+              <small *ngIf="courseForm.get('courseTypeId')?.invalid && courseForm.get('courseTypeId')?.touched">Course Type is required.</small>
+              <small *ngIf="backendErrors['courseTypeId']">{{ backendErrors['courseTypeId'] }}</small>
             </div>
           </div>
 

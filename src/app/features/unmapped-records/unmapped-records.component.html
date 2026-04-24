@@ -172,8 +172,11 @@
                 <tr>
                   <th>Consultancy Name</th>
                   <th>Location</th>
-                  <th>Firm Name</th>
                   <th>Commission %</th>
+                  <th>Admissions</th>
+                  <th>Apps</th>
+                  <th>Can. Adm</th>
+                  <th>Can. Apps</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -182,8 +185,11 @@
                 <tr>
                   <th>Consultancy Name</th>
                   <th>Location</th>
-                  <th>Firm Name</th>
                   <th>Commission %</th>
+                  <th>Admissions</th>
+                  <th>Apps</th>
+                  <th>Can. Adm</th>
+                  <th>Can. Apps</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -251,8 +257,11 @@
                       <div class="primary">{{ item.city}}, {{ item.state }}</div>
                     </div>
                   </td>
-                  <td>{{ item.institutionOrFirmName }}</td>
-                  <td>{{ item.commissionPercentage }}</td>
+                  <td>{{ item.commissionPercentage }}%</td>
+                  <td><span class="count-badge admissions">{{ item.totalAdmissions || 0 }}</span></td>
+                  <td><span class="count-badge apps">{{ item.totalApplications || 0 }}</span></td>
+                  <td><span class="count-badge cancelled-adm">{{ item.totalCancelledAdmissions || 0 }}</span></td>
+                  <td><span class="count-badge cancelled-apps">{{ item.totalCancelledApplications || 0 }}</span></td>
                   }
                   @case ('consultancies-courses') {
                   <td>
@@ -260,8 +269,11 @@
                       <div class="primary">{{ item.city}}, {{ item.state }}</div>
                     </div>
                   </td>
-                  <td>{{ item.institutionOrFirmName }}</td>
-                  <td>{{ item.commissionPercentage }}</td>
+                  <td>{{ item.commissionPercentage }}%</td>
+                  <td><span class="count-badge admissions">{{ item.totalAdmissions || 0 }}</span></td>
+                  <td><span class="count-badge apps">{{ item.totalApplications || 0 }}</span></td>
+                  <td><span class="count-badge cancelled-adm">{{ item.totalCancelledAdmissions || 0 }}</span></td>
+                  <td><span class="count-badge cancelled-apps">{{ item.totalCancelledApplications || 0 }}</span></td>
                   }
                   }
 

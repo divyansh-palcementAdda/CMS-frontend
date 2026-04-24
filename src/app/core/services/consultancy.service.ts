@@ -20,11 +20,25 @@ export class ConsultancyService {
         const data = Array.isArray(response) ? response : (response?.data || []);
 
         let activeCount = 0;
+        let inactiveCount = 0;
+        let dormantCount = 0;
         let totalCourseCount = 0;
+        let totalAdmissions = 0;
+        let totalApplications = 0;
+        let totalCancelledAdmissions = 0;
+        let totalCancelledApplications = 0;
 
         const mappedItems: ConsultancyItem[] = data.map((dto: ConsultancyDTO, index: number) => {
-          if (dto.status === 'Active') activeCount++;
+          const status = (dto.status || 'ACTIVE').toUpperCase();
+          if (status === 'ACTIVE') activeCount++;
+          else if (status === 'INACTIVE') inactiveCount++;
+          else if (status === 'DORMANT') dormantCount++;
+
           totalCourseCount += (dto.courseCount || 0);
+          totalAdmissions += (dto.totalAdmissions || 0);
+          totalApplications += (dto.totalApplications || 0);
+          totalCancelledAdmissions += (dto.totalCancelledAdmissions || 0);
+          totalCancelledApplications += (dto.totalCancelledApplications || 0);
 
           return {
             id: dto.id || 0,
@@ -33,15 +47,25 @@ export class ConsultancyService {
             email: dto.email || 'N/A',
             mobile: dto.mobile || 'N/A',
             city: dto.city || 'N/A',
-            status: (dto.status || 'Active') as any,
-            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-'
+            status: status as any,
+            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-',
+            totalAdmissions: Number(dto.totalAdmissions) || 0,
+            totalApplications: Number(dto.totalApplications) || 0,
+            totalCancelledAdmissions: Number(dto.totalCancelledAdmissions) || 0,
+            totalCancelledApplications: Number(dto.totalCancelledApplications) || 0
           };
         });
 
         const stats: ConsultancyStats = {
           totalConsultancy: mappedItems.length,
           activeConsultancy: activeCount,
-          totalProjected: '₹ 0', // To be calculated or provided by backend
+          inactiveConsultancy: inactiveCount,
+          dormantConsultancy: dormantCount,
+          totalAdmissions,
+          totalApplications,
+          totalCancelledAdmissions,
+          totalCancelledApplications,
+          totalProjected: '₹ 0',
           totalCourses: totalCourseCount
         };
 
@@ -60,11 +84,25 @@ export class ConsultancyService {
         const data = Array.isArray(response) ? response : (response?.data || []);
 
         let activeCount = 0;
+        let inactiveCount = 0;
+        let dormantCount = 0;
         let totalCourseCount = 0;
+        let totalAdmissions = 0;
+        let totalApplications = 0;
+        let totalCancelledAdmissions = 0;
+        let totalCancelledApplications = 0;
 
         const mappedItems: ConsultancyItem[] = data.map((dto: ConsultancyDTO, index: number) => {
-          if (dto.status?.toLowerCase() === 'active') activeCount++;
+          const statusVal = (dto.status || 'ACTIVE').toUpperCase();
+          if (statusVal === 'ACTIVE') activeCount++;
+          else if (statusVal === 'INACTIVE') inactiveCount++;
+          else if (statusVal === 'DORMANT') dormantCount++;
+
           totalCourseCount += (dto.courseCount || 0);
+          totalAdmissions += (dto.totalAdmissions || 0);
+          totalApplications += (dto.totalApplications || 0);
+          totalCancelledAdmissions += (dto.totalCancelledAdmissions || 0);
+          totalCancelledApplications += (dto.totalCancelledApplications || 0);
 
           return {
             id: dto.id || 0,
@@ -73,14 +111,24 @@ export class ConsultancyService {
             email: dto.email || 'N/A',
             mobile: dto.mobile || 'N/A',
             city: dto.city || 'N/A',
-            status: (dto.status || 'Active') as any,
-            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-'
+            status: statusVal as any,
+            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-',
+            totalAdmissions: Number(dto.totalAdmissions) || 0,
+            totalApplications: Number(dto.totalApplications) || 0,
+            totalCancelledAdmissions: Number(dto.totalCancelledAdmissions) || 0,
+            totalCancelledApplications: Number(dto.totalCancelledApplications) || 0
           };
         });
 
         const stats: ConsultancyStats = {
           totalConsultancy: mappedItems.length,
           activeConsultancy: activeCount,
+          inactiveConsultancy: inactiveCount,
+          dormantConsultancy: dormantCount,
+          totalAdmissions,
+          totalApplications,
+          totalCancelledAdmissions,
+          totalCancelledApplications,
           totalProjected: '₹ 0',
           totalCourses: totalCourseCount
         };
@@ -100,11 +148,25 @@ export class ConsultancyService {
         const data = Array.isArray(response) ? response : (response?.data || []);
 
         let activeCount = 0;
+        let inactiveCount = 0;
+        let dormantCount = 0;
         let totalCourseCount = 0;
+        let totalAdmissions = 0;
+        let totalApplications = 0;
+        let totalCancelledAdmissions = 0;
+        let totalCancelledApplications = 0;
 
         const mappedItems: ConsultancyItem[] = data.map((dto: ConsultancyDTO, index: number) => {
-          if (dto.status?.toLowerCase() === 'active') activeCount++;
+          const statusVal = (dto.status || 'ACTIVE').toUpperCase();
+          if (statusVal === 'ACTIVE') activeCount++;
+          else if (statusVal === 'INACTIVE') inactiveCount++;
+          else if (statusVal === 'DORMANT') dormantCount++;
+
           totalCourseCount += (dto.courseCount || 0);
+          totalAdmissions += (dto.totalAdmissions || 0);
+          totalApplications += (dto.totalApplications || 0);
+          totalCancelledAdmissions += (dto.totalCancelledAdmissions || 0);
+          totalCancelledApplications += (dto.totalCancelledApplications || 0);
 
           return {
             id: dto.id || 0,
@@ -113,14 +175,24 @@ export class ConsultancyService {
             email: dto.email || 'N/A',
             mobile: dto.mobile || 'N/A',
             city: dto.city || 'N/A',
-            status: (dto.status || 'Active') as any,
-            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-'
+            status: statusVal as any,
+            commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-',
+            totalAdmissions: Number(dto.totalAdmissions) || 0,
+            totalApplications: Number(dto.totalApplications) || 0,
+            totalCancelledAdmissions: Number(dto.totalCancelledAdmissions) || 0,
+            totalCancelledApplications: Number(dto.totalCancelledApplications) || 0
           };
         });
 
         const stats: ConsultancyStats = {
           totalConsultancy: mappedItems.length,
           activeConsultancy: activeCount,
+          inactiveConsultancy: inactiveCount,
+          dormantConsultancy: dormantCount,
+          totalAdmissions,
+          totalApplications,
+          totalCancelledAdmissions,
+          totalCancelledApplications,
           totalProjected: '₹ 0',
           totalCourses: totalCourseCount
         };
@@ -141,7 +213,7 @@ export class ConsultancyService {
         if (!data) throw new Error('Consultancy not found');
 
         return {
-          ...data.basicInfo, // ✅ FIXED
+          ...data.basicInfo,
 
           financials: data.financials || {
             totalProjected: '0',
@@ -180,23 +252,22 @@ export class ConsultancyService {
             sNo: index + 1
           })),
 
-          // ✅ ADD THESE (MISSING EARLIER)
-          totalAdmissions: (data.totalAdmissions || []).map((a: any, index: number) => ({
+          totalAdmissionsList: (data.totalAdmissions || []).map((a: any, index: number) => ({
             ...a,
             sNo: index + 1
           })),
 
-          totalApplications: (data.totalApplications || []).map((a: any, index: number) => ({
+          totalApplicationsList: (data.totalApplications || []).map((a: any, index: number) => ({
             ...a,
             sNo: index + 1
           })),
 
-          cancelledApplications: (data.cancelledApplications || []).map((a: any, index: number) => ({
+          cancelledApplicationsList: (data.cancelledApplications || []).map((a: any, index: number) => ({
             ...a,
             sNo: index + 1
           })),
 
-          cancelledAdmissions: (data.cancelledAdmissions || []).map((a: any, index: number) => ({
+          cancelledAdmissionsList: (data.cancelledAdmissions || []).map((a: any, index: number) => ({
             ...a,
             sNo: index + 1
           })),

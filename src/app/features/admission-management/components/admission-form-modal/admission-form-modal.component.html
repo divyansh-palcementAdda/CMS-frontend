@@ -37,41 +37,49 @@
           <div class="form-grid">
             <div class="input-group">
               <label>Full Name <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['fullName']">
                 <i class="fa-solid fa-user"></i>
                 <input type="text" formControlName="fullName" placeholder="Enter student full name">
               </div>
-              <div class="error-msg" [class.show]="isFieldInvalid('fullName')">Full name is required</div>
+              <div class="error-msg" [class.show]="isFieldInvalid('fullName') || backendErrors['fullName']">
+                <span *ngIf="isFieldInvalid('fullName')">Full name is required</span>
+                <span *ngIf="backendErrors['fullName']">{{ backendErrors['fullName'] }}</span>
+              </div>
             </div>
 
             <div class="input-group">
               <label>Father's Name</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['fatherName']">
                 <i class="fa-solid fa-user-friends"></i>
                 <input type="text" formControlName="fatherName" placeholder="Enter father's name">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['fatherName']">{{ backendErrors['fatherName'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Mother's Name</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['motherName']">
                 <i class="fa-solid fa-female"></i>
                 <input type="text" formControlName="motherName" placeholder="Enter mother's name">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['motherName']">{{ backendErrors['motherName'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Date of Birth <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['dateOfBirth']">
                 <i class="fa-solid fa-calendar"></i>
                 <input type="date" formControlName="dateOfBirth">
               </div>
-              <div class="error-msg" [class.show]="isFieldInvalid('dateOfBirth')">Valid DOB is required</div>
+              <div class="error-msg" [class.show]="isFieldInvalid('dateOfBirth') || backendErrors['dateOfBirth']">
+                <span *ngIf="isFieldInvalid('dateOfBirth')">Valid DOB is required</span>
+                <span *ngIf="backendErrors['dateOfBirth']">{{ backendErrors['dateOfBirth'] }}</span>
+              </div>
             </div>
 
             <div class="input-group">
               <label>Gender <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['gender']">
                 <i class="fa-solid fa-venus-mars"></i>
                 <select formControlName="gender">
                   <option value="">Select Gender</option>
@@ -80,29 +88,36 @@
                   <option value="OTHER">Other</option>
                 </select>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['gender']">{{ backendErrors['gender'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Email Address <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['email']">
                 <i class="fa-solid fa-envelope"></i>
                 <input type="email" formControlName="email" placeholder="Enter email address">
               </div>
-              <div class="error-msg" [class.show]="isFieldInvalid('email')">Valid email is required</div>
+              <div class="error-msg" [class.show]="isFieldInvalid('email') || backendErrors['email']">
+                <span *ngIf="isFieldInvalid('email')">Valid email is required</span>
+                <span *ngIf="backendErrors['email']">{{ backendErrors['email'] }}</span>
+              </div>
             </div>
 
             <div class="input-group">
               <label>Phone Number <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['phoneNumber']">
                 <i class="fa-solid fa-phone"></i>
                 <input type="text" formControlName="phoneNumber" placeholder="Enter 10-digit mobile">
               </div>
-              <div class="error-msg" [class.show]="isFieldInvalid('phoneNumber')">Valid 10-digit mobile required</div>
+              <div class="error-msg" [class.show]="isFieldInvalid('phoneNumber') || backendErrors['phoneNumber']">
+                <span *ngIf="isFieldInvalid('phoneNumber')">Valid 10-digit mobile required</span>
+                <span *ngIf="backendErrors['phoneNumber']">{{ backendErrors['phoneNumber'] }}</span>
+              </div>
             </div>
 
             <div class="input-group">
               <label>WhatsApp Number</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['whatsappPhoneNo']">
                 <i class="fa-brands fa-whatsapp"></i>
                 <input type="text" formControlName="whatsappPhoneNo" placeholder="Enter WhatsApp number">
               </div>
@@ -110,38 +125,43 @@
                 <input type="checkbox" [checked]="isSameAsMobile">
                 <span>Same as mobile number</span>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['whatsappPhoneNo']">{{ backendErrors['whatsappPhoneNo'] }}</div>
             </div>
 
             <div class="input-group">
               <label>City <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['city']">
                 <i class="fa-solid fa-city"></i>
                 <input type="text" formControlName="city" placeholder="Enter city">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['city']">{{ backendErrors['city'] }}</div>
             </div>
 
             <div class="input-group">
               <label>State <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['state']">
                 <i class="fa-solid fa-map"></i>
                 <input type="text" formControlName="state" placeholder="Enter state">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['state']">{{ backendErrors['state'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Pincode <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['pincode']">
                 <i class="fa-solid fa-map-pin"></i>
                 <input type="text" formControlName="pincode" placeholder="Enter 6-digit pincode">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['pincode']">{{ backendErrors['pincode'] }}</div>
             </div>
 
             <div class="input-group full-width">
               <label>Full Address <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['address']">
                 <i class="fa-solid fa-location-dot"></i>
                 <textarea formControlName="address" placeholder="Enter complete residential address"></textarea>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['address']">{{ backendErrors['address'] }}</div>
             </div>
           </div>
         </div>
@@ -151,87 +171,97 @@
           <div class="form-grid">
             <div class="input-group">
               <label>Admission Source <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['admissionSource']">
                 <i class="fa-solid fa-share-nodes"></i>
                 <select formControlName="admissionSource">
                   <option value="USER">Direct / User</option>
                   <option value="CONSULTANCY">Via Consultancy</option>
                 </select>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['admissionSource']">{{ backendErrors['admissionSource'] }}</div>
             </div>
 
             <div class="input-group" *ngIf="admissionForm.get('admissionSource')?.value === 'CONSULTANCY'">
               <label>Consultancy <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['consultancyId']">
                 <i class="fa-solid fa-handshake"></i>
                 <select formControlName="consultancyId">
                   <option value="">Select Consultancy</option>
                   <option *ngFor="let c of filteredConsultancies" [value]="c.id">{{ c.name }}</option>
                 </select>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['consultancyId']">{{ backendErrors['consultancyId'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Admitted By <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['admittedByUserId']">
                 <i class="fa-solid fa-user-tie"></i>
                 <select formControlName="admittedByUserId">
                   <option value="">Select User</option>
                   <option *ngFor="let u of filteredUsers" [value]="u.id">{{ u.fullName }}</option>
                 </select>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['admittedByUserId']">{{ backendErrors['admittedByUserId'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Counseled By</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['counselorName']">
                 <i class="fa-solid fa-user-check"></i>
                 <input type="text" formControlName="counselorName" placeholder="Enter counselor name">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['counselorName']">{{ backendErrors['counselorName'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Institution <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['institutionId']">
                 <i class="fa-solid fa-university"></i>
                 <select formControlName="institutionId" (change)="onInstitutionChange()">
                   <option value="">Select Institution</option>
                   <option *ngFor="let inst of institutions" [value]="inst.id">{{ inst.name }}</option>
                 </select>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['institutionId']">{{ backendErrors['institutionId'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Course <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['courseId']">
                 <i class="fa-solid fa-book"></i>
                 <select formControlName="courseId">
                   <option value="">Select Course</option>
                   <option *ngFor="let course of filteredCourses" [value]="course.id">{{ course.name }}</option>
                 </select>
               </div>
-              <div class="error-msg" [class.show]="isFieldInvalid('courseId')">Please select a course</div>
+              <div class="error-msg" [class.show]="isFieldInvalid('courseId') || backendErrors['courseId']">
+                <span *ngIf="isFieldInvalid('courseId')">Please select a course</span>
+                <span *ngIf="backendErrors['courseId']">{{ backendErrors['courseId'] }}</span>
+              </div>
             </div>
 
             <div class="input-group">
               <label>Admission Date <span class="required">*</span></label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['admissionDate']">
                 <i class="fa-solid fa-calendar-check"></i>
                 <input type="date" formControlName="admissionDate">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['admissionDate']">{{ backendErrors['admissionDate'] }}</div>
             </div>
 
             <div class="input-group">
               <label>Session</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['session']">
                 <i class="fa-solid fa-clock"></i>
                 <input type="text" formControlName="session" placeholder="e.g. 2025-26">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['session']">{{ backendErrors['session'] }}</div>
             </div>
 
             <div class="input-group" *ngIf="!admissionForm.get('isScholar')?.value">
               <label>Discount Type</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['discountType']">
                 <i class="fa-solid fa-tags"></i>
                 <select formControlName="discountType">
                   <option value="">No Discount</option>
@@ -239,15 +269,17 @@
                   <option value="PERCENTAGE">Percentage</option>
                 </select>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['discountType']">{{ backendErrors['discountType'] }}</div>
             </div>
 
             <div class="input-group"
               *ngIf="!admissionForm.get('isScholar')?.value && admissionForm.get('discountType')?.value">
               <label>Discount Value</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['discountValue']">
                 <i class="fa-solid fa-coins"></i>
                 <input type="number" formControlName="discountValue" placeholder="Enter value">
               </div>
+              <div class="error-msg" [class.show]="backendErrors['discountValue']">{{ backendErrors['discountValue'] }}</div>
             </div>
 
             <div class="input-group">
@@ -260,11 +292,12 @@
 
             <div class="input-group full-width" *ngIf="admissionForm.get('isScholar')?.value">
               <label>Scholarship Details</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.error-border]="backendErrors['scholarshipDetails']">
                 <i class="fa-solid fa-info-circle"></i>
                 <textarea formControlName="scholarshipDetails"
                   placeholder="Enter scholarship scheme name and details"></textarea>
               </div>
+              <div class="error-msg" [class.show]="backendErrors['scholarshipDetails']">{{ backendErrors['scholarshipDetails'] }}</div>
             </div>
           </div>
         </div>

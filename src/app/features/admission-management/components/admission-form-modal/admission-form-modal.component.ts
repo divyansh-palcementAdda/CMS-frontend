@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { AdmissionService } from '../../../../core/services/admission.service';
 import { ConsultancyService } from '../../../../core/services/consultancy.service';
 import { InstitutionService } from '../../../../core/services/institution.service';
@@ -20,7 +21,16 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
+  private fb = inject(FormBuilder);
+  private admissionService = inject(AdmissionService);
+  private consultancyService = inject(ConsultancyService);
+  private institutionService = inject(InstitutionService);
+  private courseService = inject(CourseService);
+  private userService = inject(UserService);
+  private toastr = inject(ToastrService);
+
   admissionForm: FormGroup;
+  backendErrors: { [key: string]: string } = {};
   currentStep = 1;
   activeTab: 'single' | 'bulk' = 'single';
   isEditMode = false;
@@ -74,14 +84,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     this.bulkResponse = null;
   }
 
-  constructor(
-    private fb: FormBuilder,
-    private admissionService: AdmissionService,
-    private consultancyService: ConsultancyService,
-    private institutionService: InstitutionService,
-    private courseService: CourseService,
-    private userService: UserService
-  ) {
+  constructor() {
     this.admissionForm = this.initForm();
   }
 
@@ -221,7 +224,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
         this.isSameAsMobile = data.phoneNumber === data.whatsappPhoneNo;
       },
       error: (err) => {
-        alert('Failed to load student details');
+        this.toastr.error('Failed to load student details', 'Error');
         this.onClose();
       }
     });
@@ -251,6 +254,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
 
   nextStep(): void {
     if (this.currentStep === 1) {
+      this.backendErrors = {};
       // Validate Step 1 fields
       const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'pincode', 'address'];
       let isValid = true;
@@ -311,10 +315,12 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   onSubmit(): void {
     if (this.admissionForm.invalid) {
       this.admissionForm.markAllAsTouched();
+      this.toastr.warning('Please check all required fields', 'Form Invalid');
       return;
     }
 
     this.isSaving = true;
+    this.backendErrors = {};
     const data = { ...this.admissionForm.value };
 
     // Cleanup: Convert empty strings to null for backend enum/number compatibility
@@ -329,13 +335,26 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     request.subscribe({
       next: () => {
         this.isSaving = false;
-        alert(this.isEditMode ? 'Admission updated successfully!' : 'Admission created successfully!');
+        this.toastr.success(this.isEditMode ? 'Admission updated successfully!' : 'Admission created successfully!', 'Success');
         this.saved.emit();
         this.onClose();
       },
       error: (err) => {
         this.isSaving = false;
-        alert(err.error?.message || 'Operation failed');
+        console.error(err);
+        if (err.error?.errors) {
+          this.backendErrors = err.error.errors;
+          this.toastr.error('Validation failed. Please check individual fields.', 'Error');
+          
+          // If errors are on Step 1, go back
+          const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'pincode', 'address'];
+          const hasStep1Errors = Object.keys(this.backendErrors).some(key => step1Fields.includes(key));
+          if (hasStep1Errors) {
+            this.currentStep = 1;
+          }
+        } else {
+          this.toastr.error(err.error?.detail || err.error?.message || 'Operation failed', 'Error');
+        }
       }
     });
   }

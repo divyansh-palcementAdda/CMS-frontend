@@ -50,28 +50,30 @@
             <div class="form-group">
               <label>Institution Name <span class="req">*</span></label>
               <input type="text" formControlName="name" placeholder="Enter institution name"
-                [class.error]="institutionForm.get('name')?.invalid && institutionForm.get('name')?.touched">
+                [class.error]="(institutionForm.get('name')?.invalid && institutionForm.get('name')?.touched) || backendErrors['name']">
               <span class="error-msg"
                 *ngIf="institutionForm.get('name')?.invalid && institutionForm.get('name')?.touched">
                 Name is required (min 3 chars)
               </span>
+              <span class="error-msg" *ngIf="backendErrors['name']">{{ backendErrors['name'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Institution Code <span class="req">*</span></label>
               <input type="text" formControlName="code" placeholder="e.g. MNU-101"
-                [class.error]="institutionForm.get('code')?.invalid && institutionForm.get('code')?.touched">
+                [class.error]="(institutionForm.get('code')?.invalid && institutionForm.get('code')?.touched) || backendErrors['code']">
               <span class="error-msg"
                 *ngIf="institutionForm.get('code')?.invalid && institutionForm.get('code')?.touched">
                 Code is required
               </span>
+              <span class="error-msg" *ngIf="backendErrors['code']">{{ backendErrors['code'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Institution Type <span class="req">*</span></label>
               <div class="select-wrapper">
                 <select formControlName="institutionType"
-                  [class.error]="institutionForm.get('institutionType')?.invalid && institutionForm.get('institutionType')?.touched">
+                  [class.error]="(institutionForm.get('institutionType')?.invalid && institutionForm.get('institutionType')?.touched) || backendErrors['institutionType']">
                   <option value="" disabled>Select Type</option>
                   <option *ngFor="let type of institutionTypes" [value]="type">{{type}}</option>
                 </select>
@@ -86,47 +88,53 @@
                 *ngIf="institutionForm.get('institutionType')?.invalid && institutionForm.get('institutionType')?.touched">
                 Type is required
               </span>
+              <span class="error-msg" *ngIf="backendErrors['institutionType']">{{ backendErrors['institutionType'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Established Year</label>
-              <input type="number" formControlName="establishedYear" placeholder="e.g. 1950">
+              <input type="number" formControlName="establishedYear" placeholder="e.g. 1950" [class.error]="backendErrors['establishedYear']">
+              <span class="error-msg" *ngIf="backendErrors['establishedYear']">{{ backendErrors['establishedYear'] }}</span>
             </div>
 
             <div class="form-group-full">
               <label>Description</label>
-              <textarea formControlName="description" rows="3" placeholder="Brief about institution..."></textarea>
+              <textarea formControlName="description" rows="3" placeholder="Brief about institution..." [class.error]="backendErrors['description']"></textarea>
+              <span class="error-msg" *ngIf="backendErrors['description']">{{ backendErrors['description'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Email ID <span class="req">*</span></label>
               <input type="text" formControlName="email" placeholder="example@domain.com"
-                [class.error]="institutionForm.get('email')?.invalid && institutionForm.get('email')?.touched">
+                [class.error]="(institutionForm.get('email')?.invalid && institutionForm.get('email')?.touched) || backendErrors['email']">
               <span class="error-msg"
                 *ngIf="institutionForm.get('email')?.invalid && institutionForm.get('email')?.touched">
                 Valid email is required
               </span>
+              <span class="error-msg" *ngIf="backendErrors['email']">{{ backendErrors['email'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Contact Number <span class="req">*</span></label>
               <input type="text" formControlName="phoneNumber" placeholder="+91 00000 00000"
-                [class.error]="institutionForm.get('phoneNumber')?.invalid && institutionForm.get('phoneNumber')?.touched">
+                [class.error]="(institutionForm.get('phoneNumber')?.invalid && institutionForm.get('phoneNumber')?.touched) || backendErrors['phoneNumber']">
               <span class="error-msg"
                 *ngIf="institutionForm.get('phoneNumber')?.invalid && institutionForm.get('phoneNumber')?.touched">
                 Valid contact number is required
               </span>
+              <span class="error-msg" *ngIf="backendErrors['phoneNumber']">{{ backendErrors['phoneNumber'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Website</label>
-              <input type="text" formControlName="website" placeholder="https://www.example.com">
+              <input type="text" formControlName="website" placeholder="https://www.example.com" [class.error]="backendErrors['website']">
+              <span class="error-msg" *ngIf="backendErrors['website']">{{ backendErrors['website'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Status <span class="req">*</span></label>
               <div class="select-wrapper">
-                <select formControlName="status">
+                <select formControlName="status" [class.error]="backendErrors['status']">
                   <option value="ACTIVE">Active</option>
                   <option value="INACTIVE">Inactive</option>
                 </select>
@@ -137,6 +145,7 @@
                   </svg>
                 </div>
               </div>
+              <span class="error-msg" *ngIf="backendErrors['status']">{{ backendErrors['status'] }}</span>
             </div>
           </div>
 
@@ -153,36 +162,41 @@
             <div class="form-group-full">
               <label>Full Address <span class="req">*</span></label>
               <input type="text" formControlName="address" placeholder="Building, Street, Area"
-                [class.error]="institutionForm.get('address')?.invalid && institutionForm.get('address')?.touched">
+                [class.error]="(institutionForm.get('address')?.invalid && institutionForm.get('address')?.touched) || backendErrors['address']">
+              <span class="error-msg" *ngIf="backendErrors['address']">{{ backendErrors['address'] }}</span>
             </div>
 
             <div class="form-group">
               <label>City <span class="req">*</span></label>
               <input type="text" formControlName="city" placeholder="e.g. Indore"
-                [class.error]="institutionForm.get('city')?.invalid && institutionForm.get('city')?.touched">
+                [class.error]="(institutionForm.get('city')?.invalid && institutionForm.get('city')?.touched) || backendErrors['city']">
+              <span class="error-msg" *ngIf="backendErrors['city']">{{ backendErrors['city'] }}</span>
             </div>
 
             <div class="form-group">
               <label>State <span class="req">*</span></label>
               <input type="text" formControlName="state" placeholder="e.g. Madhya Pradesh"
-                [class.error]="institutionForm.get('state')?.invalid && institutionForm.get('state')?.touched">
+                [class.error]="(institutionForm.get('state')?.invalid && institutionForm.get('state')?.touched) || backendErrors['state']">
+              <span class="error-msg" *ngIf="backendErrors['state']">{{ backendErrors['state'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Country <span class="req">*</span></label>
               <input type="text" formControlName="country" placeholder="e.g. India"
-                [class.error]="institutionForm.get('country')?.invalid && institutionForm.get('country')?.touched">
+                [class.error]="(institutionForm.get('country')?.invalid && institutionForm.get('country')?.touched) || backendErrors['country']">
+              <span class="error-msg" *ngIf="backendErrors['country']">{{ backendErrors['country'] }}</span>
             </div>
 
             <div class="form-group">
               <label>Pincode <span class="req">*</span></label>
               <!-- Pincode as Text/Number Input (No dropdown caret as per user instructions) -->
               <input type="text" formControlName="pincode" placeholder="6-digit code"
-                [class.error]="institutionForm.get('pincode')?.invalid && institutionForm.get('pincode')?.touched">
+                [class.error]="(institutionForm.get('pincode')?.invalid && institutionForm.get('pincode')?.touched) || backendErrors['pincode']">
               <span class="error-msg"
                 *ngIf="institutionForm.get('pincode')?.invalid && institutionForm.get('pincode')?.touched">
                 Valid 6-digit pincode required
               </span>
+              <span class="error-msg" *ngIf="backendErrors['pincode']">{{ backendErrors['pincode'] }}</span>
             </div>
           </div>
 

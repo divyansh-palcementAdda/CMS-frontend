@@ -20,6 +20,10 @@ export interface ConsultancyDTO {
   representativeCount?: number;
   studentCount?: number;
   institutionCount?: number;
+  totalAdmissions?: number;
+  totalApplications?: number;
+  totalCancelledAdmissions?: number;
+  totalCancelledApplications?: number;
 }
 
 export interface ConsultancyItem {
@@ -31,11 +35,21 @@ export interface ConsultancyItem {
   city: string;
   status: 'ACTIVE' | 'INACTIVE' | 'DORMANT';
   commission: string;
+  totalAdmissions: number;
+  totalApplications: number;
+  totalCancelledAdmissions: number;
+  totalCancelledApplications: number;
 }
 
 export interface ConsultancyStats {
   totalConsultancy: number;
   activeConsultancy: number;
+  inactiveConsultancy: number;
+  dormantConsultancy: number;
+  totalAdmissions: number;
+  totalApplications: number;
+  totalCancelledAdmissions: number;
+  totalCancelledApplications: number;
   totalProjected: string;
   totalCourses: number;
 }
@@ -125,8 +139,9 @@ export interface ConsultancyDetail extends ConsultancyDTO {
   institutionsOverview: ConsultancyInstitutionOverview[];
   allAdmissions: ConsultancyAdmission[];
   yearlyAdmissions?: YearlyAdmission[];
-  totalApplications?: ConsultancyAdmission[];
-  cancelledApplications?: ConsultancyAdmission[];
-  totalAdmissions?: ConsultancyAdmission[];
-  cancelledAdmissions?: ConsultancyAdmission[];
+  totalApplicationsList?: ConsultancyAdmission[];
+
+  cancelledApplicationsList?: ConsultancyAdmission[];
+  totalAdmissionsList?: ConsultancyAdmission[];
+  cancelledAdmissionsList?: ConsultancyAdmission[];
 }

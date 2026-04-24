@@ -26,7 +26,7 @@
                 placeholder="Enter username"
                 [class.error]="userForm.get('username')?.invalid && userForm.get('username')?.touched"
               >
-              <div class="error-msg" *ngIf="userForm.get('username')?.touched">
+              <div class="error-msg" *ngIf="userForm.get('username')?.touched || backendErrors['username']">
                 <span *ngIf="userForm.get('username')?.errors?.['required']">Username is required.</span>
                 <span *ngIf="userForm.get('username')?.errors?.['minlength']">Minimum 3 characters required.</span>
                 <span *ngIf="userForm.get('username')?.errors?.['maxlength']">Maximum 80 characters allowed.</span>
@@ -42,13 +42,13 @@
                   [type]="passwordVisible ? 'text' : 'password'" 
                   formControlName="password" 
                   [placeholder]="userId ? 'Leave blank to keep unchanged' : 'Enter password'" 
-                  [class.error]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+                  [class.error]="(userForm.get('password')?.invalid && userForm.get('password')?.touched) || backendErrors['password']"
                 >
                 <button type="button" class="icon-btn" (click)="togglePassword()">
                   <i class="fas" [ngClass]="passwordVisible ? 'fa-eye-slash' : 'fa-eye'"></i>
                 </button>
               </div>
-              <div class="error-msg" *ngIf="userForm.get('password')?.touched">
+              <div class="error-msg" *ngIf="userForm.get('password')?.touched || backendErrors['password']">
                 <span *ngIf="userForm.get('password')?.errors?.['required']">Password is required.</span>
                 <span *ngIf="userForm.get('password')?.errors?.['minlength']">Minimum 8 characters required.</span>
                 <span *ngIf="userForm.get('password')?.errors?.['maxlength']">Maximum 64 characters allowed.</span>
@@ -63,7 +63,7 @@
                   type="email" 
                   formControlName="email" 
                   placeholder="email@example.com"
-                  [class.error]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+                  [class.error]="(userForm.get('email')?.invalid && userForm.get('email')?.touched) || backendErrors['email']"
                 >
                 <button 
                   *ngIf="!userId || isEmailChanged"
@@ -77,7 +77,7 @@
                   {{ otpCooldown > 0 ? 'Resend (' + otpCooldown + 's)' : 'Send OTP' }}
                 </button>
               </div>
-              <div class="error-msg" *ngIf="userForm.get('email')?.touched">
+              <div class="error-msg" *ngIf="userForm.get('email')?.touched || backendErrors['email']">
                 <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required.</span>
                 <span *ngIf="userForm.get('email')?.errors?.['email']">Please enter a valid email address.</span>
                 <span *ngIf="userForm.get('email')?.errors?.['maxlength']">Maximum 200 characters allowed.</span>
@@ -91,9 +91,9 @@
                 type="text" 
                 formControlName="fullName" 
                 placeholder="Enter full name"
-                [class.error]="userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched"
+                [class.error]="(userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched) || backendErrors['fullName']"
               >
-              <div class="error-msg" *ngIf="userForm.get('fullName')?.touched">
+              <div class="error-msg" *ngIf="userForm.get('fullName')?.touched || backendErrors['fullName']">
                 <span *ngIf="userForm.get('fullName')?.errors?.['required']">Full name is required.</span>
                 <span *ngIf="userForm.get('fullName')?.errors?.['minlength']">Minimum 2 characters required.</span>
                 <span *ngIf="userForm.get('fullName')?.errors?.['maxlength']">Maximum 80 characters allowed.</span>
@@ -108,9 +108,9 @@
                 type="text" 
                 formControlName="mobile" 
                 placeholder="e.g. +919876543210"
-                [class.error]="userForm.get('mobile')?.invalid && userForm.get('mobile')?.touched"
+                [class.error]="(userForm.get('mobile')?.invalid && userForm.get('mobile')?.touched) || backendErrors['mobile']"
               >
-              <div class="error-msg" *ngIf="userForm.get('mobile')?.touched">
+              <div class="error-msg" *ngIf="userForm.get('mobile')?.touched || backendErrors['mobile']">
                 <span *ngIf="userForm.get('mobile')?.errors?.['pattern']">Invalid mobile format (e.g. +919876543210).</span>
                 <span *ngIf="backendErrors['mobile']">{{backendErrors['mobile']}}</span>
               </div>
@@ -131,7 +131,7 @@
                   </label>
                 </div>
               </div>
-              <div class="error-msg" *ngIf="userForm.get('roles')?.touched">
+              <div class="error-msg" *ngIf="userForm.get('roles')?.touched || backendErrors['roles']">
                 <span *ngIf="userForm.get('roles')?.errors?.['required']">At least one role is required.</span>
                 <span *ngIf="backendErrors['roles']">{{backendErrors['roles']}}</span>
               </div>
