@@ -300,6 +300,10 @@ export class ConsultancyService {
     return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
   }
 
+  downloadExcel(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download-excel`, { responseType: 'blob' });
+  }
+
   getActiveInstitutions(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/institutions/active`);
   }

@@ -36,6 +36,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   selectedConsultancy: ConsultancyItem | null = null;
   showBulkUploadModal = false;
   editingConsultancyId: number | null = null;
+  downloadLoading = false;
 
   constructor(
     public consultancyService: ConsultancyService, 
@@ -248,6 +249,30 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   onSearchChange() {
     this.currentPage = 1;
+  }
+
+  downloadExcel() {
+    if (this.downloadLoading) return;
+    
+    this.downloadLoading = true;
+    this.consultancyService.downloadExcel().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Consultancy_Report_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        this.downloadLoading = false;
+      },
+      error: (err) => {
+        console.error('Error downloading excel', err);
+        this.downloadLoading = false;
+        alert('Failed to download excel report. Please try again later.');
+      }
+    });
   }
 
   ngOnDestroy() {
