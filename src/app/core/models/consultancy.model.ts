@@ -60,6 +60,26 @@ export interface ConsultancyPageData {
   totalCount: number;
 }
 
+export interface ConsultancyPageRequest {
+  search?: string;
+  status?: string;
+  years?: number[];
+  page: number;
+  size: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  globalStats: ConsultancyStats;
+}
+
 export interface ConsultancyFinancials {
   totalProjected: string;
   payableAmount: string;

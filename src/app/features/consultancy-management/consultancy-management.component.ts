@@ -1,13 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConsultancyService } from '../../core/services/consultancy.service';
-import { ConsultancyItem, ConsultancyPageData } from '../../core/models/consultancy.model';
+import { ConsultancyItem, ConsultancyPageRequest, PageResponse, ConsultancyStats } from '../../core/models/consultancy.model';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddConsultancyModalComponent } from './components/add-consultancy-modal/add-consultancy-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
@@ -20,14 +20,26 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
   styleUrls: ['./consultancy-management.component.scss']
 })
 export class ConsultancyManagementComponent implements OnInit, OnDestroy {
-  pageData: ConsultancyPageData | null = null;
+  pageResponse: PageResponse<ConsultancyItem> | null = null;
   loading = true;
   searchTerm = '';
   selectedFilter: string = 'TOTAL';
   
-  currentPage = 1;
-  pageSize = 10;
+  // Backend Driven Config
+  requestConfig: ConsultancyPageRequest = {
+    page: 0,
+    size: 10,
+    sortBy: 'name',
+    sortDirection: 'asc',
+    search: '',
+    years: []
+  };
   
+  // Year Filter
+  availableYears: number[] = [2021, 2022, 2023, 2024, 2025, 2026];
+  showYearDropdown = false;
+  
+  private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
   // Actions
@@ -41,8 +53,26 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   constructor(
     public consultancyService: ConsultancyService, 
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private eRef: ElementRef
+  ) {
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(term => {
+      this.requestConfig.search = term;
+      this.requestConfig.page = 0;
+      this.loadData();
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) {
+    if(!this.eRef.nativeElement.querySelector('.year-filter-wrapper')?.contains(event.target)) {
+      this.showYearDropdown = false;
+    }
+  }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -54,30 +84,11 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
       }
 
       if (status) {
-        this.loadFilteredData(status);
+        this.setFilter(status); // also loads data
       } else {
         this.loadData();
       }
     });
-  }
-
-  loadFilteredData(status: string) {
-    this.loading = true;
-    const obs = status.toUpperCase() === 'DELETED' 
-      ? this.consultancyService.getConsultanciesByStatusAndDeleted('DELETED', true)
-      : this.consultancyService.getConsultanciesByStatus(status);
-
-    obs.pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.pageData = data;
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Error loading filtered consultancy data', err);
-          this.loading = false;
-        }
-      });
   }
 
   onView(id: number) {
@@ -127,7 +138,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
           this.showDeleteModal = false;
           this.loadData();
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Error deleting consultancy', err);
           this.loading = false;
           this.showDeleteModal = false;
@@ -138,14 +149,14 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading = true;
-    this.consultancyService.getConsultancyData()
+    this.consultancyService.getConsultancyPage(this.requestConfig)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => {
-          this.pageData = data;
+        next: (response) => {
+          this.pageResponse = response;
           this.loading = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Error loading consultancy data', err);
           this.loading = false;
         }
@@ -154,65 +165,73 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   setFilter(filter: string) {
     this.selectedFilter = filter;
-    this.currentPage = 1;
+    this.requestConfig.page = 0;
+    
+    // Map status string back to enum properly. DORMANT / ACTIVE / INACTIVE are direct. 
+    // Wait, requirement is that TOTAL means NO STATUS FILTER.
+    if (['ACTIVE', 'INACTIVE', 'DORMANT'].includes(filter.toUpperCase())) {
+        this.requestConfig.status = filter.toUpperCase();
+    } else {
+        this.requestConfig.status = undefined; // For TOTAL or other frontend logic
+    }
+    
+    this.loadData();
   }
 
-  get filteredConsultancies(): ConsultancyItem[] {
-    if (!this.pageData) return [];
-    let list = this.pageData.consultancies;
-
-    // Apply Status/Metric Filter
-    switch (this.selectedFilter) {
-      case 'ACTIVE':
-        list = list.filter(item => item.status === 'ACTIVE');
-        break;
-      case 'INACTIVE':
-        list = list.filter(item => item.status === 'INACTIVE');
-        break;
-      case 'DORMANT':
-        list = list.filter(item => item.status === 'DORMANT');
-        break;
-      case 'ADMISSIONS':
-        list = list.filter(item => item.totalAdmissions > 0);
-        break;
-      case 'APPLICATIONS':
-        list = list.filter(item => item.totalApplications > 0);
-        break;
-      case 'CANCELLED_ADMISSIONS':
-        list = list.filter(item => item.totalCancelledAdmissions > 0);
-        break;
-      case 'CANCELLED_APPLICATIONS':
-        list = list.filter(item => item.totalCancelledApplications > 0);
-        break;
-      default:
-        // 'TOTAL' - no filtering
-        break;
+  // Sorting Logic
+  setSort(column: string) {
+    if (this.requestConfig.sortBy === column) {
+      this.requestConfig.sortDirection = this.requestConfig.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.requestConfig.sortBy = column;
+      this.requestConfig.sortDirection = 'asc';
     }
+    this.requestConfig.page = 0;
+    this.loadData();
+  }
+  
+  getSortIcon(column: string): string {
+    if (this.requestConfig.sortBy !== column) return '';
+    return this.requestConfig.sortDirection === 'asc' ? '↑' : '↓';
+  }
 
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      list = list.filter(item => 
-        item.name.toLowerCase().includes(term) ||
-        item.email.toLowerCase().includes(term) ||
-        item.city.toLowerCase().includes(term)
-      );
+  // Year Selection Logic
+  toggleYearDropdown() {
+    this.showYearDropdown = !this.showYearDropdown;
+  }
+  
+  toggleYearSelection(year: number) {
+    if(!this.requestConfig.years) this.requestConfig.years = [];
+    
+    const index = this.requestConfig.years.indexOf(year);
+    if (index > -1) {
+      this.requestConfig.years.splice(index, 1);
+    } else {
+      this.requestConfig.years.push(year);
     }
-    return list;
+    this.requestConfig.page = 0;
+    this.loadData();
+  }
+  
+  isYearSelected(year: number): boolean {
+    return this.requestConfig.years?.includes(year) || false;
   }
 
   get paginatedConsultancies(): ConsultancyItem[] {
-    const list = this.filteredConsultancies;
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    return list.slice(startIndex, startIndex + this.pageSize);
+    return this.pageResponse?.content || [];
   }
 
   get totalPages(): number {
-    return Math.ceil(this.filteredConsultancies.length / this.pageSize) || 1;
+    return this.pageResponse?.totalPages || 1;
+  }
+  
+  get currentPage(): number {
+    return this.pageResponse?.pageNumber || 1; // Backend returns 1-indexed for response payload
   }
 
   getVisiblePages(): (number | string)[] {
     const total = this.totalPages;
-    const current = this.currentPage;
+    const current = this.requestConfig.page + 1; // requestConfig.page is 0-indexed
     const pages: (number | string)[] = [];
 
     if (total <= 7) {
@@ -243,12 +262,13 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
+      this.requestConfig.page = page - 1; // requestConfig is 0-indexed
+      this.loadData();
     }
   }
 
   onSearchChange() {
-    this.currentPage = 1;
+    this.searchSubject.next(this.searchTerm);
   }
 
   downloadExcel() {
@@ -256,7 +276,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     
     this.downloadLoading = true;
     this.consultancyService.downloadExcel().subscribe({
-      next: (blob) => {
+      next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -267,7 +287,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
         document.body.removeChild(a);
         this.downloadLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error downloading excel', err);
         this.downloadLoading = false;
         alert('Failed to download excel report. Please try again later.');

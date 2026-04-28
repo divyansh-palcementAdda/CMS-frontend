@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { ConsultancyDTO, ConsultancyItem, ConsultancyPageData, ConsultancyStats, ConsultancyDetail } from '../models/consultancy.model';
+import { ConsultancyDTO, ConsultancyItem, ConsultancyPageData, ConsultancyStats, ConsultancyDetail, ConsultancyPageRequest, PageResponse } from '../models/consultancy.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,51 @@ export class ConsultancyService {
   private apiUrl = `${environment.apiUrl}/consultancies`;
 
   constructor(private http: HttpClient) { }
+
+  getConsultancyPage(request: ConsultancyPageRequest): Observable<PageResponse<ConsultancyItem>> {
+    return this.http.post<any>(`${this.apiUrl}/paged`, request).pipe(
+      map(response => {
+        const pageData = response.data || response;
+        const pageResponse: PageResponse<ConsultancyItem> = {
+          content: (pageData.content || []).map((dto: ConsultancyDTO, index: number) => {
+            const statusVal = (dto.status || 'ACTIVE').toUpperCase();
+            return {
+              id: dto.id || 0,
+              sNo: (pageData.pageNumber - 1) * pageData.pageSize + index + 1,
+              name: dto.name || 'Unknown Consultancy',
+              email: dto.email || 'N/A',
+              mobile: dto.mobile || 'N/A',
+              city: dto.city || 'N/A',
+              status: statusVal as any,
+              commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-',
+              totalAdmissions: Number(dto.totalAdmissions) || 0,
+              totalApplications: Number(dto.totalApplications) || 0,
+              totalCancelledAdmissions: Number(dto.totalCancelledAdmissions) || 0,
+              totalCancelledApplications: Number(dto.totalCancelledApplications) || 0
+            };
+          }),
+          pageNumber: pageData.pageNumber || 1,
+          pageSize: pageData.pageSize || 10,
+          totalElements: pageData.totalElements || 0,
+          totalPages: pageData.totalPages || 0,
+          last: !!pageData.last,
+          globalStats: pageData.globalStats || {
+            totalConsultancy: 0,
+            activeConsultancy: 0,
+            inactiveConsultancy: 0,
+            dormantConsultancy: 0,
+            totalAdmissions: 0,
+            totalApplications: 0,
+            totalCancelledAdmissions: 0,
+            totalCancelledApplications: 0,
+            totalProjected: '₹ 0',
+            totalCourses: 0
+          }
+        };
+        return pageResponse;
+      })
+    );
+  }
 
   getConsultancyData(): Observable<ConsultancyPageData> {
     return this.http.get<any>(this.apiUrl).pipe(
