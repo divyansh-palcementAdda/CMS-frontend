@@ -58,6 +58,41 @@ export class CourseDetailComponent implements OnInit {
   loading = true;
   searchTerm = '';
 
+  // Master Table
+  masterSearch = '';
+  masterPage = 1;
+  masterPageSize = 10;
+
+  // Total Applications
+  totalAppSearch = '';
+  totalAppPage = 1;
+  totalAppPageSize = 10;
+
+  // Cancelled Applications
+  cancelledAppSearch = '';
+  cancelledAppPage = 1;
+  cancelledAppPageSize = 10;
+
+  // Total Admissions
+  totalAdmSearch = '';
+  totalAdmPage = 1;
+  totalAdmPageSize = 10;
+
+  // Cancelled Admissions
+  cancelledAdmSearch = '';
+  cancelledAdmPage = 1;
+  cancelledAdmPageSize = 10;
+
+  // Consultancies table from HTML
+  consPage = 1;
+  consPageSize = 10;
+  consultancyStatusFilter: string = '';
+
+  appFilterSource: string = '';
+  appFilterScholar: boolean = false;
+  admFilterSource: string = '';
+  admFilterScholar: boolean = false;
+
   // Actions
   showDeleteModal = false;
   deleteType: string = '';
@@ -235,6 +270,56 @@ export class CourseDetailComponent implements OnInit {
     this.itemToDelete = null;
   }
 
+  onStatClick(stat: string) {
+    this.clearAdmissionFilter();
+    this.clearApplicationFilter();
+
+    const statusMap: any = {
+      active: 'ACTIVE',
+      inactive: 'INACTIVE',
+      dormant: 'DORMANT'
+    };
+
+    if (statusMap[stat] || stat === 'total_cons') {
+      this.consultancyStatusFilter = statusMap[stat] || '';
+      this.scrollToTable('consultancy-section');
+    }
+    else if (stat === 'total_all') {
+      this.scrollToTable('master-table');
+    }
+    else if (stat === 'scholar_adm') {
+      this.admFilterScholar = true;
+      this.scrollToTable('total-adms');
+    }
+    else if (stat === 'direct_adm') {
+      this.admFilterSource = 'USER';
+      this.scrollToTable('total-adms');
+    }
+    else if (stat === 'cons_adm') {
+      this.admFilterSource = 'CONSULTANCY';
+      this.scrollToTable('total-adms');
+    }
+    else if (stat === 'scholar_app') {
+      this.appFilterScholar = true;
+      this.scrollToTable('total-apps');
+    }
+    else if (stat === 'direct_app') {
+      this.appFilterSource = 'USER';
+      this.scrollToTable('total-apps');
+    }
+    else if (stat === 'cons_app') {
+      this.appFilterSource = 'CONSULTANCY';
+      this.scrollToTable('total-apps');
+    }
+  }
+
+  scrollToTable(tableId: string): void {
+    const el = document.getElementById(tableId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   confirmDelete() {
     if (!this.itemToDelete) return;
 
@@ -246,10 +331,10 @@ export class CourseDetailComponent implements OnInit {
         deleteObservable = this.courseService.deleteCourse(this.courseId);
         break;
       case 'Admission':
-        deleteObservable = this.admissionService.deleteAdmission(this.itemToDelete.id);
+        deleteObservable = this.admissionService.deleteAdmission(this.itemToDelete);
         break;
       case 'Institution':
-        deleteObservable = this.institutionService.deleteInstitution(this.itemToDelete.id);
+        deleteObservable = this.institutionService.deleteInstitution(this.itemToDelete);
         break;
       default:
         this.loading = false;
@@ -274,4 +359,127 @@ export class CourseDetailComponent implements OnInit {
       }
     });
   }
+
+  getTotalPages(totalItems: number, pageSize: number): number {
+    return Math.ceil(totalItems / pageSize);
+  }
+
+  changePage(type: string, delta: number) {
+    if (type === 'master') {
+      this.masterPage += delta;
+    } else if (type === 'totalApp') {
+      this.totalAppPage += delta;
+    } else if (type === 'cancelledApp') {
+      this.cancelledAppPage += delta;
+    } else if (type === 'totalAdm') {
+      this.totalAdmPage += delta;
+    } else if (type === 'cancelledAdm') {
+      this.cancelledAdmPage += delta;
+    } else if (type === 'cons') {
+      this.consPage += delta;
+    }
+  }
+
+  clearApplicationFilter() {
+    this.appFilterSource = '';
+    this.appFilterScholar = false;
+  }
+
+  clearAdmissionFilter() {
+    this.admFilterSource = '';
+    this.admFilterScholar = false;
+  }
+
+  get filteredTotalApplications(): any[] {
+    if (!this.courseDetail || !this.courseDetail.totalApplications) return [];
+    const search = this.totalAppSearch.toLowerCase();
+    return this.courseDetail.totalApplications.filter(item => {
+      const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
+      const itemSource = (item.source || '').toLowerCase();
+      const matchesSource = !this.appFilterSource || itemSource === this.appFilterSource.toLowerCase();
+      const isScholarItem = item.isScholler === true || item.isScholler === 'true' || item.isScholler === 1 || item.isScholler === 'YES';
+      const matchesScholar = this.appFilterScholar === false || (isScholarItem === this.appFilterScholar);
+      return matchesSearch && matchesSource && matchesScholar;
+    });
+  }
+
+  get paginatedTotalApplications(): any[] {
+    const start = (this.totalAppPage - 1) * this.totalAppPageSize;
+    return this.filteredTotalApplications.slice(start, start + this.totalAppPageSize);
+  }
+
+  get filteredCancelledApplications(): any[] {
+    if (!this.courseDetail || !this.courseDetail.cancelledApplications) return [];
+    const search = this.cancelledAppSearch.toLowerCase();
+    return this.courseDetail.cancelledApplications.filter(item =>
+      item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search)
+    );
+  }
+
+  get paginatedCancelledApplications(): any[] {
+    const start = (this.cancelledAppPage - 1) * this.cancelledAppPageSize;
+    return this.filteredCancelledApplications.slice(start, start + this.cancelledAppPageSize);
+  }
+
+  get filteredTotalAdmissions(): any[] {
+    if (!this.courseDetail || !this.courseDetail.totalAdmissions) return [];
+    const search = this.totalAdmSearch.toLowerCase();
+    return this.courseDetail.totalAdmissions.filter(item => {
+      const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
+      const itemSource = (item.source || '').toLowerCase();
+      const matchesSource = !this.admFilterSource || itemSource === this.admFilterSource.toLowerCase();
+      const isScholarItem = item.isScholler === true || item.isScholler === 'true' || item.isScholler === 1 || item.isScholler === 'YES';
+      const matchesScholar = this.admFilterScholar === false || (isScholarItem === this.admFilterScholar);
+      return matchesSearch && matchesSource && matchesScholar;
+    });
+  }
+
+  get paginatedTotalAdmissions(): any[] {
+    const start = (this.totalAdmPage - 1) * this.totalAdmPageSize;
+    return this.filteredTotalAdmissions.slice(start, start + this.totalAdmPageSize);
+  }
+
+  get filteredCancelledAdmissions(): any[] {
+    if (!this.courseDetail || !this.courseDetail.cancelledAdmissions) return [];
+    const search = this.cancelledAdmSearch.toLowerCase();
+    return this.courseDetail.cancelledAdmissions.filter(item =>
+      item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search)
+    );
+  }
+
+  get paginatedCancelledAdmissions(): any[] {
+    const start = (this.cancelledAdmPage - 1) * this.cancelledAdmPageSize;
+    return this.filteredCancelledAdmissions.slice(start, start + this.cancelledAdmPageSize);
+  }
+
+  get filteredMasterList(): any[] {
+    if (!this.courseDetail) return [];
+    const all = [
+      ...(this.courseDetail.totalApplications || []),
+      ...(this.courseDetail.totalAdmissions || []),
+      ...(this.courseDetail.cancelledApplications || []),
+      ...(this.courseDetail.cancelledAdmissions || [])
+    ];
+    const search = this.masterSearch.toLowerCase();
+    return all.filter(item =>
+      item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search)
+    );
+  }
+
+  get paginatedMasterList(): any[] {
+    const start = (this.masterPage - 1) * this.masterPageSize;
+    return this.filteredMasterList.slice(start, start + this.masterPageSize);
+  }
+
+  get filteredConsultancies(): any[] {
+    if (!this.courseDetail || !this.courseDetail.consultancies) return [];
+    if (!this.consultancyStatusFilter) return this.courseDetail.consultancies;
+    return this.courseDetail.consultancies; // Update if courseDetail has consultancy status filtering later
+  }
+
+  get paginatedConsultancies(): any[] {
+    const start = (this.consPage - 1) * this.consPageSize;
+    return this.filteredConsultancies.slice(start, start + this.consPageSize);
+  }
+
 }

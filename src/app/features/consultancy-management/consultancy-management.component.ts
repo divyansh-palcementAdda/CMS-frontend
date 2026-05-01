@@ -11,11 +11,12 @@ import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddConsultancyModalComponent } from './components/add-consultancy-modal/add-consultancy-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
+import { BulkMapModalComponent } from '../../shared/components/bulk-map-modal/bulk-map-modal.component';
 
 @Component({
   selector: 'app-consultancy-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent, BulkUploadModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent, BulkUploadModalComponent, BulkMapModalComponent],
   templateUrl: './consultancy-management.component.html',
   styleUrls: ['./consultancy-management.component.scss']
 })
@@ -47,6 +48,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   selectedConsultancy: ConsultancyItem | null = null;
   showBulkUploadModal = false;
+  showBulkMapModal = false;
   editingConsultancyId: number | null = null;
   downloadLoading = false;
 

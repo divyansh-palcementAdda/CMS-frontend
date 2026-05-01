@@ -83,17 +83,31 @@ export interface CourseDetail {
     studentsEnrolled: number;
     revenueGenerated: string;
     commissionPaid: string;
+    totalApplications?: number;
+    totalAdmissions?: number;
   }>;
-  admissions: Array<{
-    id: number;
-    studentName: string;
-    course: string;
-    duration: string;
-    discount: string;
-    feeStatus: string;
-    status: string;
-    admissionDate: string;
-  }>;
+  admissionStats: {
+    activeAdmissions: number;
+    activeApplications: number;
+    cancelledAdmissions: number;
+    cancelledApplications: number;
+    activeConsultancies: number;
+    inactiveConsultancies: number;
+    dormantConsultancies: number;
+    totalConsultancies: number;
+    coursesWithoutConsultancy?: number;
+    admissionInAllCourses: number;
+    scholarAdmissions: number;
+    directAdmissions: number;
+    viaConsultancy: number;
+    scholarApplications: number;
+    directApplications: number;
+    viaConsultancyApplications: number;
+  };
+  totalApplications: any[];
+  totalAdmissions: any[];
+  cancelledApplications: any[];
+  cancelledAdmissions: any[];
   institutions: Array<{
     id: number;
     name: string;

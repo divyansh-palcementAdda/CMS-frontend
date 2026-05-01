@@ -345,6 +345,20 @@ export class ConsultancyService {
     return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
   }
 
+  bulkMapUpload(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.apiUrl}/upload-representatives`, formData);
+  }
+
+  downloadBulkMapTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/upload-representatives/template`, { responseType: 'blob' });
+  }
+
+  downloadBulkMapErrorFile(fileId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/upload-representatives/errors/${fileId}`, { responseType: 'blob' });
+  }
+
   downloadExcel(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/download-excel`, { responseType: 'blob' });
   }
