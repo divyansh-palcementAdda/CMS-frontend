@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { BulkUploadService } from '../../../../app/core/services/bulk-upload.service';
 
 export interface BulkUploadResult {
   totalProcessed: number;
@@ -8,6 +10,7 @@ export interface BulkUploadResult {
   failureCount: number;
   successes: any[];
   failures: { rowNumber: number; errorMessage: string }[];
+  errorFileId?: string;
 }
 
 @Component({
@@ -21,6 +24,8 @@ export class BulkUploadModalComponent {
   @Input() title: string = 'Bulk Upload';
   @Input() moduleName: string = 'Records';
   @Input() service: any; // Service must implement bulkUpload and downloadTemplate
+  private readonly baseUrl = environment.apiUrl;
+  private bulkUploadService = inject(BulkUploadService);
 
   @Output() uploaded = new EventEmitter<BulkUploadResult>();
   @Output() closed = new EventEmitter<void>();
@@ -87,6 +92,28 @@ export class BulkUploadModalComponent {
     });
   }
 
+  downloadErrorFile() {
+    if (!this.uploadResult?.errorFileId) return;
+    
+    this.bulkUploadService.downloadErrorFile(this.uploadResult.errorFileId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        a.download = `error_report_${this.moduleName.toLowerCase()}_${timestamp}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err: any) => {
+        console.error('Error file download failed', err);
+        this.errorMessage = 'Failed to download error file. Please try again.';
+      }
+    });
+  }
+
   uploadFile() {
     if (!this.selectedFile || !this.service || !this.service.bulkUpload) return;
 
@@ -94,8 +121,11 @@ export class BulkUploadModalComponent {
     this.errorMessage = null;
 
     this.service.bulkUpload(this.selectedFile).subscribe({
-      next: (result: BulkUploadResult) => {
+      next: (response: any) => {
+        // Support both direct BulkUploadResult and ApiResult<BulkUploadResult>
+        const result: BulkUploadResult = response.data || response;
         this.uploadResult = result;
+        
         if (result.failureCount === 0) {
           this.uploadStatus = 'SUCCESS';
         } else if (result.successCount > 0) {

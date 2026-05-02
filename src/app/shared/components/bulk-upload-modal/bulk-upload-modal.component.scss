@@ -277,15 +277,61 @@
       &.has-errors { background: #FEF2F2; color: #DC2626; }
     }
     &.total { background: #F8FAFC; color: #475569; }
+
+    .btn-download-error-mini {
+      margin-top: 8px;
+      background: #FEE2E2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: #FCA5A5;
+        color: white;
+      }
+    }
   }
 }
 
 .failures-list {
-  h5 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #1E293B;
+  .failures-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h5 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1E293B;
+    }
+
+    .btn-download-error {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #FEE2E2;
+        border-color: #FCA5A5;
+      }
+    }
   }
 
   .table-container {
