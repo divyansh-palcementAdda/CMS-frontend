@@ -19,7 +19,8 @@
         <header class="detail-header">
           <div class="header-left">
             <button class="back-btn" (click)="goBack()">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
             </button>
@@ -30,14 +31,16 @@
           </div>
           <div class="header-actions">
             <button class="btn-edit" (click)="onEdit()">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                 <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
               Edit
             </button>
             <button class="btn-delete" (click)="onDelete()">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path
                   d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
               </svg>
@@ -110,7 +113,7 @@
                 </div>
                 <div class="stat-row">
                   <span>Course Fees</span>
-                  <span class="stat-value blue-text">{{ courseDetail.quickStats.courseFees }}</span>
+                  <span class="stat-value blue-text">{{ courseDetail.basicInfo.fees }}</span>
                 </div>
               </div>
             </section>
@@ -122,7 +125,7 @@
             <div class="card-content">
               <div class="info">
                 <span class="label">Total Applications (Active)</span>
-                <span class="value">{{ courseDetail?.admissionStats?.activeApplications || 0 }}</span>
+                <span class="value">{{ courseDetail.admissionStats?.activeApplications || 0 }}</span>
               </div>
               <div class="icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -137,7 +140,7 @@
             <div class="card-content">
               <div class="info">
                 <span class="label">Cancelled Applications</span>
-                <span class="value">{{ courseDetail?.admissionStats?.cancelledApplications || 0 }}</span>
+                <span class="value">{{ courseDetail.admissionStats?.cancelledApplications || 0 }}</span>
               </div>
               <div class="icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -152,7 +155,7 @@
             <div class="card-content">
               <div class="info">
                 <span class="label">Total Admissions (Active)</span>
-                <span class="value">{{ courseDetail?.admissionStats?.activeAdmissions || 0 }}</span>
+                <span class="value">{{ courseDetail.admissionStats?.activeAdmissions || 0 }}</span>
               </div>
               <div class="icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -168,7 +171,7 @@
             <div class="card-content">
               <div class="info">
                 <span class="label">Cancelled Admissions</span>
-                <span class="value">{{ courseDetail?.admissionStats?.cancelledAdmissions || 0 }}</span>
+                <span class="value">{{ courseDetail.admissionStats?.cancelledAdmissions || 0 }}</span>
               </div>
               <div class="icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -187,10 +190,11 @@
           <div class="stat-card" (click)="onStatClick('active')">
             <div class="stat-info">
               <span class="label">Active Consultancies</span>
-              <div class="value">{{ courseDetail?.admissionStats?.activeConsultancies || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.activeConsultancies || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -198,10 +202,11 @@
           <div class="stat-card" (click)="onStatClick('inactive')">
             <div class="stat-info">
               <span class="label">InActive Consultancies</span>
-              <div class="value">{{ courseDetail?.admissionStats?.inactiveConsultancies || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.inactiveConsultancies || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -210,10 +215,11 @@
           <div class="stat-card" (click)="onStatClick('dormant')">
             <div class="stat-info">
               <span class="label">Dormant Consultancies</span>
-              <div class="value">{{ courseDetail?.admissionStats?.dormantConsultancies || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.dormantConsultancies || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -222,10 +228,11 @@
           <div class="stat-card" (click)="onStatClick('total_cons')">
             <div class="stat-info">
               <span class="label">Total Consultancies</span>
-              <div class="value">{{ courseDetail?.admissionStats?.totalConsultancies || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.totalConsultancies || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -235,10 +242,11 @@
           <div class="stat-card">
             <div class="stat-info">
               <span class="label">Courses that have no consultancy</span>
-              <div class="value">{{ courseDetail?.admissionStats?.coursesWithoutConsultancy || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.coursesWithoutConsultancy || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -247,10 +255,11 @@
           <div class="stat-card" (click)="onStatClick('total_all')">
             <div class="stat-info">
               <span class="label">Total Addmissions and Applications</span>
-              <div class="value">{{ courseDetail?.admissionStats?.admissionInAllCourses || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.admissionInAllCourses || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
@@ -260,10 +269,11 @@
           <div class="stat-card" (click)="onStatClick('scholar_adm')">
             <div class="stat-info">
               <span class="label">Scholar Admissions</span>
-              <div class="value">{{ courseDetail?.admissionStats?.scholarAdmissions || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.scholarAdmissions || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path
                   d="M12 14l9-5-9-5-9 5 9 5zM12 14l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.083M12 14A11.952 11.952 0 0 0 5.175 17.057a12.083 12.083 0 0 1 .665-6.479"
                   stroke-linecap="round" stroke-linejoin="round" />
@@ -274,10 +284,11 @@
           <div class="stat-card" (click)="onStatClick('direct_adm')">
             <div class="stat-info">
               <span class="label"> Direct Addmissions</span>
-              <div class="value">{{ courseDetail?.admissionStats?.directAdmissions || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.directAdmissions || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -287,10 +298,11 @@
           <div class="stat-card" (click)="onStatClick('cons_adm')">
             <div class="stat-info">
               <span class="label">Admissions Via consultancy</span>
-              <div class="value">{{ courseDetail?.admissionStats?.viaConsultancy || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.viaConsultancy || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -299,10 +311,11 @@
           <div class="stat-card" (click)="onStatClick('scholar_app')">
             <div class="stat-info">
               <span class="label">Scholar Applications</span>
-              <div class="value">{{ courseDetail?.admissionStats?.scholarApplications || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.scholarApplications || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path
                   d="M12 14l9-5-9-5-9 5 9 5zM12 14l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.083M12 14A11.952 11.952 0 0 0 5.175 17.057a12.083 12.083 0 0 1 .665-6.479"
                   stroke-linecap="round" stroke-linejoin="round" />
@@ -313,10 +326,11 @@
           <div class="stat-card" (click)="onStatClick('direct_app')">
             <div class="stat-info">
               <span class="label"> Direct Applications</span>
-              <div class="value">{{ courseDetail?.admissionStats?.directApplications || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.directApplications || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -326,10 +340,11 @@
           <div class="stat-card" (click)="onStatClick('cons_app')">
             <div class="stat-info">
               <span class="label">Applications Via consultancy</span>
-              <div class="value">{{ courseDetail?.admissionStats?.viaConsultancyApplications || 0 }}</div>
+              <div class="value">{{ courseDetail.admissionStats?.viaConsultancyApplications || 0 }}</div>
             </div>
             <div class="icon-box blue">
-              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -386,19 +401,23 @@
                     <td>{{ item.admissionDate | date:'mediumDate' }}</td>
                     <td class="text-center">
                       <div class="action-tools">
-                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg></div>
-                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg></div>
-                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                           </svg></div>
                       </div>
                     </td>
@@ -466,19 +485,23 @@
                     <td>{{ item.session }}</td>
                     <td class="text-center">
                       <div class="action-tools">
-                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg></div>
-                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg></div>
-                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                           </svg></div>
                       </div>
                     </td>
@@ -546,19 +569,23 @@
                     <td>{{ item.session }}</td>
                     <td class="text-center">
                       <div class="action-tools">
-                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg></div>
-                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg></div>
-                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                           </svg></div>
                       </div>
                     </td>
@@ -625,19 +652,23 @@
                     <td>{{ item.session }}</td>
                     <td class="text-center">
                       <div class="action-tools">
-                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg></div>
-                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg></div>
-                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                           </svg></div>
                       </div>
                     </td>
@@ -699,19 +730,23 @@
                     <td>{{ item.session }}</td>
                     <td class="text-center">
                       <div class="action-tools">
-                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn view" (click)="onViewAdmission(item.id)" title="View"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg></div>
-                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn edit" (click)="onEditAdmission(item.id)" title="Edit"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg></div>
-                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        <div class="tool-btn delete" (click)="onDeleteAdmission(item.id)" title="Delete"><svg width="24"
+                            height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                            <path
+                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                           </svg></div>
                       </div>
                     </td>
@@ -770,8 +805,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of courseDetail.consultancies; let i = index">
-                  <td>{{ i + 1 }}</td>
+                <tr *ngFor="let item of paginatedConsultancies; let i = index">
+                  <td>{{ (consPage - 1) * consPageSize + i + 1 }}</td>
                   <td>
                     <div class="consultancy-cell">
                       <span class="bold-text">{{ item.name }}</span>
@@ -794,6 +829,16 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedConsultancies.length }} of {{ filteredConsultancies.length }} records</span>
+            <div class="pagination">
+              <button class="nav-btn" (click)="consPage = 1" [disabled]="consPage === 1">First</button>
+              <button class="nav-btn" (click)="changePage('cons', -1)" [disabled]="consPage === 1">Prev</button>
+              <span class="page-info">Page {{ consPage }} of {{ getTotalPages(filteredConsultancies.length, consPageSize) }}</span>
+              <button class="nav-btn" (click)="changePage('cons', 1)" [disabled]="consPage >= getTotalPages(filteredConsultancies.length, consPageSize)">Next</button>
+              <button class="nav-btn" (click)="consPage = getTotalPages(filteredConsultancies.length, consPageSize)" [disabled]="consPage >= getTotalPages(filteredConsultancies.length, consPageSize)">Last</button>
+            </div>
           </div>
         </section>
 
@@ -825,8 +870,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of courseDetail.institutions; let i = index">
-                  <td class="text-center">{{ i + 1 }}</td>
+                <tr *ngFor="let item of paginatedInstitutions; let i = index">
+                  <td class="text-center">{{ (instPage - 1) * instPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ item.name }}</td>
                   <td>{{ item.code }}</td>
                   <td class="bold-text">{{ item.students }}</td>
@@ -857,6 +902,16 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="table-footer">
+            <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ filteredInstitutions.length }} records</span>
+            <div class="pagination">
+              <button class="nav-btn" (click)="instPage = 1" [disabled]="instPage === 1">First</button>
+              <button class="nav-btn" (click)="changePage('inst', -1)" [disabled]="instPage === 1">Prev</button>
+              <span class="page-info">Page {{ instPage }} of {{ getTotalPages(filteredInstitutions.length, instPageSize) }}</span>
+              <button class="nav-btn" (click)="changePage('inst', 1)" [disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">Next</button>
+              <button class="nav-btn" (click)="instPage = getTotalPages(filteredInstitutions.length, instPageSize)" [disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">Last</button>
+            </div>
           </div>
         </section>
 

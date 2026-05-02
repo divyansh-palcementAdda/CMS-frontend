@@ -58,6 +58,10 @@ export class CourseDetailComponent implements OnInit {
   loading = true;
   searchTerm = '';
 
+  // Institutions Table
+  instPage = 1;
+  instPageSize = 10;
+
   // Master Table
   masterSearch = '';
   masterPage = 1;
@@ -377,6 +381,8 @@ export class CourseDetailComponent implements OnInit {
       this.cancelledAdmPage += delta;
     } else if (type === 'cons') {
       this.consPage += delta;
+    } else if (type === 'inst') {
+      this.instPage += delta;
     }
   }
 
@@ -480,6 +486,20 @@ export class CourseDetailComponent implements OnInit {
   get paginatedConsultancies(): any[] {
     const start = (this.consPage - 1) * this.consPageSize;
     return this.filteredConsultancies.slice(start, start + this.consPageSize);
+  }
+
+  get filteredInstitutions(): any[] {
+    if (!this.courseDetail || !this.courseDetail.institutions) return [];
+    if (!this.searchTerm) return this.courseDetail.institutions;
+    const search = this.searchTerm.toLowerCase();
+    return this.courseDetail.institutions.filter(item => 
+      item.name.toLowerCase().includes(search) || item.code.toLowerCase().includes(search)
+    );
+  }
+
+  get paginatedInstitutions(): any[] {
+    const start = (this.instPage - 1) * this.instPageSize;
+    return this.filteredInstitutions.slice(start, start + this.instPageSize);
   }
 
 }

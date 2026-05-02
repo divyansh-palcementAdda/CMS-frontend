@@ -86,7 +86,7 @@ export interface CourseDetail {
     totalApplications?: number;
     totalAdmissions?: number;
   }>;
-  admissionStats: {
+  admissionStats?: {
     activeAdmissions: number;
     activeApplications: number;
     cancelledAdmissions: number;

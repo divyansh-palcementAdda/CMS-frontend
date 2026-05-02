@@ -39,14 +39,14 @@ export class AdmissionService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    if (search)        params = params.set('search', search);
-    if (tab)           params = params.set('tab', tab);
-    if (statFilter)    params = params.set('statFilter', statFilter);
-    if (courseId)      params = params.set('courseId', courseId.toString());
-    if (sortColumn)    params = params.set('sortColumn', sortColumn);
+    if (search) params = params.set('search', search);
+    if (tab) params = params.set('tab', tab);
+    if (statFilter) params = params.set('statFilter', statFilter);
+    if (courseId) params = params.set('courseId', courseId.toString());
+    if (sortColumn) params = params.set('sortColumn', sortColumn);
     if (sortDirection) params = params.set('sortDirection', sortDirection);
-    if (statusFilter)  params = params.set('statusFilter', statusFilter);
-    if (source)        params = params.set('source', source);
+    if (statusFilter) params = params.set('statusFilter', statusFilter);
+    if (source) params = params.set('source', source);
     if (isScholar != null && isScholar !== '') params = params.set('isScholar', isScholar);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
@@ -116,7 +116,7 @@ export class AdmissionService {
   }
 
   downloadTemplate(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/bulk-upload/template`, { responseType: 'blob' });
+    return this.http.get(`${this.apiUrl}/template`, { responseType: 'blob' });
   }
 
   updateFeeStatus(id: number | undefined, isPaid: boolean): Observable<any> {
