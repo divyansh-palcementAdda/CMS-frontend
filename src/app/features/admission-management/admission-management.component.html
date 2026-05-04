@@ -408,7 +408,7 @@
 
                         <!-- Standardized Pagination -->
                         <div class="pagination-section">
-                            <span class="showing-text">Showing {{ paginatedAdmissions.length }} records out of {{
+                            <span class="showing-text">Showing {{ pageSize }} records out of {{
                                 pageData.totalCount }} Admissions</span>
                             <div class="pagination-controls">
                                 <button class="page-btn nav-btn" (click)="goToPage(currentPage - 1)"
@@ -418,8 +418,9 @@
                                         <polyline points="15 18 9 12 15 6"></polyline>
                                     </svg>
                                 </button>
-                                <button class="page-btn" *ngFor="let p of getPagesArray()"
-                                    [class.active]="p === currentPage" (click)="goToPage(p)">
+                                <button class="page-btn" *ngFor="let p of getVisiblePages()"
+                                    [class.active]="p === currentPage" [class.ellipsis]="p === '...'"
+                                    [disabled]="p === '...'" (click)="p !== '...' && goToPage(+p)">
                                     {{ p }}
                                 </button>
                                 <button class="page-btn nav-btn" (click)="goToPage(currentPage + 1)"

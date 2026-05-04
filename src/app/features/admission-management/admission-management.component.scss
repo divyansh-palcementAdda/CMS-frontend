@@ -468,7 +468,6 @@ $text-light: #64748B;
                       background: #ecfdf5;
                     }
                   }
-
                   &.delete {
                     color: #ef4444;
 
@@ -479,6 +478,74 @@ $text-light: #64748B;
                 }
               }
             }
+          }
+        }
+      }
+    }
+
+    .pagination-section {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid $card-border;
+      background: white;
+
+      .showing-text {
+        font-size: 14px;
+        color: $text-light;
+        font-weight: 500;
+      }
+
+      .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .page-btn {
+          min-width: 36px;
+          height: 36px;
+          padding: 0 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+          border: 1px solid $card-border;
+          background: white;
+          color: $text-dark;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover:not(:disabled):not(.active) {
+            border-color: $primary;
+            color: $primary;
+            background: #F5F7FF;
+          }
+
+          &.active {
+            background: $primary;
+            color: white;
+            border-color: $primary;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+          }
+
+          &.ellipsis {
+            cursor: default;
+            border-color: transparent;
+            background: transparent;
+            color: $text-light;
+          }
+
+          &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            background: #F8FAFC;
+          }
+
+          &.nav-btn {
+            svg { width: 18px; height: 18px; }
           }
         }
       }
