@@ -76,9 +76,17 @@
       <!-- Results View -->
       <div class="results-view" *ngIf="uploadResult">
         <div class="res-summary">
-          <div class="res-card success">
-            <span class="count">{{ uploadResult.successCount }}</span>
-            <span class="label">Successful</span>
+          <div class="res-card created">
+            <span class="count">{{ uploadResult.createdCount || 0 }}</span>
+            <span class="label">Created</span>
+          </div>
+          <div class="res-card updated">
+            <span class="count">{{ uploadResult.updatedCount || 0 }}</span>
+            <span class="label">Updated</span>
+          </div>
+          <div class="res-card skipped">
+            <span class="count">{{ uploadResult.skippedCount || 0 }}</span>
+            <span class="label">Skipped</span>
           </div>
           <div class="res-card failure" [class.has-errors]="uploadResult.failureCount > 0">
             <span class="count">{{ uploadResult.failureCount }}</span>
@@ -93,7 +101,7 @@
           </div>
           <div class="res-card total">
             <span class="count">{{ uploadResult.totalProcessed }}</span>
-            <span class="label">Total Records</span>
+            <span class="label">Total Rows</span>
           </div>
         </div>
 

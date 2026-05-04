@@ -60,8 +60,8 @@
               </div>
               <div class="stat-content">
                 <h2 class="stat-value">{{ stats().unmappedStudents || 0 }}</h2>
-                <span class="stat-label">Unmapped Students</span>
-                <p class="stat-desc">Students not mapped with a consultancy or user.</p>
+                <span class="stat-label">Unmapped Applications</span>
+                <p class="stat-desc">Applications not mapped with a consultancy or user.</p>
               </div>
             </div>
           </div>
@@ -142,6 +142,7 @@
                 @switch (currentTab()) {
                 @case ('students') {
                 <tr>
+                  <th>S.No</th>
                   <th>Student Name</th>
                   <th>Contact Info</th>
                   <th>Enrolled Course</th>
@@ -152,6 +153,7 @@
                 }
                 @case ('users') {
                 <tr>
+                  <th>S.No</th>
                   <th>Name</th>
                   <th>Role</th>
                   <th>Email</th>
@@ -161,6 +163,7 @@
                 }
                 @case ('courses') {
                 <tr>
+                  <th>S.No</th>
                   <th>Course Name</th>
                   <th>Course Type</th>
                   <th>Duration</th>
@@ -170,6 +173,7 @@
                 }
                 @case ('consultancies-users') {
                 <tr>
+                  <th>S.No</th>
                   <th>Consultancy Name</th>
                   <th>Location</th>
                   <th>Commission %</th>
@@ -183,6 +187,7 @@
                 }
                 @case ('consultancies-courses') {
                 <tr>
+                  <th>S.No</th>
                   <th>Consultancy Name</th>
                   <th>Location</th>
                   <th>Commission %</th>
@@ -199,6 +204,7 @@
               <tbody>
                 @for (item of paginatedData(); track item.id || item.email || $index) {
                 <tr>
+                  <td class="serial-no">{{ (currentPage() - 1) * pageSize() + $index + 1 }}</td>
 
                   <!-- NAME COLUMN -->
                   <td>
@@ -229,19 +235,19 @@
                   <td>
                     <div class="roles-container" style="display: flex; gap: 4px; flex-wrap: wrap;">
                       @for (role of item.roles; track role.roleId) {
-                        <span class="role-badge" [ngClass]="getRoleClass(role.name)">
-                          {{ role.name }}
-                        </span>
+                      <span class="role-badge" [ngClass]="getRoleClass(role.name)">
+                        {{ role.name }}
+                      </span>
                       }
                       @if ((!item.roles || item.roles.length === 0) && item.role) {
-                        <span class="role-badge" [ngClass]="getRoleClass(item.role)">
-                          {{ item.role }}
-                        </span>
+                      <span class="role-badge" [ngClass]="getRoleClass(item.role)">
+                        {{ item.role }}
+                      </span>
                       }
                       @if ((!item.roles || item.roles.length === 0) && !item.role) {
-                        <span class="role-badge" [ngClass]="getRoleClass('User')">
-                          User
-                        </span>
+                      <span class="role-badge" [ngClass]="getRoleClass('User')">
+                        User
+                      </span>
                       }
                     </div>
                   </td>
@@ -300,7 +306,7 @@
                 } @empty {
                 @if (!loading()) {
                 <tr>
-                  <td colspan="8" class="empty-state">
+                  <td colspan="10" class="empty-state">
                     <span class="material-symbols-outlined">folder_open</span>
                     <p>No unmapped {{ currentTab() }} found.</p>
                   </td>
@@ -320,20 +326,19 @@
                 <button class="page-arrow" [disabled]="currentPage() === 1" (click)="changePage(currentPage() - 1)">
                   <span class="material-symbols-outlined">chevron_left</span>
                 </button>
-                
+
                 @for (page of getPageNumbers(); track page) {
-                  @if (page !== '...') {
-                    <button class="page-num" 
-                            [class.active]="currentPage() === page"
-                            (click)="changePage(+$any(page))">
-                      {{ page }}
-                    </button>
-                  } @else {
-                    <span class="pagination-dots">...</span>
-                  }
+                @if (page !== '...') {
+                <button class="page-num" [class.active]="currentPage() === page" (click)="changePage(+$any(page))">
+                  {{ page }}
+                </button>
+                } @else {
+                <span class="pagination-dots">...</span>
+                }
                 }
 
-                <button class="page-arrow" [disabled]="currentPage() === totalPages()" (click)="changePage(currentPage() + 1)">
+                <button class="page-arrow" [disabled]="currentPage() === totalPages()"
+                  (click)="changePage(currentPage() + 1)">
                   <span class="material-symbols-outlined">chevron_right</span>
                 </button>
               </div>

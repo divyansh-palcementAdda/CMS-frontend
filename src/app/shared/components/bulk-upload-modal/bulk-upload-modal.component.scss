@@ -247,36 +247,43 @@
 .results-view {
   .res-summary {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
     margin-bottom: 32px;
   }
 
   .res-card {
-    padding: 16px;
+    padding: 12px 8px;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-width: 0;
 
     .count {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
       display: block;
+      margin-bottom: 2px;
     }
     .label {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
     }
 
+    &.created { background: #ECFDF5; color: #059669; border: 1px solid #D1FAE5; }
+    &.updated { background: #EFF6FF; color: #2563EB; border: 1px solid #DBEAFE; }
+    &.skipped { background: #FFF7ED; color: #EA580C; border: 1px solid #FFEDD5; }
     &.success { background: #ECFDF5; color: #059669; }
     &.failure { 
-      background: #F1F5F9; color: #64748B; 
-      &.has-errors { background: #FEF2F2; color: #DC2626; }
+      background: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0;
+      &.has-errors { background: #FEF2F2; color: #DC2626; border-color: #FEE2E2; }
     }
-    &.total { background: #F8FAFC; color: #475569; }
+    &.total { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
 
     .btn-download-error-mini {
       margin-top: 8px;

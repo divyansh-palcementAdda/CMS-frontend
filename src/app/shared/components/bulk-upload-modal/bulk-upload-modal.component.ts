@@ -8,6 +8,9 @@ export interface BulkUploadResult {
   totalProcessed: number;
   successCount: number;
   failureCount: number;
+  createdCount?: number;
+  updatedCount?: number;
+  skippedCount?: number;
   successes: any[];
   failures: { rowNumber: number; errorMessage: string }[];
   errorFileId?: string;
