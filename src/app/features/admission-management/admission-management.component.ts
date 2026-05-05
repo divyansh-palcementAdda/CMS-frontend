@@ -74,12 +74,18 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   showDeleteModal: boolean = false;
   showAdmissionModal: boolean = false;
   showBulkUploadModal: boolean = false;
+  showBulkUpdateEnrollmentModal: boolean = false;
   showPaymentModal: boolean = false;
   selectedAdmission: AdmissionItem | null = null;
   selectedStudentId?: number;
   selectedStudentIdForPayment?: number;
   selectedStudentNameForPayment: string = '';
   admissionIdToDelete?: number;
+
+  enrollmentUpdateService = {
+    bulkUpload: (file: File) => this.admissionService.bulkUpdateEnrollment(file),
+    downloadTemplate: () => this.admissionService.downloadEnrollmentTemplate()
+  };
 
   constructor(
     public admissionService: AdmissionService,

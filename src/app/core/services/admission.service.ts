@@ -161,4 +161,14 @@ export class AdmissionService {
     if (!id) throw new Error('Student ID is required');
     return this.http.patch(`${this.apiUrl}/${id}/commission-status`, { status });
   }
+
+  bulkUpdateEnrollment(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.apiUrl}/bulk-update-enrollment`, formData);
+  }
+
+  downloadEnrollmentTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/enrollment-template`, { responseType: 'blob' });
+  }
 }
