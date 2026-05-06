@@ -120,6 +120,7 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
 
   onEdit(id: number | undefined) {
     if (id) {
+      this.editingInstitutionId = id;
       this.showAddModal = true;
     }
   }
@@ -153,11 +154,13 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   }
 
   openAddModal() {
+    this.editingInstitutionId = null;
     this.showAddModal = true;
   }
 
   closeAddModal() {
     this.showAddModal = false;
+    this.editingInstitutionId = null;
   }
 
   onAddSuccess() {
