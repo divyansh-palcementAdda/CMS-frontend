@@ -1,5 +1,5 @@
-<div class="modal-overlay" (click)="onClose()">
-  <div class="modal-container" (click)="$event.stopPropagation()">
+<div [class.modal-overlay]="!isDialog" (click)="!isDialog && onClose()">
+  <div [class.modal-container]="!isDialog" (click)="$event.stopPropagation()">
     <!-- Header -->
     <div class="modal-header">
       <div class="header-title">

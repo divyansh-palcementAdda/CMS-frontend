@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Output, OnInit, Input, inject } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, Input, inject, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../../../core/services/user.service';
 import { CreateUserDTO, BulkUserUploadResponse } from '../../../../core/models/user.model';
 import { finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-user-modal',
@@ -23,13 +24,17 @@ export class AddUserModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
   private toastr = inject(ToastrService);
+  private dialogRef = inject(MatDialogRef<AddUserModalComponent>, { optional: true });
+  private dialogData = inject(MAT_DIALOG_DATA, { optional: true });
+
+  isDialog = !!this.dialogRef;
 
   userForm: FormGroup;
   isSubmitting = false;
   roles: any[] = [];
   originalEmail: string = '';
   isEmailChanged = false;
-  
+
   // New UI states
   passwordVisible = false;
   showOtpModal = false;
@@ -42,23 +47,23 @@ export class AddUserModalComponent implements OnInit {
   isOtpSending = false;
   otpCooldown = 0;
   private cooldownInterval: any;
-  
+
 
   constructor() {
     this.userForm = this.fb.group({
       username: ['', [
-        Validators.required, 
-        Validators.minLength(3), 
+        Validators.required,
+        Validators.minLength(3),
         Validators.maxLength(80),
         Validators.pattern(/^[a-zA-Z0-9._-]+$/)
       ]],
       password: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(8),
         Validators.maxLength(64)
       ]],
       email: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.email,
         Validators.maxLength(200)
       ]],
@@ -68,7 +73,7 @@ export class AddUserModalComponent implements OnInit {
         Validators.maxLength(80),
         Validators.pattern(/^[a-zA-Z ]+$/)
       ]],
-      mobile: ['', [Validators.pattern(/^\+?[0-9]{10,15}$/)]],
+      mobile: ['', [Validators.pattern(/^(\+?[0-9]{10,15})?$/)]],
       roles: [[], [Validators.required]]
     });
   }
@@ -76,7 +81,12 @@ export class AddUserModalComponent implements OnInit {
   ngOnInit(): void {
     console.log('AddUserModal initialized. UserId:', this.userId, 'UserToEdit:', this.userToEdit);
     this.loadRoles();
-    
+
+    if (this.dialogData) {
+      this.userId = this.dialogData.userId ?? this.userId;
+      this.userToEdit = this.dialogData.userToEdit ?? this.userToEdit;
+    }
+
     if (this.userToEdit) {
       this.userId = this.userToEdit.id;
       this.patchFormData(this.userToEdit);
@@ -97,7 +107,7 @@ export class AddUserModalComponent implements OnInit {
     this.originalEmail = user.email;
     // Map roles objects to raw names for checkbox matching
     const roleNames = user.roles?.map((r: any) => r.rawName || r.name) || [];
-    
+
     this.userForm.patchValue({
       username: user.username,
       email: user.email,
@@ -109,7 +119,7 @@ export class AddUserModalComponent implements OnInit {
     // Make password optional for edit mode
     this.userForm.get('password')?.clearValidators();
     this.userForm.get('password')?.updateValueAndValidity();
-    
+
     // Ensure form state is updated
     this.userForm.markAsPristine();
   }
@@ -195,7 +205,7 @@ export class AddUserModalComponent implements OnInit {
       this.toastr.warning('Please fill all required fields correctly', 'Form Invalid');
       return;
     }
-    
+
     // Check if we need OTP:
     // 1. New user registration
     // 2. Existing user changing their email
@@ -222,7 +232,7 @@ export class AddUserModalComponent implements OnInit {
           this.toastr.success('User updated successfully', 'Success');
           this.showOtpModal = false;
           this.success.emit();
-          this.onClose();
+          this.onClose(true);
         },
         error: (err) => {
           console.error('Error updating user', err);
@@ -264,7 +274,7 @@ export class AddUserModalComponent implements OnInit {
           this.toastr.success('User created successfully', 'Success');
           this.showOtpModal = false;
           this.success.emit();
-          this.onClose();
+          this.onClose(true);
         },
         error: (err) => {
           console.error('Error creating user', err);
@@ -280,8 +290,12 @@ export class AddUserModalComponent implements OnInit {
       });
   }
 
-  onClose(): void {
-    this.close.emit();
+  onClose(success = false): void {
+    if (this.isDialog) {
+      this.dialogRef?.close(success);
+    } else {
+      this.close.emit();
+    }
   }
 
 }

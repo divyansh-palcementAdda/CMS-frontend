@@ -30,6 +30,7 @@ import { Router } from '@angular/router';
 })
 export class UnmappedRecordsComponent implements OnInit {
   // Signals
+  // Signals
   stats = signal<any>({});
   currentTab = signal<string>('students');
   data = signal<any[]>([]);
@@ -39,6 +40,7 @@ export class UnmappedRecordsComponent implements OnInit {
   // Pagination Signals
   currentPage = signal<number>(1);
   pageSize = signal<number>(10);
+  totalElements = signal<number>(0);
 
   tabs = [
     { id: 'students', label: 'Students', countKey: 'unmappedStudents' },
@@ -61,17 +63,18 @@ export class UnmappedRecordsComponent implements OnInit {
 
   // Computed Values
   filteredData = computed(() => {
-    return this.filterPipe.transform(this.data(), this.searchText());
+    // If backend handles search, this might just return data()
+    // But we'll keep it for now as a fallback or if we want to filter on top of backend results
+    return this.data();
   });
 
   paginatedData = computed(() => {
-    const start = (this.currentPage() - 1) * this.pageSize();
-    const end = start + this.pageSize();
-    return this.filteredData().slice(start, end);
+    // Since backend already paged the data, just return it
+    return this.data();
   });
 
   totalPages = computed(() => {
-    return Math.ceil(this.filteredData().length / this.pageSize()) || 1;
+    return Math.ceil(this.totalElements() / this.pageSize()) || 1;
   });
 
   ngOnInit(): void {
@@ -94,21 +97,46 @@ export class UnmappedRecordsComponent implements OnInit {
     this.loadData();
   }
 
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.loadData();
+  }
+
+  private searchTimeout: any;
+  onSearchChange(text: string): void {
+    this.searchText.set(text);
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage.set(1);
+      this.loadData();
+    }, 500);
+  }
+
   loadData(): void {
     this.loading.set(true);
     let obs$;
+    const page = this.currentPage() - 1;
+    const size = this.pageSize();
+    const search = this.searchText();
 
     switch (this.currentTab()) {
-      case 'students': obs$ = this.unmappedService.getUnmappedStudents(); break;
-      case 'users': obs$ = this.unmappedService.getUnmappedUsers(); break;
-      case 'courses': obs$ = this.unmappedService.getUnmappedCourses(); break;
-      case 'consultancies-users': obs$ = this.unmappedService.getConsultanciesWithoutUsers(); break;
-      case 'consultancies-courses': obs$ = this.unmappedService.getConsultanciesWithoutCourses(); break;
+      case 'students': obs$ = this.unmappedService.getUnmappedStudents(page, size, search); break;
+      case 'users': obs$ = this.unmappedService.getUnmappedUsers(page, size, search); break;
+      case 'courses': obs$ = this.unmappedService.getUnmappedCourses(page, size, search); break;
+      case 'consultancies-users': obs$ = this.unmappedService.getConsultanciesWithoutUsers(page, size, search); break;
+      case 'consultancies-courses': obs$ = this.unmappedService.getConsultanciesWithoutCourses(page, size, search); break;
     }
 
     obs$?.subscribe({
-      next: (res: any[]) => {
-        this.data.set(res);
+      next: (res: any) => {
+        if (res && res.content) {
+          this.data.set(res.content);
+          this.totalElements.set(res.totalElements);
+        } else {
+          this.data.set([]);
+          this.totalElements.set(0);
+        }
         this.loading.set(false);
       },
       error: (err: any) => {
@@ -179,6 +207,7 @@ export class UnmappedRecordsComponent implements OnInit {
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
+      this.loadData();
     }
   }
 

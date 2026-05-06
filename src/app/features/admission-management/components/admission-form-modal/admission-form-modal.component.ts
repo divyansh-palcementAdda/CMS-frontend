@@ -180,7 +180,6 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
       whatsappPhoneNo: ['', Validators.pattern('^[6-9]\\d{9}$')],
       city: ['', Validators.required],
       state: ['', Validators.required],
-      pincode: ['', [Validators.required, Validators.pattern('^\\d{6}$')]],
       address: ['', [Validators.required, Validators.minLength(5)]],
 
       // Step 2: Admission
@@ -256,7 +255,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     if (this.currentStep === 1) {
       this.backendErrors = {};
       // Validate Step 1 fields
-      const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'pincode', 'address'];
+      const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'address'];
       let isValid = true;
       step1Fields.forEach(field => {
         const control = this.admissionForm.get(field);
@@ -347,7 +346,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
           this.toastr.error('Validation failed. Please check individual fields.', 'Error');
           
           // If errors are on Step 1, go back
-          const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'pincode', 'address'];
+          const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'address'];
           const hasStep1Errors = Object.keys(this.backendErrors).some(key => step1Fields.includes(key));
           if (hasStep1Errors) {
             this.currentStep = 1;

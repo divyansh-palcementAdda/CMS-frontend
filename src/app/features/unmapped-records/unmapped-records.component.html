@@ -121,11 +121,23 @@
           <div class="table-card-header">
             <div class="left-header">
               <h3 class="table-title">Unmapped {{ currentTab() | titlecase }}</h3>
-              <span class="record-count">{{ data().length }} records found</span>
+              <div class="header-meta">
+                <span class="record-count">{{ totalElements() }} records found</span>
+                <div class="entries-selector">
+                  <label>Show</label>
+                  <select [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                  </select>
+                  <span>Entries</span>
+                </div>
+              </div>
             </div>
             <div class="search-box">
               <span class="material-symbols-outlined search-icon">search</span>
-              <input type="text" [value]="searchText()" (input)="searchText.set($any($event.target).value)"
+              <input type="text" [ngModel]="searchText()" (ngModelChange)="onSearchChange($event)"
                 placeholder="Search {{ currentTab() }}...">
             </div>
           </div>
@@ -319,7 +331,7 @@
             <!-- Dynamic Pagination -->
             <footer class="table-footer">
               <span class="showing-text">
-                Showing {{ paginatedData().length }} records out of {{ filteredData().length }} Records
+                Showing {{ data().length }} records out of {{ totalElements() }} Records
               </span>
               @if (totalPages() > 1) {
               <div class="pagination">

@@ -58,7 +58,6 @@ export class AddInstitutionModalComponent implements OnInit {
       city: ['', [Validators.required]],
       state: ['', [Validators.required]],
       country: ['India', [Validators.required]],
-      pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
       status: ['ACTIVE', [Validators.required]]
     });
   }

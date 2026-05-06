@@ -151,6 +151,24 @@
     }
   }
 
+  .input-with-loader {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input, select {
+      width: 100%;
+    }
+
+    .loader-icon {
+      position: absolute;
+      right: 12px;
+      color: #6366f1;
+      font-size: 14px;
+      pointer-events: none;
+    }
+  }
+
   /* Checklist UI */
   .checklist-container {
     border: 1px solid #e2e8f0;

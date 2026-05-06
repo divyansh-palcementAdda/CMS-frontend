@@ -1,8 +1,11 @@
-import { Component, EventEmitter, OnInit, Output, Input, inject } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, inject, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConsultancyService } from '../../../../core/services/consultancy.service';
+import { LocationService } from '../../../../core/services/location.service';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-consultancy-modal',
@@ -18,7 +21,12 @@ export class AddConsultancyModalComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private consultancyService = inject(ConsultancyService);
+  private locationService = inject(LocationService);
   private toastr = inject(ToastrService);
+  private dialogRef = inject(MatDialogRef<AddConsultancyModalComponent>, { optional: true });
+  private dialogData = inject(MAT_DIALOG_DATA, { optional: true });
+
+  isDialog = !!this.dialogRef;
 
   activeTab: 'single' | 'bulk' = 'single';
   isLoading = false;
@@ -49,11 +57,18 @@ export class AddConsultancyModalComponent implements OnInit {
   searchInstitutions = '';
   searchUsers = '';
 
+  // Location Data
+  states: string[] = [];
+  cities: string[] = [];
+  isLoadingLocation = false;
+  isLoadingCities = false;
+
   constructor() { }
 
   ngOnInit(): void {
     this.initForm();
     this.fetchDropdownData();
+    this.loadStates();
     if (this.consultancyId) {
       this.loadConsultancyData();
       this.activeTab = 'single';
@@ -137,6 +152,19 @@ export class AddConsultancyModalComponent implements OnInit {
         this.consultancyForm.patchValue({ whatsappNo: this.consultancyForm.get('mobile')?.value });
       } else {
         this.consultancyForm.patchValue({ whatsappNo: '' });
+      }
+    });
+
+
+    // State change listener
+    this.consultancyForm.get('state')?.valueChanges.subscribe(state => {
+      this.onStateChange(state);
+    });
+
+    // City change listener
+    this.consultancyForm.get('city')?.valueChanges.subscribe(city => {
+      if (this.consultancyForm.get('city')?.dirty) {
+        this.fetchLocationByCity(city);
       }
     });
 
@@ -261,6 +289,37 @@ export class AddConsultancyModalComponent implements OnInit {
 
   // --- Single Methods ---
 
+  private loadStates() {
+    this.locationService.getAllStates().subscribe(res => this.states = res);
+  }
+
+  private onStateChange(state: string) {
+    if (!state) {
+      this.cities = [];
+      return;
+    }
+    this.isLoadingCities = true;
+    this.locationService.getCitiesByState(state).subscribe({
+      next: (res) => {
+        this.cities = res;
+        this.isLoadingCities = false;
+      },
+      error: () => this.isLoadingCities = false
+    });
+  }
+
+
+  private fetchLocationByCity(city: string) {
+    if (!city) return;
+    this.locationService.getLocationByCity(city).subscribe(res => {
+      if (res && (!this.consultancyForm.get('state')?.value)) {
+        this.consultancyForm.patchValue({
+          state: res.state
+        }, { emitEvent: false });
+      }
+    });
+  }
+
   onSubmitSingle(): void {
     if (this.consultancyForm.invalid) {
       this.consultancyForm.markAllAsTouched();
@@ -274,7 +333,7 @@ export class AddConsultancyModalComponent implements OnInit {
     delete payload.sameAsMobileAlt;
     delete payload.sameAsMobileWa;
 
-    const request = this.consultancyId 
+    const request = this.consultancyId
       ? this.consultancyService.updateConsultancy(this.consultancyId, payload)
       : this.consultancyService.createConsultancy(payload);
 
@@ -283,11 +342,12 @@ export class AddConsultancyModalComponent implements OnInit {
         this.isSubmitting = false;
         this.toastr.success(`Consultancy ${this.consultancyId ? 'updated' : 'created'} successfully!`, 'Success');
         this.success.emit();
+        this.onClose(true);
       },
       error: (err) => {
         this.isSubmitting = false;
         console.error(err);
-        
+
         if (err.error?.errors) {
           this.backendErrors = err.error.errors;
           this.toastr.error('Validation failed. Please check individual fields.', 'Error');
@@ -368,6 +428,7 @@ export class AddConsultancyModalComponent implements OnInit {
           this.toastr.success(`Successfully uploaded ${res.successCount} consultancies!`, 'Bulk Upload Success');
           setTimeout(() => {
             this.success.emit();
+            this.onClose(true);
           }, 2000);
         } else {
           this.toastr.warning(`Uploaded ${res.successCount} with ${res.failureCount} errors.`, 'Partial Success');
@@ -381,7 +442,11 @@ export class AddConsultancyModalComponent implements OnInit {
     });
   }
 
-  onClose(): void {
-    this.close.emit();
+  onClose(success = false): void {
+    if (this.isDialog) {
+      this.dialogRef?.close(success);
+    } else {
+      this.close.emit();
+    }
   }
 }

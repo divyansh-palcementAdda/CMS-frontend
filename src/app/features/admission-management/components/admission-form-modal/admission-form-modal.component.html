@@ -125,7 +125,8 @@
                 <input type="checkbox" [checked]="isSameAsMobile">
                 <span>Same as mobile number</span>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['whatsappPhoneNo']">{{ backendErrors['whatsappPhoneNo'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['whatsappPhoneNo']">{{ backendErrors['whatsappPhoneNo']
+                }}</div>
             </div>
 
             <div class="input-group">
@@ -146,14 +147,7 @@
               <div class="error-msg" [class.show]="backendErrors['state']">{{ backendErrors['state'] }}</div>
             </div>
 
-            <div class="input-group">
-              <label>Pincode <span class="required">*</span></label>
-              <div class="input-wrapper" [class.error-border]="backendErrors['pincode']">
-                <i class="fa-solid fa-map-pin"></i>
-                <input type="text" formControlName="pincode" placeholder="Enter 6-digit pincode">
-              </div>
-              <div class="error-msg" [class.show]="backendErrors['pincode']">{{ backendErrors['pincode'] }}</div>
-            </div>
+
 
             <div class="input-group full-width">
               <label>Full Address <span class="required">*</span></label>
@@ -176,9 +170,11 @@
                 <select formControlName="admissionSource">
                   <option value="USER">Direct / User</option>
                   <option value="CONSULTANCY">Via Consultancy</option>
+                  <option value="UNMAPPED">UNMAPPED/option>
                 </select>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['admissionSource']">{{ backendErrors['admissionSource'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['admissionSource']">{{ backendErrors['admissionSource']
+                }}</div>
             </div>
 
             <div class="input-group" *ngIf="admissionForm.get('admissionSource')?.value === 'CONSULTANCY'">
@@ -190,7 +186,8 @@
                   <option *ngFor="let c of filteredConsultancies" [value]="c.id">{{ c.name }}</option>
                 </select>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['consultancyId']">{{ backendErrors['consultancyId'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['consultancyId']">{{ backendErrors['consultancyId'] }}
+              </div>
             </div>
 
             <div class="input-group">
@@ -202,7 +199,8 @@
                   <option *ngFor="let u of filteredUsers" [value]="u.id">{{ u.fullName }}</option>
                 </select>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['admittedByUserId']">{{ backendErrors['admittedByUserId'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['admittedByUserId']">{{
+                backendErrors['admittedByUserId'] }}</div>
             </div>
 
             <div class="input-group">
@@ -211,7 +209,8 @@
                 <i class="fa-solid fa-user-check"></i>
                 <input type="text" formControlName="counselorName" placeholder="Enter counselor name">
               </div>
-              <div class="error-msg" [class.show]="backendErrors['counselorName']">{{ backendErrors['counselorName'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['counselorName']">{{ backendErrors['counselorName'] }}
+              </div>
             </div>
 
             <div class="input-group">
@@ -223,7 +222,8 @@
                   <option *ngFor="let inst of institutions" [value]="inst.id">{{ inst.name }}</option>
                 </select>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['institutionId']">{{ backendErrors['institutionId'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['institutionId']">{{ backendErrors['institutionId'] }}
+              </div>
             </div>
 
             <div class="input-group">
@@ -247,7 +247,8 @@
                 <i class="fa-solid fa-calendar-check"></i>
                 <input type="date" formControlName="admissionDate">
               </div>
-              <div class="error-msg" [class.show]="backendErrors['admissionDate']">{{ backendErrors['admissionDate'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['admissionDate']">{{ backendErrors['admissionDate'] }}
+              </div>
             </div>
 
             <div class="input-group">
@@ -269,7 +270,8 @@
                   <option value="PERCENTAGE">Percentage</option>
                 </select>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['discountType']">{{ backendErrors['discountType'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['discountType']">{{ backendErrors['discountType'] }}
+              </div>
             </div>
 
             <div class="input-group"
@@ -279,7 +281,8 @@
                 <i class="fa-solid fa-coins"></i>
                 <input type="number" formControlName="discountValue" placeholder="Enter value">
               </div>
-              <div class="error-msg" [class.show]="backendErrors['discountValue']">{{ backendErrors['discountValue'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['discountValue']">{{ backendErrors['discountValue'] }}
+              </div>
             </div>
 
             <div class="input-group">
@@ -297,7 +300,8 @@
                 <textarea formControlName="scholarshipDetails"
                   placeholder="Enter scholarship scheme name and details"></textarea>
               </div>
-              <div class="error-msg" [class.show]="backendErrors['scholarshipDetails']">{{ backendErrors['scholarshipDetails'] }}</div>
+              <div class="error-msg" [class.show]="backendErrors['scholarshipDetails']">{{
+                backendErrors['scholarshipDetails'] }}</div>
             </div>
           </div>
         </div>

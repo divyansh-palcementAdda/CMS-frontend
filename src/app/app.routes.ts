@@ -102,5 +102,11 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  {
+    path: 'master-data',
+    loadComponent: () => import('./features/master-data/master-data.component').then(m => m.MasterDataComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
   { path: '**', redirectTo: '/admin/dashboard' }
 ];

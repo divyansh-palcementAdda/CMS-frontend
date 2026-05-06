@@ -11,6 +11,9 @@ import { UserService } from '../../../core/services/user.service';
 import { AdmissionService } from '../../../core/services/admission.service';
 import { InstitutionService } from '../../../core/services/institution.service';
 import { UnmappedService } from '../../../core/services/unmapped.service';
+import { MatDialog } from '@angular/material/dialog';
+import { AddUserModalComponent } from '../../user-management/components/add-user-modal/add-user-modal.component';
+import { AddConsultancyModalComponent } from '../../consultancy-management/components/add-consultancy-modal/add-consultancy-modal.component';
 
 export type MappingType = 'students' | 'users' | 'courses' | 'consultancies-users' | 'consultancies-courses';
 
@@ -51,6 +54,10 @@ export class MappingModalComponent implements OnInit {
   courseInstitutionMap = new Map<number, Set<number>>();
   institutionCourseMap = new Map<number, Set<number>>();
   relationshipLoading  = false; // tracks the in-progress institution→courses calls
+
+  // ── Bidirectional mapping cache ───────────────────────────────────────────
+  userConsultanciesMap = new Map<number, number[]>(); // userId -> consultancyIds
+  consultancyUsersMap  = new Map<number, number[]>(); // consultancyId -> userIds
 
   // ── UI state ───────────────────────────────────────────────────────────────
   loading        = false;
@@ -101,7 +108,8 @@ export class MappingModalComponent implements OnInit {
     private studentService: AdmissionService,
     private courseService: CourseService,
     private institutionService: InstitutionService,
-    private unmappedService: UnmappedService
+    private unmappedService: UnmappedService,
+    private dialog: MatDialog
   ) {}
 
   // ── Convenience getters ────────────────────────────────────────────────────
@@ -190,6 +198,7 @@ export class MappingModalComponent implements OnInit {
     if (this.isStudents || this.isConsultanciesUsers) {
       this.userService.getUsersByStatus('ACTIVE').subscribe(res => {
         this.users = (res.users || res as any) ?? [];
+        this.buildMappingCache();
         this.dropdownLoading = false;
       });
     }
@@ -302,10 +311,19 @@ export class MappingModalComponent implements OnInit {
   // ── Filtered Lists ─────────────────────────────────────────────────────────
   get filteredUsers(): any[] {
     const t = this.userSearch().toLowerCase();
-    return this.users.filter(u =>
-      !t || u.fullName?.toLowerCase().includes(t) ||
-      u.username?.toLowerCase().includes(t) || u.email?.toLowerCase().includes(t)
-    );
+    const conId = this.mappingForm.get('consultancyId')?.value;
+
+    return this.users.filter(u => {
+      const matchesSearch = !t || u.fullName?.toLowerCase().includes(t) ||
+        u.username?.toLowerCase().includes(t) || u.email?.toLowerCase().includes(t);
+      
+      if (this.isStudents && conId) {
+        // Bi-directional: if consultancy selected, filter users
+        const mappedUsers = this.consultancyUsersMap.get(conId) || [];
+        return matchesSearch && mappedUsers.includes(u.id);
+      }
+      return matchesSearch;
+    });
   }
 
   get filteredConsultancies(): any[] {
@@ -314,12 +332,16 @@ export class MappingModalComponent implements OnInit {
     const repId = this.mappingForm.get('admittedByUserId')?.value;
 
     return this.consultancies.filter(c => {
-      const ok = !t || c.name?.toLowerCase().includes(t) || c.email?.toLowerCase().includes(t);
+      const matchesSearch = !t || c.name?.toLowerCase().includes(t) || c.email?.toLowerCase().includes(t);
       if (this.isStudents) {
         if (src === 'USER') return false;
-        if (src === 'CONSULTANCY' && repId) return ok && this.availableConsultancyIds.has(c.id);
+        if (src === 'CONSULTANCY' && repId) {
+          // Bi-directional: if rep selected, filter consultancies
+          const mappedCons = this.userConsultanciesMap.get(repId) || [];
+          return matchesSearch && mappedCons.includes(c.id);
+        }
       }
-      return ok;
+      return matchesSearch;
     });
   }
 
@@ -375,39 +397,112 @@ export class MappingModalComponent implements OnInit {
   // ── Student-specific selection ─────────────────────────────────────────────
   selectRepresentative(userId: number): void {
     const cur = this.mappingForm.get('admittedByUserId')?.value;
+    const conId = this.mappingForm.get('consultancyId')?.value;
+
     if (cur === userId) {
       this.mappingForm.patchValue({ admittedByUserId: null, consultancyId: null });
       this.availableConsultancyIds.clear();
       return;
     }
-    this.mappingForm.patchValue({ admittedByUserId: userId, consultancyId: null });
-    this.availableConsultancyIds.clear();
-    this.userService.getUserById(userId).subscribe(user => {
-      if (user.consultancies?.length) {
-        user.consultancies.forEach((c: any) => this.availableConsultancyIds.add(c.id));
-        if (user.consultancies.length === 1) {
-          this.mappingForm.patchValue({ consultancyId: user.consultancies[0].id });
-        }
+
+    this.mappingForm.patchValue({ admittedByUserId: userId });
+
+    // Auto-reset consultancy if not linked to this user
+    if (conId) {
+      const mappedCons = this.userConsultanciesMap.get(userId) || [];
+      if (!mappedCons.includes(conId)) {
+        this.mappingForm.patchValue({ consultancyId: null });
+        this.toastr.info('Consultancy selection cleared as it is not linked to the selected representative.');
       }
-    });
+    } else {
+      // If no consultancy selected, see if there's only one mapped consultancy for this user
+      const mappedCons = this.userConsultanciesMap.get(userId) || [];
+      if (mappedCons.length === 1) {
+        this.selectConsultancyForStudent(mappedCons[0]);
+      }
+    }
   }
 
   selectConsultancyForStudent(cId: number): void {
     const cur = this.mappingForm.get('consultancyId')?.value;
+    const repId = this.mappingForm.get('admittedByUserId')?.value;
+
     if (cur === cId) {
       this.mappingForm.patchValue({ consultancyId: null });
       this.selectedCourseIds.clear();
       this.selectedInstitutionIds.clear();
       return;
     }
+
     this.mappingForm.patchValue({ consultancyId: cId });
     this.selectedCourseIds.clear();
     this.selectedInstitutionIds.clear();
+
+    // Auto-reset representative if not mapped to this consultancy
+    if (repId) {
+      const mappedUsers = this.consultancyUsersMap.get(cId) || [];
+      if (!mappedUsers.includes(repId)) {
+        this.mappingForm.patchValue({ admittedByUserId: null });
+        this.toastr.info('Representative selection cleared as they are not linked to the selected consultancy.');
+      }
+    } else {
+      // If no representative selected, see if there's only one mapped representative for this consultancy
+      const mappedUsers = this.consultancyUsersMap.get(cId) || [];
+      if (mappedUsers.length === 1) {
+        this.mappingForm.patchValue({ admittedByUserId: mappedUsers[0] });
+      }
+    }
     
     // Load consultancy details to pre-fill its courses and institutions
     this.consultancyService.getConsultancyById(cId).subscribe(con => {
       if (con.courses)     con.courses.forEach((c: any) => this.selectedCourseIds.add(c.id));
       if (con.institutions) con.institutions.forEach((i: any) => this.selectedInstitutionIds.add(i.id));
+    });
+  }
+
+  // ── Create Actions ─────────────────────────────────────────────────────────
+  addRepresentative(): void {
+    const dialogRef = this.dialog.open(AddUserModalComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadDropdowns();
+        this.toastr.success('New representative added successfully');
+      }
+    });
+  }
+
+  addConsultancy(): void {
+    const dialogRef = this.dialog.open(AddConsultancyModalComponent, {
+      width: '1000px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadDropdowns();
+        this.toastr.success('New consultancy added successfully');
+      }
+    });
+  }
+
+  private buildMappingCache(): void {
+    this.userConsultanciesMap.clear();
+    this.consultancyUsersMap.clear();
+    
+    this.users.forEach(user => {
+      const conIds = (user.consultancies || []).map((c: any) => c.id);
+      this.userConsultanciesMap.set(user.id, conIds);
+      
+      conIds.forEach((conId: number) => {
+        if (!this.consultancyUsersMap.has(conId)) {
+          this.consultancyUsersMap.set(conId, []);
+        }
+        this.consultancyUsersMap.get(conId)!.push(user.id);
+      });
     });
   }
 

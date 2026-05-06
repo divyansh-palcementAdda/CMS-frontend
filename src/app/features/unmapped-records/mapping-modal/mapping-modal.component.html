@@ -106,16 +106,21 @@
             <div class="mm-stage__bar">
               <p class="mm-stage__label">
                 <span class="material-symbols-outlined">badge</span>
-                Select Representative
+                {{ mappingForm.get('consultancyId')?.value ? 'Representatives linked with selected consultancy' : 'Select Representative' }}
                 @if (mappingForm.get('admittedByUserId')?.value) {
                   <span class="mm-stage__badge" [style.background]="config.color + '20'" [style.color]="config.color">Selected</span>
                 }
               </p>
-              <div class="mm-search">
-                <span class="material-symbols-outlined">search</span>
-                <input type="text" placeholder="Search users…"
-                       [ngModel]="userSearch()" (ngModelChange)="userSearch.set($event)"
-                       [ngModelOptions]="{standalone: true}">
+              <div class="mm-stage__actions">
+                <div class="mm-search">
+                  <span class="material-symbols-outlined">search</span>
+                  <input type="text" placeholder="Search users…"
+                         [ngModel]="userSearch()" (ngModelChange)="userSearch.set($event)"
+                         [ngModelOptions]="{standalone: true}">
+                </div>
+                <button type="button" class="mm-btn-add" (click)="addRepresentative()" title="Add New Representative" [style.--accent]="config.color">
+                  <span class="material-symbols-outlined">person_add</span>
+                </button>
               </div>
             </div>
             <div class="mm-list-box">
@@ -163,28 +168,36 @@
         }
 
         <!-- Stage 3: Select Consultancy (Consultancy channel only) -->
-        @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY' && mappingForm.get('admittedByUserId')?.value) {
+        @if (mappingForm.get('admissionSource')?.value === 'CONSULTANCY') {
           <div class="mm-stage animate-in">
             <div class="mm-stage__bar">
               <p class="mm-stage__label">
                 <span class="material-symbols-outlined">apartment</span>
-                Select Consultancy
-                @if (filteredConsultancies.length === 0 && availableConsultancyIds.size === 0) {
+                {{ mappingForm.get('admittedByUserId')?.value ? 'Consultancies linked with selected representative' : 'Select Consultancy' }}
+                @if (mappingForm.get('consultancyId')?.value) {
+                  <span class="mm-stage__badge" [style.background]="config.color + '20'" [style.color]="config.color">Selected</span>
+                }
+                @if (filteredConsultancies.length === 0 && consultancyUsersMap.size > 0) {
                   <span class="mm-stage__tag warn">No linked consultancies</span>
                 }
               </p>
-              <div class="mm-search">
-                <span class="material-symbols-outlined">search</span>
-                <input type="text" placeholder="Search consultancies…"
-                       [ngModel]="conSearch()" (ngModelChange)="conSearch.set($event)"
-                       [ngModelOptions]="{standalone: true}">
+              <div class="mm-stage__actions">
+                <div class="mm-search">
+                  <span class="material-symbols-outlined">search</span>
+                  <input type="text" placeholder="Search consultancies…"
+                         [ngModel]="conSearch()" (ngModelChange)="conSearch.set($event)"
+                         [ngModelOptions]="{standalone: true}">
+                </div>
+                <button type="button" class="mm-btn-add" (click)="addConsultancy()" title="Add New Consultancy" [style.--accent]="config.color">
+                  <span class="material-symbols-outlined">add_business</span>
+                </button>
               </div>
             </div>
             <div class="mm-list-box">
               @if (filteredConsultancies.length === 0) {
                 <div class="mm-list__empty">
                   <span class="material-symbols-outlined">link_off</span>
-                  <p>No consultancies linked to this representative</p>
+                  <p>No consultancies found for this selection</p>
                 </div>
               }
               @else {

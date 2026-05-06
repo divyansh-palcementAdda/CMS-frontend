@@ -12,24 +12,29 @@ export class UnmappedService {
 
   constructor(private http: HttpClient) { }
 
-  getUnmappedStudents(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/students`);
+  getUnmappedStudents(page: number = 0, size: number = 10, search: string = ''): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('search', search);
+    return this.http.get<any>(`${this.apiUrl}/students`, { params });
   }
 
-  getUnmappedUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/users`);
+  getUnmappedUsers(page: number = 0, size: number = 10, search: string = ''): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('search', search);
+    return this.http.get<any>(`${this.apiUrl}/users`, { params });
   }
 
-  getUnmappedCourses(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/courses`);
+  getUnmappedCourses(page: number = 0, size: number = 10, search: string = ''): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('search', search);
+    return this.http.get<any>(`${this.apiUrl}/courses`, { params });
   }
 
-  getConsultanciesWithoutUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/consultancies/without-users`);
+  getConsultanciesWithoutUsers(page: number = 0, size: number = 10, search: string = ''): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('search', search);
+    return this.http.get<any>(`${this.apiUrl}/consultancy-users`, { params });
   }
 
-  getConsultanciesWithoutCourses(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/consultancies/without-courses`);
+  getConsultanciesWithoutCourses(page: number = 0, size: number = 10, search: string = ''): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('search', search);
+    return this.http.get<any>(`${this.apiUrl}/consultancy-courses`, { params });
   }
 
   exportToExcel(type: string, columns: string[]): Observable<Blob> {
