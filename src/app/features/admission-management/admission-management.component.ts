@@ -12,6 +12,7 @@ import { ConfirmationModalComponent } from '../../shared/components/confirmation
 import { AdmissionFormModalComponent } from './components/admission-form-modal/admission-form-modal.component';
 import { FeePaymentModalComponent } from './components/fee-payment-modal/fee-payment-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
+import { LocationService } from '../../core/services/location.service';
 
 /**
  * ActiveFilters — mirrors every query param that can come in from the route.
@@ -23,6 +24,8 @@ interface ActiveFilters {
   source: string;        // '' | 'USER' | 'CONSULTANCY'
   isScholar: string;     // '' | 'true' | 'false'
   statFilter: string;    // '' | 'DIRECT' | 'INDIRECT' | 'SCHOLAR' | ...
+  state: string;
+  city: string;
 }
 
 @Component({
@@ -58,8 +61,14 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     statusFilter: '',
     source: '',
     isScholar: '',
-    statFilter: ''
+    statFilter: '',
+    state: '',
+    city: ''
   };
+
+  states: string[] = [];
+  cities: string[] = [];
+  loadingCities: boolean = false;
 
   // ── Sorting ───────────────────────────────────────────────────────────
   sortColumn: string = '';
@@ -75,6 +84,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   showAdmissionModal: boolean = false;
   showBulkUploadModal: boolean = false;
   showBulkUpdateEnrollmentModal: boolean = false;
+  showBulkUpdateAdmissionDateModal: boolean = false;
   showPaymentModal: boolean = false;
   selectedAdmission: AdmissionItem | null = null;
   selectedStudentId?: number;
@@ -87,8 +97,14 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     downloadTemplate: () => this.admissionService.downloadEnrollmentTemplate()
   };
 
+  admissionDateUpdateService = {
+    bulkUpload: (file: File) => this.admissionService.bulkUpdateAdmissionDate(file),
+    downloadTemplate: () => this.admissionService.downloadAdmissionDateTemplate()
+  };
+
   constructor(
     public admissionService: AdmissionService,
+    private locationService: LocationService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -103,8 +119,15 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         statusFilter: params['status'] || '',
         source: params['source'] || '',
         isScholar: params['isScholar'] || '',
-        statFilter: params['statFilter'] || ''
+        statFilter: params['statFilter'] || '',
+        state: params['state'] || '',
+        city: params['city'] || ''
       };
+      
+      if (this.filters.state && this.states.length > 0) {
+        this.loadCities(this.filters.state);
+      }
+
       this.currentPage = 1;
       this.fetchData();
 
@@ -124,6 +147,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.currentPage = 1;
       this.fetchData();
     });
+
+    this.loadStates();
   }
 
   ngOnDestroy(): void {
@@ -153,7 +178,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.tab,
       this.filters.statusFilter,
       this.filters.source,
-      this.filters.isScholar
+      this.filters.isScholar,
+      this.filters.state,
+      this.filters.city
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -200,6 +227,61 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { statFilter: newFilter || null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  // ── Location Helpers ──────────────────────────────────────────────────
+
+  loadStates(): void {
+    this.locationService.getAllStates().subscribe({
+      next: states => {
+        this.states = states;
+        // If state already in filters (from URL), load its cities
+        if (this.filters.state) {
+          this.loadCities(this.filters.state);
+        }
+      },
+      error: err => console.error('Error loading states', err)
+    });
+  }
+
+  loadCities(state: string): void {
+    this.loadingCities = true;
+    this.locationService.getCitiesByState(state).subscribe({
+      next: cities => {
+        this.cities = cities;
+        this.loadingCities = false;
+      },
+      error: err => {
+        console.error('Error loading cities', err);
+        this.loadingCities = false;
+      }
+    });
+  }
+
+  onStateChange(): void {
+    // Reset city when state changes
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { 
+        state: this.filters.state || null,
+        city: null 
+      },
+      queryParamsHandling: 'merge'
+    });
+    
+    if (this.filters.state) {
+      this.loadCities(this.filters.state);
+    } else {
+      this.cities = [];
+    }
+  }
+
+  onCityChange(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { city: this.filters.city || null },
       queryParamsHandling: 'merge'
     });
   }

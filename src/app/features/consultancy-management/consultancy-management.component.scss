@@ -156,6 +156,35 @@ $text-light: #64748B;
       }
     }
 
+    .form-select-sm {
+      padding: 8px 12px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+      outline: none;
+      background: white;
+      transition: all 0.2s ease;
+      min-width: 160px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: #6366F1;
+      }
+
+      &:focus {
+        border-color: #6366F1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      &:disabled {
+        background: #F8FAFC;
+        cursor: not-allowed;
+        color: #94A3B8;
+      }
+    }
+
     .table-wrapper {
       padding: 0 24px 8px;
 

@@ -7,6 +7,7 @@ import { ConsultancyService } from '../../../../core/services/consultancy.servic
 import { InstitutionService } from '../../../../core/services/institution.service';
 import { CourseService } from '../../../../core/services/course.service';
 import { UserService } from '../../../../core/services/user.service';
+import { LocationService } from '../../../../core/services/location.service';
 
 @Component({
   selector: 'app-admission-form-modal',
@@ -27,6 +28,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   private institutionService = inject(InstitutionService);
   private courseService = inject(CourseService);
   private userService = inject(UserService);
+  private locationService = inject(LocationService);
   private toastr = inject(ToastrService);
 
   admissionForm: FormGroup;
@@ -46,6 +48,11 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   institutions: any[] = [];
   courses: any[] = [];
   filteredCourses: any[] = [];
+
+  // Location Data
+  states: string[] = [];
+  cities: string[] = [];
+  isLoadingCities = false;
 
   // Bulk Upload State
   selectedFile: File | null = null;
@@ -90,8 +97,24 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadDropdownData();
+    this.loadStates();
     this.setupScholarDiscountLogic();
     this.setupRelationshipFiltering();
+    this.setupLocationListeners();
+  }
+
+  private setupLocationListeners(): void {
+    // State change listener
+    this.admissionForm.get('state')?.valueChanges.subscribe(state => {
+      this.onStateChange(state);
+    });
+
+    // City change listener
+    this.admissionForm.get('city')?.valueChanges.subscribe(city => {
+      if (this.admissionForm.get('city')?.dirty) {
+        this.fetchLocationByCity(city);
+      }
+    });
   }
 
   private setupRelationshipFiltering(): void {
@@ -209,6 +232,36 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     });
     this.institutionService.getInstitutionsData().subscribe(data => this.institutions = data.institutions);
     this.courseService.getAllCourses()?.subscribe(data => this.courses = data);
+  }
+
+  private loadStates() {
+    this.locationService.getAllStates().subscribe(res => this.states = res);
+  }
+
+  private onStateChange(state: string) {
+    if (!state) {
+      this.cities = [];
+      return;
+    }
+    this.isLoadingCities = true;
+    this.locationService.getCitiesByState(state).subscribe({
+      next: (res) => {
+        this.cities = res;
+        this.isLoadingCities = false;
+      },
+      error: () => this.isLoadingCities = false
+    });
+  }
+
+  private fetchLocationByCity(city: string) {
+    if (!city) return;
+    this.locationService.getLocationByCity(city).subscribe(res => {
+      if (res && (!this.admissionForm.get('state')?.value)) {
+        this.admissionForm.patchValue({
+          state: res.state
+        }, { emitEvent: false });
+      }
+    });
   }
 
   private loadStudentData(id: number): void {

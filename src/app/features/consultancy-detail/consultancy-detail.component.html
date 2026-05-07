@@ -1039,6 +1039,11 @@
         </div> -->
 
 
+
+        <!-- Edit Consultancy Modal -->
+        <app-add-consultancy-modal *ngIf="showAddModal" [consultancyId]="consultancy.id ?? null"
+          (close)="showAddModal = false" (success)="onEditSuccess()">
+        </app-add-consultancy-modal>
       </ng-container>
 
       <!-- Confirmation Modal -->

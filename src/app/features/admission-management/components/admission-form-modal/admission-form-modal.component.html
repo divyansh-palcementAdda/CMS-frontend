@@ -129,24 +129,33 @@
                 }}</div>
             </div>
 
-            <div class="input-group">
-              <label>City <span class="required">*</span></label>
-              <div class="input-wrapper" [class.error-border]="backendErrors['city']">
-                <i class="fa-solid fa-city"></i>
-                <input type="text" formControlName="city" placeholder="Enter city">
-              </div>
-              <div class="error-msg" [class.show]="backendErrors['city']">{{ backendErrors['city'] }}</div>
-            </div>
+
 
             <div class="input-group">
               <label>State <span class="required">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['state']">
                 <i class="fa-solid fa-map"></i>
-                <input type="text" formControlName="state" placeholder="Enter state">
+                <select formControlName="state">
+                  <option value="">Select State</option>
+                  <option *ngFor="let s of states" [value]="s">{{ s }}</option>
+                </select>
               </div>
               <div class="error-msg" [class.show]="backendErrors['state']">{{ backendErrors['state'] }}</div>
             </div>
-
+            <div class="input-group">
+              <label>City <span class="required">*</span></label>
+              <div class="input-wrapper input-with-loader" [class.error-border]="backendErrors['city']">
+                <i class="fa-solid fa-city"></i>
+                <select formControlName="city">
+                  <option value="">Select City</option>
+                  <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+                </select>
+                <span class="loader-icon" *ngIf="isLoadingCities">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                </span>
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['city']">{{ backendErrors['city'] }}</div>
+            </div>
 
 
             <div class="input-group full-width">
@@ -170,7 +179,7 @@
                 <select formControlName="admissionSource">
                   <option value="USER">Direct / User</option>
                   <option value="CONSULTANCY">Via Consultancy</option>
-                  <option value="UNMAPPED">UNMAPPED/option>
+                  <option value="UNMAPPED">UNMAPPED</option>
                 </select>
               </div>
               <div class="error-msg" [class.show]="backendErrors['admissionSource']">{{ backendErrors['admissionSource']

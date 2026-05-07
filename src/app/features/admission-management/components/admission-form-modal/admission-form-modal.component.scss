@@ -256,6 +256,25 @@
         color: #3b82f6;
       }
     }
+
+    &.input-with-loader {
+      display: flex;
+      align-items: center;
+
+      select {
+        width: 100%;
+        padding-right: 40px; // Space for the loader
+      }
+
+      .loader-icon {
+        position: absolute;
+        right: 14px;
+        color: #3b82f6;
+        font-size: 14px;
+        pointer-events: none;
+        z-index: 10;
+      }
+    }
   }
 
   .error-msg {

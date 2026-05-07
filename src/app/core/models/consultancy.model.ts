@@ -68,6 +68,8 @@ export interface ConsultancyPageRequest {
   size: number;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
+  state?: string;
+  city?: string;
 }
 
 export interface PageResponse<T> {

@@ -22,11 +22,15 @@ import { UserService } from '../../core/services/user.service';
 import { InstitutionService } from '../../core/services/institution.service';
 import { AdmissionService } from '../../core/services/admission.service';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { AddConsultancyModalComponent } from '../consultancy-management/components/add-consultancy-modal/add-consultancy-modal.component';
 
+/**
+ * Component to display detailed information about a specific consultancy.
+ */
 @Component({
   selector: 'app-consultancy-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgApexchartsModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, NgApexchartsModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent],
   templateUrl: './consultancy-detail.component.html',
   styleUrl: './consultancy-detail.component.scss'
 })
@@ -71,6 +75,7 @@ export class ConsultancyDetailComponent implements OnInit {
   yearlyPageSize = 5;
 
   // Actions
+  showAddModal = false;
   showDeleteModal = false;
   itemToDelete: any = null;
   deleteType: 'consultancy' | 'course' | 'user' | 'institution' | 'admission' = 'consultancy';
@@ -344,7 +349,14 @@ export class ConsultancyDetailComponent implements OnInit {
   }
 
   onEdit() {
-    this.router.navigate([], { fragment: 'edit' });
+    this.showAddModal = true;
+  }
+
+  onEditSuccess() {
+    this.showAddModal = false;
+    if (this.consultancy?.id) {
+      this.fetchConsultancy(this.consultancy.id);
+    }
   }
 
   onDelete() {

@@ -5,6 +5,7 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConsultancyService } from '../../core/services/consultancy.service';
+import { LocationService } from '../../core/services/location.service';
 import { ConsultancyItem, ConsultancyPageRequest, PageResponse, ConsultancyStats } from '../../core/models/consultancy.model';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -33,8 +34,14 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     sortBy: 'name',
     sortDirection: 'asc',
     search: '',
-    years: []
+    years: [],
+    state: '',
+    city: ''
   };
+
+  states: string[] = [];
+  cities: string[] = [];
+  loadingCities: boolean = false;
   
   // Year Filter
   availableYears: number[] = [2021, 2022, 2023, 2024, 2025, 2026];
@@ -54,6 +61,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     public consultancyService: ConsultancyService, 
+    private locationService: LocationService,
     private router: Router,
     private route: ActivatedRoute,
     private eRef: ElementRef
@@ -91,6 +99,48 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
         this.loadData();
       }
     });
+
+    this.loadStates();
+  }
+
+  // ── Location Helpers ──────────────────────────────────────────────────
+
+  loadStates(): void {
+    this.locationService.getAllStates().subscribe({
+      next: states => this.states = states,
+      error: err => console.error('Error loading states', err)
+    });
+  }
+
+  loadCities(state: string): void {
+    this.loadingCities = true;
+    this.locationService.getCitiesByState(state).subscribe({
+      next: cities => {
+        this.cities = cities;
+        this.loadingCities = false;
+      },
+      error: err => {
+        console.error('Error loading cities', err);
+        this.loadingCities = false;
+      }
+    });
+  }
+
+  onStateChange(): void {
+    this.requestConfig.city = '';
+    this.requestConfig.page = 0;
+    
+    if (this.requestConfig.state) {
+      this.loadCities(this.requestConfig.state);
+    } else {
+      this.cities = [];
+    }
+    this.loadData();
+  }
+
+  onCityChange(): void {
+    this.requestConfig.page = 0;
+    this.loadData();
   }
 
   onView(id: number) {

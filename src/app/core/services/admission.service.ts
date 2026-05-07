@@ -33,7 +33,9 @@ export class AdmissionService {
     tab?: string,
     statusFilter?: string,
     source?: string,
-    isScholar?: string
+    isScholar?: string,
+    state?: string,
+    city?: string
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -48,6 +50,8 @@ export class AdmissionService {
     if (statusFilter) params = params.set('statusFilter', statusFilter);
     if (source) params = params.set('source', source);
     if (isScholar != null && isScholar !== '') params = params.set('isScholar', isScholar);
+    if (state) params = params.set('state', state);
+    if (city) params = params.set('city', city);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -170,5 +174,15 @@ export class AdmissionService {
 
   downloadEnrollmentTemplate(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/enrollment-template`, { responseType: 'blob' });
+  }
+
+  bulkUpdateAdmissionDate(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.apiUrl}/bulk-update-admission-date`, formData);
+  }
+
+  downloadAdmissionDateTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/bulk-update-admission-date/template`, { responseType: 'blob' });
   }
 }
