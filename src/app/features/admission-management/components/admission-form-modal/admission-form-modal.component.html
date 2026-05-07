@@ -48,6 +48,18 @@
             </div>
 
             <div class="input-group">
+              <label>Enrollment ID <span class="required">*</span></label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['enrollmentId']">
+                <i class="fa-solid fa-id-card"></i>
+                <input type="text" formControlName="enrollmentId" placeholder="Enter enrollment ID">
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('enrollmentId') || backendErrors['enrollmentId']">
+                <span *ngIf="isFieldInvalid('enrollmentId')">Enrollment ID is required</span>
+                <span *ngIf="backendErrors['enrollmentId']">{{ backendErrors['enrollmentId'] }}</span>
+              </div>
+            </div>
+
+            <div class="input-group">
               <label>Father's Name</label>
               <div class="input-wrapper" [class.error-border]="backendErrors['fatherName']">
                 <i class="fa-solid fa-user-friends"></i>
@@ -186,6 +198,21 @@
                 }}</div>
             </div>
 
+            <div class="input-group">
+              <label>Lead Source <span class="required">*</span></label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['leadSourceId']">
+                <i class="fa-solid fa-bullhorn"></i>
+                <select formControlName="leadSourceId">
+                  <option [ngValue]="null">Select Lead Source</option>
+                  <option *ngFor="let s of activeLeadSources" [value]="s.id">{{ s.name }}</option>
+                </select>
+              </div>
+              <div class="error-msg" [class.show]="isFieldInvalid('leadSourceId') || backendErrors['leadSourceId']">
+                <span *ngIf="isFieldInvalid('leadSourceId')">Lead source is required</span>
+                <span *ngIf="backendErrors['leadSourceId']">{{ backendErrors['leadSourceId'] }}</span>
+              </div>
+            </div>
+
             <div class="input-group" *ngIf="admissionForm.get('admissionSource')?.value === 'CONSULTANCY'">
               <label>Consultancy <span class="required">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['consultancyId']">
@@ -264,10 +291,14 @@
               <label>Session</label>
               <div class="input-wrapper" [class.error-border]="backendErrors['session']">
                 <i class="fa-solid fa-clock"></i>
-                <input type="text" formControlName="session" placeholder="e.g. 2025-26">
+                <select formControlName="session">
+                  <option value="">Select Session</option>
+                  <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+                </select>
               </div>
               <div class="error-msg" [class.show]="backendErrors['session']">{{ backendErrors['session'] }}</div>
             </div>
+
 
             <div class="input-group" *ngIf="!admissionForm.get('isScholar')?.value">
               <label>Discount Type</label>

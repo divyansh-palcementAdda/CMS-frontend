@@ -553,6 +553,159 @@ $text-light: #64748B;
   }
 }
 
+  // ── Filter Button ──────────────────────────────────────────
+  .btn-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    border: 1.5px solid #E2E8F0;
+    background: white;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+
+    &:hover {
+      border-color: $primary;
+      color: $primary;
+      background: #F5F7FF;
+    }
+
+    &.has-active {
+      border-color: $primary;
+      color: $primary;
+      background: #F5F7FF;
+    }
+
+    .filter-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: $primary;
+      color: white;
+      font-size: 11px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+    }
+  }
+
+  // ── Filter Chips ──────────────────────────────────────────
+  .filter-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 24px;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+    align-items: center;
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1px solid #E2E8F0;
+      padding: 6px 12px;
+      border-radius: 100px;
+      font-size: 13px;
+      color: #475569;
+      font-weight: 500;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: $primary;
+        color: $primary;
+      }
+
+      .chip-remove {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-size: 16px;
+        color: #94A3B8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          color: #EF4444;
+        }
+      }
+    }
+
+    .clear-all-chips {
+      background: none;
+      border: none;
+      color: #6366F1;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0 8px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // ── Filter Drawer Content Styles ──────────────────────────
+  .filter-section {
+    margin-bottom: 24px;
+
+    .filter-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    .filter-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #475569;
+      outline: none;
+      transition: all 0.2s;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 16px;
+
+      .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #475569;
+
+        input[type="radio"] {
+          width: 18px;
+          height: 18px;
+          accent-color: $primary;
+        }
+      }
+    }
+  }
+
 @media (max-width: 1024px) {
   .admission-page-wrapper .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -585,4 +738,4 @@ $text-light: #64748B;
       align-items: stretch;
     }
   }
-}
+}

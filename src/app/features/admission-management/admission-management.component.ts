@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +13,9 @@ import { AdmissionFormModalComponent } from './components/admission-form-modal/a
 import { FeePaymentModalComponent } from './components/fee-payment-modal/fee-payment-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 import { LocationService } from '../../core/services/location.service';
+import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
+import { LeadSourceService } from '../../core/services/lead-source.service';
+
 
 /**
  * ActiveFilters — mirrors every query param that can come in from the route.
@@ -26,6 +29,15 @@ interface ActiveFilters {
   statFilter: string;    // '' | 'DIRECT' | 'INDIRECT' | 'SCHOLAR' | ...
   state: string;
   city: string;
+
+  // New Advanced Filters
+  courseId: number | null;
+  session: string;
+  commissionStatus: string;
+  fiftyPercentFeesPaid: boolean | null;
+  startDate: string;
+  endDate: string;
+  leadSourceId: string;
 }
 
 @Component({
@@ -40,6 +52,7 @@ interface ActiveFilters {
     AdmissionFormModalComponent,
     FeePaymentModalComponent,
     BulkUploadModalComponent,
+    FilterDrawerComponent
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -63,8 +76,35 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     isScholar: '',
     statFilter: '',
     state: '',
-    city: ''
+    city: '',
+    courseId: null,
+    session: '',
+    commissionStatus: '',
+    fiftyPercentFeesPaid: null,
+    startDate: '',
+    endDate: '',
+    leadSourceId: ''
   };
+
+
+  showFilterDrawer = false;
+  activeFilterCount = 0;
+
+  courses: any[] = [];
+  sessions: string[] = (() => {
+    const currentYear = new Date().getFullYear();
+    const result = [];
+    for (let i = 4; i >= 0; i--) {
+      result.push((currentYear - i).toString());
+    }
+    return result;
+  })();
+
+
+  activeLeadSources: any[] = [];
+  private leadSourceService = inject(LeadSourceService);
+
+  commissionStatuses: string[] = ['UNPAID', 'PARTIAL_PAID', 'PAID'];
 
   states: string[] = [];
   cities: string[] = [];
@@ -121,9 +161,18 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         isScholar: params['isScholar'] || '',
         statFilter: params['statFilter'] || '',
         state: params['state'] || '',
-        city: params['city'] || ''
+        city: params['city'] || '',
+        courseId: params['courseId'] ? +params['courseId'] : null,
+        session: params['session'] || '',
+        commissionStatus: params['commissionStatus'] || '',
+        fiftyPercentFeesPaid: params['fiftyPercentFeesPaid'] === 'true' ? true : (params['fiftyPercentFeesPaid'] === 'false' ? false : null),
+        startDate: params['startDate'] || '',
+        endDate: params['endDate'] || '',
+        leadSourceId: params['leadSourceId'] || ''
       };
-      
+
+      this.updateActiveFilterCount();
+
       if (this.filters.state && this.states.length > 0) {
         this.loadCities(this.filters.state);
       }
@@ -149,6 +198,40 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
 
     this.loadStates();
+    this.loadCourses();
+    this.fetchActiveLeadSources();
+  }
+
+  fetchActiveLeadSources() {
+    this.leadSourceService.getActive().subscribe(res => {
+      this.activeLeadSources = res.data;
+    });
+  }
+
+  loadCourses(): void {
+    this.admissionService.getActiveCourses().subscribe({
+      next: (courses: any) => {
+        this.courses = courses.data || courses;
+      },
+      error: err => console.error('Error loading courses', err)
+    });
+  }
+
+  updateActiveFilterCount(): void {
+    let count = 0;
+    if (this.filters.source) count++;
+    if (this.filters.isScholar) count++;
+    if (this.filters.statusFilter) count++;
+    if (this.filters.state) count++;
+    if (this.filters.city) count++;
+    if (this.filters.courseId) count++;
+    if (this.filters.session) count++;
+    if (this.filters.commissionStatus) count++;
+    if (this.filters.fiftyPercentFeesPaid !== null) count++;
+    if (this.filters.startDate) count++;
+    if (this.filters.endDate) count++;
+    if (this.filters.leadSourceId) count++;
+    this.activeFilterCount = count;
   }
 
   ngOnDestroy(): void {
@@ -180,7 +263,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.source,
       this.filters.isScholar,
       this.filters.state,
-      this.filters.city
+      this.filters.city,
+      this.filters.session,
+      this.filters.commissionStatus,
+      this.filters.fiftyPercentFeesPaid ?? undefined,
+      this.filters.startDate,
+      this.filters.endDate,
+      this.filters.leadSourceId
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -231,6 +320,48 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
   }
 
+  applyFilters(): void {
+    this.showFilterDrawer = false;
+    const queryParams: any = {
+      courseId: this.filters.courseId || null,
+      session: this.filters.session || null,
+      commissionStatus: this.filters.commissionStatus || null,
+      fiftyPercentFeesPaid: this.filters.fiftyPercentFeesPaid !== null ? this.filters.fiftyPercentFeesPaid.toString() : null,
+      startDate: this.filters.startDate || null,
+      endDate: this.filters.endDate || null,
+      state: this.filters.state || null,
+      city: this.filters.city || null,
+      source: this.filters.source || null,
+      isScholar: this.filters.isScholar || null,
+      leadSourceId: this.filters.leadSourceId || null
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  resetFilters(): void {
+    this.filters = {
+      ...this.filters,
+      source: '',
+      isScholar: '',
+      statusFilter: '',
+      state: '',
+      city: '',
+      courseId: null,
+      session: '',
+      commissionStatus: '',
+      fiftyPercentFeesPaid: null,
+      startDate: '',
+      endDate: '',
+      leadSourceId: ''
+    };
+    this.applyFilters();
+  }
+
   // ── Location Helpers ──────────────────────────────────────────────────
 
   loadStates(): void {
@@ -264,13 +395,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     // Reset city when state changes
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { 
+      queryParams: {
         state: this.filters.state || null,
-        city: null 
+        city: null
       },
       queryParamsHandling: 'merge'
     });
-    
+
     if (this.filters.state) {
       this.loadCities(this.filters.state);
     } else {
@@ -448,7 +579,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       for (let i = 1; i <= total; i++) pages.push(i);
     } else {
       pages.push(1);
-      
+
       if (current > 3) {
         pages.push('...');
       }

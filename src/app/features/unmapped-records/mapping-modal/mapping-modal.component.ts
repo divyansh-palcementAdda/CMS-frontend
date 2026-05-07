@@ -11,7 +11,9 @@ import { UserService } from '../../../core/services/user.service';
 import { AdmissionService } from '../../../core/services/admission.service';
 import { InstitutionService } from '../../../core/services/institution.service';
 import { UnmappedService } from '../../../core/services/unmapped.service';
+import { LeadSourceService } from '../../../core/services/lead-source.service';
 import { MatDialog } from '@angular/material/dialog';
+
 import { AddUserModalComponent } from '../../user-management/components/add-user-modal/add-user-modal.component';
 import { AddConsultancyModalComponent } from '../../consultancy-management/components/add-consultancy-modal/add-consultancy-modal.component';
 
@@ -34,6 +36,8 @@ export class MappingModalComponent implements OnInit {
   users: any[] = [];
   courses: any[] = [];
   institutions: any[] = [];
+  leadSources: any[] = [];
+
 
   // ── Live search signals ────────────────────────────────────────────────────
   userSearch    = signal<string>('');
@@ -109,8 +113,10 @@ export class MappingModalComponent implements OnInit {
     private courseService: CourseService,
     private institutionService: InstitutionService,
     private unmappedService: UnmappedService,
+    private leadSourceService: LeadSourceService,
     private dialog: MatDialog
   ) {}
+
 
   // ── Convenience getters ────────────────────────────────────────────────────
   get type(): MappingType  { return this.data.type; }
@@ -137,7 +143,9 @@ export class MappingModalComponent implements OnInit {
         admissionSource:   ['CONSULTANCY', Validators.required],
         admittedByUserId:  [null, Validators.required],
         consultancyId:     [null, Validators.required],
+        leadSourceId:      [null, Validators.required],
         isScholar:         [false],
+
         discountType:      [null],
         discountValue:     [0, [Validators.min(0)]],
         scholarshipDetails:[''],
@@ -205,10 +213,17 @@ export class MappingModalComponent implements OnInit {
 
     if (this.isStudents || this.isUsers || this.isCourses) {
       this.consultancyService.getConsultancyData().subscribe(res => {
-        this.consultancies = res.consultancies ?? [];
+        this.consultancies = (res.consultancies ?? []).sort((a: any, b: any) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
         this.dropdownLoading = false;
       });
     }
+
+    if (this.isStudents) {
+      this.leadSourceService.getActive().subscribe(res => {
+        this.leadSources = (res.data || res).sort((a: any, b: any) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      });
+    }
+
 
     if (this.isConsultanciesCourses) {
       this.loadConsultancyCourseData();
@@ -558,10 +573,12 @@ export class MappingModalComponent implements OnInit {
       const src = this.mappingForm.get('admissionSource')?.value;
       const rep = this.mappingForm.get('admittedByUserId')?.value;
       const con = this.mappingForm.get('consultancyId')?.value;
-      if (!src || !rep) return false;
+      const ls  = this.mappingForm.get('leadSourceId')?.value;
+      if (!src || !rep || !ls) return false;
       if (src === 'CONSULTANCY' && !con) return false;
       return true;
     }
+
     if (this.isUsers || this.isCourses)        return this.selectedConsultancyIds.size > 0;
     if (this.isConsultanciesUsers)              return this.selectedUserIds.size > 0;
     if (this.isConsultanciesCourses)            return this.selectedCourseIds.size > 0;
@@ -603,7 +620,9 @@ export class MappingModalComponent implements OnInit {
       if (fv.admissionSource === 'CONSULTANCY' && fv.consultancyId) {
         items.push({ label: 'Consultancy',  value: this.getConName(fv.consultancyId),                       icon: 'apartment' });
       }
+      items.push({ label: 'Lead Source',  value: this.leadSources.find(s => s.id === fv.leadSourceId)?.name || '—', icon: 'bullhorn' });
       items.push({ label: 'Scholar Status', value: fv.isScholar ? '✓ Yes — Scholarship Applied' : 'No',   icon: 'school' });
+
       if (!fv.isScholar && fv.discountType) {
         items.push({ label: 'Discount',     value: `${fv.discountValue} ${fv.discountType === 'PERCENTAGE' ? '%' : '₹ (Flat)'}`, icon: 'sell' });
       }

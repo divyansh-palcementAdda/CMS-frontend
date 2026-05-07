@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { LocationService } from '../../core/services/location.service';
@@ -8,7 +9,7 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
 @Component({
   selector: 'app-master-data',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, TopbarComponent, BulkUploadModalComponent],
+  imports: [CommonModule, SidebarComponent, TopbarComponent, BulkUploadModalComponent, RouterLink],
   template: `
     <div class="dashboard-layout">
       <app-sidebar></app-sidebar>
@@ -30,6 +31,24 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
           </div>
 
           <div class="master-data-grid">
+            <div class="master-card" routerLink="/lead-sources">
+              <div class="card-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h3>Lead Source Master</h3>
+                <p>Manage dynamic sources like Digital, Consultant, etc.</p>
+              </div>
+              <div class="card-action">
+                <span class="btn-text">Manage Sources</span>
+              </div>
+            </div>
+
             <div class="master-card" (click)="showBulkUpload = true">
               <div class="card-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

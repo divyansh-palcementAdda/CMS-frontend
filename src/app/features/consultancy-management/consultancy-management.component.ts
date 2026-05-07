@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConsultancyService } from '../../core/services/consultancy.service';
+import { LeadSourceService } from '../../core/services/lead-source.service';
 import { LocationService } from '../../core/services/location.service';
 import { ConsultancyItem, ConsultancyPageRequest, PageResponse, ConsultancyStats } from '../../core/models/consultancy.model';
 import { Subject } from 'rxjs';
@@ -13,11 +14,13 @@ import { ConfirmationModalComponent } from '../../shared/components/confirmation
 import { AddConsultancyModalComponent } from './components/add-consultancy-modal/add-consultancy-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 import { BulkMapModalComponent } from '../../shared/components/bulk-map-modal/bulk-map-modal.component';
+import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
+
 
 @Component({
   selector: 'app-consultancy-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent, BulkUploadModalComponent, BulkMapModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent, BulkUploadModalComponent, BulkMapModalComponent, FilterDrawerComponent],
   templateUrl: './consultancy-management.component.html',
   styleUrls: ['./consultancy-management.component.scss']
 })
@@ -36,7 +39,8 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     search: '',
     years: [],
     state: '',
-    city: ''
+    city: '',
+    leadSourceId: ''
   };
 
   states: string[] = [];
@@ -44,7 +48,14 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   loadingCities: boolean = false;
   
   // Year Filter
-  availableYears: number[] = [2021, 2022, 2023, 2024, 2025, 2026];
+  availableYears: number[] = (() => {
+    const currentYear = new Date().getFullYear();
+    const result = [];
+    for (let i = 4; i >= 0; i--) {
+      result.push(currentYear - i);
+    }
+    return result;
+  })();
   showYearDropdown = false;
   
   private searchSubject = new Subject<string>();
@@ -58,6 +69,10 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   showBulkMapModal = false;
   editingConsultancyId: number | null = null;
   downloadLoading = false;
+  showFilterDrawer = false;
+  activeFilterCount = 0;
+  activeLeadSources: any[] = [];
+  private leadSourceService = inject(LeadSourceService);
 
   constructor(
     public consultancyService: ConsultancyService, 
@@ -85,6 +100,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.fetchActiveLeadSources();
     this.route.queryParams.subscribe(params => {
       const status = params['status'];
       const editId = params['id'];
@@ -101,6 +117,12 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     });
 
     this.loadStates();
+  }
+
+  fetchActiveLeadSources() {
+    this.leadSourceService.getActive().subscribe(res => {
+      this.activeLeadSources = res.data;
+    });
   }
 
   // ── Location Helpers ──────────────────────────────────────────────────
@@ -201,6 +223,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading = true;
+    this.updateActiveFilterCount();
     this.consultancyService.getConsultancyPage(this.requestConfig)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -213,6 +236,32 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  updateActiveFilterCount() {
+    let count = 0;
+    if (this.requestConfig.status) count++;
+    if (this.requestConfig.years && this.requestConfig.years.length > 0) count++;
+    if (this.requestConfig.state) count++;
+    if (this.requestConfig.city) count++;
+    if (this.requestConfig.leadSourceId) count++;
+    this.activeFilterCount = count;
+  }
+
+  applyFilters() {
+    this.showFilterDrawer = false;
+    this.requestConfig.page = 0;
+    this.loadData();
+  }
+
+  resetFilters() {
+    this.requestConfig.status = undefined;
+    this.requestConfig.years = [];
+    this.requestConfig.state = '';
+    this.requestConfig.city = '';
+    this.requestConfig.leadSourceId = '';
+    this.selectedFilter = 'TOTAL';
+    this.applyFilters();
   }
 
   setFilter(filter: string) {
@@ -321,6 +370,12 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   onSearchChange() {
     this.searchSubject.next(this.searchTerm);
+  }
+
+  onPageSizeChange(): void {
+    this.requestConfig.size = Number(this.requestConfig.size);
+    this.requestConfig.page = 0;
+    this.loadData();
   }
 
   downloadExcel() {

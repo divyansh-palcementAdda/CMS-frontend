@@ -35,7 +35,13 @@ export class AdmissionService {
     source?: string,
     isScholar?: string,
     state?: string,
-    city?: string
+    city?: string,
+    session?: string,
+    commissionStatus?: string,
+    fiftyPercentFeesPaid?: boolean,
+    startDate?: string,
+    endDate?: string,
+    leadSourceId?: string
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -52,6 +58,12 @@ export class AdmissionService {
     if (isScholar != null && isScholar !== '') params = params.set('isScholar', isScholar);
     if (state) params = params.set('state', state);
     if (city) params = params.set('city', city);
+    if (session) params = params.set('session', session);
+    if (commissionStatus) params = params.set('commissionStatus', commissionStatus);
+    if (fiftyPercentFeesPaid !== undefined) params = params.set('fiftyPercentFeesPaid', fiftyPercentFeesPaid.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    if (leadSourceId) params = params.set('leadSourceId', leadSourceId);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -184,5 +196,9 @@ export class AdmissionService {
 
   downloadAdmissionDateTemplate(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/bulk-update-admission-date/template`, { responseType: 'blob' });
+  }
+
+  getActiveCourses(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/courses/active`);
   }
 }

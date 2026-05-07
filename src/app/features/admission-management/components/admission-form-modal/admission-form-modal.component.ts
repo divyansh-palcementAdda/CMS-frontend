@@ -8,6 +8,7 @@ import { InstitutionService } from '../../../../core/services/institution.servic
 import { CourseService } from '../../../../core/services/course.service';
 import { UserService } from '../../../../core/services/user.service';
 import { LocationService } from '../../../../core/services/location.service';
+import { LeadSourceService } from '../../../../core/services/lead-source.service';
 
 @Component({
   selector: 'app-admission-form-modal',
@@ -29,6 +30,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   private courseService = inject(CourseService);
   private userService = inject(UserService);
   private locationService = inject(LocationService);
+  private leadSourceService = inject(LeadSourceService);
   private toastr = inject(ToastrService);
 
   admissionForm: FormGroup;
@@ -48,6 +50,16 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   institutions: any[] = [];
   courses: any[] = [];
   filteredCourses: any[] = [];
+  activeLeadSources: any[] = [];
+  sessions: string[] = (() => {
+    const currentYear = new Date().getFullYear();
+    const result = [];
+    for (let i = 4; i >= 0; i--) {
+      result.push((currentYear - i).toString());
+    }
+    return result;
+  })();
+
 
   // Location Data
   states: string[] = [];
@@ -206,7 +218,9 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
       address: ['', [Validators.required, Validators.minLength(5)]],
 
       // Step 2: Admission
+      enrollmentId: ['', [Validators.required]],
       admissionSource: ['USER', Validators.required],
+      leadSourceId: [null, Validators.required],
       consultancyId: [null],
       admittedByUserId: ['', Validators.required],
       institutionId: ['', Validators.required],
@@ -232,6 +246,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     });
     this.institutionService.getInstitutionsData().subscribe(data => this.institutions = data.institutions);
     this.courseService.getAllCourses()?.subscribe(data => this.courses = data);
+    this.leadSourceService.getActive().subscribe(res => this.activeLeadSources = res.data);
   }
 
   private loadStates() {
@@ -308,7 +323,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     if (this.currentStep === 1) {
       this.backendErrors = {};
       // Validate Step 1 fields
-      const step1Fields = ['fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'address'];
+      const step1Fields = ['fullName', 'enrollmentId', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 'city', 'state', 'address'];
       let isValid = true;
       step1Fields.forEach(field => {
         const control = this.admissionForm.get(field);

@@ -70,6 +70,7 @@ export interface ConsultancyPageRequest {
   sortDirection?: 'asc' | 'desc';
   state?: string;
   city?: string;
+  leadSourceId?: string;
 }
 
 export interface PageResponse<T> {

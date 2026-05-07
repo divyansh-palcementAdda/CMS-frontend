@@ -1,0 +1,56 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ id ? 'Edit' : 'Add New' }} Lead Source</h3>
+      <button class="close-btn" (click)="closed.emit()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <form (submit)="onSubmit()" #lsForm="ngForm">
+      <div class="modal-body">
+        <div *ngIf="error" class="error-alert">
+          {{ error }}
+        </div>
+
+        <div class="form-group">
+          <label for="name">Source Name <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            [(ngModel)]="leadSource.name" 
+            required 
+            placeholder="e.g. Digital Marketing, Newspaper"
+            class="form-control"
+            [disabled]="loading"
+          >
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-container">
+            <input 
+              type="checkbox" 
+              name="active" 
+              [(ngModel)]="leadSource.active"
+              [disabled]="loading"
+            >
+            <span class="checkmark"></span>
+            <span class="label-text">Active (Visible in dropdowns)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closed.emit()" [disabled]="loading">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="loading || !lsForm.form.valid">
+          <span *ngIf="!loading">{{ id ? 'Update' : 'Create' }} Source</span>
+          <span *ngIf="loading" class="spinner"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

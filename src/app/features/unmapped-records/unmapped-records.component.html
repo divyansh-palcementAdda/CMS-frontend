@@ -124,7 +124,7 @@
               <div class="header-meta">
                 <span class="record-count">{{ totalElements() }} records found</span>
                 <div class="entries-selector">
-                  <label>Show</label>
+                  <span>Show</span>
                   <select [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
                     <option [value]="5">5</option>
                     <option [value]="10">10</option>

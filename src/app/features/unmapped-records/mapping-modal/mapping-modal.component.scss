@@ -245,24 +245,50 @@
   &__label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
     margin: 0;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--mm-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    // Removed global text-transform to protect icon ligatures
 
-    .material-symbols-outlined { font-size: 16px; }
+    > span:not(.material-symbols-outlined) {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .material-symbols-outlined { 
+      font-family: 'Material Symbols Outlined' !important;
+      font-size: 20px !important; 
+      text-transform: none !important; 
+      letter-spacing: normal !important;
+      font-variant-ligatures: common-ligatures !important;
+      font-weight: normal !important;
+      display: inline-block;
+      line-height: 1;
+    }
   }
 
   &__badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 10px;
+    padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.65rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+
+    &.req {
+      background: #fee2e2;
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.1);
+    }
+
+    &.info {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
   }
 
   &__tag {
@@ -918,24 +944,48 @@
 }
 
 .mm-select {
+  appearance: none;
+  background-color: #f8faff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
   width: 100%;
-  padding: 10px 12px;
-  border-radius: var(--mm-radius-md);
-  border: 1px solid var(--mm-border);
-  background: var(--mm-bg);
-  font-size: 0.85rem;
-  color: var(--mm-text);
+  padding: 12px 40px 12px 16px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0f172a;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
+  outline: none;
 
-  &:focus {
-    outline: none;
+  &:hover {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   }
 
-  &.full { padding: 12px 14px; font-size: 0.9rem; }
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent);
+    background-color: #ffffff;
+  }
+
+  &.is-error {
+    border-color: #ef4444;
+    background-color: #fff1f2;
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+  }
+
+  &.full {
+    padding: 14px 44px 14px 18px;
+    font-size: 0.95rem;
+  }
 }
 
 .mm-textarea {
