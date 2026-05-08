@@ -6,6 +6,7 @@ import { CourseTypeService } from '../../../../core/services/course-type.service
 import { InstitutionService } from '../../../../core/services/institution.service';
 import { BulkUploadResponse } from '../../../../core/models/course.model';
 import { ToastrService } from 'ngx-toastr';
+import { sanitizeIds } from '../../../../core/utils/sanitize-ids';
 
 @Component({
   selector: 'app-add-course-modal',
@@ -151,7 +152,9 @@ export class AddCourseModalComponent implements OnInit {
       active: this.courseForm.value.active === 'true' || this.courseForm.value.active === true,
       duration: Number(this.courseForm.value.duration),
       fees: Number(this.courseForm.value.fees),
-      courseTypeId: Number(this.courseForm.value.courseTypeId)
+      courseTypeId: Number(this.courseForm.value.courseTypeId),
+      institutionIds: sanitizeIds(this.courseForm.value.institutionIds),
+      consultancyIds: sanitizeIds(this.courseForm.value.consultancyIds)
     };
 
     const request = this.editId
@@ -174,6 +177,9 @@ export class AddCourseModalComponent implements OnInit {
         } else {
           this.toastr.error(err.error?.detail || err.error?.message || 'Server error occurred', 'Operation Failed');
         }
+
+        // Redirect back even on error as requested
+        setTimeout(() => this.onClose(), 3000);
       }
     });
   }

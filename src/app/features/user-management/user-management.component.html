@@ -247,7 +247,7 @@
                 </app-confirmation-modal>
 
                 <app-add-user-modal *ngIf="showAddModal" [userToEdit]="selectedUser"
-                    (close)="showAddModal = false; selectedUser = null" (success)="onAddSuccess()">
+                    (close)="closeAddModal()" (success)="onAddSuccess()">
                 </app-add-user-modal>
 
                 <!-- Bulk Upload Modal -->

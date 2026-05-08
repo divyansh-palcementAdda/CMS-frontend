@@ -25,8 +25,15 @@ export class CourseService {
     );
   }
 
-  getCoursesData(): Observable<CoursePageData> {
-    return this.http.get<any>(this.apiUrl).pipe(
+  getCoursesData(filters?: { feeFilter?: string, startDate?: string, endDate?: string, session?: string }): Observable<CoursePageData> {
+    let params: any = {};
+    if (filters) {
+      if (filters.feeFilter) params.feeFilter = filters.feeFilter;
+      if (filters.startDate) params.startDate = filters.startDate;
+      if (filters.endDate) params.endDate = filters.endDate;
+      if (filters.session) params.session = filters.session;
+    }
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => this.transformCoursePageData(response)),
       catchError(err => {
         console.error('Failed to load courses data', err);
@@ -88,7 +95,8 @@ export class CourseService {
         totalApplications: course.totalApplications || 0,
         totalAdmissions: course.totalAdmissions || 0,
         cancelledApplications: course.cancelledApplications || 0,
-        cancelledAdmissions: course.cancelledAdmissions || 0
+        cancelledAdmissions: course.cancelledAdmissions || 0,
+        totalFeesCollected: course.totalFeesCollected || 0
       };
     });
 

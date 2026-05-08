@@ -6,6 +6,7 @@ import { LocationService } from '../../../../core/services/location.service';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { sanitizeIds } from '../../../../core/utils/sanitize-ids';
 
 @Component({
   selector: 'app-add-consultancy-modal',
@@ -330,6 +331,10 @@ export class AddConsultancyModalComponent implements OnInit {
     this.isSubmitting = true;
     this.backendErrors = {};
     const payload = { ...this.consultancyForm.value };
+    payload.courseIds = sanitizeIds(payload.courseIds);
+    payload.institutionIds = sanitizeIds(payload.institutionIds);
+    payload.representativeIds = sanitizeIds(payload.representativeIds);
+
     delete payload.sameAsMobileAlt;
     delete payload.sameAsMobileWa;
 
@@ -354,6 +359,9 @@ export class AddConsultancyModalComponent implements OnInit {
         } else {
           this.toastr.error(err.error?.detail || err.error?.message || 'Server error occurred', 'Operation Failed');
         }
+        
+        // Redirect back even on error as requested
+        setTimeout(() => this.onClose(false), 3000);
       }
     });
   }

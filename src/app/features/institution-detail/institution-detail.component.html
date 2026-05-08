@@ -131,7 +131,7 @@
             </div>
           </div>
 
-          <div class="stat-premium-card blue" (click)="onStatClick('total_all')">
+          <!-- <div class="stat-premium-card blue" (click)="onStatClick('total_all')">
             <div class="card-content">
               <div class="info">
                 <span class="label">Total Students</span>
@@ -146,7 +146,7 @@
                 </svg>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="stat-premium-card green" (click)="onStatClick('scholar_adm')">
             <div class="card-content">
@@ -251,7 +251,7 @@
         <div class="tables-section">
 
           <!-- Master Admissions & Applications Table -->
-          <div id="master-table" class="table-card mb-32">
+          <!-- <div id="master-table" class="table-card mb-32">
             <div class="table-header-row">
               <h3>Total Admissions & Applications</h3>
               <div class="table-tools">
@@ -329,7 +329,7 @@
                   [disabled]="masterPage >= getTotalPages(filteredMasterList.length, masterPageSize)">Last</button>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- Total Applications Table -->
           <div id="total-apps" class="table-card mb-32">
@@ -514,16 +514,16 @@
             <div class="table-wrapper">
               <table>
                 <thead class="header-teal">
-                <tr>
-                  <th>S.NO</th>
-                  <th>Name</th>
-                  <th>Course</th>
-                  <th>Fee Status</th>
-                  <th>Source</th>
-                  <th>Session</th>
-                  <th class="text-center">Actions</th>
-                </tr>
-              </thead>
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Fee Status</th>
+                    <th>Source</th>
+                    <th>Session</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr *ngFor="let item of paginatedTotalAdmissions; let i = index">
                     <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>

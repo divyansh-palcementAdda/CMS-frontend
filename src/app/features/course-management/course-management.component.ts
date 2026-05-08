@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -29,6 +29,12 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   pageSize = 10;
   
   private destroy$ = new Subject<void>();
+  
+  feeFilter = 'ALL_TIME';
+  startDate = '';
+  endDate = '';
+  sessionFilter = '';
+  availableSessions: string[] = [];
 
   // Actions
   showDeleteModal = false;
@@ -40,8 +46,18 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   constructor(
     public courseService: CourseService,
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private location: Location
+  ) {
+    this.generateSessions();
+  }
+
+  generateSessions() {
+    const currentYear = new Date().getFullYear();
+    for (let i = 0; i < 5; i++) {
+      this.availableSessions.push((currentYear - i).toString());
+    }
+  }
 
   onView(id: number) {
     this.router.navigate(['/courses', id]);
@@ -58,11 +74,17 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   }
 
   closeAddModal() {
+    const hasRouteTrigger = this.route.snapshot.fragment === 'edit' || !!this.route.snapshot.queryParams['id'];
     this.showAddModal = false;
     this.editCourseId = null;
+
+    if (hasRouteTrigger) {
+      this.location.back();
+    }
   }
 
   onAddSuccess() {
+    this.closeAddModal();
     this.loadData();
   }
 
@@ -108,6 +130,12 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
       } else {
         this.loadData();
       }
+
+      // Handle route-triggered edit
+      const editId = params['id'];
+      if (editId && this.route.snapshot.fragment === 'edit') {
+        this.onEdit(+editId);
+      }
     });
   }
 
@@ -129,7 +157,14 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
 
   loadData() {
     this.loading = true;
-    this.courseService.getCoursesData()
+    const filters = {
+      feeFilter: this.feeFilter,
+      startDate: this.startDate || undefined,
+      endDate: this.endDate || undefined,
+      session: this.sessionFilter || undefined
+    };
+
+    this.courseService.getCoursesData(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
@@ -141,6 +176,11 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  onFeeFilterChange() {
+    this.currentPage = 1;
+    this.loadData();
   }
 
   get filteredCourses(): CourseItem[] {

@@ -199,7 +199,7 @@ export class CourseDetailComponent implements OnInit {
       tooltip: {
         theme: "light",
         y: {
-          formatter: function(val) {
+          formatter: function (val) {
             return val + " Students";
           }
         }
@@ -208,19 +208,22 @@ export class CourseDetailComponent implements OnInit {
   }
 
   updateChartData(): void {
-    if (this.courseDetail?.topConsultancies) {
-      const categories = this.courseDetail.topConsultancies.map(c => c.label);
-      const values = this.courseDetail.topConsultancies.map(c => c.value);
+    if (this.courseDetail?.topConsultancies && this.courseDetail.topConsultancies.length > 0) {
+      const categories = this.courseDetail.topConsultancies.map(c => c.label || (c as any).consultancyName || 'Unknown');
+      const values = this.courseDetail.topConsultancies.map(c => c.value !== undefined ? c.value : (c as any).admissionCount || 0);
 
-      this.chartOptions.series = [
-        {
-          name: "Students",
-          data: values
+      this.chartOptions = {
+        ...this.chartOptions,
+        series: [
+          {
+            name: "Students",
+            data: values
+          }
+        ],
+        xaxis: {
+          ...this.chartOptions.xaxis,
+          categories: categories
         }
-      ];
-      this.chartOptions.xaxis = {
-        ...this.chartOptions.xaxis,
-        categories: categories
       };
     }
   }
@@ -400,10 +403,12 @@ export class CourseDetailComponent implements OnInit {
     if (!this.courseDetail || !this.courseDetail.totalApplications) return [];
     const search = this.totalAppSearch.toLowerCase();
     return this.courseDetail.totalApplications.filter(item => {
-      const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
-      const itemSource = (item.source || '').toLowerCase();
+      const name = item.studentName || item.fullName || '';
+      const course = item.courseName || '';
+      const matchesSearch = name.toLowerCase().includes(search) || course.toLowerCase().includes(search);
+      const itemSource = (item.source || item.admissionSource || '').toLowerCase();
       const matchesSource = !this.appFilterSource || itemSource === this.appFilterSource.toLowerCase();
-      const isScholarItem = item.isScholler === true || item.isScholler === 'true' || item.isScholler === 1 || item.isScholler === 'YES';
+      const isScholarItem = item.isScholar === true || item.isScholler === true || item.isScholar === 'true' || item.isScholler === 'true' || item.isScholar === 1 || item.isScholler === 1 || item.isScholar === 'YES' || item.isScholler === 'YES';
       const matchesScholar = this.appFilterScholar === false || (isScholarItem === this.appFilterScholar);
       return matchesSearch && matchesSource && matchesScholar;
     });
@@ -431,10 +436,12 @@ export class CourseDetailComponent implements OnInit {
     if (!this.courseDetail || !this.courseDetail.totalAdmissions) return [];
     const search = this.totalAdmSearch.toLowerCase();
     return this.courseDetail.totalAdmissions.filter(item => {
-      const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
-      const itemSource = (item.source || '').toLowerCase();
+      const name = item.studentName || item.fullName || '';
+      const course = item.courseName || '';
+      const matchesSearch = name.toLowerCase().includes(search) || course.toLowerCase().includes(search);
+      const itemSource = (item.source || item.admissionSource || '').toLowerCase();
       const matchesSource = !this.admFilterSource || itemSource === this.admFilterSource.toLowerCase();
-      const isScholarItem = item.isScholler === true || item.isScholler === 'true' || item.isScholler === 1 || item.isScholler === 'YES';
+      const isScholarItem = item.isScholar === true || item.isScholler === true || item.isScholar === 'true' || item.isScholler === 'true' || item.isScholar === 1 || item.isScholler === 1 || item.isScholar === 'YES' || item.isScholler === 'YES';
       const matchesScholar = this.admFilterScholar === false || (isScholarItem === this.admFilterScholar);
       return matchesSearch && matchesSource && matchesScholar;
     });
@@ -467,9 +474,11 @@ export class CourseDetailComponent implements OnInit {
       ...(this.courseDetail.cancelledAdmissions || [])
     ];
     const search = this.masterSearch.toLowerCase();
-    return all.filter(item =>
-      item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search)
-    );
+    return all.filter(item => {
+      const name = item.studentName || item.fullName || '';
+      const course = item.courseName || '';
+      return name.toLowerCase().includes(search) || course.toLowerCase().includes(search);
+    });
   }
 
   get paginatedMasterList(): any[] {
@@ -492,7 +501,7 @@ export class CourseDetailComponent implements OnInit {
     if (!this.courseDetail || !this.courseDetail.institutions) return [];
     if (!this.searchTerm) return this.courseDetail.institutions;
     const search = this.searchTerm.toLowerCase();
-    return this.courseDetail.institutions.filter(item => 
+    return this.courseDetail.institutions.filter(item =>
       item.name.toLowerCase().includes(search) || item.code.toLowerCase().includes(search)
     );
   }

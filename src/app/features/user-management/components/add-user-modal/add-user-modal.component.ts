@@ -244,6 +244,9 @@ export class AddUserModalComponent implements OnInit {
             this.toastr.error(err.error?.detail || err.error?.message || 'Update failed', 'Error');
             this.otpError = err.error?.message || 'Update failed';
           }
+          
+          // Redirect back even on error as requested
+          setTimeout(() => this.onClose(false), 3000);
         }
       });
   }
@@ -286,6 +289,9 @@ export class AddUserModalComponent implements OnInit {
             this.toastr.error(err.error?.detail || err.error?.message || 'Creation failed', 'Error');
             this.otpError = err.error?.message || 'Verification failed. Please try again.';
           }
+          
+          // Redirect back even on error as requested
+          setTimeout(() => this.onClose(false), 3000);
         }
       });
   }

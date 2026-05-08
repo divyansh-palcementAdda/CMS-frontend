@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener, ElementRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -79,7 +79,8 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     private locationService: LocationService,
     private router: Router,
     private route: ActivatedRoute,
-    private eRef: ElementRef
+    private eRef: ElementRef,
+    private location: Location
   ) {
     this.searchSubject.pipe(
       debounceTime(500),
@@ -190,12 +191,17 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   }
 
   closeAddModal() {
+    const hasRouteTrigger = this.route.snapshot.fragment === 'edit' || !!this.route.snapshot.queryParams['id'];
     this.showAddModal = false;
     this.editingConsultancyId = null;
+
+    if (hasRouteTrigger) {
+      this.location.back();
+    }
   }
 
   onAddSuccess() {
-    this.showAddModal = false;
+    this.closeAddModal();
     this.loadData();
   }
 

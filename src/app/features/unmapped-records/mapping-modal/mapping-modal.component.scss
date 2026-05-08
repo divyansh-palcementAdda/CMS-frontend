@@ -24,6 +24,22 @@
 
   display: block;
   font-family: 'Inter', system-ui, sans-serif;
+
+  // Global protection for Material Symbols ligatures
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    text-transform: none !important;
+    font-variant-ligatures: common-ligatures !important;
+    letter-spacing: normal !important;
+    word-wrap: normal !important;
+    white-space: nowrap !important;
+    direction: ltr !important;
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal !important;
+    font-style: normal !important;
+    line-height: 1;
+    display: inline-block;
+  }
 }
 
 // ─── Root ─────────────────────────────────────────────────────────────────────

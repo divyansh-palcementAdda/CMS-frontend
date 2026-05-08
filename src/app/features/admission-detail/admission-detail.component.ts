@@ -56,6 +56,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
+          console.log(data);
           this.detail = data;
           this.loading = false;
         },
@@ -83,7 +84,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
 
   async onDelete() {
     if (!this.detail) return;
-    
+
     const confirmed = await this.notificationService.confirm(
       'Confirm Deletion',
       'Are you sure you want to delete this admission? This action cannot be undone.',
@@ -137,10 +138,10 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
 
   async toggleFeeStatus(event: Event) {
     if (!this.detail) return;
-    
+
     // Safety cast for the input element
     const target = event.target as HTMLInputElement;
-    
+
     // Prevent the checkbox from toggling visually until we confirm the action
     event.preventDefault();
 
@@ -187,7 +188,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
 
   onFeeSaved(isThresholdMet: boolean) {
     this.showFeeModal = false;
-    
+
     // Auto-update status ONLY if triggered by the toggle sync AND threshold met
     if (this.isSyncMode && isThresholdMet) {
       this.updateFeeStatusServiceCall(true);
@@ -239,15 +240,15 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
 
     // Rule 3: Valid manual transitions (CALCULATED <-> PAID)
     if (currentStatus === 'CALCULATED' && newStatus !== 'PAID') {
-       this.notificationService.warning('Invalid Action', 'From "Calculated" status, you can only mark the commission as "Paid".');
-       this.loadData();
-       return;
+      this.notificationService.warning('Invalid Action', 'From "Calculated" status, you can only mark the commission as "Paid".');
+      this.loadData();
+      return;
     }
 
     if (currentStatus === 'PAID' && newStatus !== 'CALCULATED') {
-       this.notificationService.warning('Invalid Action', 'From "Paid" status, you can only move back to "Calculated".');
-       this.loadData();
-       return;
+      this.notificationService.warning('Invalid Action', 'From "Paid" status, you can only move back to "Calculated".');
+      this.loadData();
+      return;
     }
 
     this.loading = true;

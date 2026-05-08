@@ -15,6 +15,7 @@ export interface CourseDTO {
   cancelledApplications?: number;
   cancelledAdmissions?: number;
   institutionIds?: number[];
+  totalFeesCollected?: number;
 }
 
 export interface CreateCourseDTO {
@@ -43,6 +44,7 @@ export interface CourseItem {
   totalAdmissions: number;
   cancelledApplications: number;
   cancelledAdmissions: number;
+  totalFeesCollected?: number;
 }
 
 export interface CourseStats {

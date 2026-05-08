@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -47,7 +47,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   constructor(
     public userService: UserService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) { }
 
   ngOnInit() {
@@ -57,6 +58,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.fetchFilteredData(status);
       } else {
         this.fetchData();
+      }
+
+      // Handle route-triggered edit
+      const editId = params['id'];
+      if (editId && this.route.snapshot.fragment === 'edit') {
+        this.onEdit(+editId);
       }
     });
   }
@@ -91,7 +98,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   onAddSuccess() {
+    this.closeAddModal();
     this.fetchData();
+  }
+
+  closeAddModal() {
+    const hasRouteTrigger = this.route.snapshot.fragment === 'edit' || !!this.route.snapshot.queryParams['id'];
+    this.showAddModal = false;
+    this.selectedUser = null;
+
+    if (hasRouteTrigger) {
+      this.location.back();
+    }
   }
 
   onBulkUploadSuccess(result: any) {

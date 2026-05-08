@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -51,7 +51,8 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   constructor(
     public institutionService: InstitutionService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) { }
 
   ngOnInit() {
@@ -61,6 +62,12 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
         this.fetchFilteredData(status);
       } else {
         this.fetchData();
+      }
+
+      // Handle route-triggered edit
+      const editId = params['id'];
+      if (editId && this.route.snapshot.fragment === 'edit') {
+        this.onEdit(+editId);
       }
     });
   }
@@ -159,11 +166,17 @@ export class InstitutionManagementComponent implements OnInit, OnDestroy {
   }
 
   closeAddModal() {
+    const hasRouteTrigger = this.route.snapshot.fragment === 'edit' || !!this.route.snapshot.queryParams['id'];
     this.showAddModal = false;
     this.editingInstitutionId = null;
+
+    if (hasRouteTrigger) {
+      this.location.back();
+    }
   }
 
   onAddSuccess() {
+    this.closeAddModal();
     this.fetchData();
   }
 

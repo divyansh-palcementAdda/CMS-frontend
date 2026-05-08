@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, Subject } from 'rxjs';
@@ -146,7 +146,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     public admissionService: AdmissionService,
     private locationService: LocationService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) { }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────
@@ -170,14 +171,14 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         endDate: params['endDate'] || '',
         leadSourceId: params['leadSourceId'] || ''
       };
-
+      this.searchTerm = params['search'] || '';
+      this.currentPage = params['page'] ? +params['page'] : 1;
       this.updateActiveFilterCount();
 
       if (this.filters.state && this.states.length > 0) {
         this.loadCities(this.filters.state);
       }
 
-      this.currentPage = 1;
       this.fetchData();
 
       // Check for incoming edit request
@@ -187,14 +188,16 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Debounced search
+    // Debounced search — now drives URL state
     this.searchSub = this.searchSubject.pipe(
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(term => {
-      this.searchTerm = term;
-      this.currentPage = 1;
-      this.fetchData();
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { search: term || null, page: 1 },
+        queryParamsHandling: 'merge'
+      });
     });
 
     this.loadStates();
@@ -286,19 +289,81 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   // ── Filter / Tab controls ─────────────────────────────────────────────
 
-  /** Switch the tab and clear source/scholar/status filters. Sync to URL. */
+  // ── Tab State Management ───────────────────────────────────────────
+  private tabStates: Record<string, any> = {};
+
+  /** Switch the tab and preserve/restore its specific filter/search state. */
   setTab(tab: string): void {
+    const currentTab = this.filters.tab || 'all';
+
+    // 1. Save current state for the departing tab
+    this.tabStates[currentTab] = {
+      filters: { ...this.filters },
+      searchTerm: this.searchTerm,
+      currentPage: this.currentPage,
+      sortColumn: this.sortColumn,
+      sortDirection: this.sortDirection
+    };
+
+    const targetTab = tab || 'all';
+    const savedState = this.tabStates[targetTab];
+
+    // 2. Prepare new query params
+    const queryParams: any = {
+      tab: tab || null,
+      // Explicitly clear/reset search and pagination unless restored
+      search: null,
+      page: 1,
+      // Reset basic filters that might leak
+      status: null,
+      source: null,
+      isScholar: null,
+      statFilter: null,
+      courseId: null,
+      session: null,
+      commissionStatus: null,
+      fiftyPercentFeesPaid: null,
+      startDate: null,
+      endDate: null,
+      state: null,
+      city: null,
+      leadSourceId: null
+    };
+
+    // 3. If we have saved state for the target tab, restore it
+    if (savedState) {
+      Object.assign(queryParams, {
+        search: savedState.searchTerm || null,
+        page: savedState.currentPage || 1,
+        status: savedState.filters.statusFilter || null,
+        source: savedState.filters.source || null,
+        isScholar: savedState.filters.isScholar || null,
+        statFilter: savedState.filters.statFilter || null,
+        courseId: savedState.filters.courseId || null,
+        session: savedState.filters.session || null,
+        commissionStatus: savedState.filters.commissionStatus || null,
+        fiftyPercentFeesPaid: savedState.filters.fiftyPercentFeesPaid !== null ? savedState.filters.fiftyPercentFeesPaid.toString() : null,
+        startDate: savedState.filters.startDate || null,
+        endDate: savedState.filters.endDate || null,
+        state: savedState.filters.state || null,
+        city: savedState.filters.city || null,
+        leadSourceId: savedState.filters.leadSourceId || null
+      });
+      this.searchTerm = savedState.searchTerm || '';
+      this.currentPage = savedState.currentPage || 1;
+      this.sortColumn = savedState.sortColumn;
+      this.sortDirection = savedState.sortDirection;
+    } else {
+      // Clean start for this tab
+      this.searchTerm = '';
+      this.currentPage = 1;
+    }
+
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: {
-        tab: tab || null,
-        status: null,
-        source: null,
-        isScholar: null
-      },
+      queryParams,
       queryParamsHandling: 'merge'
     });
-    // routeSub handles fetchData automatically
   }
 
   /** Dismiss / clear the status filter from URL. */
@@ -359,6 +424,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       endDate: '',
       leadSourceId: ''
     };
+    this.searchTerm = '';
     this.applyFilters();
   }
 
@@ -417,7 +483,51 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Computed labels ───────────────────────────────────────────────────
+  // ── Computed labels & Dynamic UI ──────────────────────────────────────
+
+  get isApplicationTab(): boolean {
+    return this.filters.tab === 'applications';
+  }
+
+  get labels() {
+    const isApp = this.isApplicationTab;
+
+    return {
+      total: isApp ? 'Total Applications' : 'Total Admissions',
+
+      totalDesc: isApp
+        ? 'All student application records'
+        : 'All confirmed admission records',
+
+      direct: isApp
+        ? 'Direct Applications'
+        : 'Direct Admissions',
+
+      directDesc: isApp
+        ? 'Applications received directly '
+        : 'Admissions From Direct Users',
+
+      indirect: isApp
+        ? 'Applications via Consultancy'
+        : 'Admissions via Consultancy',
+
+      indirectDesc: isApp
+        ? 'Applications received through consultancy partners'
+        : 'Admissions processed through consultancy partners',
+
+      scholar: isApp
+        ? 'Scholarship Applications'
+        : 'Scholarship Admissions',
+
+      scholarDesc: isApp
+        ? 'Applications submitted under scholarship category'
+        : 'Admissions completed under scholarship category',
+
+      totalDescFull: isApp
+        ? 'Total number of student applications'
+        : 'Total number of Confirmed Admissions'
+    };
+  }
 
   get activeTabLabel(): string {
     const labels: Record<string, string> = {
@@ -438,7 +548,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   }
 
   get hasActiveFilters(): boolean {
-    return !!(this.filters.source || this.filters.isScholar || this.filters.statusFilter);
+    return !!(this.searchTerm || this.filters.source || this.filters.isScholar || this.filters.statusFilter || this.filters.courseId || this.filters.session || this.filters.state || this.filters.city || this.filters.startDate);
   }
 
   // ── Navigation ────────────────────────────────────────────────────────
@@ -464,8 +574,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   }
 
   closeAdmissionModal(): void {
+    const hasRouteTrigger = this.route.snapshot.fragment === 'edit' || !!this.route.snapshot.queryParams['id'];
     this.showAdmissionModal = false;
     this.selectedStudentId = undefined;
+
+    if (hasRouteTrigger) {
+      this.location.back();
+    }
   }
 
   onBulkUploadSuccess(_result: any): void {

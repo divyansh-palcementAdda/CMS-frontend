@@ -13,6 +13,7 @@ import { InstitutionService } from '../../../core/services/institution.service';
 import { UnmappedService } from '../../../core/services/unmapped.service';
 import { LeadSourceService } from '../../../core/services/lead-source.service';
 import { MatDialog } from '@angular/material/dialog';
+import { sanitizeIds } from '../../../core/utils/sanitize-ids';
 
 import { AddUserModalComponent } from '../../user-management/components/add-user-modal/add-user-modal.component';
 import { AddConsultancyModalComponent } from '../../consultancy-management/components/add-consultancy-modal/add-consultancy-modal.component';
@@ -40,16 +41,16 @@ export class MappingModalComponent implements OnInit {
 
 
   // ── Live search signals ────────────────────────────────────────────────────
-  userSearch    = signal<string>('');
-  conSearch     = signal<string>('');
-  courseSearch  = signal<string>('');
-  instSearch    = signal<string>('');
+  userSearch = signal<string>('');
+  conSearch = signal<string>('');
+  courseSearch = signal<string>('');
+  instSearch = signal<string>('');
 
   // ── Multi-select sets ──────────────────────────────────────────────────────
-  selectedConsultancyIds  = new Set<number>();
-  selectedUserIds         = new Set<number>();
-  selectedCourseIds       = new Set<number>();
-  selectedInstitutionIds  = new Set<number>();
+  selectedConsultancyIds = new Set<number>();
+  selectedUserIds = new Set<number>();
+  selectedCourseIds = new Set<number>();
+  selectedInstitutionIds = new Set<number>();
   availableConsultancyIds = new Set<number>(); // rep-filtered
 
   // ── Bidirectional relationship maps (consultancies-courses only) ───────────
@@ -57,17 +58,17 @@ export class MappingModalComponent implements OnInit {
   // institutionCourseMap: institutionId → Set of courseIds it offers
   courseInstitutionMap = new Map<number, Set<number>>();
   institutionCourseMap = new Map<number, Set<number>>();
-  relationshipLoading  = false; // tracks the in-progress institution→courses calls
+  relationshipLoading = false; // tracks the in-progress institution→courses calls
 
   // ── Bidirectional mapping cache ───────────────────────────────────────────
   userConsultanciesMap = new Map<number, number[]>(); // userId -> consultancyIds
-  consultancyUsersMap  = new Map<number, number[]>(); // consultancyId -> userIds
+  consultancyUsersMap = new Map<number, number[]>(); // consultancyId -> userIds
 
   // ── UI state ───────────────────────────────────────────────────────────────
-  loading        = false;
+  loading = false;
   dropdownLoading = false;
-  currentStep    = 1;   // 1 = mapping, 2 = fees (students only)
-  showConfirm    = false;
+  currentStep = 1;   // 1 = mapping, 2 = fees (students only)
+  showConfirm = false;
 
   private toastr = inject(ToastrService);
 
@@ -96,11 +97,11 @@ export class MappingModalComponent implements OnInit {
   };
 
   paymentModes = [
-    { value: 'CASH',          label: '💵  Cash' },
-    { value: 'UPI',           label: '📱  UPI / QR Code' },
+    { value: 'CASH', label: '💵  Cash' },
+    { value: 'UPI', label: '📱  UPI / QR Code' },
     { value: 'BANK_TRANSFER', label: '🏦  Bank Transfer' },
-    { value: 'CARD',          label: '💳  Credit / Debit Card' },
-    { value: 'CHEQUE',        label: '📄  Cheque' }
+    { value: 'CARD', label: '💳  Credit / Debit Card' },
+    { value: 'CHEQUE', label: '📄  Cheque' }
   ];
 
   constructor(
@@ -115,20 +116,20 @@ export class MappingModalComponent implements OnInit {
     private unmappedService: UnmappedService,
     private leadSourceService: LeadSourceService,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
 
   // ── Convenience getters ────────────────────────────────────────────────────
-  get type(): MappingType  { return this.data.type; }
+  get type(): MappingType { return this.data.type; }
   set type(v: MappingType) { this.data.type = v; }
-  get record(): any        { return this.data.record; }
+  get record(): any { return this.data.record; }
   get config(): ModalConfig { return this.modalConfig[this.type]; }
-  get isStudents(): boolean          { return this.type === 'students'; }
-  get isUsers(): boolean             { return this.type === 'users'; }
-  get isCourses(): boolean           { return this.type === 'courses'; }
-  get isConsultanciesUsers(): boolean  { return this.type === 'consultancies-users'; }
+  get isStudents(): boolean { return this.type === 'students'; }
+  get isUsers(): boolean { return this.type === 'users'; }
+  get isCourses(): boolean { return this.type === 'courses'; }
+  get isConsultanciesUsers(): boolean { return this.type === 'consultancies-users'; }
   get isConsultanciesCourses(): boolean { return this.type === 'consultancies-courses'; }
-  get recordName(): string  { return this.record?.fullName || this.record?.name || 'Record'; }
+  get recordName(): string { return this.record?.fullName || this.record?.name || 'Record'; }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
@@ -140,26 +141,26 @@ export class MappingModalComponent implements OnInit {
   initForm(): void {
     if (this.isStudents) {
       this.mappingForm = this.fb.group({
-        admissionSource:   ['CONSULTANCY', Validators.required],
-        admittedByUserId:  [null, Validators.required],
-        consultancyId:     [null, Validators.required],
-        leadSourceId:      [null, Validators.required],
-        isScholar:         [false],
+        admissionSource: ['CONSULTANCY', Validators.required],
+        admittedByUserId: [null, Validators.required],
+        consultancyId: [null, Validators.required],
+        leadSourceId: [null, Validators.required],
+        isScholar: [false],
 
-        discountType:      [null],
-        discountValue:     [0, [Validators.min(0)]],
-        scholarshipDetails:[''],
-        feeAmount:         [null],
-        paymentMode:       ['CASH'],
-        referenceNo:       [''],
-        remarks:           ['']
+        discountType: [null],
+        discountValue: [0, [Validators.min(0)]],
+        scholarshipDetails: [''],
+        feeAmount: [null],
+        paymentMode: ['CASH'],
+        referenceNo: [''],
+        remarks: ['']
       });
 
       this.mappingForm.get('admissionSource')?.valueChanges.subscribe(src => {
         this.resetStudentSelections();
         const cc = this.mappingForm.get('consultancyId');
         if (src === 'CONSULTANCY') { cc?.setValidators(Validators.required); }
-        else                       { cc?.clearValidators(); cc?.setValue(null); }
+        else { cc?.clearValidators(); cc?.setValue(null); }
         cc?.updateValueAndValidity();
       });
 
@@ -239,17 +240,17 @@ export class MappingModalComponent implements OnInit {
    * institutionCourseMap used for dynamic filtering.
    */
   private loadConsultancyCourseData(): void {
-    this.dropdownLoading   = true;
+    this.dropdownLoading = true;
     this.relationshipLoading = true;
     this.courseInstitutionMap.clear();
     this.institutionCourseMap.clear();
 
     forkJoin({
-      courses:      this.courseService.getAllCourses(),
+      courses: this.courseService.getAllCourses(),
       institutions: this.institutionService.getInstitutionsData()
     }).pipe(
       switchMap(({ courses, institutions }) => {
-        this.courses      = courses ?? [];
+        this.courses = courses ?? [];
         this.institutions = institutions.institutions ?? [];
         this.dropdownLoading = false;
 
@@ -331,7 +332,7 @@ export class MappingModalComponent implements OnInit {
     return this.users.filter(u => {
       const matchesSearch = !t || u.fullName?.toLowerCase().includes(t) ||
         u.username?.toLowerCase().includes(t) || u.email?.toLowerCase().includes(t);
-      
+
       if (this.isStudents && conId) {
         // Bi-directional: if consultancy selected, filter users
         const mappedUsers = this.consultancyUsersMap.get(conId) || [];
@@ -342,8 +343,8 @@ export class MappingModalComponent implements OnInit {
   }
 
   get filteredConsultancies(): any[] {
-    const t    = this.conSearch().toLowerCase();
-    const src  = this.mappingForm.get('admissionSource')?.value;
+    const t = this.conSearch().toLowerCase();
+    const src = this.mappingForm.get('admissionSource')?.value;
     const repId = this.mappingForm.get('admittedByUserId')?.value;
 
     return this.consultancies.filter(c => {
@@ -467,10 +468,10 @@ export class MappingModalComponent implements OnInit {
         this.mappingForm.patchValue({ admittedByUserId: mappedUsers[0] });
       }
     }
-    
+
     // Load consultancy details to pre-fill its courses and institutions
     this.consultancyService.getConsultancyById(cId).subscribe(con => {
-      if (con.courses)     con.courses.forEach((c: any) => this.selectedCourseIds.add(c.id));
+      if (con.courses) con.courses.forEach((c: any) => this.selectedCourseIds.add(c.id));
       if (con.institutions) con.institutions.forEach((i: any) => this.selectedInstitutionIds.add(i.id));
     });
   }
@@ -507,11 +508,11 @@ export class MappingModalComponent implements OnInit {
   private buildMappingCache(): void {
     this.userConsultanciesMap.clear();
     this.consultancyUsersMap.clear();
-    
+
     this.users.forEach(user => {
       const conIds = (user.consultancies || []).map((c: any) => c.id);
       this.userConsultanciesMap.set(user.id, conIds);
-      
+
       conIds.forEach((conId: number) => {
         if (!this.consultancyUsersMap.has(conId)) {
           this.consultancyUsersMap.set(conId, []);
@@ -522,50 +523,50 @@ export class MappingModalComponent implements OnInit {
   }
 
   // ── Multi-select toggles ───────────────────────────────────────────────────
-  toggleConsultancy(id: number): void  { this._toggle(this.selectedConsultancyIds, id); }
-  toggleUser(id: number): void         { this._toggle(this.selectedUserIds, id); }
-  toggleCourse(id: number): void       { this._toggle(this.selectedCourseIds, id); }
-  toggleInstitution(id: number): void  { this._toggle(this.selectedInstitutionIds, id); }
+  toggleConsultancy(id: number): void { this._toggle(this.selectedConsultancyIds, id); }
+  toggleUser(id: number): void { this._toggle(this.selectedUserIds, id); }
+  toggleCourse(id: number): void { this._toggle(this.selectedCourseIds, id); }
+  toggleInstitution(id: number): void { this._toggle(this.selectedInstitutionIds, id); }
 
   private _toggle(set: Set<number>, id: number): void {
     set.has(id) ? set.delete(id) : set.add(id);
   }
 
-  isConSelected(id: number): boolean   { return this.selectedConsultancyIds.has(id); }
-  isUserSelected(id: number): boolean  { return this.selectedUserIds.has(id); }
+  isConSelected(id: number): boolean { return this.selectedConsultancyIds.has(id); }
+  isUserSelected(id: number): boolean { return this.selectedUserIds.has(id); }
   isCourseSelected(id: number): boolean { return this.selectedCourseIds.has(id); }
-  isInstSelected(id: number): boolean  { return this.selectedInstitutionIds.has(id); }
+  isInstSelected(id: number): boolean { return this.selectedInstitutionIds.has(id); }
 
   selectAllConsultancies(): void { this._selectAll(this.filteredConsultancies, this.selectedConsultancyIds); }
-  selectAllUsers(): void         { this._selectAll(this.filteredUsers, this.selectedUserIds); }
-  selectAllCourses(): void       { this._selectAll(this.filteredCourses, this.selectedCourseIds); }
+  selectAllUsers(): void { this._selectAll(this.filteredUsers, this.selectedUserIds); }
+  selectAllCourses(): void { this._selectAll(this.filteredCourses, this.selectedCourseIds); }
 
   private _selectAll(items: any[], set: Set<number>): void {
     const all = items.every(i => set.has(i.id));
     items.forEach(i => all ? set.delete(i.id) : set.add(i.id));
   }
 
-  removeConsultancy(id: number): void  { this.selectedConsultancyIds.delete(id); }
-  removeUser(id: number): void         { this.selectedUserIds.delete(id); }
-  removeCourse(id: number): void       { this.selectedCourseIds.delete(id); }
-  removeInstitution(id: number): void  { this.selectedInstitutionIds.delete(id); }
+  removeConsultancy(id: number): void { this.selectedConsultancyIds.delete(id); }
+  removeUser(id: number): void { this.selectedUserIds.delete(id); }
+  removeCourse(id: number): void { this.selectedCourseIds.delete(id); }
+  removeInstitution(id: number): void { this.selectedInstitutionIds.delete(id); }
 
   // ── Array snapshots for @for change-detection ──────────────────────────────
   // Angular's @for needs an Array (or any Iterable snapshot) to re-render
   // correctly when the underlying Set mutates within Zone.js event handlers.
   get selectedConsultancyArray(): number[] { return Array.from(this.selectedConsultancyIds); }
-  get selectedUserArray(): number[]        { return Array.from(this.selectedUserIds); }
-  get selectedCourseArray(): number[]      { return Array.from(this.selectedCourseIds); }
+  get selectedUserArray(): number[] { return Array.from(this.selectedUserIds); }
+  get selectedCourseArray(): number[] { return Array.from(this.selectedCourseIds); }
   get selectedInstitutionArray(): number[] { return Array.from(this.selectedInstitutionIds); }
 
   // ── Name helpers ───────────────────────────────────────────────────────────
-  getConName(id: number): string  { return this.consultancies.find(c => c.id === id)?.name  || '—'; }
+  getConName(id: number): string { return this.consultancies.find(c => c.id === id)?.name || '—'; }
   getUserName(id: number): string {
     const u = this.users.find(u => u.id === id);
     return u?.fullName || u?.username || '—';
   }
   getCourseName(id: number): string { return this.courses.find(c => c.id === id)?.name || '—'; }
-  getInstName(id: number): string  { return this.institutions.find(i => i.id === id)?.name || '—'; }
+  getInstName(id: number): string { return this.institutions.find(i => i.id === id)?.name || '—'; }
 
   // ── Step / Flow Navigation ─────────────────────────────────────────────────
   get canProceed(): boolean {
@@ -573,15 +574,15 @@ export class MappingModalComponent implements OnInit {
       const src = this.mappingForm.get('admissionSource')?.value;
       const rep = this.mappingForm.get('admittedByUserId')?.value;
       const con = this.mappingForm.get('consultancyId')?.value;
-      const ls  = this.mappingForm.get('leadSourceId')?.value;
+      const ls = this.mappingForm.get('leadSourceId')?.value;
       if (!src || !rep || !ls) return false;
       if (src === 'CONSULTANCY' && !con) return false;
       return true;
     }
 
-    if (this.isUsers || this.isCourses)        return this.selectedConsultancyIds.size > 0;
-    if (this.isConsultanciesUsers)              return this.selectedUserIds.size > 0;
-    if (this.isConsultanciesCourses)            return this.selectedCourseIds.size > 0;
+    if (this.isUsers || this.isCourses) return this.selectedConsultancyIds.size > 0;
+    if (this.isConsultanciesUsers) return this.selectedUserIds.size > 0;
+    if (this.isConsultanciesCourses) return this.selectedCourseIds.size > 0;
     return false;
   }
 
@@ -614,33 +615,33 @@ export class MappingModalComponent implements OnInit {
     const items: { label: string; value: string; icon: string }[] = [];
     if (this.isStudents) {
       const fv = this.mappingForm.getRawValue();
-      items.push({ label: 'Student',        value: this.recordName,                                          icon: 'person' });
-      items.push({ label: 'Channel',        value: fv.admissionSource === 'CONSULTANCY' ? 'Consultancy' : 'Internal', icon: 'swap_horiz' });
-      items.push({ label: 'Representative', value: this.getUserName(fv.admittedByUserId),                   icon: 'badge' });
+      items.push({ label: 'Student', value: this.recordName, icon: 'person' });
+      items.push({ label: 'Channel', value: fv.admissionSource === 'CONSULTANCY' ? 'Consultancy' : 'Internal', icon: 'swap_horiz' });
+      items.push({ label: 'Representative', value: this.getUserName(fv.admittedByUserId), icon: 'badge' });
       if (fv.admissionSource === 'CONSULTANCY' && fv.consultancyId) {
-        items.push({ label: 'Consultancy',  value: this.getConName(fv.consultancyId),                       icon: 'apartment' });
+        items.push({ label: 'Consultancy', value: this.getConName(fv.consultancyId), icon: 'apartment' });
       }
-      items.push({ label: 'Lead Source',  value: this.leadSources.find(s => s.id === fv.leadSourceId)?.name || '—', icon: 'bullhorn' });
-      items.push({ label: 'Scholar Status', value: fv.isScholar ? '✓ Yes — Scholarship Applied' : 'No',   icon: 'school' });
+      items.push({ label: 'Lead Source', value: this.leadSources.find(s => s.id === fv.leadSourceId)?.name || '—', icon: 'campaign' });
+      items.push({ label: 'Scholar Status', value: fv.isScholar ? '✓ Yes — Scholarship Applied' : 'No', icon: 'school' });
 
       if (!fv.isScholar && fv.discountType) {
-        items.push({ label: 'Discount',     value: `${fv.discountValue} ${fv.discountType === 'PERCENTAGE' ? '%' : '₹ (Flat)'}`, icon: 'sell' });
+        items.push({ label: 'Discount', value: `${fv.discountValue} ${fv.discountType === 'PERCENTAGE' ? '%' : '₹ (Flat)'}`, icon: 'sell' });
       }
       if (fv.feeAmount && fv.feeAmount > 0) {
-        items.push({ label: 'Fee Paid',     value: `₹${fv.feeAmount} via ${fv.paymentMode}`,               icon: 'payments' });
+        items.push({ label: 'Fee Paid', value: `₹${fv.feeAmount} via ${fv.paymentMode}`, icon: 'payments' });
       }
     } else if (this.isUsers) {
-      items.push({ label: 'User',           value: this.recordName,                                          icon: 'person' });
-      items.push({ label: 'Consultancies',  value: Array.from(this.selectedConsultancyIds).map(id => this.getConName(id)).join(', '), icon: 'apartment' });
+      items.push({ label: 'User', value: this.recordName, icon: 'person' });
+      items.push({ label: 'Consultancies', value: Array.from(this.selectedConsultancyIds).map(id => this.getConName(id)).join(', '), icon: 'apartment' });
     } else if (this.isCourses) {
-      items.push({ label: 'Course',         value: this.recordName,                                          icon: 'menu_book' });
-      items.push({ label: 'Consultancies',  value: Array.from(this.selectedConsultancyIds).map(id => this.getConName(id)).join(', '), icon: 'apartment' });
+      items.push({ label: 'Course', value: this.recordName, icon: 'menu_book' });
+      items.push({ label: 'Consultancies', value: Array.from(this.selectedConsultancyIds).map(id => this.getConName(id)).join(', '), icon: 'apartment' });
     } else if (this.isConsultanciesUsers) {
-      items.push({ label: 'Consultancy',    value: this.recordName,                                          icon: 'apartment' });
-      items.push({ label: 'Users',          value: Array.from(this.selectedUserIds).map(id => this.getUserName(id)).join(', '),        icon: 'group' });
+      items.push({ label: 'Consultancy', value: this.recordName, icon: 'apartment' });
+      items.push({ label: 'Users', value: Array.from(this.selectedUserIds).map(id => this.getUserName(id)).join(', '), icon: 'group' });
     } else if (this.isConsultanciesCourses) {
-      items.push({ label: 'Consultancy',    value: this.recordName,                                          icon: 'apartment' });
-      items.push({ label: 'Courses',        value: Array.from(this.selectedCourseIds).map(id => this.getCourseName(id)).join(', '),    icon: 'menu_book' });
+      items.push({ label: 'Consultancy', value: this.recordName, icon: 'apartment' });
+      items.push({ label: 'Courses', value: Array.from(this.selectedCourseIds).map(id => this.getCourseName(id)).join(', '), icon: 'menu_book' });
       if (this.selectedInstitutionIds.size > 0) {
         items.push({ label: 'Institutions', value: Array.from(this.selectedInstitutionIds).map(id => this.getInstName(id)).join(', '), icon: 'account_balance' });
       }
@@ -654,10 +655,10 @@ export class MappingModalComponent implements OnInit {
     const id = this.record.id || this.record.userId || this.record.consultancyId;
 
     switch (this.type) {
-      case 'students':            this.doStudentMap(id);           break;
-      case 'users':               this.doUserMap(id);              break;
-      case 'courses':             this.doCourseMap(id);            break;
-      case 'consultancies-users': this.doConsultancyUsersMap(id);  break;
+      case 'students': this.doStudentMap(id); break;
+      case 'users': this.doUserMap(id); break;
+      case 'courses': this.doCourseMap(id); break;
+      case 'consultancies-users': this.doConsultancyUsersMap(id); break;
       case 'consultancies-courses': this.doConsultancyCoursesMap(id); break;
     }
   }
@@ -666,10 +667,10 @@ export class MappingModalComponent implements OnInit {
     const fv = this.mappingForm.getRawValue();
     const payload = {
       ...fv,
-      courseIds: Array.from(this.selectedCourseIds),
-      institutionIds: Array.from(this.selectedInstitutionIds)
+      courseIds: sanitizeIds(Array.from(this.selectedCourseIds)),
+      institutionIds: sanitizeIds(Array.from(this.selectedInstitutionIds))
     };
-    
+
     this.unmappedService.mapStudent(studentId, payload).subscribe({
       next: () => {
         if (fv.feeAmount && fv.feeAmount > 0) {
@@ -686,24 +687,24 @@ export class MappingModalComponent implements OnInit {
   }
 
   private doUserMap(userId: any): void {
-    this.unmappedService.mapUser(userId, { consultancyIds: Array.from(this.selectedConsultancyIds) })
+    this.unmappedService.mapUser(userId, { consultancyIds: sanitizeIds(Array.from(this.selectedConsultancyIds)) })
       .subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
   private doCourseMap(courseId: any): void {
-    this.unmappedService.mapCourse(courseId, { consultancyIds: Array.from(this.selectedConsultancyIds) })
+    this.unmappedService.mapCourse(courseId, { consultancyIds: sanitizeIds(Array.from(this.selectedConsultancyIds)) })
       .subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
   private doConsultancyUsersMap(consultancyId: any): void {
-    this.unmappedService.mapConsultancyUsers(consultancyId, { representativeIds: Array.from(this.selectedUserIds) })
+    this.unmappedService.mapConsultancyUsers(consultancyId, { representativeIds: sanitizeIds(Array.from(this.selectedUserIds)) })
       .subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
   private doConsultancyCoursesMap(consultancyId: any): void {
     this.unmappedService.mapConsultancyCourses(consultancyId, {
-      courseIds:       Array.from(this.selectedCourseIds),
-      institutionIds:  Array.from(this.selectedInstitutionIds)
+      courseIds: sanitizeIds(Array.from(this.selectedCourseIds)),
+      institutionIds: sanitizeIds(Array.from(this.selectedInstitutionIds))
     }).subscribe({ next: () => this.onSuccess(), error: e => this.onError(e) });
   }
 
@@ -716,7 +717,7 @@ export class MappingModalComponent implements OnInit {
     this.loading = false;
     const status = err?.status;
     let msg = 'Something went wrong. Please try again.';
-    if      (status === 400) msg = err.error?.message || 'Invalid data. Please review your selections.';
+    if (status === 400) msg = err.error?.message || 'Invalid data. Please review your selections.';
     else if (status === 404) msg = 'Record not found — it may have been deleted.';
     else if (status === 500) msg = 'Server error. Contact support if this persists.';
     else if (err.error?.message) msg = err.error.message;

@@ -104,17 +104,8 @@
                 <p class="whatsapp-link">{{ detail.whatsappPhoneNo || 'N/A' }}</p>
               </div>
               <div class="info-group">
-                <label>Gender <span class="required">*</span></label>
-                <div class="radio-group">
-                  <label class="radio-item">
-                    <input type="radio" [checked]="detail.gender === 'MALE'" disabled>
-                    <span class="radio-label">Male</span>
-                  </label>
-                  <label class="radio-item">
-                    <input type="radio" [checked]="detail.gender === 'FEMALE'" disabled>
-                    <span class="radio-label">Female</span>
-                  </label>
-                </div>
+                <label>Gender</label>
+                <p>{{ (detail.gender | titlecase) || 'N/A' }}</p>
               </div>
             </div>
           </section>
@@ -151,6 +142,10 @@
               <div class="info-group">
                 <label>Source of Admission</label>
                 <span class="badge blue-badge">{{ detail.admissionSource }}</span>
+              </div>
+              <div class="info-group">
+                <label>Lead Source</label>
+                <p>{{ detail.leadSource?.name || 'N/A' }}</p>
               </div>
               <div class="info-group">
                 <label>Date of Admission</label>

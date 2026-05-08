@@ -95,6 +95,151 @@ $text-light: #64748B;
     }
   }
 
+  .fee-filter-bar {
+    background: white;
+    border: 1.5px solid $card-border;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      border-color: color.adjust($card-border, $lightness: -5%);
+    }
+
+    .filter-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #F1F5F9;
+
+      .filter-icon {
+        width: 36px;
+        height: 36px;
+        background: $primary-light;
+        color: $primary;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .filter-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1E293B;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 20px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+        min-width: 220px;
+
+        &.date-input {
+          flex: 0 0 180px;
+        }
+
+        &.session-input {
+          flex: 0 0 180px;
+        }
+
+        label {
+          font-size: 13px;
+          font-weight: 700;
+          color: #475569;
+          letter-spacing: 0.02em;
+          text-transform: uppercase;
+          font-size: 11px;
+          opacity: 0.8;
+        }
+
+        .filter-control {
+          width: 100%;
+          padding: 11px 16px;
+          border-radius: 12px;
+          border: 1.5px solid #CBD5E1;
+          font-weight: 500;
+          color: #1E293B;
+          background: #F8FAFC;
+          outline: none;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          font-size: 14px;
+
+          &:focus {
+            border-color: $primary;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+          }
+
+          &:hover {
+            border-color: #94A3B8;
+          }
+        }
+
+        select.filter-control {
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          background-size: 16px;
+          padding-right: 40px;
+          cursor: pointer;
+        }
+      }
+
+      .reset-btn {
+        margin-left: auto;
+        padding: 11px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        background: #F1F5F9;
+        border: 1.5px solid transparent;
+        color: #475569;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        height: 44px;
+
+        &:hover {
+          background: #E2E8F0;
+          color: #1E293B;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
+          transition: transform 0.4s ease;
+        }
+
+        &:hover svg {
+          transform: rotate(-180deg);
+        }
+      }
+    }
+  }
+
   .table-card {
     background: white;
     border: 1px solid $card-border;
@@ -184,6 +329,19 @@ $text-light: #64748B;
                   color: #059669;
                   border-color: #A7F3D0;
                 }
+              }
+
+              .revenue-cell {
+                color: #059669;
+                font-weight: 700;
+                font-size: 14px;
+                background: #F0FDF4;
+                padding: 6px 12px;
+                border-radius: 8px;
+                display: inline-block;
+                min-width: 100px;
+                text-align: center;
+                border: 1px solid #DCFCE7;
               }
             }
 

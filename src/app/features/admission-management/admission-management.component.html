@@ -74,13 +74,31 @@
 
                     <!-- Main Stats Row -->
                     <div class="stats-grid main-stats">
-                        <!-- Direct Admission -->
+                        <!-- Total Records -->
+                        <div class="stat-card" [class.active]="filters.statFilter === ''" (click)="onStatFilter('')"
+                            style="cursor: pointer;">
+                            <div class="stat-card-top">
+                                <div class="stat-info">
+                                    <div class="stat-title">{{ labels.total }}</div>
+                                    <div class="stat-desc">{{ labels.totalDesc }}</div>
+                                </div>
+                                <div class="stat-icon purple-filled">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-value">{{ pageData.stats.totalApplication }}</div>
+                        </div>
+
+                        <!-- Direct Admission/Application -->
                         <div class="stat-card" [class.active]="filters.statFilter === 'DIRECT'"
                             (click)="onStatFilter('DIRECT')" style="cursor: pointer;">
                             <div class="stat-card-top">
                                 <div class="stat-info">
-                                    <div class="stat-title">Direct Admission</div>
-                                    <div class="stat-desc">Students with no consultancy mapping</div>
+                                    <div class="stat-title">{{ labels.direct }}</div>
+                                    <div class="stat-desc">{{ labels.directDesc }}</div>
                                 </div>
                                 <div class="stat-icon purple-filled">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
@@ -92,13 +110,13 @@
                             <div class="stat-value">{{ pageData.stats.directAdmission }}</div>
                         </div>
 
-                        <!-- Indirect Admission -->
+                        <!-- Indirect Admission/Application -->
                         <div class="stat-card" [class.active]="filters.statFilter === 'INDIRECT'"
                             (click)="onStatFilter('INDIRECT')" style="cursor: pointer;">
                             <div class="stat-card-top">
                                 <div class="stat-info">
-                                    <div class="stat-title">Admission Via Consultancies</div>
-                                    <div class="stat-desc">Students admitted through consultancy partners</div>
+                                    <div class="stat-title">{{ labels.indirect }}</div>
+                                    <div class="stat-desc">{{ labels.indirectDesc }}</div>
                                 </div>
                                 <div class="stat-icon purple-filled">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
@@ -110,13 +128,13 @@
                             <div class="stat-value">{{ pageData.stats.indirectAdmission }}</div>
                         </div>
 
-                        <!-- Scholar Admission -->
+                        <!-- Scholar Admission/Application -->
                         <div class="stat-card" [class.active]="filters.statFilter === 'SCHOLAR'"
                             (click)="onStatFilter('SCHOLAR')" style="cursor: pointer;">
                             <div class="stat-card-top">
                                 <div class="stat-info">
-                                    <div class="stat-title">Scholar Admission</div>
-                                    <div class="stat-desc">Students receiving scholarship admission</div>
+                                    <div class="stat-title">{{ labels.scholar }}</div>
+                                    <div class="stat-desc">{{ labels.scholarDesc }}</div>
                                 </div>
                                 <div class="stat-icon purple-filled">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
@@ -129,25 +147,11 @@
                         </div>
                     </div>
 
-                    <!-- Sub Stats Row -->
-                    <div class="stats-grid sub-stats" style="margin-bottom: 32px;">
-                        <!-- Total Application -->
-                        <div class="stat-card small" [class.active]="filters.statFilter === ''"
-                            (click)="onStatFilter('')" style="cursor: pointer;">
-                            <div class="stat-info">
-                                <div class="stat-title">Total<br>Application</div>
-                                <div class="stat-value">{{ pageData.stats.totalApplication }}</div>
-                            </div>
-                            <div class="stat-icon purple-outline">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1"
-                                    stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="9" y1="3" x2="9" y2="21"></line>
-                                </svg>
-                            </div>
-                        </div>
+                    <!-- Sub Stats Row (Finance Counters) - ONLY FOR ADMISSION -->
+                    <div class="stats-grid sub-stats" *ngIf="filters.tab !== 'applications'"
+                        style="margin-bottom: 32px;">
 
-                        <!-- Approved Admissions (Partial fees Paid) -->
+                        <!-- Partial Fees Paid -->
                         <div class="stat-card small" [class.active]="filters.statFilter === 'PARTIAL_PAID'"
                             (click)="onStatFilter('PARTIAL_PAID')" style="cursor: pointer;">
                             <div class="stat-info">
@@ -163,7 +167,7 @@
                             </div>
                         </div>
 
-                        <!-- Pending Admissions (Partial fees Unpaid) -->
+                        <!-- Partial Fees Unpaid -->
                         <div class="stat-card small" [class.active]="filters.statFilter === 'UNPAID'"
                             (click)="onStatFilter('UNPAID')" style="cursor: pointer;">
                             <div class="stat-info">
@@ -181,11 +185,11 @@
                             </div>
                         </div>
 
-                        <!-- Rejected Admissions (Token amount Paid) -->
+                        <!-- Token Amount Paid -->
                         <div class="stat-card small" [class.active]="filters.statFilter === 'TOKEN_PAID'"
                             (click)="onStatFilter('TOKEN_PAID')" style="cursor: pointer;">
                             <div class="stat-info">
-                                <div class="stat-title">Token amount<br>Paid</div>
+                                <div class="stat-title">Provisional<br>Amount Paid</div>
                                 <div class="stat-value">{{ pageData.stats.tokenAmountPaid }}</div>
                             </div>
                             <div class="stat-icon purple-outline">
@@ -316,8 +320,8 @@
                                         <circle cx="11" cy="11" r="8"></circle>
                                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg>
-                                    <input type="text" placeholder="Search Admission" [(ngModel)]="searchTerm"
-                                        (ngModelChange)="onSearchChange()">
+                                    <input type="text" [placeholder]="'Search ' + activeTabLabel"
+                                        [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
                                 </div>
 
 
@@ -400,6 +404,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">S.NO</th>
+                                        <th>Enrollment ID</th>
                                         <th (click)="sortBy('fullName')" style="cursor: pointer; user-select: none;">
                                             <div style="display: flex; align-items: center; gap: 4px;">Student Name
                                                 <span [style.opacity]="sortColumn === 'fullName' ? '1' : '0.3'"
@@ -409,9 +414,11 @@
                                             </div>
                                         </th>
                                         <th>Course</th>
-                                        <th>Partial Fee Status</th>
-                                        <th>Commission Status</th>
-                                        <th>Provisional Amount</th>
+                                        <th>Lead Source</th>
+                                        <th *ngIf="!isApplicationTab">Partial Fee Status</th>
+                                        <th *ngIf="!isApplicationTab">Commission Status</th>
+                                        <th *ngIf="isApplicationTab">Mobile No.</th>
+                                        <th *ngIf="!isApplicationTab">Provisional Amount</th>
                                         <th (click)="sortBy('session')" style="cursor: pointer; user-select: none;">
                                             <div style="display: flex; align-items: center; gap: 4px;">Session <span
                                                     [style.opacity]="sortColumn === 'session' ? '1' : '0.3'"
@@ -422,7 +429,7 @@
                                         </th>
                                         <th (click)="sortBy('admissionDate')"
                                             style="cursor: pointer; user-select: none;">
-                                            <div style="display: flex; align-items: center; gap: 4px;">Admission
+                                            <div style="display: flex; align-items: center; gap: 4px;">Application
                                                 Date
                                                 <span [style.opacity]="sortColumn === 'admissionDate' ? '1' : '0.3'"
                                                     style="font-size: 12px; font-weight: bold;">{{ sortColumn ===
@@ -436,6 +443,11 @@
                                 <tbody>
                                     <tr *ngFor="let item of paginatedAdmissions; let i = index">
                                         <td class="text-center text-bold">{{ item.sNo }}</td>
+                                        <td>
+                                            <div class="contact-info">
+                                                <div class="primary">{{ item.enrollmentId }}</div>
+                                            </div>
+                                        </td>
                                         <td class="student-name">
                                             {{ item.fullName.split(' ')[0] }}<br>
                                             {{ item.fullName.split(' ').slice(1).join(' ') }}
@@ -444,11 +456,14 @@
                                             {{ item.courseName.split(' ')[0] }}<br>
                                             {{ item.courseName.split(' ').slice(1).join(' ') }}
                                         </td>
-                                        <td>
+                                        <td>{{ item.leadSource?.name || 'N/A' }}</td>
+                                        <td *ngIf="!isApplicationTab">
                                             {{item.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid'}}
                                         </td>
-                                        <td class="text-bold">{{item.commissionStatus}}</td>
-                                        <td class="text-bold text-danger">{{ (item.feeHistory?.[0]?.amountPaid || 0)
+                                        <td *ngIf="!isApplicationTab" class="text-bold">{{item.commissionStatus}}</td>
+                                        <td *ngIf="isApplicationTab">{{item.phoneNumber}}</td>
+                                        <td *ngIf="!isApplicationTab" class="text-bold text-danger">{{
+                                            (item.feeHistory?.[0]?.amountPaid || 0)
                                             |
                                             currency:'INR':'symbol':'1.0-0' }}</td>
                                         <td>{{ item.session }}</td>
@@ -487,7 +502,7 @@
                                         </td>
                                     </tr>
                                     <tr *ngIf="paginatedAdmissions.length === 0">
-                                        <td colspan="10" class="text-center p-4">No admissions found matching
+                                        <td colspan="10" class="text-center p-4">No records found matching
                                             "{{searchTerm}}"</td>
                                     </tr>
                                 </tbody>
@@ -497,7 +512,7 @@
                         <!-- Standardized Pagination -->
                         <div class="pagination-section">
                             <span class="showing-text">Showing {{ pageSize }} records out of {{
-                                pageData.totalCount }} Admissions</span>
+                                pageData.totalCount }} {{ activeTabLabel }}</span>
                             <div class="pagination-controls">
                                 <button class="page-btn nav-btn" (click)="goToPage(currentPage - 1)"
                                     [disabled]="currentPage === 1">

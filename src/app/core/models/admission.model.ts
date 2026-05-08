@@ -90,6 +90,11 @@ export interface AdmissionItem {
   tokenAmount?: number;
   discountPercentage?: number;
 
+  leadSource?: {
+    id: number;
+    name: string;
+  };
+
   feeHistory?: StudentFee[];
 }
 

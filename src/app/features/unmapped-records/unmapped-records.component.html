@@ -155,6 +155,7 @@
                 @case ('students') {
                 <tr>
                   <th>S.No</th>
+                  <th>Enrollment ID</th>
                   <th>Student Name</th>
                   <th>Contact Info</th>
                   <th>Enrolled Course</th>
@@ -217,7 +218,15 @@
                 @for (item of paginatedData(); track item.id || item.email || $index) {
                 <tr>
                   <td class="serial-no">{{ (currentPage() - 1) * pageSize() + $index + 1 }}</td>
-
+                  @switch (currentTab()) {
+                  @case ('students') {
+                  <td>
+                    <div class="contact-info">
+                      <div class="primary">{{ item.enrollmentId }}</div>
+                    </div>
+                  </td>
+                  }
+                  }
                   <!-- NAME COLUMN -->
                   <td>
                     <div class="user-cell">

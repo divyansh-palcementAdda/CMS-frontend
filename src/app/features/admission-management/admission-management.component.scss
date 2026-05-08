@@ -111,11 +111,11 @@ $text-light: #64748B;
     margin-bottom: 24px;
 
     &.main-stats {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
     }
 
     &.sub-stats {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
 
     .stat-card {

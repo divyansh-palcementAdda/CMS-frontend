@@ -63,9 +63,13 @@ export class WelcomeBannerComponent {
 
   constructor(private auth: AuthService) { }
 
-  get data(): CommissionData | null { return this.commissionData; }
+  get data(): CommissionData | null {
+    console.log(this.commissionData);
+    return this.commissionData;
+  }
 
   get paidPct(): number {
+
     if (!this.data?.totalProjected || !this.data?.totalCollected) return 0;
     return Math.min(100, Math.round((this.data.totalCollected / this.data.totalProjected) * 100));
   }

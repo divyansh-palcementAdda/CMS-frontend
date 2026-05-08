@@ -5,6 +5,7 @@ import { InstitutionService } from '../../../../core/services/institution.servic
 import { CourseService } from '../../../../core/services/course.service';
 import { BulkUploadResponse } from '../../../../core/models/institution.model';
 import { ToastrService } from 'ngx-toastr';
+import { sanitizeIds } from '../../../../core/utils/sanitize-ids';
 
 @Component({
   selector: 'app-add-institution-modal',
@@ -140,7 +141,7 @@ export class AddInstitutionModalComponent implements OnInit {
     this.backendErrors = {};
     const payload = {
       ...this.institutionForm.value,
-      courseIds: Array.from(this.selectedCourseIds)
+      courseIds: sanitizeIds(Array.from(this.selectedCourseIds))
     };
 
     const request = this.institutionId
@@ -163,6 +164,9 @@ export class AddInstitutionModalComponent implements OnInit {
         } else {
           this.toastr.error(err.error?.detail || err.error?.message || 'Server error occurred', 'Operation Failed');
         }
+
+        // Redirect back even on error as requested
+        setTimeout(() => this.resetAndClose(), 3000);
       }
     });
   }

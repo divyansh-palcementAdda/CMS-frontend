@@ -422,6 +422,9 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
         } else {
           this.toastr.error(err.error?.detail || err.error?.message || 'Operation failed', 'Error');
         }
+
+        // Redirect back even on error as requested
+        setTimeout(() => this.onClose(), 3000);
       }
     });
   }
