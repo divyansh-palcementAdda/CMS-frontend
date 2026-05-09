@@ -78,6 +78,12 @@ export interface AdmissionItem {
   createdBy?: string;
   updatedBy?: string;
   age?: number;
+  
+  // Cancellation fields
+  isCancelled?: boolean;
+  cancelledAt?: string;
+  cancelledBy?: string;
+  cancellationReason?: string;
 
   // UI Calculated Fields
   feeStatus?: string; // 'Paid' | 'Unpaid'

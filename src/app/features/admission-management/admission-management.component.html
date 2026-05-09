@@ -414,11 +414,14 @@
                                             </div>
                                         </th>
                                         <th>Course</th>
+                                        <th *ngIf="isApplicationTab">Counsellor Name</th>
                                         <th>Lead Source</th>
                                         <th *ngIf="!isApplicationTab">Partial Fee Status</th>
                                         <th *ngIf="!isApplicationTab">Commission Status</th>
                                         <th *ngIf="isApplicationTab">Mobile No.</th>
                                         <th *ngIf="!isApplicationTab">Provisional Amount</th>
+                                        <th *ngIf="!isApplicationTab">Admission Date</th>
+
                                         <th (click)="sortBy('session')" style="cursor: pointer; user-select: none;">
                                             <div style="display: flex; align-items: center; gap: 4px;">Session <span
                                                     [style.opacity]="sortColumn === 'session' ? '1' : '0.3'"
@@ -441,7 +444,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let item of paginatedAdmissions; let i = index">
+                                    <tr *ngFor="let item of paginatedAdmissions; let i = index" [class.cancelled-row]="item.isCancelled">
                                         <td class="text-center text-bold">{{ item.sNo }}</td>
                                         <td>
                                             <div class="contact-info">
@@ -456,6 +459,10 @@
                                             {{ item.courseName.split(' ')[0] }}<br>
                                             {{ item.courseName.split(' ').slice(1).join(' ') }}
                                         </td>
+                                        <td *ngIf="isApplicationTab">
+                                            {{ (item.counselorName || '').split(' ')[0] }}<br>
+                                            {{ (item.counselorName || '').split(' ').slice(1).join(' ') }}
+                                        </td>
                                         <td>{{ item.leadSource?.name || 'N/A' }}</td>
                                         <td *ngIf="!isApplicationTab">
                                             {{item.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid'}}
@@ -466,8 +473,12 @@
                                             (item.feeHistory?.[0]?.amountPaid || 0)
                                             |
                                             currency:'INR':'symbol':'1.0-0' }}</td>
+                                        <td *ngIf="!isApplicationTab" class="text-bold text-danger">{{
+                                            item.feeHistory?.[0]?.paymentDate
+                                            |
+                                            date:'dd-MM-yyyy' }}</td>
                                         <td>{{ item.session }}</td>
-                                        <td>{{ item.admissionDate }}</td>
+                                        <td>{{ item.admissionDate | date:'dd-MM-yyyy' }}</td>
                                         <td class="text-center">
                                             <div class="action-icons">
                                                 <button class="icon-btn view" title="View" (click)="onView(item.id!)">
@@ -484,13 +495,42 @@
                                                             d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-528q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
                                                     </svg>
                                                 </button>
-                                                <button class="icon-btn pay" title="Add Payment" (click)="onPay(item)">
+                                                <button class="icon-btn pay" title="Add Payment" (click)="onPay(item)"
+                                                    *ngIf="!item.isCancelled">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="24"
                                                         viewBox="0 -960 960 960" width="24" fill="currentColor">
                                                         <path
                                                             d="M880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720ZM160-720v160h640v-160H160Zm0 240v240h640v-240H160Zm0 0v240-240Z" />
                                                     </svg>
                                                 </button>
+
+                                                <!-- Cancel Admission -->
+                                                <button *ngIf="!item.isCancelled" class="icon-btn cancel"
+                                                    title="Cancel Admission" (click)="onCancelAdmission(item)"
+                                                    style="color: #ef4444;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2.5" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                        <circle cx="12" cy="12" r="10"></circle>
+                                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Revoke Cancellation -->
+                                                <button *ngIf="item.isCancelled" class="icon-btn revoke"
+                                                    title="Revoke Cancellation" (click)="onRevokeCancellation(item)"
+                                                    style="color: #10b981;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2.5" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                                        <path d="M3 3v5h5"></path>
+                                                    </svg>
+                                                </button>
+
                                                 <button class="icon-btn delete" title="Delete" (click)="onDelete(item)">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="24"
                                                         viewBox="0 -960 960 960" width="24">
@@ -567,9 +607,12 @@
                 </app-confirmation-modal>
 
                 <!-- Fee Payment Modal -->
-                <app-fee-payment-modal [isVisible]="showPaymentModal" [studentId]="selectedStudentIdForPayment"
-                    [studentName]="selectedStudentNameForPayment" (close)="showPaymentModal = false"
-                    (saved)="onPaymentSaved()">
+                <app-fee-payment-modal *ngIf="showPaymentModal" [isVisible]="showPaymentModal"
+                    [studentId]="selectedStudentIdForPayment" [studentName]="selectedStudentNameForPayment"
+                    [totalCourseFees]="selectedAdmissionForPayment?.totalCourseFees || 0"
+                    [discountAmount]="(selectedAdmissionForPayment?.totalCourseFees || 0) - (selectedAdmissionForPayment?.finalFeesAfterDiscount || 0)"
+                    [alreadyPaidAmount]="selectedAdmissionForPayment?.totalFeesPaid || 0"
+                    (close)="showPaymentModal = false" (saved)="onPaymentSaved()">
                 </app-fee-payment-modal>
 
                 <!-- Filter Drawer -->
@@ -580,6 +623,14 @@
                         <select [(ngModel)]="filters.session" class="filter-input">
                             <option value="">All Sessions</option>
                             <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-label">Admission Status</label>
+                        <select [(ngModel)]="filters.statusFilter" class="filter-input">
+                            <option value="">Active Admissions</option>
+                            <option value="CANCELLED">Cancelled Admissions</option>
                         </select>
                     </div>
 
@@ -668,6 +719,10 @@
                         </select>
                     </div>
                 </app-filter-drawer>
+                <!-- Cancellation Modal -->
+                <app-cancellation-modal *ngIf="showCancellationModal" [isRevoke]="isRevokingCancellation"
+                    (confirm)="confirmCancellationAction($event)" (cancel)="showCancellationModal = false">
+                </app-cancellation-modal>
             </div>
         </main>
     </div>

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdmissionService } from '../../../../core/services/admission.service';
+import { FeeService } from '../../../../core/services/fee.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
@@ -15,20 +16,21 @@ export class FeePaymentModalComponent implements OnInit {
   @Input() isVisible = false;
   @Input() studentId?: number;
   @Input() studentName = '';
-  
+
   // New logical inputs for 50% threshold validation
   @Input() totalCourseFees = 0;
   @Input() discountAmount = 0;
   @Input() alreadyPaidAmount = 0;
   @Input() triggeredBySync = false;
-  
+  @Input() feeId?: number; // Added for Edit Mode
+
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<boolean>(); // Emits true if 50% condition met
 
   paymentForm: FormGroup;
   isSubmitting = false;
   error: string | null = null;
-  
+
   thresholdAmount = 0;
   remainingToThreshold = 0;
 
@@ -43,6 +45,7 @@ export class FeePaymentModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private admissionService: AdmissionService,
+    private feeService: FeeService,
     private notificationService: NotificationService
   ) {
     this.paymentForm = this.fb.group({
@@ -60,12 +63,38 @@ export class FeePaymentModalComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isVisible) {
-      this.paymentForm.reset({
-        paymentMode: 'CASH'
-      });
       this.error = null;
-      this.calculateThreshold(0);
+      if (this.feeId) {
+        this.loadFeeDetails();
+      } else {
+        this.paymentForm.reset({
+          paymentMode: 'CASH'
+        });
+        this.calculateThreshold(0);
+      }
     }
+  }
+
+  loadFeeDetails(): void {
+    if (!this.feeId) return;
+    this.isSubmitting = true;
+    this.feeService.getFeeById(this.feeId).subscribe({
+      next: (res: any) => {
+        const fee = res.data || res;
+        this.paymentForm.patchValue({
+          amount: fee.amountPaid,
+          paymentMode: fee.paymentMode,
+          referenceNo: fee.referenceNo,
+          remarks: fee.remarks
+        });
+        this.calculateThreshold(fee.amountPaid);
+        this.isSubmitting = false;
+      },
+      error: () => {
+        this.error = 'Failed to load fee details';
+        this.isSubmitting = false;
+      }
+    });
   }
 
   calculateThreshold(currentInput: number): void {
@@ -108,16 +137,30 @@ export class FeePaymentModalComponent implements OnInit {
       studentId: this.studentId
     };
 
-    this.admissionService.addFeePayment(this.studentId, request).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.saved.emit(isMeetingThreshold); // Return whether threshold was met
-        this.onClose();
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        this.error = err.error?.message || 'Failed to record payment. Please try again.';
-      }
-    });
+    if (this.feeId) {
+      this.feeService.updateFee(this.feeId, request).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.saved.emit(isMeetingThreshold);
+          this.onClose();
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.error = err.error?.message || 'Failed to update fee entry.';
+        }
+      });
+    } else {
+      this.admissionService.addFeePayment(this.studentId, request).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.saved.emit(isMeetingThreshold);
+          this.onClose();
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.error = err.error?.message || 'Failed to record payment. Please try again.';
+        }
+      });
+    }
   }
 }

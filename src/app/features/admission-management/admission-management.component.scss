@@ -468,6 +468,23 @@ $text-light: #64748B;
                       background: #ecfdf5;
                     }
                   }
+
+                  &.cancel {
+                    color: #ef4444;
+
+                    &:hover {
+                      background: #fee2e2;
+                    }
+                  }
+
+                  &.revoke {
+                    color: #10b981;
+
+                    &:hover {
+                      background: #dcfce7;
+                    }
+                  }
+
                   &.delete {
                     color: #ef4444;
 
@@ -475,6 +492,25 @@ $text-light: #64748B;
                       background: #fee2e2;
                     }
                   }
+                }
+              }
+
+              // ── Cancelled Row ──
+              &.cancelled-row {
+                background-color: #f8fafc;
+                opacity: 0.8;
+
+                td {
+                  color: #94a3b8;
+                }
+
+                .student-name {
+                  text-decoration: line-through;
+                  color: #cbd5e1;
+                }
+
+                .action-icons .icon-btn:not(.revoke):not(.view) {
+                  display: none;
                 }
               }
             }

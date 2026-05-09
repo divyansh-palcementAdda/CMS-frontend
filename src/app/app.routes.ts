@@ -114,5 +114,11 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  {
+    path: 'fees',
+    loadComponent: () => import('./features/fees-management/fees-management.component').then(m => m.FeesManagementComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
   { path: '**', redirectTo: '/admin/dashboard' }
 ];

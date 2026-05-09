@@ -359,7 +359,7 @@ export class CourseDetailComponent implements OnInit {
           this.loadCourseDetail();
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(`Error deleting ${this.deleteType}:`, err);
         this.loading = false;
         this.showDeleteModal = false;

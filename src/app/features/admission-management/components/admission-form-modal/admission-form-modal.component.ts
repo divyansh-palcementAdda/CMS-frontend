@@ -113,6 +113,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     this.setupScholarDiscountLogic();
     this.setupRelationshipFiltering();
     this.setupLocationListeners();
+    this.adjustValidators();
   }
 
   private setupLocationListeners(): void {
@@ -198,7 +199,47 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
       } else {
         this.isEditMode = false;
       }
+      this.adjustValidators();
     }
+  }
+
+  private adjustValidators(): void {
+    const fields = [
+      'fullName', 'dateOfBirth', 'gender', 'email', 'phoneNumber', 
+      'city', 'state', 'address', 'admissionSource', 'leadSourceId',
+      'admittedByUserId', 'institutionId', 'courseId', 'admissionDate'
+    ];
+
+    fields.forEach(fieldName => {
+      const control = this.admissionForm.get(fieldName);
+      if (control) {
+        if (this.isEditMode) {
+          control.clearValidators();
+          // Keep non-required validators
+          if (fieldName === 'fullName') control.setValidators([Validators.minLength(2)]);
+          if (fieldName === 'email') control.setValidators([Validators.email]);
+          if (fieldName === 'phoneNumber') control.setValidators([Validators.pattern('^[6-9]\\d{9}$')]);
+          if (fieldName === 'address') control.setValidators([Validators.minLength(5)]);
+        } else {
+          // Add required validators back
+          if (fieldName === 'fullName') control.setValidators([Validators.required, Validators.minLength(2)]);
+          else if (fieldName === 'dateOfBirth') control.setValidators([Validators.required]);
+          else if (fieldName === 'gender') control.setValidators([Validators.required]);
+          else if (fieldName === 'email') control.setValidators([Validators.required, Validators.email]);
+          else if (fieldName === 'phoneNumber') control.setValidators([Validators.required, Validators.pattern('^[6-9]\\d{9}$')]);
+          else if (fieldName === 'city') control.setValidators([Validators.required]);
+          else if (fieldName === 'state') control.setValidators([Validators.required]);
+          else if (fieldName === 'address') control.setValidators([Validators.required, Validators.minLength(5)]);
+          else if (fieldName === 'admissionSource') control.setValidators([Validators.required]);
+          else if (fieldName === 'leadSourceId') control.setValidators([Validators.required]);
+          else if (fieldName === 'admittedByUserId') control.setValidators([Validators.required]);
+          else if (fieldName === 'institutionId') control.setValidators([Validators.required]);
+          else if (fieldName === 'courseId') control.setValidators([Validators.required]);
+          else if (fieldName === 'admissionDate') control.setValidators([Validators.required]);
+        }
+        control.updateValueAndValidity();
+      }
+    });
   }
 
   private initForm(): FormGroup {

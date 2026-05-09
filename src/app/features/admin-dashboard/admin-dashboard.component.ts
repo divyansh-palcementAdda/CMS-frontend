@@ -143,7 +143,7 @@ export class AdminDashboardComponent implements OnInit {
         this.itemToDelete = null;
         this.loadData(); // Refresh dashboard
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(`Error deleting ${this.deleteType}`, err);
         this.loading.set(false);
         this.showDeleteModal = false;

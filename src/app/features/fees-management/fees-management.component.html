@@ -1,0 +1,285 @@
+<div class="dashboard-layout">
+  <!-- Standard Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Body Content -->
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+
+    <main class="main-content">
+      <div class="fees-container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="header-info">
+            <h1>Fees Management</h1>
+            <p>Centrally track and manage student fee transactions across the system</p>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" *ngIf="stats">
+          <div class="stat-card">
+            <div class="icon-box primary">
+              <i class="material-symbols-outlined">payments</i>
+            </div>
+            <div class="stat-info">
+              <span class="label">Total Collected</span>
+              <span class="value">{{ stats.totalCollected | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="icon-box success">
+              <i class="material-symbols-outlined">today</i>
+            </div>
+            <div class="stat-info">
+              <span class="label">Today's Collection</span>
+              <span class="value">{{ stats.todayCollection | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="icon-box warning">
+              <i class="material-symbols-outlined">pending_actions</i>
+            </div>
+            <div class="stat-info">
+              <span class="label">Pending Total</span>
+              <span class="value">{{ stats.totalStudentsWithPendingFees }} Students</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="icon-box info">
+              <i class="material-symbols-outlined">group</i>
+            </div>
+            <div class="stat-info">
+              <span class="label">Paid Students</span>
+              <span class="value">{{ stats.totalStudentsPaid }} Students</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="icon-box danger">
+              <i class="material-symbols-outlined">analytics</i>
+            </div>
+            <div class="stat-info">
+              <span class="label">Avg Collection</span>
+              <span class="value">{{ stats.averageCollection | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Search & Filters Bar -->
+        <div class="quick-actions-bar">
+          <div class="actions-left">
+            <div class="filter-group-row">
+              <button class="btn-filter" (click)="toggleFilterDrawer()">
+                <i class="material-symbols-outlined">filter_list</i>
+                <span>Filters</span>
+                <span class="filter-count" *ngIf="isFilterActive">!</span>
+              </button>
+              
+              <button class="btn-clear-filters" *ngIf="isFilterActive" (click)="clearFilters()" title="Clear all filters">
+                <i class="material-symbols-outlined">close</i>
+                <span>Clear All</span>
+              </button>
+            </div>
+          </div>
+          <div class="actions-right">
+            <div class="search-wrapper">
+              <i class="material-symbols-outlined search-icon">search</i>
+              <input type="text" class="search-input" placeholder="Search by student name or reference number..." 
+                     (input)="searchSubject.next($any($event.target).value)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+          <div class="table-card">
+            <div class="table-responsive">
+              <table class="fees-table">
+                <thead>
+                  <tr>
+                    <th class="text-center">S.NO</th>
+                    <th>Student Details</th>
+                    <th>Course</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Date</th>
+                    <th>Mode</th>
+                    <th>Ref Number</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loading State -->
+                  <tr *ngIf="loading">
+                    <td colspan="8">
+                      <div class="loading-placeholder">
+                        <div class="spinner-sm"></div>
+                        <span>Loading records...</span>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Empty State -->
+                  <tr *ngIf="!loading && history.length === 0">
+                    <td colspan="8">
+                      <div class="empty-state">
+                        <i class="material-symbols-outlined">receipt_long</i>
+                        <h3>No Transactions Found</h3>
+                        <p>No fee history matches your current filters or search.</p>
+                        <button class="btn-clear-inline" (click)="clearFilters()">Clear all filters</button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Data Rows -->
+                  <tr *ngFor="let item of history; let i = index">
+                    <td class="text-center" style="font-weight: 700; color: #1e293b;">
+                      {{ (currentPage - 1) * pageSize + i + 1 }}
+                    </td>
+                    <td>
+                      <div class="student-cell">
+                        <div class="avatar">{{ item.studentName.charAt(0) }}</div>
+                        <div class="details">
+                          <span class="name">{{ item.studentName }}</span>
+                          <span class="enrollment">{{ item.enrollmentId || 'No ID' }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="course-badge">{{ item.courseName }}</span>
+                    </td>
+                    <td>
+                      <span class="amount-paid">₹{{ item.amountPaid | number:'1.0-0' }}</span>
+                    </td>
+                    <td>
+                      <span class="date-cell">{{ item.paymentDate | date:'dd MMM yyyy' }}</span>
+                    </td>
+                    <td>
+                      <span class="mode-pill" [attr.data-mode]="item.paymentMode">{{ item.paymentMode }}</span>
+                    </td>
+                    <td>
+                      <code class="ref-code">{{ item.referenceNo || '—' }}</code>
+                    </td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn-icon view" title="View Details" (click)="viewStudent(item)">
+                          <i class="material-symbols-outlined">visibility</i>
+                        </button>
+                        <button class="btn-icon edit" title="Edit Entry" (click)="editFee(item)">
+                          <i class="material-symbols-outlined">edit</i>
+                        </button>
+                        <button class="btn-icon delete" title="Delete Entry" (click)="deleteFee(item)">
+                          <i class="material-symbols-outlined">delete</i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Standardized Pagination -->
+            <div class="pagination-section">
+              <span class="showing-text">
+                Showing {{ history.length }} records out of {{ totalElements }} Fee Transactions
+              </span>
+              <div class="pagination-controls">
+                <button class="page-btn nav-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+                  <i class="material-symbols-outlined">chevron_left</i>
+                </button>
+                <button class="page-btn" *ngFor="let p of getVisiblePages()" [class.active]="p === currentPage"
+                  [class.ellipsis]="p === '...'" [disabled]="p === '...'" (click)="p !== '...' && goToPage(+p)">
+                  {{ p }}
+                </button>
+                <button class="page-btn nav-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+                  <i class="material-symbols-outlined">chevron_right</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Filter Drawer Integration -->
+<app-filter-drawer
+  [isOpen]="isFilterDrawerOpen"
+  (close)="isFilterDrawerOpen = false"
+  (apply)="applyFilters()"
+  (clear)="clearFilters()"
+>
+  <div class="filter-drawer-body">
+    <div class="filter-group">
+      <label>Course</label>
+      <select class="filter-select" [(ngModel)]="filters.courseId">
+        <option [ngValue]="undefined">All Courses</option>
+        <option *ngFor="let course of courses" [value]="course.id">{{ course.name }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Admission Status</label>
+      <select class="filter-select" [(ngModel)]="filters.statusFilter">
+        <option value="">Active Admissions</option>
+        <option value="CANCELLED">Cancelled Admissions</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Payment Mode</label>
+      <select class="filter-select" [(ngModel)]="filters.paymentMode">
+        <option value="">All Modes</option>
+        <option value="CASH">Cash</option>
+        <option value="UPI">UPI</option>
+        <option value="BANK_TRANSFER">Bank Transfer</option>
+        <option value="CARD">Card</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Lead Source</label>
+      <select class="filter-select" [(ngModel)]="filters.leadSourceId">
+        <option [ngValue]="undefined">All Lead Sources</option>
+        <option *ngFor="let source of leadSources" [value]="source.id">{{ source.name }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Time Range</label>
+      <select class="filter-select" [(ngModel)]="selectedDateRange" (change)="onDateRangeChange()">
+        <option value="all">All Time</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+        <option value="year">This Year</option>
+        <option value="custom">Custom Range</option>
+      </select>
+    </div>
+
+    <div class="filter-group" *ngIf="selectedDateRange === 'custom'">
+      <label>Date Range (From)</label>
+      <input type="date" class="filter-input" [(ngModel)]="filters.startDate">
+    </div>
+
+    <div class="filter-group" *ngIf="selectedDateRange === 'custom'">
+      <label>Date Range (To)</label>
+      <input type="date" class="filter-input" [(ngModel)]="filters.endDate">
+    </div>
+  </div>
+</app-filter-drawer>
+
+<!-- Fee Payment Modal -->
+<app-fee-payment-modal
+  *ngIf="isModalVisible"
+  [isVisible]="isModalVisible"
+  [feeId]="selectedFee?.id"
+  [studentId]="selectedFee?.studentId"
+  [studentName]="selectedFee?.studentName || ''"
+  (close)="onModalClose()"
+  (saved)="onFeeSaved()"
+></app-fee-payment-modal>

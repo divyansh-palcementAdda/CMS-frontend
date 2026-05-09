@@ -11,13 +11,23 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NotificationService } from '../../core/services/notification.service';
 import { AdmissionFormModalComponent } from '../admission-management/components/admission-form-modal/admission-form-modal.component';
+import { CancellationModalComponent } from '../admission-management/components/cancellation-modal/cancellation-modal.component';
 
 // Notification service imported via core services
 
 @Component({
   selector: 'app-admission-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, FeePaymentModalComponent, AdmissionFormModalComponent],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    RouterModule, 
+    SidebarComponent, 
+    TopbarComponent, 
+    FeePaymentModalComponent, 
+    AdmissionFormModalComponent,
+    CancellationModalComponent
+  ],
   templateUrl: './admission-detail.component.html',
   styleUrls: ['./admission-detail.component.scss']
 })
@@ -31,7 +41,9 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   showAdmissionModal = false;
   selectedStudentId: number | null = null;
 
-  // Actions
+  // Cancellation State
+  showCancellationModal = false;
+  isRevokingCancellation = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,7 +72,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
           this.detail = data;
           this.loading = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Error loading admission details', err);
           this.loading = false;
         }
@@ -101,7 +113,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
             this.notificationService.success('Deleted', 'Admission has been deleted successfully.');
             this.router.navigate(['/admission-management']);
           },
-          error: (err) => {
+          error: (err: any) => {
             console.error('Error deleting admission', err);
             this.notificationService.error('Delete Failed', 'An error occurred while deleting the admission.');
             this.loading = false;
@@ -208,7 +220,7 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
           this.loadData();
           this.notificationService.success('Status Updated', `Student marked as ${newStatus ? 'Paid' : 'Unpaid'} successfully.`);
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Error updating fee status', err);
           this.notificationService.error('Update Failed', err.error?.message || 'Could not update fee status');
           this.loadData(); // Force re-sync with server state
@@ -280,6 +292,39 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }
+
+  // ── Cancellation ──────────────────────────────────────────────────────
+  handleCancellationClick() {
+    this.isRevokingCancellation = false;
+    this.showCancellationModal = true;
+  }
+
+  handleRevokeClick() {
+    this.isRevokingCancellation = true;
+    this.showCancellationModal = true;
+  }
+
+  confirmCancellationAction(reason: string) {
+    this.loading = true;
+    const obs = this.isRevokingCancellation
+      ? this.admissionService.revokeCancellation(this.admissionId)
+      : this.admissionService.cancelAdmission(this.admissionId, reason);
+
+    obs.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.showCancellationModal = false;
+        this.notificationService.success(
+          this.isRevokingCancellation ? 'Admission Restored' : 'Admission Cancelled',
+          this.isRevokingCancellation ? 'The cancellation has been revoked.' : 'The admission has been successfully cancelled.'
+        );
+        this.loadData();
+      },
+      error: (err: any) => {
+        this.notificationService.error('Action Failed', err.error?.message || 'An error occurred.');
+        this.loading = false;
+      }
+    });
   }
 
   ngOnDestroy() {

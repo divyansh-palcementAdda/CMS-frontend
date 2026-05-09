@@ -424,7 +424,7 @@ export class ConsultancyDetailComponent implements OnInit {
           this.fetchConsultancy(Number(this.route.snapshot.paramMap.get('id')));
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error(`Error deleting ${this.deleteType}`, err);
         this.loading = false;
         this.showDeleteModal = false;

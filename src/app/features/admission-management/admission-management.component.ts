@@ -15,6 +15,7 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
 import { LocationService } from '../../core/services/location.service';
 import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
 import { LeadSourceService } from '../../core/services/lead-source.service';
+import { CancellationModalComponent } from './components/cancellation-modal/cancellation-modal.component';
 
 
 /**
@@ -52,7 +53,8 @@ interface ActiveFilters {
     AdmissionFormModalComponent,
     FeePaymentModalComponent,
     BulkUploadModalComponent,
-    FilterDrawerComponent
+    FilterDrawerComponent,
+    CancellationModalComponent
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -126,11 +128,15 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   showBulkUpdateEnrollmentModal: boolean = false;
   showBulkUpdateAdmissionDateModal: boolean = false;
   showPaymentModal: boolean = false;
+  showCancellationModal: boolean = false;
+  isRevokingCancellation: boolean = false;
   selectedAdmission: AdmissionItem | null = null;
+  selectedAdmissionForPayment: AdmissionItem | null = null;
   selectedStudentId?: number;
   selectedStudentIdForPayment?: number;
   selectedStudentNameForPayment: string = '';
   admissionIdToDelete?: number;
+  admissionIdToCancel?: number;
 
   enrollmentUpdateService = {
     bulkUpload: (file: File) => this.admissionService.bulkUpdateEnrollment(file),
@@ -216,7 +222,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       next: (courses: any) => {
         this.courses = courses.data || courses;
       },
-      error: err => console.error('Error loading courses', err)
+      error: (err: any) => console.error('Error loading courses', err)
     });
   }
 
@@ -280,7 +286,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
         this.loading = false;
       },
-      error: err => {
+      error: (err: any) => {
         console.error('Error fetching admissions', err);
         this.loading = false;
       }
@@ -610,10 +616,48 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         this.admissionIdToDelete = undefined;
         this.fetchData();
       },
-      error: err => {
+      error: (err: any) => {
         console.error('Error deleting admission', err);
         this.loading = false;
         this.showDeleteModal = false;
+      }
+    });
+  }
+
+  // ── Cancellation ──────────────────────────────────────────────────────
+  onCancelAdmission(item: AdmissionItem): void {
+    this.admissionIdToCancel = item.id;
+    this.selectedAdmission = item;
+    this.isRevokingCancellation = false;
+    this.showCancellationModal = true;
+  }
+
+  onRevokeCancellation(item: AdmissionItem): void {
+    this.admissionIdToCancel = item.id;
+    this.selectedAdmission = item;
+    this.isRevokingCancellation = true;
+    this.showCancellationModal = true;
+  }
+
+  confirmCancellationAction(reason: string): void {
+    if (!this.admissionIdToCancel) return;
+    this.loading = true;
+
+    const obs = this.isRevokingCancellation
+      ? this.admissionService.revokeCancellation(this.admissionIdToCancel)
+      : this.admissionService.cancelAdmission(this.admissionIdToCancel, reason);
+
+    obs.subscribe({
+      next: () => {
+        this.showCancellationModal = false;
+        this.admissionIdToCancel = undefined;
+        this.selectedAdmission = null;
+        this.fetchData();
+      },
+      error: (err: any) => {
+        console.error('Error processing cancellation/revoke', err);
+        this.loading = false;
+        this.showCancellationModal = false;
       }
     });
   }
@@ -623,6 +667,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   onPay(item: AdmissionItem): void {
     this.selectedStudentIdForPayment = item.id;
     this.selectedStudentNameForPayment = item.fullName;
+    this.selectedAdmissionForPayment = item;
     this.showPaymentModal = true;
   }
 

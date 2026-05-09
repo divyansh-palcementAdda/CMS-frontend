@@ -2,8 +2,8 @@
   <div class="modal-container">
     <div class="modal-header">
       <div class="header-content">
-        <h2>Add Fee Payment</h2>
-        <p>Record a new payment for <strong>{{ studentName }}</strong></p>
+        <h2>{{ feeId ? 'Edit Fee Entry' : 'Add Fee Payment' }}</h2>
+        <p>{{ feeId ? 'Update details for transaction' : 'Record a new payment' }} for <strong>{{ studentName }}</strong></p>
       </div>
       <button class="close-btn" (click)="onClose()">
         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
@@ -113,7 +113,7 @@
     <div class="modal-footer">
       <button class="cancel-btn" (click)="onClose()">Cancel</button>
       <button class="submit-btn" (click)="onSubmit()" [disabled]="isSubmitting || paymentForm.invalid">
-        <span *ngIf="!isSubmitting">Add Payment</span>
+        <span *ngIf="!isSubmitting">{{ feeId ? 'Update' : 'Add' }} Payment</span>
         <span *ngIf="isSubmitting">Processing...</span>
       </button>
     </div>

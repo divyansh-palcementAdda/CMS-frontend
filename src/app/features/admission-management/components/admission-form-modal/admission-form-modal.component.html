@@ -36,7 +36,7 @@
         <div class="step-content" *ngIf="currentStep === 1">
           <div class="form-grid">
             <div class="input-group">
-              <label>Full Name <span class="required">*</span></label>
+              <label>Full Name <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['fullName']">
                 <i class="fa-solid fa-user"></i>
                 <input type="text" formControlName="fullName" placeholder="Enter student full name">
@@ -78,7 +78,7 @@
             </div>
 
             <div class="input-group">
-              <label>Date of Birth <span class="required">*</span></label>
+              <label>Date of Birth <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['dateOfBirth']">
                 <i class="fa-solid fa-calendar"></i>
                 <input type="date" formControlName="dateOfBirth">
@@ -90,7 +90,7 @@
             </div>
 
             <div class="input-group">
-              <label>Gender <span class="required">*</span></label>
+              <label>Gender <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['gender']">
                 <i class="fa-solid fa-venus-mars"></i>
                 <select formControlName="gender">
@@ -104,7 +104,7 @@
             </div>
 
             <div class="input-group">
-              <label>Email Address <span class="required">*</span></label>
+              <label>Email Address <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['email']">
                 <i class="fa-solid fa-envelope"></i>
                 <input type="email" formControlName="email" placeholder="Enter email address">
@@ -116,7 +116,7 @@
             </div>
 
             <div class="input-group">
-              <label>Phone Number <span class="required">*</span></label>
+              <label>Phone Number <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['phoneNumber']">
                 <i class="fa-solid fa-phone"></i>
                 <input type="text" formControlName="phoneNumber" placeholder="Enter 10-digit mobile">
@@ -144,7 +144,7 @@
 
 
             <div class="input-group">
-              <label>State <span class="required">*</span></label>
+              <label>State <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['state']">
                 <i class="fa-solid fa-map"></i>
                 <select formControlName="state">
@@ -155,7 +155,7 @@
               <div class="error-msg" [class.show]="backendErrors['state']">{{ backendErrors['state'] }}</div>
             </div>
             <div class="input-group">
-              <label>City <span class="required">*</span></label>
+              <label>City <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper input-with-loader" [class.error-border]="backendErrors['city']">
                 <i class="fa-solid fa-city"></i>
                 <select formControlName="city">
@@ -171,7 +171,7 @@
 
 
             <div class="input-group full-width">
-              <label>Full Address <span class="required">*</span></label>
+              <label>Full Address <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['address']">
                 <i class="fa-solid fa-location-dot"></i>
                 <textarea formControlName="address" placeholder="Enter complete residential address"></textarea>
@@ -185,7 +185,7 @@
         <div class="step-content" *ngIf="currentStep === 2">
           <div class="form-grid">
             <div class="input-group">
-              <label>Admission Source <span class="required">*</span></label>
+              <label>Admission Source <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['admissionSource']">
                 <i class="fa-solid fa-share-nodes"></i>
                 <select formControlName="admissionSource">
@@ -199,7 +199,7 @@
             </div>
 
             <div class="input-group">
-              <label>Lead Source <span class="required">*</span></label>
+              <label>Lead Source <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['leadSourceId']">
                 <i class="fa-solid fa-bullhorn"></i>
                 <select formControlName="leadSourceId">
@@ -214,7 +214,7 @@
             </div>
 
             <div class="input-group" *ngIf="admissionForm.get('admissionSource')?.value === 'CONSULTANCY'">
-              <label>Consultancy <span class="required">*</span></label>
+              <label>Consultancy <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['consultancyId']">
                 <i class="fa-solid fa-handshake"></i>
                 <select formControlName="consultancyId">
@@ -227,7 +227,7 @@
             </div>
 
             <div class="input-group">
-              <label>Admitted By <span class="required">*</span></label>
+              <label>Admitted By <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['admittedByUserId']">
                 <i class="fa-solid fa-user-tie"></i>
                 <select formControlName="admittedByUserId">
@@ -250,7 +250,7 @@
             </div>
 
             <div class="input-group">
-              <label>Institution <span class="required">*</span></label>
+              <label>Institution <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['institutionId']">
                 <i class="fa-solid fa-university"></i>
                 <select formControlName="institutionId" (change)="onInstitutionChange()">
@@ -263,7 +263,7 @@
             </div>
 
             <div class="input-group">
-              <label>Course <span class="required">*</span></label>
+              <label>Course <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['courseId']">
                 <i class="fa-solid fa-book"></i>
                 <select formControlName="courseId">
@@ -278,7 +278,7 @@
             </div>
 
             <div class="input-group">
-              <label>Admission Date <span class="required">*</span></label>
+              <label>Admission Date <span class="required" *ngIf="!isEditMode">*</span></label>
               <div class="input-wrapper" [class.error-border]="backendErrors['admissionDate']">
                 <i class="fa-solid fa-calendar-check"></i>
                 <input type="date" formControlName="admissionDate">

@@ -125,6 +125,10 @@ export class AdmissionService {
     return this.http.put<any>(`${this.apiUrl}/${id}`, admission);
   }
 
+  deleteAdmission(id: number | string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
+
   bulkUpload(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
@@ -144,8 +148,12 @@ export class AdmissionService {
     return this.http.post<any>(`${this.apiUrl}/${studentId}/fees`, request);
   }
 
-  deleteAdmission(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  cancelAdmission(id: number, reason: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/cancel`, { reason });
+  }
+
+  revokeCancellation(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/revoke-cancellation`, {});
   }
 
   private mapStudentToAdmissionItem(s: any, sNo?: number): AdmissionItem {
@@ -155,7 +163,7 @@ export class AdmissionService {
       fullName: s.fullName || 'Unknown Student',
       courseName: s.courseName || 'N/A',
       feeStatus: s.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid',
-      status: 'Active',
+      status: s.isCancelled ? 'Cancelled' : 'Active',
       duration: s.duration || 'N/A',
       discountPercentageDisplay: s.discountType === 'PERCENTAGE' ? `${s.discountValue}%` : (s.isScholar ? 'Scholarship' : '-'),
 
