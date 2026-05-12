@@ -16,13 +16,15 @@ import { LocationService } from '../../core/services/location.service';
 import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
 import { LeadSourceService } from '../../core/services/lead-source.service';
 import { CancellationModalComponent } from './components/cancellation-modal/cancellation-modal.component';
+import { CalendarModalComponent } from '../../shared/components/calendar-modal/calendar-modal.component';
 
 
 /**
  * ActiveFilters — mirrors every query param that can come in from the route.
  * All 14 filter combinations are driven purely by these fields.
  */
-interface ActiveFilters {
+export interface ActiveFilters {
+  [key: string]: any;    // Allow dynamic indexing for filter chips
   tab: string;           // '' | 'Admission' | 'applications'
   statusFilter: string;  // '' | 'CANCELLED'
   source: string;        // '' | 'USER' | 'CONSULTANCY'
@@ -39,6 +41,14 @@ interface ActiveFilters {
   startDate: string;
   endDate: string;
   leadSourceId: string;
+
+  // Dedicated Date Filters
+  appDateRangeType: string; // 'today' | 'week' | 'month' | 'custom' | ''
+  admDateRangeType: string;
+  appStartDate: string;
+  appEndDate: string;
+  admStartDate: string;
+  admEndDate: string;
 }
 
 @Component({
@@ -54,7 +64,8 @@ interface ActiveFilters {
     FeePaymentModalComponent,
     BulkUploadModalComponent,
     FilterDrawerComponent,
-    CancellationModalComponent
+    CancellationModalComponent,
+    CalendarModalComponent
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -85,12 +96,22 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     fiftyPercentFeesPaid: null,
     startDate: '',
     endDate: '',
-    leadSourceId: ''
+    leadSourceId: '',
+    appDateRangeType: '',
+    admDateRangeType: '',
+    appStartDate: '',
+    appEndDate: '',
+    admStartDate: '',
+    admEndDate: ''
   };
 
 
   showFilterDrawer = false;
   activeFilterCount = 0;
+
+  // Calendar Modal State
+  showCalendarModal = false;
+  calendarTarget: 'application' | 'admission' = 'application';
 
   courses: any[] = [];
   sessions: string[] = (() => {
@@ -106,7 +127,16 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   activeLeadSources: any[] = [];
   private leadSourceService = inject(LeadSourceService);
 
-  commissionStatuses: string[] = ['UNPAID', 'PARTIAL_PAID', 'PAID'];
+  commissionStatuses: string[] = [
+    'PENDING', 
+    'CALCULATED', 
+    'PAID', 
+    'PARTIALLY_PAID', 
+    'WAIVED', 
+    'DISPUTED', 
+    'NOT_APPLICABLE', 
+    'UNMAPPED'
+  ];
 
   states: string[] = [];
   cities: string[] = [];
@@ -175,7 +205,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         fiftyPercentFeesPaid: params['fiftyPercentFeesPaid'] === 'true' ? true : (params['fiftyPercentFeesPaid'] === 'false' ? false : null),
         startDate: params['startDate'] || '',
         endDate: params['endDate'] || '',
-        leadSourceId: params['leadSourceId'] || ''
+        leadSourceId: params['leadSourceId'] || '',
+        appDateRangeType: params['appDateRangeType'] || '',
+        admDateRangeType: params['admDateRangeType'] || '',
+        appStartDate: params['appStartDate'] || '',
+        appEndDate: params['appEndDate'] || '',
+        admStartDate: params['admStartDate'] || '',
+        admEndDate: params['admEndDate'] || ''
       };
       this.searchTerm = params['search'] || '';
       this.currentPage = params['page'] ? +params['page'] : 1;
@@ -240,6 +276,11 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.startDate) count++;
     if (this.filters.endDate) count++;
     if (this.filters.leadSourceId) count++;
+
+    // New Date filters count
+    if (this.filters.appStartDate) count++;
+    if (this.filters.admStartDate) count++;
+
     this.activeFilterCount = count;
   }
 
@@ -259,6 +300,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.sub?.unsubscribe();
 
+    // Align with backend: map the primary date for each tab to 'startDate' and 'endDate'
+    const finalStartDate = this.isApplicationTab ? this.filters.appStartDate : this.filters.admStartDate;
+    const finalEndDate = this.isApplicationTab ? this.filters.appEndDate : this.filters.admEndDate;
+
     this.sub = this.admissionService.getAdmissionsData(
       this.currentPage,
       this.pageSize,
@@ -276,9 +321,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.session,
       this.filters.commissionStatus,
       this.filters.fiftyPercentFeesPaid ?? undefined,
-      this.filters.startDate,
-      this.filters.endDate,
-      this.filters.leadSourceId
+      finalStartDate || this.filters.startDate, // Legacy param for primary filter
+      finalEndDate || this.filters.endDate,     // Legacy param for primary filter
+      this.filters.leadSourceId,
+      this.filters.appStartDate,
+      this.filters.appEndDate,
+      this.filters.admStartDate,
+      this.filters.admEndDate
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -404,7 +453,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       city: this.filters.city || null,
       source: this.filters.source || null,
       isScholar: this.filters.isScholar || null,
-      leadSourceId: this.filters.leadSourceId || null
+      leadSourceId: this.filters.leadSourceId || null,
+      appDateRangeType: this.filters.appDateRangeType || null,
+      admDateRangeType: this.filters.admDateRangeType || null,
+      appStartDate: this.filters.appStartDate || null,
+      appEndDate: this.filters.appEndDate || null,
+      admStartDate: this.filters.admStartDate || null,
+      admEndDate: this.filters.admEndDate || null
     };
 
     this.router.navigate([], {
@@ -428,10 +483,99 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       fiftyPercentFeesPaid: null,
       startDate: '',
       endDate: '',
-      leadSourceId: ''
+      leadSourceId: '',
+      appDateRangeType: '',
+      admDateRangeType: '',
+      appStartDate: '',
+      appEndDate: '',
+      admStartDate: '',
+      admEndDate: ''
     };
     this.searchTerm = '';
     this.applyFilters();
+  }
+
+  // ── Date Range Logic ────────────────────────────────────────────────
+
+  onDateRangeTypeChange(type: 'application' | 'admission'): void {
+    const rangeType = type === 'application' ? this.filters.appDateRangeType : this.filters.admDateRangeType;
+
+    if (rangeType === 'custom') {
+      this.calendarTarget = type;
+      this.showCalendarModal = true;
+      return;
+    }
+
+    if (!rangeType) {
+      if (type === 'application') {
+        this.filters.appStartDate = '';
+        this.filters.appEndDate = '';
+      } else {
+        this.filters.admStartDate = '';
+        this.filters.admEndDate = '';
+      }
+      return;
+    }
+
+    const { start, end } = this.calculateDateRange(rangeType);
+    if (type === 'application') {
+      this.filters.appStartDate = start;
+      this.filters.appEndDate = end;
+    } else {
+      this.filters.admStartDate = start;
+      this.filters.admEndDate = end;
+    }
+  }
+
+  private calculateDateRange(type: string): { start: string; end: string } {
+    const now = new Date();
+    let start = new Date();
+    let end = new Date();
+
+    switch (type) {
+      case 'today':
+        break;
+      case 'week':
+        start.setDate(now.getDate() - now.getDay());
+        break;
+      case 'month':
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+    }
+
+    return {
+      start: start.toISOString().split('T')[0],
+      end: end.toISOString().split('T')[0]
+    };
+  }
+
+  getSourceStyle(name: string | undefined): any {
+    if (!name) return {};
+    
+    // Simple hash function to get a deterministic hue (0-360)
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash % 360);
+    
+    // Using HSL for premium pastel look (high lightness for bg, low for text)
+    return {
+      'background-color': `hsl(${hue}, 85%, 94%)`,
+      'color': `hsl(${hue}, 85%, 25%)`,
+      'border-color': `hsl(${hue}, 85%, 85%)`
+    };
+  }
+
+  onCalendarApply(event: { startDate: string; endDate: string }): void {
+    if (this.calendarTarget === 'application') {
+      this.filters.appStartDate = event.startDate;
+      this.filters.appEndDate = event.endDate;
+    } else {
+      this.filters.admStartDate = event.startDate;
+      this.filters.admEndDate = event.endDate;
+    }
+    this.showCalendarModal = false;
   }
 
   // ── Location Helpers ──────────────────────────────────────────────────
@@ -489,58 +633,46 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearFilter(key: string): void {
+    (this.filters as any)[key] = '';
+    this.applyFilters();
+  }
+
   // ── Computed labels & Dynamic UI ──────────────────────────────────────
 
   get isApplicationTab(): boolean {
     return this.filters.tab === 'applications';
   }
 
-  get labels() {
-    const isApp = this.isApplicationTab;
-
-    return {
-      total: isApp ? 'Total Applications' : 'Total Admissions',
-
-      totalDesc: isApp
-        ? 'All student application records'
-        : 'All confirmed admission records',
-
-      direct: isApp
-        ? 'Direct Applications'
-        : 'Direct Admissions',
-
-      directDesc: isApp
-        ? 'Applications received directly '
-        : 'Admissions From Direct Users',
-
-      indirect: isApp
-        ? 'Applications via Consultancy'
-        : 'Admissions via Consultancy',
-
-      indirectDesc: isApp
-        ? 'Applications received through consultancy partners'
-        : 'Admissions processed through consultancy partners',
-
-      scholar: isApp
-        ? 'Scholarship Applications'
-        : 'Scholarship Admissions',
-
-      scholarDesc: isApp
-        ? 'Applications submitted under scholarship category'
-        : 'Admissions completed under scholarship category',
-
-      totalDescFull: isApp
-        ? 'Total number of student applications'
-        : 'Total number of Confirmed Admissions'
-    };
+  get activeTabLabel(): string {
+    return this.isApplicationTab ? 'Recent Applications' : 'Confirmed Admissions';
   }
 
-  get activeTabLabel(): string {
-    const labels: Record<string, string> = {
-      'Admission': 'Admissions',
-      'applications': 'Applications'
+  get labels(): any {
+    if (this.isApplicationTab) {
+      return {
+        total: 'Total Applications',
+        totalDesc: 'All student application records',
+        direct: 'Direct App',
+        directDesc: 'Applications received directly',
+        indirect: 'Consultancy App',
+        indirectDesc: 'Applications via partners',
+        scholar: 'Scholar App',
+        scholarDesc: 'Scholarship applicants',
+        totalDescFull: 'Total student applications registered'
+      };
+    }
+    return {
+      total: 'Total Admissions',
+      totalDesc: 'All confirmed admission records',
+      direct: 'Direct Adm',
+      directDesc: 'Confirmed direct admissions',
+      indirect: 'Consultancy Adm',
+      indirectDesc: 'Admissions via partners',
+      scholar: 'Scholar Adm',
+      scholarDesc: 'Confirmed scholarship students',
+      totalDescFull: 'Total confirmed student admissions'
     };
-    return labels[this.filters.tab] ?? 'All Records';
   }
 
   /** Human-readable description of all active filters for the header badge */
@@ -695,7 +827,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   // ── Search ────────────────────────────────────────────────────────────
 
   onSearchChange(): void {
-    this.searchSubject.next(this.searchTerm);
+    const trimmedTerm = (this.searchTerm || '').trim();
+    this.searchSubject.next(trimmedTerm);
   }
 
   // ── Sorting ───────────────────────────────────────────────────────────

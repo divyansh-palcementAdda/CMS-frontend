@@ -41,13 +41,21 @@ export class AdmissionService {
     fiftyPercentFeesPaid?: boolean,
     startDate?: string,
     endDate?: string,
-    leadSourceId?: string
+    leadSourceId?: string,
+    appStartDate?: string,
+    appEndDate?: string,
+    admStartDate?: string,
+    admEndDate?: string
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
-    if (search) params = params.set('search', search);
+    if (search) {
+      params = params.set('search', search);
+      // Also pass as enrollmentId in case the backend expects it specifically for ID search
+      params = params.set('enrollmentId', search);
+    }
     if (tab) params = params.set('tab', tab);
     if (statFilter) params = params.set('statFilter', statFilter);
     if (courseId) params = params.set('courseId', courseId.toString());
@@ -64,6 +72,10 @@ export class AdmissionService {
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
     if (leadSourceId) params = params.set('leadSourceId', leadSourceId);
+    if (appStartDate) params = params.set('appStartDate', appStartDate);
+    if (appEndDate) params = params.set('appEndDate', appEndDate);
+    if (admStartDate) params = params.set('admStartDate', admStartDate);
+    if (admEndDate) params = params.set('admEndDate', admEndDate);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {

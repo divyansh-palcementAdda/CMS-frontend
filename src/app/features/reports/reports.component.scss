@@ -1,0 +1,831 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+// --- Premium Color Palette ---
+$primary: #4f46e5;
+$primary-light: #e0e7ff;
+$secondary: #6366f1;
+$success: #10b981;
+$danger: #f43f5e;
+$warning: #f59e0b;
+$info: #06b6d4;
+$slate-50: #f8fafc;
+$slate-100: #f1f5f9;
+$slate-200: #e2e8f0;
+$slate-300: #cbd5e1;
+$slate-400: #94a3b8;
+$slate-500: #64748b;
+$slate-600: #475569;
+$slate-700: #334155;
+$slate-800: #1e293b;
+$slate-900: #0f172a;
+
+// --- Elevations ---
+$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+$shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+.reports-premium-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f1f5f9;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: $slate-800;
+
+    .main-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+}
+
+// --- 1. Report Selection Portal ---
+.report-portal {
+    position: absolute;
+    inset: 0;
+    background: #f8fafc;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    animation: fadeIn 0.3s ease-out;
+
+    .portal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 48px;
+        padding: 0 20px;
+
+        h1 { font-size: 36px; font-weight: 800; color: $slate-900; margin: 0; letter-spacing: -0.03em; }
+        p { font-size: 16px; color: $slate-500; margin: 4px 0 0 0; font-weight: 500; }
+
+        .btn-close {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid $slate-200;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            &:hover { background: $slate-50; color: $danger; transform: rotate(90deg); }
+        }
+    }
+
+    .portal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+        padding: 20px;
+        overflow-y: auto;
+        
+        &::-webkit-scrollbar { width: 6px; }
+        &::-webkit-scrollbar-thumb { background: $slate-200; border-radius: 10px; }
+    }
+
+    .report-tile {
+        background: #ffffff;
+        padding: 32px;
+        border-radius: 24px;
+        border: 1px solid $slate-200;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            opacity: 0.8;
+        }
+
+        .tile-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .material-symbols-outlined { font-size: 28px; }
+        }
+
+        .tile-info {
+            h3 { font-size: 18px; font-weight: 800; color: $slate-900; margin: 0; }
+            p { font-size: 13px; color: $slate-500; margin: 6px 0 0 0; line-height: 1.5; font-weight: 500; }
+        }
+
+        .tile-action {
+            align-self: flex-end;
+            color: $slate-300;
+            transition: 0.2s;
+        }
+
+        &:hover {
+            transform: translateY(-8px);
+            box-shadow: $shadow-xl;
+            border-color: transparent;
+            .tile-action { color: $primary; transform: translateX(4px); }
+        }
+
+        // Color Themes
+        &.indigo { &::before { background: $primary; } .tile-icon { background: rgba($primary, 0.1); color: $primary; } }
+        &.purple { &::before { background: #8b5cf6; } .tile-icon { background: rgba(#8b5cf6, 0.1); color: #8b5cf6; } }
+        &.emerald { &::before { background: $success; } .tile-icon { background: rgba($success, 0.1); color: $success; } }
+        &.blue { &::before { background: #3b82f6; } .tile-icon { background: rgba(#3b82f6, 0.1); color: #3b82f6; } }
+        &.rose { &::before { background: $danger; } .tile-icon { background: rgba($danger, 0.1); color: $danger; } }
+        &.cyan { &::before { background: #06b6d4; } .tile-icon { background: rgba(#06b6d4, 0.1); color: #06b6d4; } }
+        &.amber { &::before { background: $warning; } .tile-icon { background: rgba($warning, 0.1); color: $warning; } }
+        &.slate { &::before { background: $slate-600; } .tile-icon { background: rgba($slate-600, 0.1); color: $slate-600; } }
+        &.violet { &::before { background: #7c3aed; } .tile-icon { background: rgba(#7c3aed, 0.1); color: #7c3aed; } }
+    }
+}
+
+// --- 2. Dashboard Container ---
+.report-dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+// --- 3. Sticky Navbar ---
+.report-navbar {
+    height: 72px;
+    background: #ffffff;
+    border-bottom: 1px solid $slate-200;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .btn-portal-trigger {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: $slate-50;
+        border: 1px solid $slate-200;
+        color: $slate-700;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+        &:hover { background: #fff; border-color: $primary; color: $primary; box-shadow: $shadow-sm; }
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex: 1;
+        min-width: 0; // Crucial for flex-shrink/overflow to work
+    }
+
+    .nav-divider { width: 1px; height: 32px; background: $slate-200; flex-shrink: 0; }
+
+    .report-tabs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        flex: 1;
+        min-width: 0;
+        
+        &::-webkit-scrollbar { height: 4px; }
+        &::-webkit-scrollbar-thumb { background: $slate-100; border-radius: 10px; }
+        
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: transparent;
+            border: none;
+            color: $slate-500;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0; // Prevent tabs from squashing
+
+            &:hover { background: $slate-50; color: $slate-900; }
+
+            &.active {
+                background: $primary;
+                color: #ffffff;
+                box-shadow: 0 4px 12px rgba($primary, 0.25);
+            }
+        }
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: 24px;
+        flex-shrink: 0; // Prevent buttons from shrinking
+    }
+}
+
+// --- 4. Export Buttons ---
+.export-group {
+    display: flex;
+    gap: 10px;
+}
+
+
+
+.btn-export {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+
+    &.whatsapp {
+        background: #25d366; color: #fff;
+        svg { width: 18px; fill: currentColor; }
+        &:hover { background: #1eb956; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(37, 211, 102, 0.3); }
+    }
+
+    &.excel {
+        background: $slate-900; color: #fff;
+        .material-symbols-outlined { font-size: 20px; }
+        &:hover { background: #000; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+    }
+
+    &:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+}
+
+// --- 5. Scrollable Dashboard Content ---
+.dashboard-scroll-area {
+    flex: 1;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+// --- 6. Dashboard Header & Filters ---
+.dashboard-header {
+    .header-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 40px;
+    }
+
+    .report-title-text {
+        font-size: 32px;
+        font-weight: 800;
+        color: $slate-900;
+        margin: 0;
+        letter-spacing: -0.03em;
+    }
+
+    .report-subtitle {
+        font-size: 15px;
+        color: $slate-500;
+        font-weight: 500;
+        margin: 8px 0 0 0;
+    }
+}
+
+.filter-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #fff;
+    padding: 12px 20px;
+    border-radius: 20px;
+    border: 1px solid $slate-200;
+    box-shadow: $shadow-md;
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        height: 48px;
+        background: $slate-50;
+        border-radius: 14px;
+        width: 280px;
+        transition: 0.2s;
+        border: 1px solid transparent;
+
+        &:focus-within { background: #fff; border-color: $primary; width: 340px; box-shadow: 0 0 0 4px rgba($primary, 0.1); }
+        .material-symbols-outlined { color: $slate-400; font-size: 20px; }
+        input { border: none; outline: none; background: transparent; width: 100%; font-size: 14px; font-weight: 600; color: $slate-800; }
+    }
+
+    .filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .control-item {
+        display: flex;
+        flex-direction: column;
+        label { font-size: 10px; font-weight: 800; color: $slate-400; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; padding-left: 2px; }
+        select {
+            height: 44px;
+            padding: 0 12px;
+            border-radius: 12px;
+            border: 1px solid $slate-200;
+            font-size: 13px;
+            font-weight: 700;
+            color: $slate-800;
+            cursor: pointer;
+            &:focus { border-color: $primary; outline: none; }
+        }
+    }
+
+    .btn-sync {
+        width: 44px;
+        height: 44px;
+        margin-top: 18px;
+        border-radius: 12px;
+        background: $slate-50;
+        border: 1px solid $slate-200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        &:hover { color: $primary; border-color: $primary; background: #fff; transform: rotate(180deg); }
+        &.syncing { .material-symbols-outlined { animation: spin 1s linear infinite; } }
+    }
+}
+
+// --- 7. Premium KPI Cards ---
+.kpi-grid-premium {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.kpi-card-v2 {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 28px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+    box-shadow: $shadow-lg;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover { transform: translateY(-6px); box-shadow: $shadow-xl; }
+
+    .card-bg-icon {
+        position: absolute;
+        right: -10px;
+        top: -10px;
+        font-size: 80px;
+        opacity: 0.04;
+        transform: rotate(-15deg);
+        .material-symbols-outlined { font-size: 120px; }
+    }
+
+    .card-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .kpi-label { font-size: 14px; font-weight: 700; color: $slate-500; text-transform: uppercase; letter-spacing: 0.02em; }
+    
+    .value-group {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .kpi-value { font-size: 32px; font-weight: 800; color: $slate-900; letter-spacing: -0.04em; }
+    
+    .trend {
+        font-size: 12px;
+        font-weight: 800;
+        padding: 2px 8px;
+        border-radius: 6px;
+        &.up { background: #f0fdf4; color: $success; }
+    }
+
+    .percentage { font-size: 13px; font-weight: 700; color: $primary; }
+
+    // Variations
+    &.total { border-bottom: 4px solid $primary; }
+    &.confirmed { border-bottom: 4px solid $success; }
+    &.revenue { border-bottom: 4px solid $info; }
+    &.pending { border-bottom: 4px solid $warning; }
+}
+
+// --- 8. Visuals Grid V2 ---
+.visuals-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.chart-card {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 32px;
+    box-shadow: $shadow-lg;
+    border: 1px solid $slate-100;
+    
+    &.main { grid-column: span 2; }
+    &.wide { grid-column: span 3; }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        h3 { font-size: 18px; font-weight: 800; color: $slate-800; margin: 0; }
+        .badge { background: $slate-50; color: $slate-500; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+    }
+
+    .chart-area {
+        min-height: 350px;
+    }
+}
+
+// --- 9. Data Surface & Enterprise Table ---
+.data-surface-v2 {
+    background: #ffffff;
+    border-radius: 32px;
+    box-shadow: $shadow-xl;
+    border: 1px solid $slate-200;
+    overflow: hidden;
+
+    .surface-top {
+        padding: 32px;
+        border-bottom: 1px solid $slate-100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fdfdfd;
+
+        h3 { font-size: 20px; font-weight: 800; color: $slate-900; margin: 0; }
+        p { font-size: 14px; color: $slate-500; margin: 6px 0 0 0; font-weight: 500; }
+    }
+}
+
+.table-container-v2 {
+    position: relative;
+    overflow-x: auto;
+}
+
+.enterprise-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fff;
+        
+        th {
+            padding: 20px 28px;
+            font-size: 12px;
+            font-weight: 800;
+            color: $slate-500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-align: left;
+            border-bottom: 2px solid $slate-100;
+            white-space: nowrap;
+
+            &.sticky-col { position: sticky; left: 0; background: #fff; z-index: 11; border-right: 1px solid $slate-100; }
+            &.highlight-col { background: $slate-50; color: $primary; }
+            &.success-col { background: #f0fdf4; color: $success; }
+        }
+    }
+
+    tbody {
+        tr {
+            transition: all 0.2s;
+            &:nth-child(even) { background-color: #fafbfc; }
+            &:hover { background-color: $slate-50; transform: scale(1.001); z-index: 2; }
+
+            td {
+                padding: 22px 28px;
+                border-bottom: 1px solid $slate-100;
+                font-size: 14px;
+                color: $slate-700;
+                font-weight: 500;
+
+                &.sticky-col { position: sticky; left: 0; background: inherit; z-index: 5; border-right: 1px solid $slate-100; }
+            }
+        }
+    }
+
+    .summary-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        background: $slate-900;
+        
+        td {
+            padding: 24px 28px;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 15px;
+            border-top: 4px solid $primary;
+            
+            &.sticky-col { background: $slate-900; border-right: 1px solid rgba(255,255,255,0.1); }
+        }
+    }
+}
+
+// --- 10. Premium UI Components ---
+.btn-icon-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    background: linear-gradient(to bottom, #ffffff, $slate-50);
+    border: 1px solid $slate-200;
+    border-radius: 14px;
+    color: $slate-700;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: $shadow-sm;
+    user-select: none;
+
+    .material-symbols-outlined {
+        font-size: 22px;
+        color: $primary;
+        transition: all 0.3s ease;
+    }
+
+    &:hover {
+        background: #ffffff;
+        border-color: $primary;
+        color: $primary;
+        box-shadow: 0 10px 20px -5px rgba($primary, 0.15);
+        transform: translateY(-2px);
+        
+        .material-symbols-outlined {
+            transform: rotate(180deg);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: $shadow-sm;
+    }
+
+    &.syncing {
+        background: $primary-light;
+        border-color: $primary;
+        color: $primary;
+        pointer-events: none;
+        box-shadow: none;
+        
+        .material-symbols-outlined {
+            animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+    }
+}
+.count-chip {
+    background: $slate-100;
+    color: $slate-800;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 13px;
+    &.dimmed { opacity: 0.25; font-weight: 500; }
+}
+
+.volume-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba($primary, 0.2);
+}
+
+.contribution-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.counselor-pill {
+    background: #ffffff;
+    border: 1px solid $slate-200;
+    padding: 6px 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: $shadow-sm;
+    
+    .name { font-size: 12px; font-weight: 700; color: $slate-700; }
+    .count { background: $primary; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+}
+
+.program-info, .student-identity, .context-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    .p-name, .name, .course { font-size: 15px; font-weight: 800; color: $slate-900; }
+    .p-category, .id, .source { font-size: 12px; font-weight: 600; color: $slate-400; }
+}
+
+.pill-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 800;
+    &.success { background: #dcfce7; color: #15803d; }
+    &.danger { background: #fee2e2; color: #b91c1c; }
+}
+
+.threshold-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 800;
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    
+    &.success { background: #ecfdf5; color: $success; .dot { background: $success; box-shadow: 0 0 10px rgba($success, 0.5); } }
+    &.warning { background: #fffbeb; color: $warning; .dot { background: $warning; } }
+}
+
+// --- 11. Loading & Empty States ---
+.table-loading-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    span { font-weight: 800; color: $slate-600; font-size: 18px; letter-spacing: -0.02em; }
+}
+
+.premium-loader {
+    width: 60px;
+    height: 60px;
+    border: 5px solid $slate-100;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.table-empty-state {
+    padding: 100px 40px;
+    text-align: center;
+    .empty-img { width: 240px; margin-bottom: 32px; opacity: 0.8; }
+    h4 { font-size: 22px; font-weight: 800; color: $slate-800; margin: 0; }
+    p { font-size: 15px; color: $slate-400; margin: 12px 0 0 0; font-weight: 500; }
+}
+
+// --- 12. Animations ---
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+// --- 13. Responsive Adaptations ---
+@media (max-width: 1600px) {
+    .kpi-grid-premium { grid-template-columns: repeat(2, 1fr); }
+    .visuals-grid-v2 { grid-template-columns: repeat(2, 1fr); .chart-card.wide { grid-column: span 2; } }
+}
+
+@media (max-width: 1200px) {
+    .report-navbar { padding: 0 20px; .report-tabs { gap: 4px; } }
+    .filter-toolbar { flex-direction: column; align-items: stretch; width: 100%; .search-box { width: 100% !important; } }
+    .dashboard-header .header-main { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 800px) {
+    .kpi-grid-premium { grid-template-columns: 1fr; }
+    .visuals-grid-v2 { grid-template-columns: 1fr; .chart-card { grid-column: span 1 !important; } }
+}
+
+// --- 14. Pagination Styling ---
+.surface-footer {
+    padding: 24px 32px;
+    border-top: 1px solid $slate-100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+
+    .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        .entry-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            span { font-size: 13px; color: $slate-500; font-weight: 600; }
+            select {
+                height: 36px;
+                padding: 0 10px;
+                border-radius: 8px;
+                border: 1px solid $slate-200;
+                font-size: 13px;
+                font-weight: 700;
+                color: $slate-800;
+                cursor: pointer;
+            }
+        }
+        .data-info {
+            font-size: 13px;
+            color: $slate-500;
+            font-weight: 600;
+            strong { color: $slate-900; }
+        }
+    }
+
+    .footer-right {
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            .page-btn {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                border: 1px solid $slate-200;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: 0.2s;
+                
+                .material-symbols-outlined { font-size: 18px; color: $slate-600; }
+
+                &:hover:not(:disabled) { border-color: $primary; color: $primary; background: rgba($primary, 0.05); }
+                &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+                &.active {
+                    background: $primary;
+                    border-color: $primary;
+                    color: #fff;
+                    font-weight: 800;
+                    font-size: 13px;
+                }
+            }
+
+            .page-numbers {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+        }
+    }
+}

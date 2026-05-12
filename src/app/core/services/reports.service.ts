@@ -1,0 +1,49 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+export interface ReportFilter {
+  startDate?: string;
+  endDate?: string;
+  session?: string;
+  filterType?: 'TODAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'THIS_YEAR' | 'ALL_TIME' | 'CUSTOM';
+  search?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReportsService {
+  private apiUrl = `${environment.apiUrl}/reports`;
+
+  constructor(private http: HttpClient) { }
+
+  getCourseLeadSourceReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/course-lead-source`, filter);
+  }
+
+  getUserAdmissionReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user-admission`, filter);
+  }
+
+  getCourseAnalyticsReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/course-analytics`, filter);
+  }
+
+  getLeadSourceConversionReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/lead-source-conversion`, filter);
+  }
+
+  getStudentDetailReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/student-detail`, filter);
+  }
+
+  exportExcel(type: string, filter: ReportFilter): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/export/excel?type=${type}`, filter, { responseType: 'blob' });
+  }
+
+  exportWhatsApp(type: string, filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/export/whatsapp?type=${type}`, filter);
+  }
+}

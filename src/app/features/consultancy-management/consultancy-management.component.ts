@@ -29,7 +29,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   loading = true;
   searchTerm = '';
   selectedFilter: string = 'TOTAL';
-  
+
   // Backend Driven Config
   requestConfig: ConsultancyPageRequest = {
     page: 0,
@@ -46,7 +46,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   states: string[] = [];
   cities: string[] = [];
   loadingCities: boolean = false;
-  
+
   // Year Filter
   availableYears: number[] = (() => {
     const currentYear = new Date().getFullYear();
@@ -57,7 +57,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     return result;
   })();
   showYearDropdown = false;
-  
+
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
@@ -75,7 +75,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   private leadSourceService = inject(LeadSourceService);
 
   constructor(
-    public consultancyService: ConsultancyService, 
+    public consultancyService: ConsultancyService,
     private locationService: LocationService,
     private router: Router,
     private route: ActivatedRoute,
@@ -95,7 +95,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   clickout(event: any) {
-    if(!this.eRef.nativeElement.querySelector('.year-filter-wrapper')?.contains(event.target)) {
+    if (!this.eRef.nativeElement.querySelector('.year-filter-wrapper')?.contains(event.target)) {
       this.showYearDropdown = false;
     }
   }
@@ -152,7 +152,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   onStateChange(): void {
     this.requestConfig.city = '';
     this.requestConfig.page = 0;
-    
+
     if (this.requestConfig.state) {
       this.loadCities(this.requestConfig.state);
     } else {
@@ -235,6 +235,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.pageResponse = response;
+          console.log('Response:', response);
           this.loading = false;
         },
         error: (err: any) => {
@@ -273,15 +274,15 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   setFilter(filter: string) {
     this.selectedFilter = filter;
     this.requestConfig.page = 0;
-    
+
     // Map status string back to enum properly. DORMANT / ACTIVE / INACTIVE are direct. 
     // Wait, requirement is that TOTAL means NO STATUS FILTER.
     if (['ACTIVE', 'INACTIVE', 'DORMANT'].includes(filter.toUpperCase())) {
-        this.requestConfig.status = filter.toUpperCase();
+      this.requestConfig.status = filter.toUpperCase();
     } else {
-        this.requestConfig.status = undefined; // For TOTAL or other frontend logic
+      this.requestConfig.status = undefined; // For TOTAL or other frontend logic
     }
-    
+
     this.loadData();
   }
 
@@ -296,7 +297,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     this.requestConfig.page = 0;
     this.loadData();
   }
-  
+
   getSortIcon(column: string): string {
     if (this.requestConfig.sortBy !== column) return '';
     return this.requestConfig.sortDirection === 'asc' ? '↑' : '↓';
@@ -306,10 +307,10 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   toggleYearDropdown() {
     this.showYearDropdown = !this.showYearDropdown;
   }
-  
+
   toggleYearSelection(year: number) {
-    if(!this.requestConfig.years) this.requestConfig.years = [];
-    
+    if (!this.requestConfig.years) this.requestConfig.years = [];
+
     const index = this.requestConfig.years.indexOf(year);
     if (index > -1) {
       this.requestConfig.years.splice(index, 1);
@@ -319,7 +320,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     this.requestConfig.page = 0;
     this.loadData();
   }
-  
+
   isYearSelected(year: number): boolean {
     return this.requestConfig.years?.includes(year) || false;
   }
@@ -331,7 +332,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   get totalPages(): number {
     return this.pageResponse?.totalPages || 1;
   }
-  
+
   get currentPage(): number {
     return this.pageResponse?.pageNumber || 1; // Backend returns 1-indexed for response payload
   }
@@ -345,7 +346,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
       for (let i = 1; i <= total; i++) pages.push(i);
     } else {
       pages.push(1);
-      
+
       if (current > 3) {
         pages.push('...');
       }
@@ -386,7 +387,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
 
   downloadExcel() {
     if (this.downloadLoading) return;
-    
+
     this.downloadLoading = true;
     this.consultancyService.downloadExcel().subscribe({
       next: (blob: Blob) => {

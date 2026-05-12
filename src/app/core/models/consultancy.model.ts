@@ -39,6 +39,7 @@ export interface ConsultancyItem {
   totalApplications: number;
   totalCancelledAdmissions: number;
   totalCancelledApplications: number;
+  firmName: string;
 }
 
 export interface ConsultancyStats {

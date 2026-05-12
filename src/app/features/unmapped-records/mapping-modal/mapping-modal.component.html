@@ -238,7 +238,7 @@
               </div>
               <div class="mm-list__info">
                 <span class="mm-list__name">{{ c.name }}</span>
-                <span class="mm-list__meta">{{ c.email || 'Partner Office' }}</span>
+                <span class="mm-list__meta">{{ c.firmName }}</span>
               </div>
               @if (mappingForm.get('consultancyId')?.value === c.id) {
               <span class="mm-check material-symbols-outlined" [style.color]="config.color">verified</span>
@@ -460,7 +460,7 @@
             </div>
             <div class="mm-list__info">
               <span class="mm-list__name">{{ c.name }}</span>
-              <span class="mm-list__meta">{{ c.email || c.city || 'Partner Agency' }}</span>
+              <span class="mm-list__meta">{{ c.firmName || c.city || 'Partner Agency' }}</span>
             </div>
           </div>
           }
@@ -527,7 +527,7 @@
             </div>
             <div class="mm-list__info">
               <span class="mm-list__name">{{ c.name }}</span>
-              <span class="mm-list__meta">{{ c.email || c.city || 'Partner Agency' }}</span>
+              <span class="mm-list__meta">{{ c.firmName || c.city || 'Partner Agency' }}</span>
             </div>
           </div>
           }
