@@ -115,6 +115,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     outstandingDues: 0, 
     conversionRate: 0 
   };
+  dailySummaryData: any = null;
   totalElements = 0;
   serverPages = 0;
 
@@ -238,7 +239,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
     { id: 'DAILY_FEES', label: 'Daily Collection', icon: 'account_balance_wallet', desc: 'Real-time financial tracking', color: 'cyan' },
     { id: 'LEAD_SOURCE_CONVERSION', label: 'Lead Conversion', icon: 'query_stats', desc: 'Conversion rate by source', color: 'amber' },
     { id: 'COURSE_SUMMARY', label: 'Program Summary', icon: 'summarize', desc: 'Full academic year overview', color: 'slate' },
-    { id: 'STUDENT_DETAIL', label: 'Student Thresholds', icon: 'group', desc: '50% fee payment status', color: 'violet' }
+    { id: 'STUDENT_DETAIL', label: 'Student Thresholds', icon: 'group', desc: '50% fee payment status', color: 'violet' },
+    { id: 'DAILY_SESSION_SUMMARY', label: 'Session Operational Report', icon: 'analytics', desc: 'Daily MIS & Session Summary', color: 'orange' }
   ];
 
   setReport(type: string) {
@@ -280,6 +282,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
       case 'STUDENT_DETAIL':
         obs = this.reportsService.getStudentDetailReport(apiFilter);
         break;
+      case 'DAILY_SESSION_SUMMARY':
+        obs = this.reportsService.getDailySessionSummaryReport(apiFilter);
+        break;
     }
 
     if (obs) {
@@ -299,11 +304,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
             return;
           }
 
-          this.reportData = (apiData.content || []).filter((d: any) => {
-            // Exclude courses with 0 forms, but preserve student detail records
-            if (this.activeReport === 'STUDENT_DETAIL') return true;
-            return (d.totalForms || 0) > 0;
-          });
+          if (this.activeReport === 'DAILY_SESSION_SUMMARY') {
+            this.reportData = apiData.content || [];
+            this.dailySummaryData = this.reportData.length > 0 ? this.reportData[0] : null;
+          } else {
+            this.dailySummaryData = null;
+            this.reportData = (apiData.content || []).filter((d: any) => {
+              // Exclude courses with 0 forms, but preserve student detail records
+              if (this.activeReport === 'STUDENT_DETAIL') return true;
+              return (d.totalForms || 0) > 0;
+            });
+          }
           
           this.totalElements = apiData.totalElements || 0;
           this.serverPages = apiData.totalPages || 0;
@@ -336,6 +347,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
   getBaseReportType(type: string): string {
     if (type.startsWith('COURSE_ANALYTICS') || type === 'COURSE_SUMMARY' || type === 'COURSE_REVENUE' || type === 'DAILY_FEES') {
       return 'COURSE_ANALYTICS';
+    }
+    if (type === 'DAILY_SESSION_SUMMARY') {
+      return 'DAILY_SESSION_SUMMARY';
     }
     return type;
   }

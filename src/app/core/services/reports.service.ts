@@ -43,6 +43,10 @@ export class ReportsService {
     return this.http.post(`${this.apiUrl}/student-detail`, filter);
   }
 
+  getDailySessionSummaryReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/daily-session-summary`, filter);
+  }
+
   exportExcel(type: string, filter: ReportFilter): Observable<Blob> {
     return this.http.post(`${this.apiUrl}/export/excel?type=${type}`, filter, { responseType: 'blob' });
   }

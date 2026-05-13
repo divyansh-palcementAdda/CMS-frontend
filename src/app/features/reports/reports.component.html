@@ -95,7 +95,7 @@
                     </header>
 
                     <!-- Analytics Section -->
-                    <section class="analytics-layer">
+                    <section class="analytics-layer" *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY'">
                         <!-- Modern KPI Grid -->
                         <div class="kpi-grid-premium">
                             <div class="kpi-card-v2 total" [class.is-loading]="loading">
@@ -213,8 +213,127 @@
                         </div>
                     </section>
 
+                    <!-- Session Operational Summary (Special View) -->
+                    <section class="daily-summary-operational-view" *ngIf="activeReport === 'DAILY_SESSION_SUMMARY' && dailySummaryData">
+                        <div class="summary-card-v2 premium-card">
+                            <div class="card-header">
+                                <div class="title-area">
+                                    <span class="report-badge">OPERATIONAL MIS</span>
+                                    <h2>{{dailySummaryData.reportTitle}}</h2>
+                                    <p class="date-label">Status as of: <strong>{{dailySummaryData.dateLabel}}</strong></p>
+                                </div>
+                                <div class="action-badges">
+                                    <div class="status-badge live">
+                                        <span class="pulse-dot"></span>
+                                        LIVE SYNC
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="operational-grid">
+                                <!-- Daily Fees Collection -->
+                                <div class="op-section collection-section">
+                                    <div class="section-header">
+                                        <span class="material-symbols-outlined">payments</span>
+                                        <h3>DAILY FEE COLLECTION</h3>
+                                    </div>
+                                    <div class="total-fees-display">
+                                        <span class="count">{{dailySummaryData.totalFeesToday | number:'2.0-0'}}</span>
+                                        <span class="label">Total Fees Received Today</span>
+                                    </div>
+                                    <div class="course-distribution-list">
+                                        <div class="dist-item" *ngFor="let cw of dailySummaryData.courseWiseFees">
+                                            <span class="course-name">{{cw.courseName}}</span>
+                                            <span class="dots"></span>
+                                            <span class="course-count">{{cw.count | number:'2.0-0'}}</span>
+                                        </div>
+                                        <div class="dist-item empty" *ngIf="dailySummaryData.courseWiseFees.length === 0">
+                                            <span class="course-name">No fee collections recorded today</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cumulative Session Health -->
+                                <div class="op-section health-section">
+                                    <div class="section-header">
+                                        <span class="material-symbols-outlined">analytics</span>
+                                        <h3>SESSION CUMULATIVE STATS</h3>
+                                    </div>
+                                    
+                                    <div class="metrics-stack">
+                                        <div class="metric-row">
+                                            <div class="metric-info">
+                                                <span class="material-symbols-outlined icon-main">description</span>
+                                                <div class="labels">
+                                                    <span class="main">Total Forms</span>
+                                                    <span class="sub">Total applications received till date</span>
+                                                </div>
+                                            </div>
+                                            <span class="metric-value">{{dailySummaryData.totalFormsTillDate}}</span>
+                                        </div>
+
+                                        <div class="metric-row highlight-success">
+                                            <div class="metric-info">
+                                                <span class="material-symbols-outlined icon-main">check_circle</span>
+                                                <div class="labels">
+                                                    <span class="main">Total Admissions</span>
+                                                    <span class="sub">Students moved to final roll</span>
+                                                </div>
+                                            </div>
+                                            <span class="metric-value">{{dailySummaryData.totalAdmissions}}</span>
+                                        </div>
+
+                                        <div class="metrics-sub-group">
+                                            <div class="sub-metric">
+                                                <span class="label">Scholarship</span>
+                                                <span class="val">{{dailySummaryData.scholarshipAdmissions}}</span>
+                                            </div>
+                                            <div class="sub-metric">
+                                                <span class="label">Actual Adm</span>
+                                                <span class="val">{{dailySummaryData.actualAdmissionsWithoutScholarship}}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="metric-row highlight-danger">
+                                            <div class="metric-info">
+                                                <span class="material-symbols-outlined icon-main">cancel</span>
+                                                <div class="labels">
+                                                    <span class="main">Cancelled Forms</span>
+                                                    <span class="sub">Total forms withdrawn/cancelled</span>
+                                                </div>
+                                            </div>
+                                            <span class="metric-value">{{dailySummaryData.totalFormsCancelledTillDate}}</span>
+                                        </div>
+
+                                        <div class="metric-row highlight-warning">
+                                            <div class="metric-info">
+                                                <span class="material-symbols-outlined icon-main">pending_actions</span>
+                                                <div class="labels">
+                                                    <span class="main">Remaining Forms</span>
+                                                    <span class="sub">Forms pending processing/closure</span>
+                                                </div>
+                                            </div>
+                                            <span class="metric-value">{{dailySummaryData.totalFormsRemainingTillDate}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer-info">
+                                <div class="footer-item">
+                                    <span class="material-symbols-outlined">event_busy</span>
+                                    <span>Admissions Cancelled Today: <strong>{{dailySummaryData.admissionCancelToday | number:'2.0-0'}}</strong></span>
+                                </div>
+                                <div class="footer-item note">
+                                    <span class="material-symbols-outlined">info</span>
+                                    <span>* This report follows the operational standard for daily session reporting.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- Data Management Layer -->
-                    <section class="data-surface-v2">
+                    <section class="data-surface-v2" *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY'">
                         <div class="surface-top">
                             <div class="info">
                                 <div class="header-with-actions">
