@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportsService, ReportFilter } from '../../core/services/reports.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
-import { finalize } from 'rxjs';
+import { finalize, Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { NgApexchartsModule, ChartComponent } from 'ng-apexcharts';
 
 import {
@@ -39,6 +39,40 @@ export type ChartOptions = {
   theme: ApexTheme;
   fill: ApexFill;
   labels: string[];
+  grid: any;
+  markers: any;
+};
+
+// --- Premium Chart Design Tokens ---
+const CHART_COLORS = [
+    '#435fff', // Primary Brand (Indigo)
+    '#00d2ff', // Electric Blue
+    '#34d399', // Emerald Green
+    '#f472b6', // Soft Pink
+    '#fbbf24', // Amber
+    '#a78bfa', // Lavender
+    '#2dd4bf', // Teal
+    '#fb7185', // Rose
+    '#94a3b8'  // Slate (Neutral)
+];
+
+const COMMON_CHART_OPTIONS = {
+    fontFamily: 'Plus Jakarta Sans, sans-serif',
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    pan: { enabled: false },
+    selection: { enabled: false },
+    animations: { 
+        enabled: true, 
+        easing: 'easeinout', 
+        speed: 800,
+        animateGradually: { enabled: true, delay: 150 },
+        dynamicAnimation: { enabled: true, speed: 350 }
+    },
+    states: {
+        active: { allowMultipleDataPointsSelection: false },
+        hover: { filter: { type: 'lighten', value: 0.15 } }
+    }
 };
 
 @Component({
@@ -49,8 +83,10 @@ export type ChartOptions = {
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss'
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit, OnDestroy {
   private reportsService = inject(ReportsService);
+  private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   loading = false;
   showReportSelector = false;
@@ -67,151 +103,124 @@ export class ReportsComponent implements OnInit {
   filters: ReportFilter = {
     filterType: 'TODAY',
     session: new Date().getFullYear().toString(),
-    search: ''
+    search: '',
+    page: 0,
+    size: 10
   };
 
-  sessions = ['2023', '2024', '2025', '2026', '2027'];
+  serverSummary: any = { 
+    totalApplications: 0, 
+    confirmedAdmissions: 0, 
+    realizedRevenue: 0, 
+    outstandingDues: 0, 
+    conversionRate: 0 
+  };
+  totalElements = 0;
+  serverPages = 0;
+
+  sessions: string[] = [];
   
   // Chart configs
   public barChartOptions: Partial<ChartOptions> | any;
   public pieChartOptions: Partial<ChartOptions> | any;
   public lineChartOptions: Partial<ChartOptions> | any;
 
-  get filteredReportData() {
-    if (!this.reportData) return [];
-    
-    let data = this.reportData;
-
-    // Specific filter for Lead Source Matrix: Exclude zero counts
-    if (this.activeReport === 'COURSE_LEAD_SOURCE') {
-      data = data.filter(item => {
-        // Check if any lead source has forms OR if totalForms is > 0
-        const leadCount = item.leadSources?.reduce((acc: number, curr: any) => acc + (curr.formsReceived || 0), 0) || 0;
-        const totalForms = item.totalForms || 0;
-        return leadCount > 0 || totalForms > 0;
-      });
-    }
-
-    if (!this.filters.search) return data;
-    
-    const term = this.filters.search.toLowerCase();
-    return data.filter(item => 
-      item.courseName?.toLowerCase().includes(term) ||
-      item.studentName?.toLowerCase().includes(term) ||
-      item.userName?.toLowerCase().includes(term) ||
-      item.enrollmentNumber?.toLowerCase().includes(term)
-    );
-  }
-
   get paginatedData() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    return this.filteredReportData.slice(start, start + this.pageSize);
+    return this.reportData;
   }
 
   get totalPages() {
-    return Math.ceil(this.filteredReportData.length / this.pageSize);
+    return this.serverPages;
+  }
+
+  ngOnInit() {
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.filters.page = 0;
+      this.loadReport();
+    });
+
+    this.generateSessions();
+    this.loadReport();
+  }
+
+  private generateSessions() {
+    const currentYear = new Date().getFullYear();
+    const years = ['OVERALL'];
+    for (let i = 5; i >= 0; i--) {
+      years.push((currentYear - i).toString());
+    }
+    this.sessions = years;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   nextPage() { 
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
+    if (this.filters.page! < this.serverPages - 1) {
+      this.filters.page!++;
+      this.loadReport();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   prevPage() { 
-    if (this.currentPage > 1) {
-      this.currentPage--;
+    if (this.filters.page! > 0) {
+      this.filters.page!--;
+      this.loadReport();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  setPage(p: number) { this.currentPage = p; }
+  setPage(p: number) { 
+    this.filters.page = p - 1;
+    this.loadReport();
+  }
 
-  onPageSizeChange() { 
-    this.pageSize = Number(this.pageSize);
-    this.currentPage = 1; 
+  onSearch() {
+    this.searchSubject.next(this.filters.search || '');
+  }
+
+  onPageSizeChange() {
+    this.filters.size = this.pageSize;
+    this.filters.page = 0;
+    this.loadReport();
   }
 
   get summaryStats() {
-    const data = this.filteredReportData;
-    if (!data || !data.length) return { total: 0, secondary: 0, tertiary: 0, quaternary: 0 };
-
-    const totals = this.totalsRow;
-    if (!totals) return { total: 0, secondary: 0, tertiary: 0, quaternary: 0 };
-
-    if (this.activeReport.includes('ANALYTICS') || this.activeReport === 'COURSE_SUMMARY' || this.activeReport === 'COURSE_REVENUE' || this.activeReport === 'DAILY_FEES') {
-      return {
-        total: totals.totalForms,
-        secondary: totals.totalConfirmed,
-        tertiary: totals.totalFeesCollected,
-        quaternary: totals.totalRemaining
-      };
-    }
-    
-    if (this.activeReport === 'STUDENT_DETAIL') {
-      return {
-        total: data.length,
-        secondary: data.filter(s => s.fiftyPercentFeesPaid).length,
-        tertiary: totals.totalFeesPaid,
-        quaternary: totals.totalRemainingFees
-      }
-    }
-
-    return {
-        total: totals.totalForms,
-        secondary: totals.totalConfirmed,
-        tertiary: totals.totalFeesCollected,
-        quaternary: totals.totalRemaining
-    };
+    return this.serverSummary;
   }
 
   get totalsRow() {
-    const data = this.filteredReportData;
-    if (!data || !data.length) return null;
-
-    const row: any = {
-        totalForms: 0,
-        totalConfirmed: 0,
-        totalCancelled: 0,
-        totalPaid50: 0,
-        totalFeesCollected: 0,
-        totalRemaining: 0,
-        totalFeesPaid: 0,
-        totalRemainingFees: 0,
-        totalFees: 0,
-        leadSourceTotals: [],
-        totalStudents: data.length
-    };
-
-    data.forEach(item => {
-        row.totalForms += (item.totalForms || 0);
-        row.totalConfirmed += (item.totalConfirmedAdmissions || 0);
-        row.totalCancelled += (item.totalCancelledAdmissions || 0);
-        row.totalPaid50 += (item.paid50PercentFees || 0);
-        row.totalFeesCollected += (item.totalFeesCollected || 0);
-        row.totalRemaining += (item.remainingAmount || 0);
-        row.totalFeesPaid += (item.totalFeesPaid || 0);
-        row.totalRemainingFees += (item.remainingFees || 0);
-        row.totalFees += (item.totalFees || 0);
-    });
-
+    const data = this.reportData || [];
+    const lsMap: {[key: string]: number} = {};
+    
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
-        const lsMap: {[key: string]: number} = {};
-        data.forEach(d => {
+        data.forEach((d: any) => {
             if (d.leadSources) {
                 d.leadSources.forEach((ls: any) => {
                     lsMap[ls.leadSourceName] = (lsMap[ls.leadSourceName] || 0) + ls.formsReceived;
                 });
             }
         });
-        row.leadSourceTotals = this.leadSourceHeaders.map(h => lsMap[h] || 0);
     }
 
-    // Revenue totals for Analytics
-    row.totalRevenue = data.reduce((acc, curr) => acc + (curr.totalRevenue || 0), 0);
-
-    return row;
+    return {
+        totalForms: this.serverSummary.totalApplications,
+        totalConfirmed: this.serverSummary.confirmedAdmissions,
+        totalFeesCollected: this.serverSummary.realizedRevenue,
+        totalRemaining: this.serverSummary.outstandingDues,
+        totalRevenue: this.serverSummary.realizedRevenue,
+        totalFeesPaid: this.serverSummary.realizedRevenue,
+        totalRemainingFees: this.serverSummary.outstandingDues,
+        totalStudents: this.totalElements,
+        leadSourceTotals: this.leadSourceHeaders.map(h => lsMap[h] || 0)
+    };
   }
 
   getLeadVal(d: any, h: string): number {
@@ -232,13 +241,10 @@ export class ReportsComponent implements OnInit {
     { id: 'STUDENT_DETAIL', label: 'Student Thresholds', icon: 'group', desc: '50% fee payment status', color: 'violet' }
   ];
 
-  ngOnInit() {
-    this.loadReport();
-  }
-
   setReport(type: string) {
     this.activeReport = type;
     this.reportData = [];
+    this.filters.page = 0;
     this.barChartOptions = null;
     this.pieChartOptions = null;
     this.lineChartOptions = null;
@@ -248,43 +254,77 @@ export class ReportsComponent implements OnInit {
   loadReport() {
     this.loading = true;
     
+    const apiFilter: ReportFilter = { ...this.filters };
+    console.log('Reports: Outgoing Payload ->', apiFilter);
+    
+    if (apiFilter.session === 'OVERALL') {
+      apiFilter.session = undefined;
+    }
+
     let obs;
     const baseType = this.getBaseReportType(this.activeReport);
 
     switch (baseType) {
       case 'COURSE_ANALYTICS':
-        obs = this.reportsService.getCourseAnalyticsReport(this.filters);
+        obs = this.reportsService.getCourseAnalyticsReport(apiFilter);
         break;
       case 'COURSE_LEAD_SOURCE':
-        obs = this.reportsService.getCourseLeadSourceReport(this.filters);
+        obs = this.reportsService.getCourseLeadSourceReport(apiFilter);
         break;
       case 'LEAD_SOURCE_CONVERSION':
-        obs = this.reportsService.getLeadSourceConversionReport(this.filters);
+        obs = this.reportsService.getLeadSourceConversionReport(apiFilter);
         break;
       case 'USER_ADMISSION':
-        obs = this.reportsService.getUserAdmissionReport(this.filters);
+        obs = this.reportsService.getUserAdmissionReport(apiFilter);
         break;
       case 'STUDENT_DETAIL':
-        obs = this.reportsService.getStudentDetailReport(this.filters);
+        obs = this.reportsService.getStudentDetailReport(apiFilter);
         break;
     }
 
     if (obs) {
-      obs.pipe(finalize(() => this.loading = false)).subscribe({
+      obs.pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.loading = false)
+      ).subscribe({
         next: (res: any) => {
-          this.reportData = res.data || res || [];
+          console.log('Reports: Raw Response ->', res);
+          const apiData = res.data; // CRITICAL FIX: Backend wraps response in 'data' object
+
+          if (!apiData) {
+            console.warn('Reports: API Data missing in response!');
+            this.reportData = [];
+            this.totalElements = 0;
+            this.serverPages = 0;
+            return;
+          }
+
+          this.reportData = (apiData.content || []).filter((d: any) => {
+            // Exclude courses with 0 forms, but preserve student detail records
+            if (this.activeReport === 'STUDENT_DETAIL') return true;
+            return (d.totalForms || 0) > 0;
+          });
           
-          if (this.activeReport === 'USER_ADMISSION') {
-            this.reportData = this.reportData.filter(d => (d.totalForms || 0) > 0);
+          this.totalElements = apiData.totalElements || 0;
+          this.serverPages = apiData.totalPages || 0;
+          
+          console.log('Mapped API Data', apiData);
+          console.log('Table Data', this.reportData);
+          console.log('Total Elements', this.totalElements);
+
+          if (apiData.summaryStats) {
+            this.serverSummary = apiData.summaryStats;
+            console.log('Summary Stats', this.serverSummary);
           }
 
           if (baseType === 'COURSE_LEAD_SOURCE' && this.reportData.length > 0 && this.reportData[0].leadSources) {
             this.leadSourceHeaders = this.reportData[0].leadSources.map((ls: any) => ls.leadSourceName);
           }
-          this.initCharts();
+          
+          setTimeout(() => this.initCharts(), 10);
         },
         error: (err) => {
-          console.error('Error loading report', err);
+          console.error('Reports: API Error ->', err);
           this.loading = false;
         }
       });
@@ -302,132 +342,196 @@ export class ReportsComponent implements OnInit {
 
   private initCharts() {
     if (!this.reportData || this.reportData.length === 0) {
-      this.barChartOptions = null;
-      this.pieChartOptions = null;
-      this.lineChartOptions = null;
+      this.clearCharts();
       return;
     }
 
-    const hasForms = this.reportData.some(d => (d.totalForms || 0) > 0);
-    const hasConfirmed = this.reportData.some(d => (d.totalConfirmedAdmissions || 0) > 0);
-
-    if (!hasForms && !hasConfirmed && this.activeReport !== 'STUDENT_DETAIL') {
-        this.barChartOptions = null;
-        this.pieChartOptions = null;
-        this.lineChartOptions = null;
-        return;
-    }
-
-    const data = this.filteredReportData;
-    const labels = data.map(d => {
+    const data = this.reportData;
+    const labels = data.map((d: any) => {
         const name = d.courseName || d.studentName || 'N/A';
-        return name.length > 25 ? name.substring(0, 22) + '...' : name;
+        return name.length > 25 ? name.substring(0, 23) + '...' : name;
     });
-    const colors = ['#4f46e5', '#10b981', '#f43f5e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6'];
-    const dynamicHeight = Math.max(350, data.length * 35);
 
+    // 1. LEAD SOURCE MATRIX - Modern Grouped/Stacked Hybrid
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
-      const series = this.leadSourceHeaders.map(ls => ({
-        name: ls,
-        data: data.map(d => {
-          const stat = d.leadSources?.find((s: any) => s.leadSourceName === ls);
-          return stat ? stat.formsReceived : 0;
-        })
-      }));
+        const chartData = data.slice(0, 15); // Top 15 courses
+        const series = this.leadSourceHeaders.map(ls => ({
+            name: ls,
+            data: chartData.map((d: any) => {
+                const stat = d.leadSources?.find((s: any) => s.leadSourceName === ls);
+                return stat ? stat.formsReceived : 0;
+            })
+        }));
 
-      this.barChartOptions = {
-        series: series,
-        chart: { type: 'bar', height: dynamicHeight, stacked: true, toolbar: { show: false }, animations: { enabled: false } },
-        plotOptions: { bar: { horizontal: true, barHeight: '80%', borderRadius: 4 } },
-        xaxis: { categories: labels, labels: { style: { fontSize: '10px', fontWeight: 600 } }, axisBorder: { show: false } },
-        yaxis: { labels: { show: true, style: { fontSize: '11px', fontWeight: 600, colors: ['#475569'] }, maxWidth: 200 } },
-        grid: { padding: { left: 20, right: 20 }, borderColor: '#f1f5f9' },
-        colors: colors,
-        legend: { position: 'top', horizontalAlign: 'right', fontSize: '12px', fontWeight: 600 },
-        dataLabels: { enabled: false }
-      };
-    }
-
-    if (this.activeReport === 'USER_ADMISSION') {
-      const allUsers = new Set<string>();
-      data.forEach(d => d.userContributions?.forEach((u: any) => allUsers.add(u.userName)));
-      const userList = Array.from(allUsers);
-
-      const series = userList.map(user => ({
-          name: user,
-          data: data.map(d => {
-            const contrib = d.userContributions?.find((u: any) => u.userName === user);
-            return contrib ? contrib.formCount : 0;
-          })
-      }));
-
-      this.barChartOptions = {
-        series: series,
-        chart: { type: 'bar', height: dynamicHeight, stacked: true, toolbar: { show: false }, animations: { enabled: false } },
-        plotOptions: { bar: { horizontal: true, barHeight: '80%', borderRadius: 4 } },
-        xaxis: { categories: labels, labels: { style: { fontSize: '10px', fontWeight: 600 } }, axisBorder: { show: false } },
-        yaxis: { labels: { show: true, style: { fontSize: '11px', fontWeight: 600, colors: ['#475569'] }, maxWidth: 200 } },
-        grid: { padding: { left: 20, right: 20 }, borderColor: '#f1f5f9' },
-        colors: colors,
-        legend: { position: 'top', horizontalAlign: 'right', fontSize: '12px', fontWeight: 600 }
-      };
-    }
-
-    if (this.getBaseReportType(this.activeReport) === 'COURSE_ANALYTICS') {
-        this.pieChartOptions = {
-            series: data.slice(0, 10).map(d => d.totalForms || 0),
-            chart: { type: 'donut', height: 400 },
-            labels: labels.slice(0, 10),
-            colors: colors,
-            legend: { position: 'bottom', fontSize: '12px' },
-            dataLabels: { enabled: true, formatter: (val: any) => val.toFixed(1) + "%" },
-            plotOptions: { pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: 'TOTAL FORMS', fontSize: '12px', fontWeight: 800 } } } } }
+        this.barChartOptions = {
+            series: series,
+            chart: { 
+                ...COMMON_CHART_OPTIONS, 
+                type: 'bar', 
+                height: Math.max(450, chartData.length * 40), 
+                stacked: true,
+                stackType: 'normal'
+            },
+            plotOptions: {
+                bar: { 
+                    horizontal: true, 
+                    barHeight: '70%', 
+                    borderRadius: 4,
+                    borderRadiusApplication: 'end',
+                    dataLabels: { position: 'center' }
+                }
+            },
+            colors: CHART_COLORS,
+            xaxis: { 
+                categories: chartData.map(d => d.courseName),
+                labels: { style: { colors: '#94a3b8', fontWeight: 600 } }
+            },
+            yaxis: { labels: { style: { colors: '#64748b', fontWeight: 700, fontSize: '11px' }, maxWidth: 250 } },
+            legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { radius: 12, width: 10, height: 10 } },
+            dataLabels: { enabled: false },
+            tooltip: { theme: 'dark', shared: true, intersect: false, y: { formatter: (val: any) => val + ' Forms' } },
+            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
         };
+    }
 
+    // 2. USER PERFORMANCE - Professional Leaderboard
+    if (this.activeReport === 'USER_ADMISSION') {
+        const chartData = [...data].sort((a, b) => (b.totalForms || 0) - (a.totalForms || 0)).slice(0, 12);
+        
+        this.barChartOptions = {
+            series: [{ name: 'Total Forms', data: chartData.map(d => d.totalForms || 0) }],
+            chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: 450 },
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%',
+                    borderRadius: 12,
+                    distributed: true,
+                    dataLabels: { position: 'top' }
+                }
+            },
+            colors: CHART_COLORS,
+            xaxis: { 
+                categories: chartData.map(d => d.courseName), // Backend sends userName in courseName field for this report
+                labels: { rotate: -45, style: { colors: '#94a3b8', fontWeight: 700 } }
+            },
+            yaxis: { labels: { style: { colors: '#64748b', fontWeight: 600 } } },
+            legend: { show: false },
+            dataLabels: { enabled: false },
+            fill: {
+                type: 'gradient',
+                gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.25, gradientToColors: undefined, inverseColors: true, opacityFrom: 0.85, opacityTo: 1, stops: [50, 0, 100] }
+            },
+            tooltip: { theme: 'light', y: { formatter: (val: any) => val + ' Forms Produced' } },
+            grid: { show: false }
+        };
+    }
+
+    // 3. REVENUE ANALYSIS - Stacked Comparison
+    if (this.activeReport === 'COURSE_REVENUE') {
+        const chartData = data.slice(0, 12);
+        this.barChartOptions = {
+            series: [
+                { name: 'Collected', data: chartData.map(d => d.totalFeesCollected || 0) },
+                { name: 'Pending', data: chartData.map(d => d.remainingAmount || 0) }
+            ],
+            chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: 450, stacked: true },
+            plotOptions: { bar: { columnWidth: '45%', borderRadius: 8 } },
+            colors: ['#34d399', '#f472b6'], // Success vs Pending
+            xaxis: { categories: chartData.map(d => d.courseName), labels: { rotate: -45, style: { fontWeight: 600 } } },
+            yaxis: { labels: { formatter: (val: any) => '₹' + (val / 1000).toFixed(0) + 'k' } },
+            legend: { position: 'top', horizontalAlign: 'right' },
+            dataLabels: { enabled: false },
+            tooltip: { theme: 'light', y: { formatter: (val: any) => '₹' + val.toLocaleString() } }
+        };
+    }
+
+    // 4. APPLICATION TRENDS - Smooth Area Chart
+    if (this.activeReport === 'COURSE_ANALYTICS_APP') {
+        const chartData = data.slice(0, 15);
         this.lineChartOptions = {
             series: [
-                { name: 'Confirmed Admissions', data: data.map(d => d.totalConfirmedAdmissions || 0) },
-                { name: 'Form Submissions', data: data.map(d => d.totalForms || 0) }
+                { name: 'Total Forms', data: chartData.map(d => d.totalForms || 0) },
+                { name: 'Active Applications', data: chartData.map(d => d.totalRemainingApplications || 0) }
             ],
-            chart: { type: 'area', height: 400, toolbar: { show: false } },
-            xaxis: { categories: labels, labels: { rotate: -45, style: { fontSize: '10px' } } },
-            colors: ['#10b981', '#4f46e5'],
+            chart: { ...COMMON_CHART_OPTIONS, type: 'area', height: 400 },
             stroke: { curve: 'smooth', width: 3 },
-            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } },
-            dataLabels: { enabled: false }
+            colors: ['#435fff', '#fbbf24'],
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.45, opacityTo: 0.05 } },
+            xaxis: { categories: chartData.map(d => d.courseName), labels: { rotate: -45 } },
+            dataLabels: { enabled: false },
+            markers: { size: 4, strokeWidth: 2, hover: { size: 6 } },
+            tooltip: { theme: 'dark', x: { show: true } },
+            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
         };
     }
 
-    if (this.activeReport === 'LEAD_SOURCE_CONVERSION') {
-        const lsTotals: { [key: string]: number } = {};
-        data.forEach(d => {
-            d.leadSourceForms?.forEach((ls: any) => {
-                lsTotals[ls.leadSourceName] = (lsTotals[ls.leadSourceName] || 0) + ls.formCount;
+    // 5. GLOBAL DONUTS (Summary Views)
+    if (this.getBaseReportType(this.activeReport) === 'COURSE_ANALYTICS' || 
+        this.activeReport === 'LEAD_SOURCE_CONVERSION' || 
+        this.activeReport === 'USER_ADMISSION') {
+        let donutSeries: number[] = [];
+        let donutLabels: string[] = [];
+        let title = '';
+
+        if (this.activeReport === 'LEAD_SOURCE_CONVERSION') {
+            const lsTotals: { [key: string]: number } = {};
+            data.forEach((d: any) => {
+                d.leadSourceForms?.forEach((ls: any) => {
+                    lsTotals[ls.leadSourceName] = (lsTotals[ls.leadSourceName] || 0) + ls.formCount;
+                });
             });
-        });
+            donutSeries = Object.values(lsTotals);
+            donutLabels = Object.keys(lsTotals);
+            title = 'SOURCE DISTRIBUTION';
+        } else {
+            const topData = data.slice(0, 8);
+            donutSeries = topData.map(d => d.totalForms || 0);
+            donutLabels = topData.map(d => d.courseName);
+            title = 'PROGRAM VOLUME';
+        }
 
         this.pieChartOptions = {
-            series: Object.values(lsTotals),
-            labels: Object.keys(lsTotals),
-            chart: { type: 'donut', height: 400 },
-            colors: colors,
-            legend: { position: 'bottom' },
-            plotOptions: { pie: { donut: { labels: { show: true, total: { show: true, label: 'LEAD SOURCES' } } } } }
+            series: donutSeries,
+            labels: donutLabels,
+            chart: { ...COMMON_CHART_OPTIONS, type: 'donut', height: 420 },
+            colors: CHART_COLORS,
+            stroke: { width: 4, colors: ['#fff'] },
+            legend: { position: 'bottom', fontWeight: 600, markers: { radius: 12 } },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '85%',
+                        labels: {
+                            show: true,
+                            total: { show: true, label: title, fontSize: '12px', fontWeight: 800, color: '#94a3b8' },
+                            value: { fontSize: '24px', fontWeight: 800, color: '#1e293b' }
+                        }
+                    }
+                }
+            },
+            dataLabels: { enabled: false },
+            tooltip: { theme: 'dark' }
         };
     }
 
-    if (this.activeReport === 'STUDENT_DETAIL') {
-        const paid = data.filter(s => s.fiftyPercentFeesPaid).length;
-        const unpaid = data.length - paid;
-        this.pieChartOptions = {
-            series: [paid, unpaid],
-            labels: ['Threshold Met (50%+)', 'Payment Pending'],
-            chart: { type: 'donut', height: 400 },
-            colors: ['#10b981', '#f59e0b'],
-            legend: { position: 'bottom' },
-            plotOptions: { pie: { donut: { labels: { show: true, total: { show: true, label: 'PAYMENT STATUS' } } } } }
+    // Default Fallback for other reports
+    if (!this.barChartOptions && !this.pieChartOptions && !this.lineChartOptions) {
+        // Simple Top 10 Bar for anything else
+        const top10 = data.slice(0, 10);
+        this.barChartOptions = {
+            series: [{ name: 'Count', data: top10.map(d => d.totalForms || d.formCount || 0) }],
+            chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: 350 },
+            plotOptions: { bar: { columnWidth: '50%', borderRadius: 6 } },
+            colors: ['#435fff'],
+            xaxis: { categories: top10.map(d => d.courseName || d.studentName || 'N/A') }
         };
     }
+  }
+
+  private clearCharts() {
+    this.barChartOptions = null;
+    this.pieChartOptions = null;
+    this.lineChartOptions = null;
   }
 
   exportExcel() {
@@ -445,10 +549,23 @@ export class ReportsComponent implements OnInit {
   exportWhatsApp() {
     this.reportsService.exportWhatsApp(this.activeReport, this.filters).subscribe({
       next: (res: any) => {
-        const text = encodeURIComponent(res.message || res.data || res);
-        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        // Debug logs to verify payload structure
+        console.log('WhatsApp API Response:', res);
+        
+        // Structured mapping: response.data.whatsappMessage
+        const reportContent = res.data?.whatsappMessage || res.data || res.message;
+        
+        if (reportContent && reportContent !== 'Success') {
+          console.log('Generated Analytics Message (Length):', reportContent.length);
+          const encoded = encodeURIComponent(reportContent);
+          window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+        } else {
+          console.error('WhatsApp report content is missing in payload:', res);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to generate WhatsApp report:', err);
       }
     });
   }
 }
-

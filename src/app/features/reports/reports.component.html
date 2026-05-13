@@ -5,7 +5,7 @@
         <app-topbar></app-topbar>
 
         <div class="content-container">
-            <!-- Landing Portal: Report Selection Grid (Show when no report or requested) -->
+            <!-- Landing Portal: Report Selection Grid -->
             <div class="report-portal" *ngIf="showReportSelector">
                 <div class="portal-header">
                     <div class="text-group">
@@ -16,11 +16,10 @@
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
-                
+
                 <div class="portal-grid">
-                    <div *ngFor="let type of reportTypes" 
-                         (click)="setReport(type.id); showReportSelector = false"
-                         class="report-tile" [class]="type.color">
+                    <div *ngFor="let type of reportTypes" (click)="setReport(type.id); showReportSelector = false"
+                        class="report-tile" [class]="type.color">
                         <div class="tile-icon">
                             <span class="material-symbols-outlined">{{type.icon}}</span>
                         </div>
@@ -29,6 +28,7 @@
                             <p>{{type.desc}}</p>
                         </div>
                         <div class="tile-action">
+                            <span>Explore Report</span>
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>
@@ -37,61 +37,218 @@
 
             <!-- Main Dashboard Area -->
             <div class="report-dashboard-container" *ngIf="!showReportSelector">
-                
-                <!-- Sticky Top Navigation & Actions -->
+
+                <!-- Premium Navigation Bar -->
                 <nav class="report-navbar">
-                    <div class="nav-left">
+                    <div class="nav-left-group">
                         <button class="btn-portal-trigger" (click)="showReportSelector = true">
                             <span class="material-symbols-outlined">apps</span>
                             <span>All Reports</span>
                         </button>
                         <div class="nav-divider"></div>
-                        <div class="report-tabs">
-                            <button *ngFor="let type of reportTypes" 
-                                    [class.active]="activeReport === type.id"
-                                    (click)="setReport(type.id)"
-                                    class="tab-btn">
-                                <span>{{type.label}}</span>
-                            </button>
+
+                        <div class="report-tabs-scroll-container">
+                            <div class="report-tabs">
+                                <button *ngFor="let type of reportTypes" [class.active]="activeReport === type.id"
+                                    (click)="setReport(type.id)" class="tab-btn">
+                                    <span>{{type.label}}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="nav-right">
-                        <div class="export-group">
-                            <button (click)="exportWhatsApp()" class="btn-export whatsapp" [disabled]="loading">
-                                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.658 1.43 5.711 1.431h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                                <span>WhatsApp</span>
-                            </button>
-                            <button (click)="exportExcel()" class="btn-export excel" [disabled]="loading">
-                                <span class="material-symbols-outlined">download_for_offline</span>
-                                <span>Export Excel</span>
-                            </button>
-                        </div>
+
+                    <div class="nav-right-sticky">
+                        <button (click)="exportWhatsApp()" class="btn-export whatsapp" [disabled]="loading">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.658 1.43 5.711 1.431h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                            </svg>
+                            <span>WhatsApp</span>
+                        </button>
+                        <button (click)="exportExcel()" class="btn-export excel" [disabled]="loading">
+                            <span class="material-symbols-outlined">download_for_offline</span>
+                            <span>Export Data</span>
+                        </button>
                     </div>
                 </nav>
 
                 <div class="dashboard-scroll-area">
-                    <!-- Dashboard Title & Filters Header -->
+                    <!-- Dashboard Header: Title & Refined Filters -->
                     <header class="dashboard-header">
-                        <div class="header-main">
-                            <div class="title-wrap">
-                                <h2 class="report-title-text">
-                                    <span *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">Lead Source Matrix</span>
-                                    <span *ngIf="activeReport === 'USER_ADMISSION'">User Performance Metrics</span>
-                                    <span *ngIf="activeReport === 'COURSE_REVENUE'">Financial Revenue Analysis</span>
-                                    <span *ngIf="activeReport === 'COURSE_ANALYTICS_APP'">Application Trends</span>
-                                    <span *ngIf="activeReport === 'COURSE_ANALYTICS_ADMISSION'">Admission Funnel</span>
-                                    <span *ngIf="activeReport === 'DAILY_FEES'">Daily Fee Collections</span>
-                                    <span *ngIf="activeReport === 'LEAD_SOURCE_CONVERSION'">Source Conversion Rates</span>
-                                    <span *ngIf="activeReport === 'COURSE_SUMMARY'">Program Performance Summary</span>
-                                    <span *ngIf="activeReport === 'STUDENT_DETAIL'">Student Payment Thresholds</span>
-                                </h2>
-                                <p class="report-subtitle">Session {{filters.session}} &bull; Updated real-time</p>
+                        <div class="title-wrap">
+                            <h2 class="report-title-text">
+                                <span *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">Lead Source Matrix</span>
+                                <span *ngIf="activeReport === 'USER_ADMISSION'">User Performance Metrics</span>
+                                <span *ngIf="activeReport === 'COURSE_REVENUE'">Financial Revenue Analysis</span>
+                                <span *ngIf="activeReport === 'COURSE_ANALYTICS_APP'">Application Trends</span>
+                                <span *ngIf="activeReport === 'COURSE_ANALYTICS_ADMISSION'">Admission Funnel</span>
+                                <span *ngIf="activeReport === 'DAILY_FEES'">Daily Fee Collections</span>
+                                <span *ngIf="activeReport === 'LEAD_SOURCE_CONVERSION'">Source Conversion Rates</span>
+                                <span *ngIf="activeReport === 'COURSE_SUMMARY'">Program Performance Summary</span>
+                                <span *ngIf="activeReport === 'STUDENT_DETAIL'">Student Payment Thresholds</span>
+                            </h2>
+                            <div class="subtitle-wrap">
+                                <span class="status-dot"></span>
+                                <p class="report-subtitle">Session {{filters.session}} &bull; Live Intelligence</p>
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- Analytics Section -->
+                    <section class="analytics-layer">
+                        <!-- Modern KPI Grid -->
+                        <div class="kpi-grid-premium">
+                            <div class="kpi-card-v2 total" [class.is-loading]="loading">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined">analytics</span></div>
+                                <div class="kpi-label">Gross Volume (Applications)</div>
+                                <div class="value-group">
+                                    <span class="kpi-value">{{summaryStats.totalApplications | number}}</span>
+                                    <div class="trend-indicator">
+                                        <span class="trend-label">Forms Received</span>
+                                    </div>
+                                </div>
                             </div>
 
+                            <div class="kpi-card-v2 confirmed" [class.is-loading]="loading">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined">verified_user</span>
+                                </div>
+                                <div class="kpi-label">Confirmed Admissions</div>
+                                <div class="value-group">
+                                    <span class="kpi-value">{{summaryStats.confirmedAdmissions | number}}</span>
+                                    <div class="trend-indicator">
+                                        <span class="percentage success" *ngIf="summaryStats.conversionRate >= 0">
+                                            <span class="badge-icon">↗</span> {{ (summaryStats.conversionRate || 0) | number:'1.1-1' }}% CR
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kpi-card-v2 revenue" [class.is-loading]="loading">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined">payments</span></div>
+                                <div class="kpi-label">Realized Revenue</div>
+                                <div class="value-group">
+                                    <span class="kpi-value">₹{{summaryStats.realizedRevenue | number:'1.0-0'}}</span>
+                                    <div class="trend-indicator">
+                                        <span class="trend-label">Actual Collections</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kpi-card-v2 pending" [class.is-loading]="loading">
+                                <div class="card-bg-icon"><span
+                                        class="material-symbols-outlined">account_balance_wallet</span></div>
+                                <div class="kpi-label">Outstanding Dues</div>
+                                <div class="value-group">
+                                    <span class="kpi-value">₹{{summaryStats.outstandingDues | number:'1.0-0'}}</span>
+                                    <div class="trend-indicator">
+                                        <span class="trend-label">Filtered Unpaid</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Professional Analytics Visualization -->
+                        <div class="analytics-visualization-grid" *ngIf="!loading && reportData.length > 0">
+                            <!-- Main Trends Section -->
+                            <div class="chart-card-v2 main-insight" *ngIf="barChartOptions || lineChartOptions">
+                                <div class="chart-header">
+                                    <div class="title-group">
+                                        <span class="material-symbols-outlined icon">insights</span>
+                                        <h3>{{ activeReport.replace('_', ' ') | titlecase }} Dynamics</h3>
+                                    </div>
+                                    <div class="chart-actions">
+                                        <span class="badge premium">Real-time Analysis</span>
+                                    </div>
+                                </div>
+                                <div class="chart-content">
+                                    <apx-chart *ngIf="barChartOptions" [series]="barChartOptions.series!"
+                                        [chart]="barChartOptions.chart!" [xaxis]="barChartOptions.xaxis!"
+                                        [yaxis]="barChartOptions.yaxis!" [plotOptions]="barChartOptions.plotOptions!"
+                                        [colors]="barChartOptions.colors!" [legend]="barChartOptions.legend!"
+                                        [dataLabels]="barChartOptions.dataLabels!" [tooltip]="barChartOptions.tooltip!"
+                                        [grid]="barChartOptions.grid!" [fill]="barChartOptions.fill!">
+                                    </apx-chart>
+
+                                    <apx-chart *ngIf="lineChartOptions" [series]="lineChartOptions.series!"
+                                        [chart]="lineChartOptions.chart!" [xaxis]="lineChartOptions.xaxis!"
+                                        [yaxis]="lineChartOptions.yaxis!" [stroke]="lineChartOptions.stroke!"
+                                        [colors]="lineChartOptions.colors!" [fill]="lineChartOptions.fill!"
+                                        [markers]="lineChartOptions.markers!" [tooltip]="lineChartOptions.tooltip!"
+                                        [grid]="lineChartOptions.grid!">
+                                    </apx-chart>
+                                </div>
+                            </div>
+
+                            <!-- Secondary Distribution Section -->
+                            <div class="chart-card-v2 side-distribution" *ngIf="pieChartOptions">
+                                <div class="chart-header">
+                                    <div class="title-group">
+                                        <span class="material-symbols-outlined icon">donut_small</span>
+                                        <h3>Distribution Matrix</h3>
+                                    </div>
+                                </div>
+                                <div class="chart-content donut-center">
+                                    <apx-chart [series]="pieChartOptions.series!" [chart]="pieChartOptions.chart!"
+                                        [labels]="pieChartOptions.labels!" [colors]="pieChartOptions.colors!"
+                                        [legend]="pieChartOptions.legend!" [plotOptions]="pieChartOptions.plotOptions!"
+                                        [dataLabels]="pieChartOptions.dataLabels!" [tooltip]="pieChartOptions.tooltip!"
+                                        [stroke]="pieChartOptions.stroke!">
+                                    </apx-chart>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Optimized Empty State -->
+                        <div class="premium-empty-state" *ngIf="!loading && reportData.length === 0">
+                            <div class="empty-illustration">
+                                <span class="material-symbols-outlined">data_alert</span>
+                            </div>
+                            <h3>No Analytics Detected</h3>
+                            <p>We couldn't find any records matching your current filter criteria.</p>
+                            <button class="btn-reset" (click)="filters.search = ''; loadReport()">
+                                <span class="material-symbols-outlined">restart_alt</span>
+                                Clear Filters
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Data Management Layer -->
+                    <section class="data-surface-v2">
+                        <div class="surface-top">
+                            <div class="info">
+                                <div class="header-with-actions">
+                                    <h3>Data Intelligence Table</h3>
+                                    <div class="entry-controls-premium">
+                                        <div class="control-label">
+                                            <span class="material-symbols-outlined">format_list_bulleted</span>
+                                            <span>Rows per page</span>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button *ngFor="let size of pageSizeOptions"
+                                                [class.active]="pageSize === size"
+                                                (click)="pageSize = size; onPageSizeChange()">
+                                                {{size}}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p *ngIf="reportData">Syncing {{totalElements}} verified records from the academic core
+                                </p>
+                            </div>
+                            <button class="btn-icon-label" [class.syncing]="loading" (click)="loadReport()">
+                                <span class="material-symbols-outlined">refresh</span>
+                                <span>Sync Dashboard</span>
+                            </button>
+                        </div>
+
+                        <!-- Integrated Filter Toolbar -->
+                        <div class="surface-filters">
                             <div class="filter-toolbar">
                                 <div class="search-box">
                                     <span class="material-symbols-outlined">search</span>
-                                    <input type="text" [(ngModel)]="filters.search" placeholder="Quick search records...">
+                                    <input type="text" [(ngModel)]="filters.search" (input)="onSearch()"
+                                        placeholder="Search records instantly...">
                                 </div>
                                 <div class="filter-controls">
                                     <div class="control-item">
@@ -101,208 +258,159 @@
                                             <option value="YESTERDAY">Yesterday</option>
                                             <option value="THIS_WEEK">This Week</option>
                                             <option value="THIS_MONTH">This Month</option>
+                                            <option value="ALL_TIME">All Time</option>
                                             <option value="CUSTOM">Custom Range</option>
                                         </select>
                                     </div>
                                     <div class="control-item">
                                         <label>Session</label>
                                         <select [(ngModel)]="filters.session" (change)="loadReport()">
-                                            <option *ngFor="let s of sessions" [value]="s">{{s}}</option>
+                                            <option *ngFor="let s of sessions" [value]="s">{{s === 'OVERALL' ? 'Overall
+                                                 / All Sessions' : s}}</option>
                                         </select>
                                     </div>
-                                    <button class="btn-sync" (click)="loadReport()" [class.syncing]="loading" title="Refresh Data">
+                                    <button class="btn-sync" (click)="loadReport()" [class.syncing]="loading"
+                                        title="Synchronize Data">
                                         <span class="material-symbols-outlined">sync</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    </header>
-
-                    <!-- Summary Analytics Layer -->
-                    <section class="analytics-layer">
-                        <!-- KPI Row -->
-                        <div class="kpi-grid-premium">
-                            <div class="kpi-card-v2 total">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined">analytics</span></div>
-                                <div class="card-content">
-                                    <span class="kpi-label">{{activeReport === 'STUDENT_DETAIL' ? 'Total Students' : 'Total Forms'}}</span>
-                                    <div class="value-group">
-                                        <span class="kpi-value">{{summaryStats.total}}</span>
-                                        <span class="trend up" *ngIf="summaryStats.total > 0">+{{(summaryStats.total/100) | number:'1.1-1'}}%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="kpi-card-v2 confirmed">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined">verified_user</span></div>
-                                <div class="card-content">
-                                    <span class="kpi-label">{{activeReport === 'STUDENT_DETAIL' ? '50%+ Paid' : 'Confirmed Adms'}}</span>
-                                    <div class="value-group">
-                                        <span class="kpi-value">{{summaryStats.secondary}}</span>
-                                        <span class="percentage" *ngIf="summaryStats.total > 0">
-                                            {{(summaryStats.secondary/summaryStats.total * 100) | number:'1.0-0'}}% CR
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="kpi-card-v2 revenue">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined">payments</span></div>
-                                <div class="card-content">
-                                    <span class="kpi-label">{{activeReport === 'STUDENT_DETAIL' ? 'Total Fees Paid' : 'Fees Realized'}}</span>
-                                    <div class="value-group">
-                                        <span class="kpi-value">₹{{summaryStats.tertiary | number:'1.0-0'}}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="kpi-card-v2 pending">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined">account_balance_wallet</span></div>
-                                <div class="card-content">
-                                    <span class="kpi-label">Outstanding</span>
-                                    <div class="value-group">
-                                        <span class="kpi-value">₹{{summaryStats.quaternary | number:'1.0-0'}}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Secondary Charts Grid -->
-                        <div class="visuals-grid-v2" *ngIf="!loading && (barChartOptions || pieChartOptions || lineChartOptions)">
-                            <div class="chart-card main" *ngIf="barChartOptions" [class.wide]="!pieChartOptions && !lineChartOptions">
-                                <div class="chart-header">
-                                    <h3>Performance Distribution</h3>
-                                    <span class="badge">Live Data</span>
-                                </div>
-                                <div class="chart-area">
-                                    <apx-chart [series]="barChartOptions.series" [chart]="barChartOptions.chart"
-                                               [xaxis]="barChartOptions.xaxis" [yaxis]="barChartOptions.yaxis"
-                                               [plotOptions]="barChartOptions.plotOptions" [legend]="barChartOptions.legend"
-                                               [colors]="barChartOptions.colors" [grid]="barChartOptions.grid">
-                                    </apx-chart>
-                                </div>
-                            </div>
-                            
-                            <div class="chart-card side" *ngIf="pieChartOptions">
-                                <div class="chart-header">
-                                    <h3>Volume Breakdown</h3>
-                                </div>
-                                <div class="chart-area">
-                                    <apx-chart [series]="pieChartOptions.series" [chart]="pieChartOptions.chart"
-                                               [labels]="pieChartOptions.labels" [colors]="pieChartOptions.colors"
-                                               [legend]="pieChartOptions.legend" [plotOptions]="pieChartOptions.plotOptions"
-                                               [dataLabels]="pieChartOptions.dataLabels">
-                                    </apx-chart>
-                                </div>
-                            </div>
-
-                            <div class="chart-card wide" *ngIf="lineChartOptions">
-                                <div class="chart-header">
-                                    <h3>Growth Analytics</h3>
-                                </div>
-                                <div class="chart-area">
-                                    <apx-chart [series]="lineChartOptions.series" [chart]="lineChartOptions.chart"
-                                               [xaxis]="lineChartOptions.xaxis" [colors]="lineChartOptions.colors"
-                                               [stroke]="lineChartOptions.stroke" [fill]="lineChartOptions.fill"
-                                               [dataLabels]="lineChartOptions.dataLabels">
-                                    </apx-chart>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Primary Table Layer -->
-                    <section class="data-surface-v2">
-                        <div class="surface-top">
-                            <div class="info">
-                                <h3>Comprehensive Report Data</h3>
-                                <p *ngIf="reportData">Showing {{filteredReportData.length}} records across academic session</p>
-                            </div>
-                            <div class="actions">
-                                <button class="btn-icon-label" [class.syncing]="loading" (click)="loadReport()">
-                                    <span class="material-symbols-outlined">refresh</span>
-                                    <span>Sync</span>
-                                </button>
-                            </div>
-                        </div>
 
                         <div class="table-container-v2">
-                            <!-- Loading Mask -->
+                            <!-- Premium Loading State -->
                             <div class="table-loading-mask" *ngIf="loading">
                                 <div class="premium-loader"></div>
-                                <span>Aggregating Report Data...</span>
+                                <span>Aggregating Enterprise Data...</span>
                             </div>
 
-                            <!-- Empty State -->
-                            <div class="table-empty-state" *ngIf="!loading && filteredReportData.length === 0">
-                                <img src="assets/images/no-data.svg" alt="No data" class="empty-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7486/7486744.png'">
-                                <h4>No Analytics Records Found</h4>
-                                <p>Try adjusting your timeframe or session filters to see more data.</p>
+                            <!-- Elegant Empty State -->
+                            <div class="table-empty-state" *ngIf="!loading && reportData.length === 0">
+                                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="No data"
+                                    class="empty-img">
+                                <h4>No Insights Available</h4>
+                                <p>We couldn't find any records for the selected filters. Please try adjusting your
+                                    search or timeframe.</p>
                             </div>
 
-                            <table *ngIf="!loading && filteredReportData.length > 0" class="enterprise-table">
-                                <!-- COURSE_LEAD_SOURCE -->
-                                <ng-container *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">
-                                    <thead>
+                            <div class="enterprise-table-wrapper" *ngIf="!loading && reportData.length > 0">
+                                <!-- Report Type: COURSE_LEAD_SOURCE -->
+                                <table class="enterprise-table" *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">
+                                    <thead class="colorful-header">
                                         <tr>
-                                            <th class="sticky-col">Course Name</th>
+                                            <th>Program Name</th>
                                             <th *ngFor="let h of leadSourceHeaders" class="text-center">{{h}}</th>
-                                            <th class="text-right highlight-col">Total Volume</th>
-                                            <th class="text-right success-col">Admissions</th>
+                                            <th class="text-right">Total forms</th>
+                                            <th class="text-right">Confirmed</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let d of paginatedData">
-                                            <td class="sticky-col font-bold">{{d.courseName}}</td>
+                                            <td class="sticky-col">{{d.courseName}}</td>
                                             <td *ngFor="let h of leadSourceHeaders" class="text-center">
                                                 <span class="count-chip" [class.dimmed]="getLeadVal(d, h) === 0">
                                                     {{getLeadVal(d, h)}}
                                                 </span>
                                             </td>
-                                            <td class="text-right font-bold text-primary">{{d.totalForms}}</td>
-                                            <td class="text-right font-bold text-success">{{d.totalConfirmedAdmissions}}</td>
+                                            <td class="text-right">{{d.totalForms}}</td>
+                                            <td class="text-right"><span
+                                                    class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
+                                            </td>
                                         </tr>
                                     </tbody>
-                                </ng-container>
-
-                                <!-- USER_ADMISSION -->
-                                <ng-container *ngIf="activeReport === 'USER_ADMISSION'">
-                                    <thead>
-                                        <tr>
-                                            <th>Academic Program</th>
-                                            <th class="text-center">Total Volume</th>
-                                            <th>Counselor Distribution & Performance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let d of paginatedData">
-                                            <td class="font-bold">{{d.courseName}}</td>
-                                            <td class="text-center">
-                                                <div class="volume-badge">{{d.totalForms}}</div>
+                                    <tfoot *ngIf="totalsRow">
+                                        <tr class="summary-footer">
+                                            <td class="sticky-col">Aggregated Totals</td>
+                                            <td *ngFor="let t of totalsRow.leadSourceTotals" class="text-center">
+                                                <span class="footer-val">{{t}}</span>
                                             </td>
-                                            <td>
-                                                <div class="contribution-row">
-                                                    <div *ngFor="let u of d.userContributions" class="counselor-pill">
-                                                        <div class="name">{{u.userName}}</div>
-                                                        <div class="count">{{u.formCount}}</div>
+                                            <td class="text-right">
+                                                <span class="footer-val">{{totalsRow.totalForms}}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="footer-val">{{totalsRow.totalConfirmed}}</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                                <!-- User Performance (Compact Analytics Performance Cards) -->
+                                <div class="performance-matrix-container" *ngIf="activeReport === 'USER_ADMISSION'">
+                                    <div class="performance-card" *ngFor="let d of paginatedData; let i = index">
+                                        <!-- Card Header: Rank & Course Info -->
+                                        <div class="card-identity-section">
+                                            <div class="card-rank" [class.top-tier]="(filters.page! * filters.size!) + i < 3">
+                                                <span class="rank-label">RANK</span>
+                                                <span class="rank-number">#{{(filters.page! * filters.size!) + i + 1}}</span>
+                                            </div>
+                                            <div class="card-course-info">
+                                                <h3 class="course-title">{{d.courseName}}</h3>
+                                                <div class="course-meta">
+                                                    <span class="p-category">Academic Program</span>
+                                                    <span class="divider"></span>
+                                                    <span class="total-count-badge">{{d.totalForms}} Forms</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Body: User Contribution Graph -->
+                                        <div class="card-analytics-section">
+                                            <div class="contribution-header">
+                                                <span class="section-title">Counselor Performance Breakdown</span>
+                                                <span class="contribution-count">{{d.userContributions.length}} Contributions</span>
+                                            </div>
+                                            <div class="contribution-graph-grid">
+                                                <div class="contribution-item" *ngFor="let u of d.userContributions">
+                                                    <div class="user-info">
+                                                        <div class="u-avatar">{{u.userName.substring(0, 1)}}</div>
+                                                        <div class="u-details">
+                                                            <span class="u-name">{{u.userName}}</span>
+                                                            <span class="u-stat">{{u.formCount}} Forms ({{((u.formCount / d.totalForms) * 100) | number:'1.0-0'}}%)</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="u-progress-track">
+                                                        <div class="u-progress-fill" 
+                                                             [style.width.%]="(u.formCount / d.totalForms) * 100">
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </ng-container>
+                                            </div>
+                                        </div>
 
-                                <!-- ANALYTICS / REVENUE / SUMMARY / DAILY -->
-                                <ng-container *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS'">
-                                    <thead>
+                                        <!-- Card Footer: Performer Spotlight -->
+                                        <div class="card-footer-section">
+                                            <div class="performer-spotlight" *ngIf="d.topPerformer && d.topPerformer !== 'N/A'">
+                                                <div class="spotlight-badge">
+                                                    <span class="material-symbols-outlined">workspace_premium</span>
+                                                    <span>TOP PERFORMER</span>
+                                                </div>
+                                                <span class="spotlight-name">{{d.topPerformer}}</span>
+                                            </div>
+                                            <div class="no-performer" *ngIf="!d.topPerformer || d.topPerformer === 'N/A'">
+                                                <span class="text-muted">Stability Target Reached</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- User Performance Footer -->
+                                    <div class="performance-matrix-footer" *ngIf="totalsRow">
+                                        <div class="footer-stat">
+                                            <span class="label">Total Enterprise Forms</span>
+                                            <span class="value">{{totalsRow.totalForms}}</span>
+                                        </div>
+                                        <div class="footer-note">Enterprise Wide Performance Insights</div>
+                                    </div>
+                                </div>
+
+                                <!-- Report Type: COURSE_ANALYTICS -->
+                                <table class="enterprise-table" *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS'">
+                                    <thead class="colorful-header">
                                         <tr>
-                                            <th>Academic Program</th>
+                                            <th>Program Details</th>
                                             <th class="text-center">Forms</th>
                                             <th class="text-center">Confirmed</th>
-                                            <th class="text-center">Cancelled</th>
-                                            <th class="text-right">Projected Revenue</th>
-                                            <th class="text-right">Fees Collected</th>
-                                            <th class="text-right">Outstanding</th>
+                                            <th class="text-right">Net Revenue</th>
+                                            <th class="text-right">Collected</th>
+                                            <th class="text-right">Balance</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -313,130 +421,112 @@
                                                     <span class="p-category">{{d.courseType}}</span>
                                                 </div>
                                             </td>
-                                            <td class="text-center font-bold">{{d.totalForms}}</td>
-                                            <td class="text-center">
-                                                <span class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
-                                            </td>
-                                            <td class="text-center">
-                                                <span class="pill-status danger">{{d.totalCancelledAdmissions}}</span>
+                                            <td class="text-center">{{d.totalForms}}</td>
+                                            <td class="text-center"><span
+                                                    class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
                                             </td>
                                             <td class="text-right font-mono">₹{{d.totalRevenue | number}}</td>
-                                            <td class="text-right font-mono text-success">₹{{d.totalFeesCollected | number}}</td>
-                                            <td class="text-right font-mono text-danger">₹{{d.remainingAmount | number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--success);">
+                                                ₹{{d.totalFeesCollected | number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--danger);">
+                                                ₹{{d.remainingAmount | number}}</td>
                                         </tr>
                                     </tbody>
-                                </ng-container>
+                                    <tfoot *ngIf="totalsRow">
+                                        <tr class="summary-footer">
+                                            <td class="sticky-col">Aggregated Totals</td>
+                                            <td class="text-center">
+                                                <span class="footer-val">{{totalsRow.totalForms}}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="footer-val">{{totalsRow.totalConfirmed}}</span>
+                                            </td>
+                                            <td class="text-right">₹{{totalsRow.totalRevenue | number}}</td>
+                                            <td class="text-right">₹{{totalsRow.totalFeesCollected | number}}</td>
+                                            <td class="text-right">₹{{totalsRow.totalRemaining | number}}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
 
-                                <!-- STUDENT_DETAIL -->
-                                <ng-container *ngIf="activeReport === 'STUDENT_DETAIL'">
-                                    <thead>
+                                <!-- Report Type: STUDENT_DETAIL -->
+                                <table class="enterprise-table" *ngIf="activeReport === 'STUDENT_DETAIL'">
+                                    <thead class="colorful-header">
                                         <tr>
-                                            <th>Student Identifier</th>
-                                            <th>Contact Detail</th>
+                                            <th>Student Information</th>
                                             <th>Academic Context</th>
-                                            <th class="text-center">Payment Threshold</th>
-                                            <th class="text-right">Amount Paid</th>
-                                            <th class="text-right">Pending Balance</th>
+                                            <th class="text-center">Threshold</th>
+                                            <th class="text-right">Paid</th>
+                                            <th class="text-right">Pending</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let d of paginatedData">
                                             <td>
-                                                <div class="student-identity">
-                                                    <span class="name">{{d.studentName}}</span>
-                                                    <span class="id">{{d.enrollmentNumber}}</span>
+                                                <div class="program-info">
+                                                    <span class="p-name">{{d.studentName}}</span>
+                                                    <span class="p-category">{{d.enrollmentNumber}} &bull;
+                                                        {{d.mobileNumber}}</span>
                                                 </div>
                                             </td>
-                                            <td>{{d.mobileNumber}}</td>
                                             <td>
-                                                <div class="context-meta">
-                                                    <span class="course">{{d.courseName}}</span>
-                                                    <span class="source">{{d.admissionSource}}</span>
+                                                <div class="program-info">
+                                                    <span class="p-name"
+                                                        style="font-size: 13px;">{{d.courseName}}</span>
+                                                    <span class="p-category">{{d.admissionSource}}</span>
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                <div class="threshold-pill" [class.success]="d.fiftyPercentFeesPaid" [class.warning]="!d.fiftyPercentFeesPaid">
-                                                    <span class="dot"></span>
-                                                    <span>{{d.fiftyPercentFeesPaid ? 'Threshold Met' : 'Incomplete'}}</span>
-                                                </div>
+                                                <span class="pill-status" [class.success]="d.fiftyPercentFeesPaid"
+                                                    [class.warning]="!d.fiftyPercentFeesPaid">
+                                                    {{d.fiftyPercentFeesPaid ? 'Verified' : 'Pending'}}
+                                                </span>
                                             </td>
-                                            <td class="text-right font-mono text-success">₹{{d.totalFeesPaid | number}}</td>
-                                            <td class="text-right font-mono text-danger">₹{{d.remainingFees | number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--success);">
+                                                ₹{{d.totalFeesPaid | number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--danger);">
+                                                ₹{{d.remainingFees | number}}</td>
                                         </tr>
                                     </tbody>
-                                </ng-container>
-
-                                <tfoot *ngIf="totalsRow">
-                                    <tr class="summary-footer">
-                                        <td *ngIf="activeReport === 'COURSE_LEAD_SOURCE'" class="sticky-col">Aggregated Totals</td>
-                                        <td *ngIf="activeReport !== 'COURSE_LEAD_SOURCE'">Aggregated Totals</td>
-
-                                        <ng-container *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">
-                                            <td *ngFor="let t of totalsRow.leadSourceTotals" class="text-center">{{t}}</td>
-                                            <td class="text-right">{{totalsRow.totalForms}}</td>
-                                            <td class="text-right">{{totalsRow.totalConfirmed}}</td>
-                                        </ng-container>
-
-                                        <ng-container *ngIf="activeReport === 'USER_ADMISSION'">
-                                            <td class="text-center">{{totalsRow.totalForms}}</td>
-                                            <td>Enterprise Distribution Matrix</td>
-                                        </ng-container>
-
-                                        <ng-container *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS'">
-                                            <td class="text-center">{{totalsRow.totalForms}}</td>
-                                            <td class="text-center">{{totalsRow.totalConfirmed}}</td>
-                                            <td class="text-center">{{totalsRow.totalCancelled}}</td>
-                                            <td class="text-right">₹{{totalsRow.totalRevenue | number}}</td>
-                                            <td class="text-right">₹{{totalsRow.totalFeesCollected | number}}</td>
-                                            <td class="text-right">₹{{totalsRow.totalRemaining | number}}</td>
-                                        </ng-container>
-
-                                        <ng-container *ngIf="activeReport === 'STUDENT_DETAIL'">
-                                            <td colspan="2">Records: {{totalsRow.totalStudents}}</td>
-                                            <td class="text-center">{{summaryStats.secondary}} Thresholds Met</td>
+                                    <tfoot *ngIf="totalsRow">
+                                        <tr class="summary-footer">
+                                            <td class="sticky-col">Aggregated Totals</td>
+                                            <td class="text-left">Total Records: {{totalElements}}</td>
+                                            <td class="text-center">{{summaryStats.secondary}} Met</td>
                                             <td class="text-right">₹{{totalsRow.totalFeesPaid | number}}</td>
                                             <td class="text-right">₹{{totalsRow.totalRemainingFees | number}}</td>
-                                        </ng-container>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Data Pagination Footer -->
+                        <div class="surface-footer" *ngIf="!loading && reportData.length > 0">
+                            <div class="footer-left">
+                                <div class="data-info">
+                                    Displaying <strong>{{(filters.page! * filters.size!) + 1}}</strong> -
+                                    <strong>{{Math.min((filters.page! + 1) * filters.size!, totalElements)}}</strong> of
+                                    <strong>{{totalElements}}</strong> records
+                                </div>
+                            </div>
+
+                            <div class="pagination-controls">
+                                <button class="page-btn" [disabled]="filters.page! <= 0" (click)="prevPage()">
+                                    <span class="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                <div class="page-numbers">
+                                    <button class="page-btn active">{{filters.page! + 1}}</button>
+                                    <span>/</span>
+                                    <span>{{Math.max(1, totalPages)}}</span>
+                                </div>
+                                <button class="page-btn" [disabled]="filters.page! >= totalPages - 1"
+                                    (click)="nextPage()">
+                                    <span class="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
                         </div>
                     </section>
                 </div>
-
-                <!-- Pagination Footer -->
-                <div class="surface-footer" *ngIf="!loading && filteredReportData.length > 0">
-                    <div class="footer-left">
-                        <div class="entry-selector">
-                            <span>Show</span>
-                            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-                                <option *ngFor="let opt of pageSizeOptions" [value]="opt">{{opt}}</option>
-                            </select>
-                            <span>Entries</span>
-                        </div>
-                        <div class="nav-divider"></div>
-                        <div class="data-info">
-                            Showing <strong>{{(currentPage - 1) * pageSize + 1}}</strong> to 
-                            <strong>{{Math.min(currentPage * pageSize, filteredReportData.length)}}</strong> of 
-                            <strong>{{filteredReportData.length}}</strong> records
-                        </div>
-                    </div>
-                    <div class="footer-right">
-                        <div class="pagination-controls">
-                            <button class="page-btn" [disabled]="currentPage <= 1" (click)="prevPage()">
-                                <span class="material-symbols-outlined">chevron_left</span>
-                            </button>
-                            <div class="page-numbers">
-                                <button class="page-btn active">{{currentPage}}</button>
-                                <span class="font-bold text-slate-400">/ {{Math.max(1, totalPages)}}</span>
-                            </div>
-                            <button class="page-btn" [disabled]="currentPage >= totalPages" (click)="nextPage()">
-                                <span class="material-symbols-outlined">chevron_right</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

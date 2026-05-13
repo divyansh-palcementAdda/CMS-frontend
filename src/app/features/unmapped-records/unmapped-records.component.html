@@ -160,7 +160,7 @@
                   <th>Contact Info</th>
                   <th>Enrolled Course</th>
                   <th>Counselled By</th>
-                  <th>Status</th>
+                  <th>Application Date</th>
                   <th>Actions</th>
                 </tr>
                 }
@@ -251,8 +251,9 @@
                   </td>
 
                   <td>{{ item.counselorName || ' - ' }}</td>
+                  <td>{{item.admissionDate}}</td>
                   }
-                  @case ('users') {
+                    @case ('users') {
                   <td>
                     <div class="roles-container" style="display: flex; gap: 4px; flex-wrap: wrap;">
                       @for (role of item.roles; track role.roleId) {
@@ -273,10 +274,12 @@
                     </div>
                   </td>
                   <td>{{ item.email }}</td>
+                  <td><span class="status-badge active">Active</span></td>
                   }
                   @case ('courses') {
                   <td>{{ item.courseTypeName }}</td>
                   <td>{{ item.duration || 0 }} Years</td>
+                  <td><span class="status-badge active">Active</span></td>
                   }
                   @case ('consultancies-users') {
                   <td>
@@ -289,6 +292,7 @@
                   <td><span class="count-badge apps">{{ item.totalApplications || 0 }}</span></td>
                   <td><span class="count-badge cancelled-adm">{{ item.totalCancelledAdmissions || 0 }}</span></td>
                   <td><span class="count-badge cancelled-apps">{{ item.totalCancelledApplications || 0 }}</span></td>
+                  <td><span class="status-badge active">Active</span></td>
                   }
                   @case ('consultancies-courses') {
                   <td>
@@ -301,13 +305,9 @@
                   <td><span class="count-badge apps">{{ item.totalApplications || 0 }}</span></td>
                   <td><span class="count-badge cancelled-adm">{{ item.totalCancelledAdmissions || 0 }}</span></td>
                   <td><span class="count-badge cancelled-apps">{{ item.totalCancelledApplications || 0 }}</span></td>
+                  <td><span class="status-badge active">Active</span></td>
                   }
                   }
-
-                  <!-- STATUS -->
-                  <td>
-                    <span class="status-badge active">Active</span>
-                  </td>
 
                   <!-- ACTIONS -->
                   <td>

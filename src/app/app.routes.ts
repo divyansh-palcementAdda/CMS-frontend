@@ -121,7 +121,7 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' }
   },
   {
-    path: 'dev/test',
+    path: 'reports',
     loadComponent: () => import('./features/reports/reports.component').then(m => m.ReportsComponent),
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }

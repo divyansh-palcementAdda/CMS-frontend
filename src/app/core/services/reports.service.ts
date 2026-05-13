@@ -7,8 +7,12 @@ export interface ReportFilter {
   startDate?: string;
   endDate?: string;
   session?: string;
-  filterType?: 'TODAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'THIS_YEAR' | 'ALL_TIME' | 'CUSTOM';
+  filterType?: 'TODAY' | 'YESTERDAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'THIS_YEAR' | 'ALL_TIME' | 'CUSTOM';
   search?: string;
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDir?: string;
 }
 
 @Injectable({
