@@ -366,9 +366,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
         return name.length > 25 ? name.substring(0, 23) + '...' : name;
     });
 
-    // 1. LEAD SOURCE MATRIX - Modern Grouped/Stacked Hybrid
+    // 1. LEAD SOURCE MATRIX - Modern Horizontal Stacked Bars
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
-        const chartData = data.slice(0, 15); // Top 15 courses
+        const chartData = data.slice(0, 20); 
+        const dynamicHeight = Math.max(chartData.length * 65, 600);
+
         const series = this.leadSourceHeaders.map(ls => ({
             name: ls,
             data: chartData.map((d: any) => {
@@ -382,15 +384,16 @@ export class ReportsComponent implements OnInit, OnDestroy {
             chart: { 
                 ...COMMON_CHART_OPTIONS, 
                 type: 'bar', 
-                height: Math.max(450, chartData.length * 40), 
+                height: dynamicHeight, 
                 stacked: true,
-                stackType: 'normal'
+                toolbar: { show: false },
+                zoom: { enabled: false }
             },
             plotOptions: {
                 bar: { 
                     horizontal: true, 
-                    barHeight: '70%', 
-                    borderRadius: 4,
+                    barHeight: '58%', 
+                    borderRadius: 8,
                     borderRadiusApplication: 'end',
                     dataLabels: { position: 'center' }
                 }
@@ -398,13 +401,36 @@ export class ReportsComponent implements OnInit, OnDestroy {
             colors: CHART_COLORS,
             xaxis: { 
                 categories: chartData.map(d => d.courseName),
-                labels: { style: { colors: '#94a3b8', fontWeight: 600 } }
+                labels: { 
+                    style: { colors: '#94a3b8', fontWeight: 600 },
+                    formatter: (val: any) => Math.floor(val).toString() 
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
             },
-            yaxis: { labels: { style: { colors: '#64748b', fontWeight: 700, fontSize: '11px' }, maxWidth: 250 } },
-            legend: { position: 'top', horizontalAlign: 'left', fontWeight: 600, markers: { radius: 12, width: 10, height: 10 } },
+            yaxis: { 
+                labels: { 
+                    style: { colors: '#1e293b', fontWeight: 700, fontSize: '13px' }, 
+                    maxWidth: 420,
+                    trim: true
+                } 
+            },
+            legend: { 
+                position: 'top', 
+                horizontalAlign: 'left', 
+                fontWeight: 600, 
+                fontSize: '13px',
+                itemMargin: { horizontal: 14, vertical: 6 },
+                markers: { radius: 12, width: 10, height: 10 } 
+            },
             dataLabels: { enabled: false },
-            tooltip: { theme: 'dark', shared: true, intersect: false, y: { formatter: (val: any) => val + ' Forms' } },
-            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+            tooltip: { 
+                theme: 'dark', 
+                shared: true, 
+                intersect: false, 
+                y: { formatter: (val: any) => val + ' Forms' } 
+            },
+            grid: { borderColor: '#f1f5f9', strokeDashArray: 4, padding: { left: 20, right: 20 } }
         };
     }
 

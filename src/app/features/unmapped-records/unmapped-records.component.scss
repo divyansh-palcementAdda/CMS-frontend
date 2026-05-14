@@ -280,6 +280,7 @@
 
       .left-header {
         flex: 1;
+
         .table-title {
           font-size: 20px;
           font-weight: 800;
@@ -309,15 +310,18 @@
             color: #64748b;
 
             select {
-                padding: 4px 10px;
-                border-radius: 8px;
-                border: 1px solid #e2e8f0;
-                background: #f8fafc;
-                font-weight: 700;
-                color: #1e293b;
-                cursor: pointer;
-                outline: none;
-                &:focus { border-color: #435FFF; }
+              padding: 4px 10px;
+              border-radius: 8px;
+              border: 1px solid #e2e8f0;
+              background: #f8fafc;
+              font-weight: 700;
+              color: #1e293b;
+              cursor: pointer;
+              outline: none;
+
+              &:focus {
+                border-color: #435FFF;
+              }
             }
           }
         }
@@ -347,7 +351,10 @@
           outline: none;
           transition: all 0.2s;
 
-          &::placeholder { color: #94a3b8; }
+          &::placeholder {
+            color: #94a3b8;
+          }
+
           &:focus {
             border-color: #435FFF;
             background: #fff;
@@ -378,8 +385,14 @@
           text-transform: uppercase;
           letter-spacing: 0.05em;
 
-          &:first-child { padding-left: 32px; }
-          &:last-child { padding-right: 32px; text-align: right; }
+          &:first-child {
+            padding-left: 32px;
+          }
+
+          &:last-child {
+            padding-right: 32px;
+            text-align: right;
+          }
         }
       }
 
@@ -394,6 +407,7 @@
         td {
           padding: 16px 20px;
           font-size: 14px;
+          vertical-align: middle;
 
           &:last-child {
             padding-right: 24px;
@@ -443,12 +457,19 @@
           }
 
           .course-badge {
-            background-color: #eff6ff;
-            color: #3b82f6;
+            display: inline-block;
+            background-color: #f0f7ff;
+            color: #435FFF;
             padding: 6px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 12px;
             font-weight: 600;
+            line-height: 1.5;
+            text-align: left;
+            border: 1px solid #dbeafe;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            max-width: 220px;
+            word-wrap: break-word;
           }
 
           .discount-badge {
@@ -459,13 +480,13 @@
             font-size: 13px;
             font-weight: 700;
             gap: 2px;
-            
+
             &.scholarship {
               background-color: #f0fdf4;
               color: #16a34a;
               border: 1px solid #dcfce7;
             }
-            
+
             &.percent {
               background-color: #fffbeb;
               color: #d97706;
@@ -528,22 +549,25 @@
             border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
-            
+
             &.admissions {
               background: #f0f7ff;
               color: #435FFF;
               border: 1px solid #dbeafe;
             }
+
             &.apps {
               background: #ecfeff;
               color: #06b6d4;
               border: 1px solid #cffafe;
             }
+
             &.cancelled-adm {
               background: #fff1f2;
               color: #e11d48;
               border: 1px solid #ffe4e6;
             }
+
             &.cancelled-apps {
               background: #fdf2f8;
               color: #db2777;
