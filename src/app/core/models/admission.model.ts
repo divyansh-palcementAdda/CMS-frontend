@@ -85,6 +85,10 @@ export interface AdmissionItem {
   cancelledBy?: string;
   cancellationReason?: string;
 
+  // Refund fields
+  isRefunded?: boolean;
+  totalRefundedAmount?: number;
+
   // UI Calculated Fields
   feeStatus?: string; // 'Paid' | 'Unpaid'
   status?: string; // 'Active' | 'Inactive'

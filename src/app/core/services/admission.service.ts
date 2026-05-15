@@ -219,6 +219,14 @@ export class AdmissionService {
   }
 
   getActiveCourses(): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/courses/active`);
+    return this.http.get<any>(`${this.apiUrl}/courses/active`);
+  }
+
+  refundAdmission(studentId: number, request: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/v1/refunds/student/${studentId}`, request);
+  }
+
+  getRefundHistory(studentId: number): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/v1/refunds/student/${studentId}/history`);
   }
 }

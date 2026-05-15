@@ -219,6 +219,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
         totalRevenue: this.serverSummary.realizedRevenue,
         totalFeesPaid: this.serverSummary.realizedRevenue,
         totalRemainingFees: this.serverSummary.outstandingDues,
+        totalRefunded: this.serverSummary.totalRefunded,
         totalStudents: this.totalElements,
         leadSourceTotals: this.leadSourceHeaders.map(h => lsMap[h] || 0)
     };

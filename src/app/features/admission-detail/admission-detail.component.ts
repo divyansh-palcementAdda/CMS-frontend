@@ -12,6 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 import { NotificationService } from '../../core/services/notification.service';
 import { AdmissionFormModalComponent } from '../admission-management/components/admission-form-modal/admission-form-modal.component';
 import { CancellationModalComponent } from '../admission-management/components/cancellation-modal/cancellation-modal.component';
+import { RefundModalComponent } from './components/refund-modal/refund-modal.component';
 
 // Notification service imported via core services
 
@@ -26,7 +27,8 @@ import { CancellationModalComponent } from '../admission-management/components/c
     TopbarComponent, 
     FeePaymentModalComponent, 
     AdmissionFormModalComponent,
-    CancellationModalComponent
+    CancellationModalComponent,
+    RefundModalComponent
   ],
   templateUrl: './admission-detail.component.html',
   styleUrls: ['./admission-detail.component.scss']
@@ -44,6 +46,10 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
   // Cancellation State
   showCancellationModal = false;
   isRevokingCancellation = false;
+
+  // Refund State
+  showRefundModal = false;
+  refundHistory: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -71,6 +77,9 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
           console.log(data);
           this.detail = data;
           this.loading = false;
+          if (this.detail?.isCancelled) {
+            this.loadRefundHistory();
+          }
         },
         error: (err: any) => {
           console.error('Error loading admission details', err);
@@ -325,6 +334,41 @@ export class AdmissionDetailComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
+  }
+
+  // ── Refund ────────────────────────────────────────────────────────────
+  openRefundModal() {
+    this.showRefundModal = true;
+  }
+
+  onRefundConfirmed(event: any) {
+    if (!this.detail) return;
+    this.loading = true;
+    this.admissionService.refundAdmission(this.detail.id!, event)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showRefundModal = false;
+          this.notificationService.success('Refund Processed', 'The refund has been issued successfully.');
+          this.loadData();
+        },
+        error: (err: any) => {
+          this.notificationService.error('Refund Failed', err.error?.message || 'Could not process refund');
+          this.loading = false;
+        }
+      });
+  }
+
+  loadRefundHistory() {
+    if (!this.detail) return;
+    this.admissionService.getRefundHistory(this.detail.id!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.refundHistory = response.data || [];
+        },
+        error: (err) => console.error('Error loading refund history', err)
+      });
   }
 
   ngOnDestroy() {

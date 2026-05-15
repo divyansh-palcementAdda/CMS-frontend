@@ -2818,3 +2818,72 @@
         transform: translateY(0);
     }
 }
+
+// --- Operational MIS Specific Styles ---
+.financial-kpi-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.kpi-mini-card {
+    padding: 20px;
+    border-radius: var(--radius-md);
+    background: var(--slate-50);
+    border: 1px solid var(--slate-200);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: var(--transition);
+
+    .label {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--slate-500);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .val {
+        font-size: 24px;
+        font-weight: 850;
+        color: var(--slate-900);
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    &.gross {
+        border-left: 5px solid var(--primary);
+    }
+
+    &.refund {
+        border-left: 5px solid var(--danger);
+        .val { color: var(--danger); }
+    }
+
+    &.net {
+        background: linear-gradient(135deg, #f0fdf4, #ffffff);
+        border: 1px solid #86efac;
+        border-left: 5px solid var(--success);
+        .val { color: var(--success); }
+    }
+
+    &:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-md);
+    }
+}
+
+.section-divider {
+    height: 1px;
+    background: var(--slate-200);
+    margin: 24px 0;
+}
+
+.section-header.mini {
+    margin-bottom: 12px;
+    h3 {
+        font-size: 13px;
+        letter-spacing: 0.1em;
+    }
+}

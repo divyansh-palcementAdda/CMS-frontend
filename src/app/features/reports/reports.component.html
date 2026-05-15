@@ -235,17 +235,34 @@
                                 <div class="op-section collection-section">
                                     <div class="section-header">
                                         <span class="material-symbols-outlined">payments</span>
-                                        <h3>DAILY FEE COLLECTION</h3>
+                                        <h3>FINANCIAL COLLECTION SUMMARY</h3>
                                     </div>
-                                    <div class="total-fees-display">
-                                        <span class="count">{{dailySummaryData.totalFeesToday | number:'2.0-0'}}</span>
-                                        <span class="label">Total Fees Received Today</span>
+                                    
+                                    <div class="financial-kpi-stack">
+                                        <div class="kpi-mini-card gross">
+                                            <span class="label">Gross Received Today</span>
+                                            <span class="val">₹{{dailySummaryData.totalFeesToday | number:'1.0-0'}}</span>
+                                        </div>
+                                        <div class="kpi-mini-card refund">
+                                            <span class="label">Total Refunds Today</span>
+                                            <span class="val">₹{{dailySummaryData.totalRefundsToday | number:'1.0-0'}}</span>
+                                        </div>
+                                        <div class="kpi-mini-card net">
+                                            <span class="label">Net Collected Today</span>
+                                            <span class="val">₹{{dailySummaryData.netCollectedToday | number:'1.0-0'}}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="section-divider"></div>
+                                    <div class="section-header mini">
+                                        <span class="material-symbols-outlined">analytics</span>
+                                        <h3>COURSE-WISE REVENUE</h3>
                                     </div>
                                     <div class="course-distribution-list">
                                         <div class="dist-item" *ngFor="let cw of dailySummaryData.courseWiseFees">
                                             <span class="course-name">{{cw.courseName}}</span>
                                             <span class="dots"></span>
-                                            <span class="course-count">{{cw.count | number:'2.0-0'}}</span>
+                                            <span class="course-count">₹{{cw.count | number:'1.0-0'}}</span>
                                         </div>
                                         <div class="dist-item empty" *ngIf="dailySummaryData.courseWiseFees.length === 0">
                                             <span class="course-name">No fee collections recorded today</span>
@@ -528,7 +545,8 @@
                                             <th class="text-center">Forms</th>
                                             <th class="text-center">Confirmed</th>
                                             <th class="text-right">Net Revenue</th>
-                                            <th class="text-right">Collected</th>
+                                            <th class="text-right">Gross Paid</th>
+                                            <th class="text-right">Refunded</th>
                                             <th class="text-right">Balance</th>
                                         </tr>
                                     </thead>
@@ -547,6 +565,8 @@
                                             <td class="text-right font-mono">₹{{d.totalRevenue | number}}</td>
                                             <td class="text-right font-mono" style="color: var(--success);">
                                                 ₹{{d.totalFeesCollected | number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--danger-text, #ef4444);">
+                                                ₹{{d.totalRefunded | number}}</td>
                                             <td class="text-right font-mono" style="color: var(--danger);">
                                                 ₹{{d.remainingAmount | number}}</td>
                                         </tr>
@@ -562,6 +582,7 @@
                                             </td>
                                             <td class="text-right">₹{{totalsRow.totalRevenue | number}}</td>
                                             <td class="text-right">₹{{totalsRow.totalFeesCollected | number}}</td>
+                                            <td class="text-right">₹{{totalsRow.totalRefunded | number}}</td>
                                             <td class="text-right">₹{{totalsRow.totalRemaining | number}}</td>
                                         </tr>
                                     </tfoot>

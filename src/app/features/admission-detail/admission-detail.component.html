@@ -49,8 +49,7 @@
             Edit
           </button>
 
-          <!-- Cancel Admission Button -->
-          <!-- <button *ngIf="!detail.isCancelled" class="btn-outline-edit" (click)="handleCancellationClick()"
+          <button *ngIf="!detail.isCancelled" class="btn-outline-edit" (click)="handleCancellationClick()"
             style="border-color: #ef4444; color: #ef4444; background: white;">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
@@ -60,7 +59,17 @@
               <line x1="9" y1="9" x2="15" y2="15"></line>
             </svg>
             Cancel Admission
-          </button> -->
+          </button>
+
+          <!-- Refund Fees Button -->
+          <button *ngIf="detail.isCancelled && detail.totalFeesPaid! > 0 && detail.totalRefundedAmount! < detail.totalFeesPaid!" class="btn-primary-fees" (click)="openRefundModal()"
+            style="background: #f59e0b; border-color: #f59e0b; margin-right: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1v22M5 5h14M5 19h14"></path>
+            </svg>
+            Refund Fees
+          </button>
 
           <!-- Restore Admission Button -->
           <button *ngIf="detail.isCancelled" class="btn-outline-edit" (click)="handleRevokeClick()"
@@ -428,6 +437,14 @@
                 <label>Remaining Fee</label>
                 <div class="sum-val-lg red-text">₹{{ detail.remainingFees | number: '1.0-0' }}</div>
               </div>
+              <div class="sum-card-basic orange-border" *ngIf="detail.totalRefundedAmount! > 0">
+                <label>Total Refunded</label>
+                <div class="sum-val-lg orange-text" style="color: #f59e0b;">₹{{ detail.totalRefundedAmount | number: '1.0-0' }}</div>
+              </div>
+              <div class="sum-card-basic green-border" *ngIf="detail.isCancelled && detail.totalFeesPaid! > 0">
+                <label>Refundable Balance</label>
+                <div class="sum-val-lg green-text" style="color: #10b981;">₹{{ (detail.totalFeesPaid! - detail.totalRefundedAmount!) | number: '1.0-0' }}</div>
+              </div>
               <div class="sum-card-basic teal-border">
                 <label>Registration Fees</label>
                 <div class="sum-val-lg teal-text">{{ detail.tokenAmountPaid ? 'Paid' : 'Unpaid' }}</div>
@@ -520,6 +537,42 @@
           </table>
         </div>
       </section>
+
+      <!-- Refund History (Only for Cancelled Admissions) -->
+      <section class="fee-history-section" *ngIf="detail.isCancelled && refundHistory && refundHistory.length > 0" style="margin-top: 32px; border-top: 2px dashed #f1f5f9; padding-top: 32px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <div style="background: #fef3c7; color: #d97706; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined">history_edu</span>
+          </div>
+          <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: #1e293b;">Refund History</h3>
+        </div>
+        <div class="history-table-container">
+          <table class="history-table">
+            <thead style="background: #fffbeb;">
+              <tr>
+                <th>S.No</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Mode</th>
+                <th>Ref No</th>
+                <th>Reason</th>
+                <th>Processed By</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let refund of refundHistory; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td class="bold" style="color: #d97706;">₹ {{ refund.amount | number: '1.0-0' }}</td>
+                <td>{{ refund.refundDate | date: 'MMM d, yyyy' }}</td>
+                <td><span class="status-badge" style="background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 4px; font-size: 11px;">{{ refund.refundMode }}</span></td>
+                <td>{{ refund.referenceNo || 'N/A' }}</td>
+                <td><span class="remarks-pill" style="background: #fffbeb; color: #b45309;">{{ refund.reason }}</span></td>
+                <td>{{ refund.refundedBy }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
 
     <ng-template #loadingTpl>
@@ -542,5 +595,13 @@
     <app-cancellation-modal *ngIf="showCancellationModal" [isRevoke]="isRevokingCancellation"
       (confirm)="confirmCancellationAction($event)" (cancel)="showCancellationModal = false">
     </app-cancellation-modal>
+
+    <app-refund-modal *ngIf="showRefundModal" 
+      [studentName]="detail?.fullName || ''" 
+      [totalPaid]="detail?.totalFeesPaid || 0"
+      [alreadyRefunded]="detail?.totalRefundedAmount || 0"
+      (confirm)="onRefundConfirmed($event)" 
+      (cancel)="showRefundModal = false">
+    </app-refund-modal>
   </div>
 </div>
