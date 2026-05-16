@@ -85,10 +85,10 @@ export interface PageResponse<T> {
 }
 
 export interface ConsultancyFinancials {
-  totalProjected: string;
-  payableAmount: string;
-  paidAmount: string;
-  unpaidAmount: string;
+  totalProjected: number;
+  payableAmount: number;
+  paidAmount: number;
+  unpaidAmount: number;
 }
 
 export interface ConsultancyCourse {
@@ -153,7 +153,7 @@ export interface ConsultancyDetail extends ConsultancyDTO {
   financials: ConsultancyFinancials;
   quickStats: {
     totalCourses: number;
-    projectedAmount: string;
+    projectedAmount: number;
     status: 'Active' | 'Inactive' | 'Dormant';
   };
   topCourses: ConsultancyChartData[];

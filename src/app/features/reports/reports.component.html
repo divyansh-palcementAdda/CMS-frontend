@@ -117,7 +117,8 @@
                                     <span class="kpi-value">{{summaryStats.confirmedAdmissions | number}}</span>
                                     <div class="trend-indicator">
                                         <span class="percentage success" *ngIf="summaryStats.conversionRate >= 0">
-                                            <span class="badge-icon">↗</span> {{ (summaryStats.conversionRate || 0) | number:'1.1-1' }}% CR
+                                            <span class="badge-icon">↗</span> {{ (summaryStats.conversionRate || 0) |
+                                            number:'1.1-1' }}% CR
                                         </span>
                                     </div>
                                 </div>
@@ -151,7 +152,8 @@
                         <!-- Professional Analytics Visualization -->
                         <div class="analytics-visualization-grid" *ngIf="!loading && reportData.length > 0">
                             <!-- Main Trends Section -->
-                            <div class="analytics-chart-card main-insight" [class.full-width]="!pieChartOptions" *ngIf="barChartOptions || lineChartOptions">
+                            <div class="analytics-chart-card main-insight" [class.full-width]="!pieChartOptions"
+                                *ngIf="barChartOptions || lineChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
                                         <span class="material-symbols-outlined icon">insights</span>
@@ -214,13 +216,15 @@
                     </section>
 
                     <!-- Session Operational Summary (Special View) -->
-                    <section class="daily-summary-operational-view" *ngIf="activeReport === 'DAILY_SESSION_SUMMARY' && dailySummaryData">
+                    <section class="daily-summary-operational-view"
+                        *ngIf="activeReport === 'DAILY_SESSION_SUMMARY' && dailySummaryData">
                         <div class="summary-card-v2 premium-card">
                             <div class="card-header">
                                 <div class="title-area">
                                     <span class="report-badge">OPERATIONAL MIS</span>
                                     <h2>{{dailySummaryData.reportTitle}}</h2>
-                                    <p class="date-label">Status as of: <strong>{{dailySummaryData.dateLabel}}</strong></p>
+                                    <p class="date-label">Status as of: <strong>{{dailySummaryData.dateLabel}}</strong>
+                                    </p>
                                 </div>
                                 <div class="action-badges">
                                     <div class="status-badge live">
@@ -237,19 +241,22 @@
                                         <span class="material-symbols-outlined">payments</span>
                                         <h3>FINANCIAL COLLECTION SUMMARY</h3>
                                     </div>
-                                    
+
                                     <div class="financial-kpi-stack">
                                         <div class="kpi-mini-card gross">
                                             <span class="label">Gross Received Today</span>
-                                            <span class="val">₹{{dailySummaryData.totalFeesToday | number:'1.0-0'}}</span>
+                                            <span class="val">₹{{dailySummaryData.totalFeesToday |
+                                                number:'1.0-0'}}</span>
                                         </div>
                                         <div class="kpi-mini-card refund">
                                             <span class="label">Total Refunds Today</span>
-                                            <span class="val">₹{{dailySummaryData.totalRefundsToday | number:'1.0-0'}}</span>
+                                            <span class="val">₹{{dailySummaryData.totalRefundsToday |
+                                                number:'1.0-0'}}</span>
                                         </div>
                                         <div class="kpi-mini-card net">
                                             <span class="label">Net Collected Today</span>
-                                            <span class="val">₹{{dailySummaryData.netCollectedToday | number:'1.0-0'}}</span>
+                                            <span class="val">₹{{dailySummaryData.netCollectedToday |
+                                                number:'1.0-0'}}</span>
                                         </div>
                                     </div>
 
@@ -264,7 +271,8 @@
                                             <span class="dots"></span>
                                             <span class="course-count">₹{{cw.count | number:'1.0-0'}}</span>
                                         </div>
-                                        <div class="dist-item empty" *ngIf="dailySummaryData.courseWiseFees.length === 0">
+                                        <div class="dist-item empty"
+                                            *ngIf="dailySummaryData.courseWiseFees.length === 0">
                                             <span class="course-name">No fee collections recorded today</span>
                                         </div>
                                     </div>
@@ -276,7 +284,7 @@
                                         <span class="material-symbols-outlined">analytics</span>
                                         <h3>SESSION CUMULATIVE STATS</h3>
                                     </div>
-                                    
+
                                     <div class="metrics-stack">
                                         <div class="metric-row">
                                             <div class="metric-info">
@@ -307,7 +315,8 @@
                                             </div>
                                             <div class="sub-metric">
                                                 <span class="label">Actual Adm</span>
-                                                <span class="val">{{dailySummaryData.actualAdmissionsWithoutScholarship}}</span>
+                                                <span
+                                                    class="val">{{dailySummaryData.actualAdmissionsWithoutScholarship}}</span>
                                             </div>
                                         </div>
 
@@ -319,7 +328,8 @@
                                                     <span class="sub">Total forms withdrawn/cancelled</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{dailySummaryData.totalFormsCancelledTillDate}}</span>
+                                            <span
+                                                class="metric-value">{{dailySummaryData.totalFormsCancelledTillDate}}</span>
                                         </div>
 
                                         <div class="metric-row highlight-warning">
@@ -330,7 +340,8 @@
                                                     <span class="sub">Forms pending processing/closure</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{dailySummaryData.totalFormsRemainingTillDate}}</span>
+                                            <span
+                                                class="metric-value">{{dailySummaryData.totalFormsRemainingTillDate}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -339,11 +350,13 @@
                             <div class="card-footer-info">
                                 <div class="footer-item">
                                     <span class="material-symbols-outlined">event_busy</span>
-                                    <span>Admissions Cancelled Today: <strong>{{dailySummaryData.admissionCancelToday | number:'2.0-0'}}</strong></span>
+                                    <span>Admissions Cancelled Today: <strong>{{dailySummaryData.admissionCancelToday |
+                                            number:'2.0-0'}}</strong></span>
                                 </div>
                                 <div class="footer-item note">
                                     <span class="material-symbols-outlined">info</span>
-                                    <span>* This report follows the operational standard for daily session reporting.</span>
+                                    <span>* This report follows the operational standard for daily session
+                                        reporting.</span>
                                 </div>
                             </div>
                         </div>
@@ -402,7 +415,7 @@
                                         <label>Session</label>
                                         <select [(ngModel)]="filters.session" (change)="loadReport()">
                                             <option *ngFor="let s of sessions" [value]="s">{{s === 'OVERALL' ? 'Overall
-                                                 / All Sessions' : s}}</option>
+                                                / All Sessions' : s}}</option>
                                         </select>
                                     </div>
                                     <button class="btn-sync" (click)="loadReport()" [class.syncing]="loading"
@@ -475,9 +488,11 @@
                                     <div class="performance-card" *ngFor="let d of paginatedData; let i = index">
                                         <!-- Card Header: Rank & Course Info -->
                                         <div class="card-identity-section">
-                                            <div class="card-rank" [class.top-tier]="(filters.page! * filters.size!) + i < 3">
+                                            <div class="card-rank"
+                                                [class.top-tier]="(filters.page! * filters.size!) + i < 3">
                                                 <span class="rank-label">RANK</span>
-                                                <span class="rank-number">#{{(filters.page! * filters.size!) + i + 1}}</span>
+                                                <span class="rank-number">#{{(filters.page! * filters.size!) + i +
+                                                    1}}</span>
                                             </div>
                                             <div class="card-course-info">
                                                 <h3 class="course-title">{{d.courseName}}</h3>
@@ -493,7 +508,8 @@
                                         <div class="card-analytics-section">
                                             <div class="contribution-header">
                                                 <span class="section-title">Counselor Performance Breakdown</span>
-                                                <span class="contribution-count">{{d.userContributions.length}} Contributions</span>
+                                                <span class="contribution-count">{{d.userContributions.length}}
+                                                    Contributions</span>
                                             </div>
                                             <div class="contribution-graph-grid">
                                                 <div class="contribution-item" *ngFor="let u of d.userContributions">
@@ -501,12 +517,13 @@
                                                         <div class="u-avatar">{{u.userName.substring(0, 1)}}</div>
                                                         <div class="u-details">
                                                             <span class="u-name">{{u.userName}}</span>
-                                                            <span class="u-stat">{{u.formCount}} Forms ({{((u.formCount / d.totalForms) * 100) | number:'1.0-0'}}%)</span>
+                                                            <span class="u-stat">{{u.formCount}} Forms ({{((u.formCount
+                                                                / d.totalForms) * 100) | number:'1.0-0'}}%)</span>
                                                         </div>
                                                     </div>
                                                     <div class="u-progress-track">
-                                                        <div class="u-progress-fill" 
-                                                             [style.width.%]="(u.formCount / d.totalForms) * 100">
+                                                        <div class="u-progress-fill"
+                                                            [style.width.%]="(u.formCount / d.totalForms) * 100">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -515,14 +532,16 @@
 
                                         <!-- Card Footer: Performer Spotlight -->
                                         <div class="card-footer-section">
-                                            <div class="performer-spotlight" *ngIf="d.topPerformer && d.topPerformer !== 'N/A'">
+                                            <div class="performer-spotlight"
+                                                *ngIf="d.topPerformer && d.topPerformer !== 'N/A'">
                                                 <div class="spotlight-badge">
                                                     <span class="material-symbols-outlined">workspace_premium</span>
                                                     <span>TOP PERFORMER</span>
                                                 </div>
                                                 <span class="spotlight-name">{{d.topPerformer}}</span>
                                             </div>
-                                            <div class="no-performer" *ngIf="!d.topPerformer || d.topPerformer === 'N/A'">
+                                            <div class="no-performer"
+                                                *ngIf="!d.topPerformer || d.topPerformer === 'N/A'">
                                                 <span class="text-muted">Stability Target Reached</span>
                                             </div>
                                         </div>
@@ -538,13 +557,13 @@
                                 </div>
 
                                 <!-- Report Type: COURSE_ANALYTICS -->
-                                <table class="enterprise-table" *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS'">
+                                <table class="enterprise-table"
+                                    *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS'">
                                     <thead class="colorful-header">
                                         <tr>
                                             <th>Program Details</th>
                                             <th class="text-center">Forms</th>
                                             <th class="text-center">Confirmed</th>
-                                            <th class="text-right">Net Revenue</th>
                                             <th class="text-right">Gross Paid</th>
                                             <th class="text-right">Refunded</th>
                                             <th class="text-right">Balance</th>
@@ -562,10 +581,10 @@
                                             <td class="text-center"><span
                                                     class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
                                             </td>
-                                            <td class="text-right font-mono">₹{{d.totalRevenue | number}}</td>
                                             <td class="text-right font-mono" style="color: var(--success);">
                                                 ₹{{d.totalFeesCollected | number}}</td>
-                                            <td class="text-right font-mono" style="color: var(--danger-text, #ef4444);">
+                                            <td class="text-right font-mono"
+                                                style="color: var(--danger-text, #ef4444);">
                                                 ₹{{d.totalRefunded | number}}</td>
                                             <td class="text-right font-mono" style="color: var(--danger);">
                                                 ₹{{d.remainingAmount | number}}</td>
@@ -580,7 +599,6 @@
                                             <td class="text-center">
                                                 <span class="footer-val">{{totalsRow.totalConfirmed}}</span>
                                             </td>
-                                            <td class="text-right">₹{{totalsRow.totalRevenue | number}}</td>
                                             <td class="text-right">₹{{totalsRow.totalFeesCollected | number}}</td>
                                             <td class="text-right">₹{{totalsRow.totalRefunded | number}}</td>
                                             <td class="text-right">₹{{totalsRow.totalRemaining | number}}</td>
