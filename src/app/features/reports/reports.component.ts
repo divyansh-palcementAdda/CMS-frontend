@@ -116,8 +116,21 @@ export class ReportsComponent implements OnInit, OnDestroy {
     conversionRate: 0 
   };
   dailySummaryData: any = null;
+  sessionCumulativeStats: any = null;
   totalElements = 0;
   serverPages = 0;
+
+  // Custom Date Picker State
+  showCustomDatePicker = false;
+  customStartDate = '';
+  customEndDate = '';
+  dateRangeValidationError = '';
+  
+  overallLeadSourceTotals: any[] = [];
+  overallTotalForms = 0;
+  overallTotalConfirmed = 0;
+  overallTotalFeesReceived = 0;
+  aggregatedTotals: any = null;
 
   sessions: string[] = [];
   
@@ -125,6 +138,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
   public barChartOptions: Partial<ChartOptions> | any;
   public pieChartOptions: Partial<ChartOptions> | any;
   public lineChartOptions: Partial<ChartOptions> | any;
+  public revenueBarChartOptions: Partial<ChartOptions> | any;
+  public revenueDonutChartOptions: Partial<ChartOptions> | any;
+  public revenueHorizontalBarChartOptions: Partial<ChartOptions> | any;
 
   get paginatedData() {
     return this.reportData;
@@ -146,6 +162,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
     this.generateSessions();
     this.loadReport();
+    if (this.activeReport === 'DAILY_SESSION_SUMMARY') {
+      this.loadSessionCumulativeStats();
+    }
   }
 
   private generateSessions() {
@@ -193,42 +212,203 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.loadReport();
   }
 
+  onDateFilterChange() {
+    if (this.filters.filterType === 'CUSTOM') {
+      this.showCustomDatePicker = true;
+      this.customStartDate = this.filters.startDate || '';
+      this.customEndDate = this.filters.endDate || '';
+      this.dateRangeValidationError = '';
+    } else {
+      this.showCustomDatePicker = false;
+      this.filters.startDate = undefined;
+      this.filters.endDate = undefined;
+      this.filters.page = 0;
+      this.loadReport();
+    }
+  }
+
+  onCustomDateChange() {
+    this.validateDateRange();
+  }
+
+  validateDateRange() {
+    this.dateRangeValidationError = '';
+    if (!this.customStartDate || !this.customEndDate) {
+      return;
+    }
+    const start = new Date(this.customStartDate);
+    const end = new Date(this.customEndDate);
+    if (end < start) {
+      this.dateRangeValidationError = 'End Date cannot be before Start Date';
+    }
+  }
+
+  applyCustomDateRange() {
+    this.validateDateRange();
+    if (this.dateRangeValidationError) {
+      return;
+    }
+    if (!this.customStartDate || !this.customEndDate) {
+      this.dateRangeValidationError = 'Please select a valid date range';
+      return;
+    }
+
+    this.filters.startDate = this.customStartDate;
+    this.filters.endDate = this.customEndDate;
+    this.filters.page = 0;
+    this.showCustomDatePicker = false;
+    this.loadReport();
+  }
+
+  cancelCustomDate() {
+    this.showCustomDatePicker = false;
+    if (!this.filters.startDate || !this.filters.endDate) {
+      this.filters.filterType = 'TODAY';
+      this.onDateFilterChange();
+    }
+  }
+
+  clearCustomDateRange() {
+    this.filters.startDate = undefined;
+    this.filters.endDate = undefined;
+    this.filters.filterType = 'TODAY';
+    this.showCustomDatePicker = false;
+    this.filters.page = 0;
+    this.loadReport();
+  }
+
+  formatCustomDate(dateStr: string | undefined): string {
+    if (!dateStr) return '';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      
+      return `${day} ${month} ${year}`;
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
   get summaryStats() {
     return this.serverSummary;
   }
 
   get totalsRow() {
-    const data = this.reportData || [];
-    const lsMap: {[key: string]: number} = {};
-    
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
-        data.forEach((d: any) => {
-            if (d.leadSources) {
-                d.leadSources.forEach((ls: any) => {
-                    lsMap[ls.leadSourceName] = (lsMap[ls.leadSourceName] || 0) + ls.formsReceived;
-                });
-            }
+        const at = this.aggregatedTotals || {};
+        const leadSourceTotals = this.leadSourceHeaders.map(h => {
+            const prefix = this.getLeadSourceKeyPrefix(h);
+            return {
+                forms: at[prefix + 'Forms'] ?? 0,
+                fees: at[prefix + 'Fees'] ?? 0
+            };
         });
+        const totalFeesReceived = leadSourceTotals.reduce((sum, t) => sum + t.fees, 0);
+        return {
+            revConfirmed: 0,
+            revProjected: 0,
+            revCollected: 0,
+            revRefunded: 0,
+            revNet: 0,
+            revRemaining: 0,
+            totalForms: at.totalForms ?? 0,
+            totalConfirmed: at.confirmed ?? 0,
+            totalFeesCollected: 0,
+            totalRemaining: 0,
+            totalRevenue: 0,
+            totalFeesPaid: 0,
+            totalRemainingFees: 0,
+            totalRefunded: 0,
+            totalStudents: this.totalElements,
+            totalFeesReceived: totalFeesReceived,
+            leadSourceTotals: leadSourceTotals
+        };
+    }
+
+    if (this.activeReport === 'COURSE_REVENUE') {
+        const revConfirmed = this.serverSummary.confirmedAdmissions || 0;
+        const revCollected = this.serverSummary.realizedRevenue || 0;
+        const revRefunded = this.serverSummary.totalRefunded || 0;
+        const revNet = this.serverSummary.netCollected || 0;
+        const revRemaining = this.serverSummary.outstandingDues || 0;
+        const revProjected = revNet + revRemaining;
+
+        return {
+            revConfirmed,
+            revProjected,
+            revCollected,
+            revRefunded,
+            revNet,
+            revRemaining,
+            totalForms: this.serverSummary.totalApplications || 0,
+            totalConfirmed: revConfirmed,
+            totalFeesCollected: revCollected,
+            totalRemaining: revRemaining,
+            totalRevenue: revProjected,
+            totalFeesPaid: revCollected,
+            totalRemainingFees: revRemaining,
+            totalRefunded: revRefunded,
+            totalStudents: this.totalElements,
+            totalFeesReceived: 0,
+            leadSourceTotals: []
+        };
     }
 
     return {
-        totalForms: this.serverSummary.totalApplications,
-        totalConfirmed: this.serverSummary.confirmedAdmissions,
-        totalFeesCollected: this.serverSummary.realizedRevenue,
-        totalRemaining: this.serverSummary.outstandingDues,
-        totalRevenue: this.serverSummary.realizedRevenue,
-        totalFeesPaid: this.serverSummary.realizedRevenue,
-        totalRemainingFees: this.serverSummary.outstandingDues,
-        totalRefunded: this.serverSummary.totalRefunded,
+        revConfirmed: 0,
+        revProjected: 0,
+        revCollected: 0,
+        revRefunded: 0,
+        revNet: 0,
+        revRemaining: 0,
+        totalForms: this.serverSummary.totalApplications || 0,
+        totalConfirmed: this.serverSummary.confirmedAdmissions || 0,
+        totalFeesCollected: this.serverSummary.realizedRevenue || 0,
+        totalRemaining: this.serverSummary.outstandingDues || 0,
+        totalRevenue: this.serverSummary.realizedRevenue || 0,
+        totalFeesPaid: this.serverSummary.realizedRevenue || 0,
+        totalRemainingFees: this.serverSummary.outstandingDues || 0,
+        totalRefunded: this.serverSummary.totalRefunded || 0,
         totalStudents: this.totalElements,
-        leadSourceTotals: this.leadSourceHeaders.map(h => lsMap[h] || 0)
+        totalFeesReceived: 0,
+        leadSourceTotals: []
     };
   }
 
-  getLeadVal(d: any, h: string): number {
+  getLeadSourceKeyPrefix(name: string): string {
+    if (!name) return 'unknown';
+    const normalized = name.trim().toLowerCase();
+    switch (normalized) {
+      case 'consultant': return 'consultant';
+      case 'orai': return 'orai';
+      case 'digital': return 'digital';
+      case 'reference': return 'reference';
+      case 'raw data':
+      case 'raw_data':
+      case 'rawdata': return 'rawData';
+      case 'direct': return 'direct';
+      default:
+        const parts = normalized.split(/\s+/);
+        let prefix = parts[0];
+        for (let i = 1; i < parts.length; i++) {
+          if (parts[i]) {
+            prefix += parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
+          }
+        }
+        return prefix;
+    }
+  }
+
+  getLeadVal(d: any, h: string, type: 'forms' | 'fees'): number {
     if (!d.leadSources) return 0;
     const stat = d.leadSources.find((s: any) => s.leadSourceName === h);
-    return stat ? stat.formsReceived : 0;
+    if (!stat) return 0;
+    return type === 'forms' ? stat.formsReceived : (stat.feesReceivedCount || 0);
   }
 
   reportTypes = [
@@ -252,9 +432,54 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.pieChartOptions = null;
     this.lineChartOptions = null;
     this.loadReport();
+    if (type === 'DAILY_SESSION_SUMMARY') {
+      this.loadSessionCumulativeStats();
+    }
+  }
+
+  loadSessionCumulativeStats() {
+    if (this.activeReport !== 'DAILY_SESSION_SUMMARY') {
+      return;
+    }
+    const sessionVal = this.filters.session === 'OVERALL' ? '' : (this.filters.session || '');
+    this.reportsService.getSessionCumulativeStats(sessionVal).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        console.log('Session Cumulative Stats Response:', res);
+        if (res && res.data) {
+          this.sessionCumulativeStats = res.data;
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load session cumulative stats:', err);
+      }
+    });
+  }
+
+  onSessionChange() {
+    this.filters.page = 0;
+    this.loadReport();
+    if (this.activeReport === 'DAILY_SESSION_SUMMARY') {
+      this.loadSessionCumulativeStats();
+    }
+  }
+
+  syncReport() {
+    this.loadReport();
+    if (this.activeReport === 'DAILY_SESSION_SUMMARY') {
+      this.loadSessionCumulativeStats();
+    }
   }
 
   loadReport() {
+    if (this.filters.filterType === 'CUSTOM') {
+      if (!this.filters.startDate || !this.filters.endDate) {
+        this.showCustomDatePicker = true;
+        this.dateRangeValidationError = 'Please select a valid date range';
+        return;
+      }
+    }
     this.loading = true;
     
     const apiFilter: ReportFilter = { ...this.filters };
@@ -327,6 +552,21 @@ export class ReportsComponent implements OnInit, OnDestroy {
           if (apiData.summaryStats) {
             this.serverSummary = apiData.summaryStats;
             console.log('Summary Stats', this.serverSummary);
+          }
+
+          this.aggregatedTotals = apiData.aggregatedTotals || null;
+          console.log("Aggregated Totals:", this.aggregatedTotals);
+
+          if (apiData.meta) {
+            this.overallLeadSourceTotals = apiData.meta.overallLeadSourceTotals || [];
+            this.overallTotalForms = apiData.meta.overallTotalForms || 0;
+            this.overallTotalConfirmed = apiData.meta.overallTotalConfirmed || 0;
+            this.overallTotalFeesReceived = apiData.meta.overallTotalFeesReceived || 0;
+          } else {
+            this.overallLeadSourceTotals = [];
+            this.overallTotalForms = 0;
+            this.overallTotalConfirmed = 0;
+            this.overallTotalFeesReceived = 0;
           }
 
           if (baseType === 'COURSE_LEAD_SOURCE' && this.reportData.length > 0 && this.reportData[0].leadSources) {
@@ -467,22 +707,100 @@ export class ReportsComponent implements OnInit, OnDestroy {
         };
     }
 
-    // 3. REVENUE ANALYSIS - Stacked Comparison
+    // 3. REVENUE ANALYSIS - Advanced Multi-Visualizations
     if (this.activeReport === 'COURSE_REVENUE') {
         const chartData = data.slice(0, 12);
-        this.barChartOptions = {
+        
+        this.revenueBarChartOptions = {
             series: [
+                { name: 'Projected', data: chartData.map(d => d.totalRevenue || 0) },
                 { name: 'Collected', data: chartData.map(d => d.totalFeesCollected || 0) },
-                { name: 'Pending', data: chartData.map(d => d.remainingAmount || 0) }
+                { name: 'Refunded', data: chartData.map(d => d.totalRefunded || 0) },
+                { name: 'Net Collected', data: chartData.map(d => d.netCollected || 0) }
             ],
-            chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: 450, stacked: true },
-            plotOptions: { bar: { columnWidth: '45%', borderRadius: 8 } },
-            colors: ['#34d399', '#f472b6'], // Success vs Pending
+            chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: 450 },
+            plotOptions: { bar: { columnWidth: '55%', borderRadius: 6 } },
+            colors: ['#4f46e5', '#10b981', '#ef4444', '#3b82f6'], // Indigo, Emerald, Red, Blue
             xaxis: { categories: chartData.map(d => d.courseName), labels: { rotate: -45, style: { fontWeight: 600 } } },
-            yaxis: { labels: { formatter: (val: any) => '₹' + (val / 1000).toFixed(0) + 'k' } },
+            yaxis: { labels: { formatter: (val: any) => '₹' + val.toLocaleString() } },
             legend: { position: 'top', horizontalAlign: 'right' },
             dataLabels: { enabled: false },
             tooltip: { theme: 'light', y: { formatter: (val: any) => '₹' + val.toLocaleString() } }
+        };
+
+        const totalNetCollected = chartData.reduce((acc, d) => acc + (d.netCollected || 0), 0);
+        const totalRefunded = chartData.reduce((acc, d) => acc + (d.totalRefunded || 0), 0);
+        const totalProjected = chartData.reduce((acc, d) => acc + (d.totalRevenue || 0), 0);
+        const totalRemaining = Math.max(0, totalProjected - totalNetCollected);
+
+        this.revenueDonutChartOptions = {
+            series: [totalNetCollected, totalRemaining, totalRefunded],
+            labels: ['Net Collected', 'Remaining Revenue', 'Refunded'],
+            chart: { ...COMMON_CHART_OPTIONS, type: 'donut', height: 350 },
+            colors: ['#10b981', '#f59e0b', '#ef4444'], // Emerald, Amber, Red
+            stroke: { width: 4, colors: ['#fff'] },
+            legend: { position: 'bottom', fontWeight: 600, markers: { radius: 12 } },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '75%',
+                        labels: {
+                            show: true,
+                            total: { 
+                                show: true, 
+                                label: 'OVERALL REVENUE', 
+                                fontSize: '12px', 
+                                fontWeight: 800, 
+                                color: '#94a3b8',
+                                formatter: () => '₹' + totalProjected.toLocaleString(undefined, { maximumFractionDigits: 0 })
+                            },
+                            value: { 
+                                fontSize: '20px', 
+                                fontWeight: 800, 
+                                color: '#1e293b',
+                                formatter: (val: any) => '₹' + Number(val).toLocaleString(undefined, { maximumFractionDigits: 0 })
+                            }
+                        }
+                    }
+                }
+            },
+            dataLabels: { enabled: false },
+            tooltip: { 
+                theme: 'light',
+                y: { formatter: (val: any) => '₹' + val.toLocaleString() }
+            }
+        };
+
+        this.revenueHorizontalBarChartOptions = {
+            series: [
+                { name: 'Confirmed Admissions', data: chartData.map(d => d.confirmedAdmissions || 0) }
+            ],
+            chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: Math.max(chartData.length * 40, 300) },
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    barHeight: '60%',
+                    borderRadius: 6,
+                    dataLabels: { position: 'end' }
+                }
+            },
+            colors: ['#3b82f6'], // Blue
+            xaxis: { 
+                categories: chartData.map(d => d.courseName),
+                labels: { style: { fontWeight: 600 } }
+            },
+            yaxis: { labels: { style: { fontWeight: 600 } } },
+            dataLabels: { 
+                enabled: true,
+                textAnchor: 'start',
+                style: { colors: ['#fff'], fontWeight: 700 },
+                formatter: (val: any) => val + ' Adms'
+            },
+            tooltip: { 
+                theme: 'light',
+                y: { formatter: (val: any) => val + ' Admissions' }
+            },
+            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
         };
     }
 
@@ -573,6 +891,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.barChartOptions = null;
     this.pieChartOptions = null;
     this.lineChartOptions = null;
+    this.revenueBarChartOptions = null;
+    this.revenueDonutChartOptions = null;
+    this.revenueHorizontalBarChartOptions = null;
   }
 
   exportExcel() {

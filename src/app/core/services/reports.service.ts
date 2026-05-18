@@ -54,4 +54,8 @@ export class ReportsService {
   exportWhatsApp(type: string, filter: ReportFilter): Observable<any> {
     return this.http.post(`${this.apiUrl}/export/whatsapp?type=${type}`, filter);
   }
+
+  getSessionCumulativeStats(session: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/session/cumulative-stats`, { params: { session } });
+  }
 }
