@@ -439,6 +439,48 @@
   }
 
   &.compact input { width: 160px; padding: 7px 12px 7px 32px; font-size: 0.8rem; }
+
+  &.is-loading input {
+    padding-right: 40px;
+  }
+
+  &__loader {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    border: 2px solid var(--mm-border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: mmSpin 0.7s linear infinite;
+  }
+}
+
+// ─── Consultancy list panel (sticky search + scrollable list) ─────────────────
+.mm-list-panel {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--mm-radius-md);
+  border: 1px solid var(--mm-border);
+  background: #fff;
+  overflow: hidden;
+
+  .mm-list-box {
+    border: none;
+    border-radius: 0;
+    max-height: 280px;
+  }
+}
+
+.mm-stage__bar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #fff;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 // ─── List Box ─────────────────────────────────────────────────────────────────
@@ -449,9 +491,12 @@
   overflow: hidden;
   max-height: 240px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: var(--mm-border); border-radius: 4px; }
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--mm-muted-light) 50%, transparent); border-radius: 4px; }
+  &::-webkit-scrollbar-thumb:hover { background: var(--mm-muted-light); }
 }
 
 .mm-list {

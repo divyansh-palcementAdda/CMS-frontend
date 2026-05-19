@@ -13,6 +13,28 @@ export interface AdmissionStats {
   totalAmountPending: number;
   totalAmountDiscounted: number;
   totalRevenueExpected: number;
+
+  // Application Management Stats
+  appDirect: number;
+  appConsultancy: number;
+  appScholar: number;
+  appUnmapped: number;
+  
+  appConfirmed: number;
+  appCancelled: number;
+  appCancelledAdmissions: number;
+  appRemaining: number;
+  
+  // Admission Management Stats
+  admTotal: number;
+  admDirect: number;
+  admConsultancy: number;
+  admScholar: number;
+  admUnmapped: number;
+  
+  admConfirmed: number;
+  admCancelled: number;
+  admRemainingActive: number;
 }
 
 export interface AdmissionItem {
@@ -56,6 +78,7 @@ export interface AdmissionItem {
 
   discountType?: string;
   discountValue?: number;
+  discountedAmount?: string;
   isScholar?: boolean;
   scholarshipDetails?: string;
 

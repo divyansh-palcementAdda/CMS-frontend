@@ -126,7 +126,7 @@
 
                             <div class="kpi-card-v2 revenue" [class.is-loading]="loading">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined">payments</span></div>
-                                <div class="kpi-label">Realized Revenue</div>
+                                <div class="kpi-label">Actual Collections</div>
                                 <div class="value-group">
                                     <span class="kpi-value">₹{{summaryStats.realizedRevenue | number:'1.0-0'}}</span>
                                     <div class="trend-indicator">
@@ -138,7 +138,7 @@
                             <div class="kpi-card-v2 pending" [class.is-loading]="loading">
                                 <div class="card-bg-icon"><span
                                         class="material-symbols-outlined">account_balance_wallet</span></div>
-                                <div class="kpi-label">Outstanding Dues</div>
+                                <div class="kpi-label">Remaining Pending Amount</div>
                                 <div class="value-group">
                                     <span class="kpi-value">₹{{summaryStats.outstandingDues | number:'1.0-0'}}</span>
                                     <div class="trend-indicator">
@@ -150,8 +150,10 @@
 
                         <!-- Revenue Summary KPI Grid for COURSE_REVENUE -->
                         <div class="kpi-grid-premium revenue-kpi-grid" *ngIf="activeReport === 'COURSE_REVENUE'">
-                            <div class="kpi-card-v2 total" [class.is-loading]="loading" style="border-left: 4px solid #10b981;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #10b981;">payments</span></div>
+                            <div class="kpi-card-v2 total" [class.is-loading]="loading"
+                                style="border-left: 4px solid #10b981;">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: #10b981;">payments</span></div>
                                 <div class="kpi-label">Total Collected Till Date (A)</div>
                                 <div class="value-group">
                                     <span class="kpi-value">₹{{summaryStats.realizedRevenue | number:'1.0-0'}}</span>
@@ -161,30 +163,38 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 confirmed" [class.is-loading]="loading" style="border-left: 4px solid #ef4444;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #ef4444;">keyboard_return</span></div>
+                            <div class="kpi-card-v2 confirmed" [class.is-loading]="loading"
+                                style="border-left: 4px solid #ef4444;">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: #ef4444;">keyboard_return</span></div>
                                 <div class="kpi-label">Total Refunded Till Date</div>
                                 <div class="value-group">
-                                    <span class="kpi-value">₹{{(summaryStats.totalRefunded || 0) | number:'1.0-0'}}</span>
+                                    <span class="kpi-value">₹{{(summaryStats.totalRefunded || 0) |
+                                        number:'1.0-0'}}</span>
                                     <div class="trend-indicator">
                                         <span class="trend-label">Refund Volume</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 revenue" [class.is-loading]="loading" style="border-left: 4px solid #4f46e5;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #4f46e5;">account_balance</span></div>
+                            <div class="kpi-card-v2 revenue" [class.is-loading]="loading"
+                                style="border-left: 4px solid #4f46e5;">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: #4f46e5;">account_balance</span></div>
                                 <div class="kpi-label">Net Collected Revenue</div>
                                 <div class="value-group">
-                                    <span class="kpi-value">₹{{(summaryStats.netCollected || 0) | number:'1.0-0'}}</span>
+                                    <span class="kpi-value">₹{{(summaryStats.netCollected || 0) |
+                                        number:'1.0-0'}}</span>
                                     <div class="trend-indicator">
                                         <span class="trend-label">Net Collected</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 pending" [class.is-loading]="loading" style="border-left: 4px solid #f59e0b;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #f59e0b;">account_balance_wallet</span></div>
+                            <div class="kpi-card-v2 pending" [class.is-loading]="loading"
+                                style="border-left: 4px solid #f59e0b;">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: #f59e0b;">account_balance_wallet</span></div>
                                 <div class="kpi-label">Total Remaining To Collect (B)</div>
                                 <div class="value-group">
                                     <span class="kpi-value">₹{{summaryStats.outstandingDues | number:'1.0-0'}}</span>
@@ -194,11 +204,14 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 total" [class.is-loading]="loading" style="border-left: 4px solid #8b5cf6;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #8b5cf6;">analytics</span></div>
+                            <div class="kpi-card-v2 total" [class.is-loading]="loading"
+                                style="border-left: 4px solid #8b5cf6;">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: #8b5cf6;">analytics</span></div>
                                 <div class="kpi-label">Overall Revenue By All Courses</div>
                                 <div class="value-group">
-                                    <span class="kpi-value">₹{{((summaryStats.netCollected || 0) + summaryStats.outstandingDues) | number:'1.0-0'}}</span>
+                                    <span class="kpi-value">₹{{((summaryStats.netCollected || 0) +
+                                        summaryStats.outstandingDues) | number:'1.0-0'}}</span>
                                     <div class="trend-indicator">
                                         <span class="trend-label">Net + Remaining</span>
                                     </div>
@@ -208,7 +221,8 @@
 
 
                         <!-- Professional Analytics Visualization -->
-                        <div class="analytics-visualization-grid" *ngIf="!loading && reportData.length > 0 && activeReport !== 'COURSE_REVENUE'">
+                        <div class="analytics-visualization-grid"
+                            *ngIf="!loading && reportData.length > 0 && activeReport !== 'COURSE_REVENUE'">
                             <!-- Main Trends Section -->
                             <div class="analytics-chart-card main-insight" [class.full-width]="!pieChartOptions"
                                 *ngIf="barChartOptions || lineChartOptions">
@@ -260,26 +274,31 @@
                         </div>
 
                         <!-- Revenue Specific Graphical Analytics -->
-                        <div class="revenue-charts-container" *ngIf="!loading && reportData.length > 0 && activeReport === 'COURSE_REVENUE'">
-                            <div class="rev-chart-row-top" style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <div class="revenue-charts-container"
+                            *ngIf="!loading && reportData.length > 0 && activeReport === 'COURSE_REVENUE'">
+                            <div class="rev-chart-row-top"
+                                style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
                                 <!-- Chart 1: Course-wise Revenue Comparison Graph -->
                                 <div class="analytics-chart-card main-insight" style="flex: 2; min-width: 350px;">
                                     <div class="chart-header">
-                                        <div class="title-group" style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <span class="material-symbols-outlined icon" style="color: var(--primary);">bar_chart</span>
-                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Course-wise Revenue Comparison</h3>
+                                        <div class="title-group"
+                                            style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="material-symbols-outlined icon"
+                                                style="color: var(--primary);">bar_chart</span>
+                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Course-wise
+                                                Revenue Comparison</h3>
                                         </div>
                                     </div>
                                     <div class="chart-wrapper" style="padding: 1rem;">
-                                        <apx-chart *ngIf="revenueBarChartOptions" 
+                                        <apx-chart *ngIf="revenueBarChartOptions"
                                             [series]="revenueBarChartOptions.series!"
-                                            [chart]="revenueBarChartOptions.chart!" 
+                                            [chart]="revenueBarChartOptions.chart!"
                                             [xaxis]="revenueBarChartOptions.xaxis!"
-                                            [yaxis]="revenueBarChartOptions.yaxis!" 
+                                            [yaxis]="revenueBarChartOptions.yaxis!"
                                             [plotOptions]="revenueBarChartOptions.plotOptions!"
-                                            [colors]="revenueBarChartOptions.colors!" 
+                                            [colors]="revenueBarChartOptions.colors!"
                                             [legend]="revenueBarChartOptions.legend!"
-                                            [dataLabels]="revenueBarChartOptions.dataLabels!" 
+                                            [dataLabels]="revenueBarChartOptions.dataLabels!"
                                             [tooltip]="revenueBarChartOptions.tooltip!"
                                             [grid]="revenueBarChartOptions.grid!">
                                         </apx-chart>
@@ -289,20 +308,24 @@
                                 <!-- Chart 2: Collection Progress Overview -->
                                 <div class="analytics-chart-card side-distribution" style="flex: 1; min-width: 300px;">
                                     <div class="chart-header">
-                                        <div class="title-group" style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <span class="material-symbols-outlined icon" style="color: var(--primary);">donut_small</span>
-                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Collection Progress Overview</h3>
+                                        <div class="title-group"
+                                            style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="material-symbols-outlined icon"
+                                                style="color: var(--primary);">donut_small</span>
+                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Collection
+                                                Progress Overview</h3>
                                         </div>
                                     </div>
-                                    <div class="chart-wrapper donut-center" style="padding: 1rem; display: flex; justify-content: center; align-items: center;">
+                                    <div class="chart-wrapper donut-center"
+                                        style="padding: 1rem; display: flex; justify-content: center; align-items: center;">
                                         <apx-chart *ngIf="revenueDonutChartOptions"
-                                            [series]="revenueDonutChartOptions.series!" 
+                                            [series]="revenueDonutChartOptions.series!"
                                             [chart]="revenueDonutChartOptions.chart!"
-                                            [labels]="revenueDonutChartOptions.labels!" 
+                                            [labels]="revenueDonutChartOptions.labels!"
                                             [colors]="revenueDonutChartOptions.colors!"
-                                            [legend]="revenueDonutChartOptions.legend!" 
+                                            [legend]="revenueDonutChartOptions.legend!"
                                             [plotOptions]="revenueDonutChartOptions.plotOptions!"
-                                            [dataLabels]="revenueDonutChartOptions.dataLabels!" 
+                                            [dataLabels]="revenueDonutChartOptions.dataLabels!"
                                             [tooltip]="revenueDonutChartOptions.tooltip!">
                                         </apx-chart>
                                     </div>
@@ -313,20 +336,23 @@
                                 <!-- Chart 3: Course-wise Admission Contribution -->
                                 <div class="analytics-chart-card main-insight">
                                     <div class="chart-header">
-                                        <div class="title-group" style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <span class="material-symbols-outlined icon" style="color: var(--primary);">align_horizontal_left</span>
-                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Course-wise Admission Contribution</h3>
+                                        <div class="title-group"
+                                            style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="material-symbols-outlined icon"
+                                                style="color: var(--primary);">align_horizontal_left</span>
+                                            <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Course-wise
+                                                Admission Contribution</h3>
                                         </div>
                                     </div>
                                     <div class="chart-wrapper" style="padding: 1rem;">
                                         <apx-chart *ngIf="revenueHorizontalBarChartOptions"
                                             [series]="revenueHorizontalBarChartOptions.series!"
-                                            [chart]="revenueHorizontalBarChartOptions.chart!" 
+                                            [chart]="revenueHorizontalBarChartOptions.chart!"
                                             [xaxis]="revenueHorizontalBarChartOptions.xaxis!"
-                                            [yaxis]="revenueHorizontalBarChartOptions.yaxis!" 
+                                            [yaxis]="revenueHorizontalBarChartOptions.yaxis!"
                                             [plotOptions]="revenueHorizontalBarChartOptions.plotOptions!"
                                             [colors]="revenueHorizontalBarChartOptions.colors!"
-                                            [dataLabels]="revenueHorizontalBarChartOptions.dataLabels!" 
+                                            [dataLabels]="revenueHorizontalBarChartOptions.dataLabels!"
                                             [tooltip]="revenueHorizontalBarChartOptions.tooltip!"
                                             [grid]="revenueHorizontalBarChartOptions.grid!">
                                         </apx-chart>
@@ -379,7 +405,8 @@
                                     <div class="financial-kpi-stack">
                                         <div class="kpi-mini-card gross">
                                             <span class="label">Fees Received Today</span>
-                                            <span class="val">{{dailySummaryData.feesReceivedTodayCount | number}}</span>
+                                            <span class="val">{{dailySummaryData.feesReceivedTodayCount |
+                                                number}}</span>
                                         </div>
                                         <div class="kpi-mini-card gross">
                                             <span class="label">Gross Received Today</span>
@@ -432,7 +459,8 @@
                                                     <span class="sub">Total applications received till date</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.totalForms ?? 0}}</span>
+                                            <span class="metric-value">{{sessionCumulativeStats?.totalForms ??
+                                                0}}</span>
                                         </div>
 
                                         <div class="metric-row highlight-success">
@@ -443,18 +471,20 @@
                                                     <span class="sub">Students moved to final roll</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.totalAdmissions ?? 0}}</span>
+                                            <span class="metric-value">{{sessionCumulativeStats?.totalAdmissions ??
+                                                0}}</span>
                                         </div>
 
                                         <div class="metrics-sub-group">
                                             <div class="sub-metric">
                                                 <span class="label">Scholarship</span>
-                                                <span class="val">{{sessionCumulativeStats?.scholarshipAdmissions ?? 0}}</span>
+                                                <span class="val">{{sessionCumulativeStats?.scholarshipAdmissions ??
+                                                    0}}</span>
                                             </div>
                                             <div class="sub-metric highlight-actual">
                                                 <span class="label">Actual Adm</span>
-                                                <span
-                                                    class="val">{{sessionCumulativeStats?.actualAdmissions ?? 0}}</span>
+                                                <span class="val">{{sessionCumulativeStats?.actualAdmissions ??
+                                                    0}}</span>
                                             </div>
                                         </div>
 
@@ -466,7 +496,8 @@
                                                     <span class="sub">Forms cancelled without fees</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.applicationCancelled ?? 0}}</span>
+                                            <span class="metric-value">{{sessionCumulativeStats?.applicationCancelled ??
+                                                0}}</span>
                                         </div>
 
                                         <div class="metric-row highlight-danger">
@@ -477,7 +508,8 @@
                                                     <span class="sub">Confirmed admissions cancelled</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.admissionCancelled ?? 0}}</span>
+                                            <span class="metric-value">{{sessionCumulativeStats?.admissionCancelled ??
+                                                0}}</span>
                                         </div>
 
                                         <div class="metric-row highlight-warning">
@@ -488,8 +520,8 @@
                                                     <span class="sub">Forms pending processing/closure</span>
                                                 </div>
                                             </div>
-                                            <span
-                                                class="metric-value">{{sessionCumulativeStats?.remainingForms ?? 0}}</span>
+                                            <span class="metric-value">{{sessionCumulativeStats?.remainingForms ??
+                                                0}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -498,7 +530,8 @@
                             <div class="card-footer-info">
                                 <div class="footer-item">
                                     <span class="material-symbols-outlined">how_to_reg</span>
-                                    <span>Students paid first fee: <strong>{{dailySummaryData.feesReceivedTodayCount | number}}</strong></span>
+                                    <span>Students paid first fee: <strong>{{dailySummaryData.feesReceivedTodayCount |
+                                            number}}</strong></span>
                                 </div>
                                 <div class="footer-item note">
                                     <span class="material-symbols-outlined">info</span>
@@ -548,10 +581,13 @@
                                 </div>
                                 <div class="filter-controls">
                                     <!-- Custom Date Applied Badge (Premium UI) -->
-                                    <div class="custom-range-badge" *ngIf="filters.filterType === 'CUSTOM' && filters.startDate && filters.endDate">
+                                    <div class="custom-range-badge"
+                                        *ngIf="filters.filterType === 'CUSTOM' && filters.startDate && filters.endDate">
                                         <span class="material-symbols-outlined icon">calendar_today</span>
-                                        <span class="range-text">{{formatCustomDate(filters.startDate)}} - {{formatCustomDate(filters.endDate)}}</span>
-                                        <button class="btn-clear-badge" (click)="clearCustomDateRange()" title="Clear Range">
+                                        <span class="range-text">{{formatCustomDate(filters.startDate)}} -
+                                            {{formatCustomDate(filters.endDate)}}</span>
+                                        <button class="btn-clear-badge" (click)="clearCustomDateRange()"
+                                            title="Clear Range">
                                             <span class="material-symbols-outlined">close</span>
                                         </button>
                                     </div>
@@ -570,7 +606,8 @@
                                     <div class="control-item">
                                         <label>Session</label>
                                         <select [(ngModel)]="filters.session" (change)="onSessionChange()">
-                                            <option *ngFor="let s of sessions" [value]="s">{{s === 'OVERALL' ? 'Overall / All Sessions' : s}}</option>
+                                            <option *ngFor="let s of sessions" [value]="s">{{s === 'OVERALL' ? 'Overall
+                                                / All Sessions' : s}}</option>
                                         </select>
                                     </div>
                                     <button class="btn-sync" (click)="syncReport()" [class.syncing]="loading"
@@ -598,14 +635,16 @@
                                             <label>Start Date</label>
                                             <div class="input-wrapper">
                                                 <span class="material-symbols-outlined input-icon">calendar_month</span>
-                                                <input type="date" [(ngModel)]="customStartDate" (change)="onCustomDateChange()">
+                                                <input type="date" [(ngModel)]="customStartDate"
+                                                    (change)="onCustomDateChange()">
                                             </div>
                                         </div>
                                         <div class="date-input-field">
                                             <label>End Date</label>
                                             <div class="input-wrapper">
                                                 <span class="material-symbols-outlined input-icon">calendar_month</span>
-                                                <input type="date" [(ngModel)]="customEndDate" (change)="onCustomDateChange()">
+                                                <input type="date" [(ngModel)]="customEndDate"
+                                                    (change)="onCustomDateChange()">
                                             </div>
                                         </div>
                                     </div>
@@ -620,9 +659,9 @@
                                     <button class="btn-panel-action secondary" (click)="cancelCustomDate()">
                                         Cancel
                                     </button>
-                                    <button class="btn-panel-action primary" 
-                                            [disabled]="!!dateRangeValidationError || !customStartDate || !customEndDate" 
-                                            (click)="applyCustomDateRange()">
+                                    <button class="btn-panel-action primary"
+                                        [disabled]="!!dateRangeValidationError || !customStartDate || !customEndDate"
+                                        (click)="applyCustomDateRange()">
                                         Apply Range
                                     </button>
                                 </div>
@@ -651,7 +690,8 @@
                                     <thead class="colorful-header">
                                         <tr>
                                             <th rowspan="2" class="align-middle">Program Name</th>
-                                            <th *ngFor="let h of leadSourceHeaders" colspan="2" class="text-center group-border">{{h}}</th>
+                                            <th *ngFor="let h of leadSourceHeaders" colspan="2"
+                                                class="text-center group-border">{{h}}</th>
                                             <th rowspan="2" class="text-right align-middle">Total Forms</th>
                                             <th rowspan="2" class="text-right align-middle">Confirmed</th>
                                             <th rowspan="2" class="text-right align-middle">Total Fees</th>
@@ -668,12 +708,14 @@
                                             <td class="sticky-col">{{d.courseName}}</td>
                                             <ng-container *ngFor="let h of leadSourceHeaders">
                                                 <td class="text-center">
-                                                    <span class="count-chip" [class.dimmed]="getLeadVal(d, h, 'forms') === 0">
+                                                    <span class="count-chip"
+                                                        [class.dimmed]="getLeadVal(d, h, 'forms') === 0">
                                                         {{getLeadVal(d, h, 'forms')}}
                                                     </span>
                                                 </td>
                                                 <td class="text-center group-border">
-                                                    <span class="count-chip" [class.dimmed]="getLeadVal(d, h, 'fees') === 0">
+                                                    <span class="count-chip"
+                                                        [class.dimmed]="getLeadVal(d, h, 'fees') === 0">
                                                         {{getLeadVal(d, h, 'fees')}}
                                                     </span>
                                                 </td>
@@ -688,27 +730,32 @@
                                         </tr>
                                     </tbody>
                                     <tfoot *ngIf="totalsRow">
-                                         <tr class="summary-footer">
-                                             <td class="sticky-col">Aggregated Totals</td>
-                                             <ng-container *ngFor="let t of totalsRow.leadSourceTotals">
-                                                 <td class="text-center">
-                                                     <span class="footer-val" [class.has-value]="t.forms > 0" [class.zero-val]="t.forms === 0">{{t.forms}}</span>
-                                                 </td>
-                                                 <td class="text-center group-border">
-                                                     <span class="footer-val" [class.has-value]="t.fees > 0" [class.zero-val]="t.fees === 0">{{t.fees}}</span>
-                                                 </td>
-                                             </ng-container>
-                                             <td class="text-right">
-                                                 <span class="footer-val" [class.has-value]="totalsRow.totalForms > 0" [class.zero-val]="totalsRow.totalForms === 0">{{totalsRow.totalForms}}</span>
-                                             </td>
-                                             <td class="text-right">
-                                                 <span class="footer-val is-confirmed" [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
-                                             </td>
-                                             <td class="text-right">
-                                                 <span class="footer-val is-confirmed" [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
-                                             </td>
-                                         </tr>
-                                     </tfoot>
+                                        <tr class="summary-footer">
+                                            <td class="sticky-col">Aggregated Totals</td>
+                                            <ng-container *ngFor="let t of totalsRow.leadSourceTotals">
+                                                <td class="text-center">
+                                                    <span class="footer-val" [class.has-value]="t.forms > 0"
+                                                        [class.zero-val]="t.forms === 0">{{t.forms}}</span>
+                                                </td>
+                                                <td class="text-center group-border">
+                                                    <span class="footer-val" [class.has-value]="t.fees > 0"
+                                                        [class.zero-val]="t.fees === 0">{{t.fees}}</span>
+                                                </td>
+                                            </ng-container>
+                                            <td class="text-right">
+                                                <span class="footer-val" [class.has-value]="totalsRow.totalForms > 0"
+                                                    [class.zero-val]="totalsRow.totalForms === 0">{{totalsRow.totalForms}}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="footer-val is-confirmed"
+                                                    [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <span class="footer-val is-confirmed"
+                                                    [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
 
                                 <!-- User Performance (Compact Analytics Performance Cards) -->
@@ -851,18 +898,26 @@
                                         <tr *ngFor="let d of paginatedData">
                                             <td class="sticky-col">{{d.courseName}}</td>
                                             <td class="text-right font-mono text-muted">₹{{d.courseFees | number}}</td>
-                                            <td class="text-center"><span class="pill-status success">{{d.totalConfirmedAdmissions}}</span></td>
-                                            <td class="text-right font-mono" style="color: var(--primary);">₹{{d.totalRevenue | number}}</td>
-                                            <td class="text-right font-mono" style="color: var(--success);">₹{{d.totalFeesCollected | number}}</td>
-                                            <td class="text-right font-mono" style="color: var(--danger-text, #ef4444);">₹{{d.totalRefunded | number}}</td>
-                                            <td class="text-right font-mono" style="color: var(--success);">₹{{d.netCollected | number}}</td>
+                                            <td class="text-center"><span
+                                                    class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
+                                            </td>
+                                            <td class="text-right font-mono" style="color: var(--primary);">
+                                                ₹{{d.totalRevenue | number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--success);">
+                                                ₹{{d.totalFeesCollected | number}}</td>
+                                            <td class="text-right font-mono"
+                                                style="color: var(--danger-text, #ef4444);">₹{{d.totalRefunded |
+                                                number}}</td>
+                                            <td class="text-right font-mono" style="color: var(--success);">
+                                                ₹{{d.netCollected | number}}</td>
                                         </tr>
                                     </tbody>
                                     <tfoot *ngIf="totalsRow">
                                         <tr class="summary-footer">
                                             <td class="sticky-col">Grand Total</td>
                                             <td class="text-right">-</td>
-                                            <td class="text-center"><span class="footer-val">{{totalsRow.revConfirmed}}</span></td>
+                                            <td class="text-center"><span
+                                                    class="footer-val">{{totalsRow.revConfirmed}}</span></td>
                                             <td class="text-right">₹{{totalsRow.revProjected | number}}</td>
                                             <td class="text-right">₹{{totalsRow.revCollected | number}}</td>
                                             <td class="text-right">₹{{totalsRow.revRefunded | number}}</td>
@@ -921,13 +976,14 @@
                                     </tfoot>
                                 </table>
                             </div>
-                            
+
                             <!-- Additional Revenue Summary Metrics -->
-                            <div class="revenue-summary-container" *ngIf="activeReport === 'COURSE_REVENUE' && totalsRow">
+                            <div class="revenue-summary-container"
+                                *ngIf="activeReport === 'COURSE_REVENUE' && totalsRow">
                                 <div class="rs-grid">
                                     <div class="rs-card success-tint">
                                         <div class="rs-header">
-                                            <span class="rs-label">Total Collected (A)</span>
+                                            <span class="rs-label">Total Collected</span>
                                             <span class="material-symbols-outlined rs-icon text-success">payments</span>
                                         </div>
                                         <div class="rs-value">₹{{totalsRow.revCollected | number}}</div>
@@ -936,7 +992,8 @@
                                     <div class="rs-card danger-tint">
                                         <div class="rs-header">
                                             <span class="rs-label">Total Refunded</span>
-                                            <span class="material-symbols-outlined rs-icon text-danger">keyboard_return</span>
+                                            <span
+                                                class="material-symbols-outlined rs-icon text-danger">keyboard_return</span>
                                         </div>
                                         <div class="rs-value">₹{{totalsRow.revRefunded | number}}</div>
                                         <span class="rs-subtitle">Refund Volume</span>
@@ -944,25 +1001,28 @@
                                     <div class="rs-card primary-tint">
                                         <div class="rs-header">
                                             <span class="rs-label">Net Collected</span>
-                                            <span class="material-symbols-outlined rs-icon text-primary">account_balance</span>
+                                            <span
+                                                class="material-symbols-outlined rs-icon text-primary">account_balance</span>
                                         </div>
                                         <div class="rs-value">₹{{totalsRow.revNet | number}}</div>
                                         <span class="rs-subtitle">Actual Net Collected</span>
                                     </div>
                                     <div class="rs-card warning-tint">
                                         <div class="rs-header">
-                                            <span class="rs-label">Remaining to Collect (B)</span>
-                                            <span class="material-symbols-outlined rs-icon text-warning">account_balance_wallet</span>
+                                            <span class="rs-label">Remaining to Collect </span>
+                                            <span
+                                                class="material-symbols-outlined rs-icon text-warning">account_balance_wallet</span>
                                         </div>
                                         <div class="rs-value">₹{{totalsRow.revRemaining | number}}</div>
-                                        <span class="rs-subtitle">Outstanding Dues</span>
+                                        <span class="rs-subtitle">Remaining Pending Amount</span>
                                     </div>
                                     <div class="rs-card highlight-tint">
                                         <div class="rs-header">
                                             <span class="rs-label">Overall Revenue</span>
                                             <span class="material-symbols-outlined rs-icon text-purple">analytics</span>
                                         </div>
-                                        <div class="rs-value">₹{{(totalsRow.revNet + totalsRow.revRemaining) | number}}</div>
+                                        <div class="rs-value">₹{{(totalsRow.revNet + totalsRow.revRemaining) | number}}
+                                        </div>
                                         <span class="rs-subtitle">Net Collected + Remaining</span>
                                     </div>
                                 </div>

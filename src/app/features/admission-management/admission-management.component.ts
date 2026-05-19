@@ -41,6 +41,7 @@ export interface ActiveFilters {
   startDate: string;
   endDate: string;
   leadSourceId: string;
+  isDiscounted: boolean | null;
 
   // Dedicated Date Filters
   appDateRangeType: string; // 'today' | 'week' | 'month' | 'custom' | ''
@@ -97,6 +98,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     startDate: '',
     endDate: '',
     leadSourceId: '',
+    isDiscounted: null,
     appDateRangeType: '',
     admDateRangeType: '',
     appStartDate: '',
@@ -104,6 +106,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     admStartDate: '',
     admEndDate: ''
   };
+
+  // ── Excel Download Modal ──────────────────────────────────────────────
+  showDownloadModal: boolean = false;
+  downloadingExcel: boolean = false;
 
 
   showFilterDrawer = false;
@@ -128,13 +134,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   private leadSourceService = inject(LeadSourceService);
 
   commissionStatuses: string[] = [
-    'PENDING', 
-    'CALCULATED', 
-    'PAID', 
-    'PARTIALLY_PAID', 
-    'WAIVED', 
-    'DISPUTED', 
-    'NOT_APPLICABLE', 
+    'PENDING',
+    'CALCULATED',
+    'PAID',
+    'PARTIALLY_PAID',
+    'WAIVED',
+    'DISPUTED',
+    'NOT_APPLICABLE',
     'UNMAPPED'
   ];
 
@@ -206,6 +212,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         startDate: params['startDate'] || '',
         endDate: params['endDate'] || '',
         leadSourceId: params['leadSourceId'] || '',
+        isDiscounted: params['isDiscounted'] === 'true' ? true : (params['isDiscounted'] === 'false' ? false : null),
         appDateRangeType: params['appDateRangeType'] || '',
         admDateRangeType: params['admDateRangeType'] || '',
         appStartDate: params['appStartDate'] || '',
@@ -276,6 +283,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.startDate) count++;
     if (this.filters.endDate) count++;
     if (this.filters.leadSourceId) count++;
+    if (this.filters.isDiscounted !== null) count++;
 
     // New Date filters count
     if (this.filters.appStartDate) count++;
@@ -309,7 +317,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.pageSize,
       this.searchTerm,
       this.filters.statFilter,
-      undefined,              // courseId — not used yet
+      this.filters.courseId ?? undefined,
       this.sortColumn,
       this.sortDirection,
       this.filters.tab,
@@ -321,17 +329,17 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.session,
       this.filters.commissionStatus,
       this.filters.fiftyPercentFeesPaid ?? undefined,
-      finalStartDate || this.filters.startDate, // Legacy param for primary filter
-      finalEndDate || this.filters.endDate,     // Legacy param for primary filter
+      finalStartDate || this.filters.startDate, // Maps to backend startDate
+      finalEndDate || this.filters.endDate,     // Maps to backend endDate
       this.filters.leadSourceId,
       this.filters.appStartDate,
       this.filters.appEndDate,
       this.filters.admStartDate,
-      this.filters.admEndDate
+      this.filters.admEndDate,
+      this.filters.isDiscounted ?? undefined
     ).subscribe({
       next: data => {
         this.pageData = data;
-        console.log(data);
         this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
         this.loading = false;
       },
@@ -454,6 +462,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       source: this.filters.source || null,
       isScholar: this.filters.isScholar || null,
       leadSourceId: this.filters.leadSourceId || null,
+      isDiscounted: this.filters.isDiscounted !== null ? this.filters.isDiscounted.toString() : null,
       appDateRangeType: this.filters.appDateRangeType || null,
       admDateRangeType: this.filters.admDateRangeType || null,
       appStartDate: this.filters.appStartDate || null,
@@ -484,6 +493,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       startDate: '',
       endDate: '',
       leadSourceId: '',
+      isDiscounted: null,
       appDateRangeType: '',
       admDateRangeType: '',
       appStartDate: '',
@@ -551,14 +561,14 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   getSourceStyle(name: string | undefined): any {
     if (!name) return {};
-    
+
     // Simple hash function to get a deterministic hue (0-360)
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = Math.abs(hash % 360);
-    
+
     // Using HSL for premium pastel look (high lightness for bg, low for text)
     return {
       'background-color': `hsl(${hue}, 85%, 94%)`,
@@ -892,5 +902,73 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     }
 
     return pages;
+  }
+
+  // ── Excel Download ────────────────────────────────────────────────────
+
+  /** Show the confirmation modal before download */
+  openDownloadModal(): void {
+    this.showDownloadModal = true;
+  }
+
+  /** Triggered when user confirms download in the modal */
+  confirmDownload(): void {
+    this.showDownloadModal = false;
+    this.downloadingExcel = true;
+
+    const finalStartDate = this.isApplicationTab ? this.filters.appStartDate : this.filters.admStartDate;
+    const finalEndDate   = this.isApplicationTab ? this.filters.appEndDate   : this.filters.admEndDate;
+
+    this.admissionService.exportStudents(
+      this.filters.tab,
+      this.filters.statusFilter,
+      this.filters.source,
+      this.filters.isScholar,
+      this.filters.statFilter,
+      this.filters.state,
+      this.filters.city,
+      this.filters.session,
+      this.filters.commissionStatus,
+      this.filters.fiftyPercentFeesPaid ?? undefined,
+      finalStartDate || this.filters.startDate,
+      finalEndDate   || this.filters.endDate,
+      this.filters.leadSourceId,
+      this.searchTerm,
+      this.filters.isDiscounted ?? undefined
+    ).subscribe({
+      next: (blob: Blob) => {
+        const tab = this.filters.tab || 'all';
+        const filename = `admissions_${tab}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.downloadingExcel = false;
+      },
+      error: (err: any) => {
+        console.error('Export failed', err);
+        this.downloadingExcel = false;
+      }
+    });
+  }
+
+  /** Get a summary of active filters for the download modal */
+  get downloadFilterSummary(): string[] {
+    const parts: string[] = [];
+    if (this.filters.tab === 'Admission') parts.push('Tab: Admissions');
+    else if (this.filters.tab === 'applications') parts.push('Tab: Applications');
+    else parts.push('Tab: All Records');
+    if (this.searchTerm) parts.push(`Search: "${this.searchTerm}"`);
+    if (this.filters.session) parts.push(`Session: ${this.filters.session}`);
+    if (this.filters.source === 'USER') parts.push('Source: Direct');
+    else if (this.filters.source === 'CONSULTANCY') parts.push('Source: Via Consultancy');
+    if (this.filters.isScholar === 'true') parts.push('Scholar: Yes');
+    if (this.filters.statusFilter) parts.push(`Status: ${this.filters.statusFilter}`);
+    if (this.filters.state) parts.push(`State: ${this.filters.state}`);
+    if (this.filters.city) parts.push(`City: ${this.filters.city}`);
+    if (this.filters.isDiscounted === true) parts.push('Discount: Discounted Only');
+    return parts;
   }
 }

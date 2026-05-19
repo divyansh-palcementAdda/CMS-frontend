@@ -210,10 +210,14 @@
             }
           </p>
           <div class="mm-stage__actions">
-            <div class="mm-search">
+            <div class="mm-search" [class.is-loading]="conSearchLoading()">
               <span class="material-symbols-outlined">search</span>
-              <input type="text" placeholder="Search consultancies…" [ngModel]="conSearch()"
-                (ngModelChange)="conSearch.set($event)" [ngModelOptions]="{standalone: true}">
+              <input type="search" placeholder="Search consultancy or firm name…" [ngModel]="conSearch()"
+                (ngModelChange)="onConSearchInput($event)" [ngModelOptions]="{standalone: true}"
+                aria-label="Search consultancy firm name" autocomplete="off">
+              @if (conSearchLoading()) {
+              <span class="mm-search__loader" aria-hidden="true"></span>
+              }
             </div>
             <button type="button" class="mm-btn-add" (click)="addConsultancy()" title="Add New Consultancy"
               [style.--accent]="config.color">
@@ -221,11 +225,18 @@
             </button>
           </div>
         </div>
+        <div class="mm-list-panel">
         <div class="mm-list-box">
-          @if (filteredConsultancies.length === 0) {
+          @if (conSearchLoading() && consultancies.length === 0) {
+          <div class="mm-list__loading">
+            <div class="mm-spinner"></div>
+            <span>Searching consultancies…</span>
+          </div>
+          }
+          @else if (filteredConsultancies.length === 0) {
           <div class="mm-list__empty">
-            <span class="material-symbols-outlined">link_off</span>
-            <p>No consultancies found for this selection</p>
+            <span class="material-symbols-outlined">{{ conSearch() ? 'search_off' : 'link_off' }}</span>
+            <p>{{ conSearchEmptyMessage }}</p>
           </div>
           }
           @else {
@@ -247,6 +258,7 @@
             }
           </div>
           }
+        </div>
         </div>
         @if (mappingForm.get('consultancyId')?.touched && !mappingForm.get('consultancyId')?.value) {
         <p class="mm-field-error">
@@ -420,10 +432,14 @@
           }
         </p>
         <div class="mm-generic__actions">
-          <div class="mm-search">
+          <div class="mm-search" [class.is-loading]="conSearchLoading()">
             <span class="material-symbols-outlined">search</span>
-            <input type="text" placeholder="Search consultancies…" [ngModel]="conSearch()"
-              (ngModelChange)="conSearch.set($event)" [ngModelOptions]="{standalone: true}">
+            <input type="search" placeholder="Search consultancy or firm name…" [ngModel]="conSearch()"
+              (ngModelChange)="onConSearchInput($event)" [ngModelOptions]="{standalone: true}"
+              aria-label="Search consultancy firm name" autocomplete="off">
+            @if (conSearchLoading()) {
+            <span class="mm-search__loader" aria-hidden="true"></span>
+            }
           </div>
           <button class="mm-select-all-btn" (click)="selectAllConsultancies()" [style.color]="config.color">
             {{ filteredConsultancies.every(c => isConSelected(c.id)) ? 'Deselect All' : 'Select All' }}
@@ -445,7 +461,14 @@
       </div>
       }
 
+      <div class="mm-list-panel">
       <div class="mm-list-box">
+        @if (conSearchLoading() && consultancies.length === 0) {
+        <div class="mm-list__loading">
+          <div class="mm-spinner"></div>
+          <span>Searching consultancies…</span>
+        </div>
+        } @else {
         <div class="mm-list">
           @for (c of filteredConsultancies; track c.id) {
           <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)" (click)="toggleConsultancy(c.id)"
@@ -467,10 +490,12 @@
           @if (filteredConsultancies.length === 0) {
           <div class="mm-list__empty">
             <span class="material-symbols-outlined">search_off</span>
-            <p>No consultancies found</p>
+            <p>{{ conSearchEmptyMessage }}</p>
           </div>
           }
         </div>
+        }
+      </div>
       </div>
       @if (selectedConsultancyIds.size === 0) {
       <p class="mm-hint-error">
@@ -494,10 +519,13 @@
           }
         </p>
         <div class="mm-generic__actions">
-          <div class="mm-search">
+          <div class="mm-search" [class.is-loading]="conSearchLoading()">
             <span class="material-symbols-outlined">search</span>
-            <input type="text" placeholder="Search…" [ngModel]="conSearch()" (ngModelChange)="conSearch.set($event)"
-              [ngModelOptions]="{standalone: true}">
+            <input type="search" placeholder="Search consultancy or firm name…" [ngModel]="conSearch()" (ngModelChange)="onConSearchInput($event)"
+              [ngModelOptions]="{standalone: true}" aria-label="Search consultancy firm name" autocomplete="off">
+            @if (conSearchLoading()) {
+            <span class="mm-search__loader" aria-hidden="true"></span>
+            }
           </div>
           <button class="mm-select-all-btn" (click)="selectAllConsultancies()" [style.color]="config.color">
             {{ filteredConsultancies.every(c => isConSelected(c.id)) ? 'Deselect All' : 'Select All' }}
@@ -514,7 +542,14 @@
         }
       </div>
       }
+      <div class="mm-list-panel">
       <div class="mm-list-box">
+        @if (conSearchLoading() && consultancies.length === 0) {
+        <div class="mm-list__loading">
+          <div class="mm-spinner"></div>
+          <span>Searching consultancies…</span>
+        </div>
+        } @else {
         <div class="mm-list">
           @for (c of filteredConsultancies; track c.id) {
           <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)" (click)="toggleConsultancy(c.id)"
@@ -534,10 +569,12 @@
           @if (filteredConsultancies.length === 0) {
           <div class="mm-list__empty">
             <span class="material-symbols-outlined">search_off</span>
-            <p>No results</p>
+            <p>{{ conSearchEmptyMessage }}</p>
           </div>
           }
         </div>
+        }
+      </div>
       </div>
     </div>
     }

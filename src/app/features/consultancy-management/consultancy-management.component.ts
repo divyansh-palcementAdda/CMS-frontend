@@ -70,6 +70,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   editingConsultancyId: number | null = null;
   downloadLoading = false;
   showFilterDrawer = false;
+  showDownloadModal = false;
   activeFilterCount = 0;
   activeLeadSources: any[] = [];
   private leadSourceService = inject(LeadSourceService);
@@ -385,28 +386,58 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  downloadExcel() {
+  /** Step 1 — show confirmation modal before downloading. */
+  showDownloadConfirmation() {
     if (this.downloadLoading) return;
+    this.showDownloadModal = true;
+  }
 
+  /** Step 2 — user confirmed: run the filter-aware export. */
+  confirmDownload() {
+    this.showDownloadModal = false;
     this.downloadLoading = true;
-    this.consultancyService.downloadExcel().subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Consultancy_Report_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        this.downloadLoading = false;
-      },
-      error: (err: any) => {
-        console.error('Error downloading excel', err);
-        this.downloadLoading = false;
-        alert('Failed to download excel report. Please try again later.');
-      }
-    });
+
+    this.consultancyService.exportExcel(this.requestConfig)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob: Blob) => {
+          const timestamp = new Date().toLocaleDateString('en-IN').replace(/\//g, '-');
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Consultancy_Report_${timestamp}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          this.downloadLoading = false;
+        },
+        error: (err: any) => {
+          console.error('Error downloading excel', err);
+          this.downloadLoading = false;
+        }
+      });
+  }
+
+  cancelDownload() {
+    this.showDownloadModal = false;
+  }
+
+  /** Returns a human-readable summary of active filters for the modal. */
+  getFilterSummary(): string {
+    const parts: string[] = [];
+    if (this.requestConfig.status)   parts.push(`Status: ${this.requestConfig.status}`);
+    if (this.requestConfig.years?.length) parts.push(`Years: ${this.requestConfig.years.join(', ')}`);
+    if (this.requestConfig.state)    parts.push(`State: ${this.requestConfig.state}`);
+    if (this.requestConfig.city)     parts.push(`City: ${this.requestConfig.city}`);
+    if (this.requestConfig.leadSourceId) parts.push('Lead Source: (filtered)');
+    if (this.requestConfig.search)   parts.push(`Search: "${this.requestConfig.search}"`);
+    return parts.length ? parts.join(' · ') : 'No filters applied (all records)';
+  }
+
+  /** @deprecated — kept for backward compat; use showDownloadConfirmation() instead. */
+  downloadExcel() {
+    this.showDownloadConfirmation();
   }
 
   ngOnDestroy() {

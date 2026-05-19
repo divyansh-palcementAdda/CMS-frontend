@@ -1,10 +1,11 @@
-import { Component, Inject, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, Inject, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { forkJoin, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { Subject, forkJoin, of } from 'rxjs';
+import { switchMap, catchError, debounceTime, distinctUntilChanged, finalize, tap } from 'rxjs/operators';
 import { ConsultancyService } from '../../../core/services/consultancy.service';
 import { CourseService } from '../../../core/services/course.service';
 import { UserService } from '../../../core/services/user.service';
@@ -43,8 +44,13 @@ export class MappingModalComponent implements OnInit {
   // ── Live search signals ────────────────────────────────────────────────────
   userSearch = signal<string>('');
   conSearch = signal<string>('');
+  conSearchLoading = signal(false);
   courseSearch = signal<string>('');
   instSearch = signal<string>('');
+
+  private readonly conSearch$ = new Subject<string>();
+  private readonly consultancyCache = new Map<number, any>();
+  private readonly destroyRef = inject(DestroyRef);
 
   // ── Multi-select sets ──────────────────────────────────────────────────────
   selectedConsultancyIds = new Set<number>();
@@ -134,7 +140,69 @@ export class MappingModalComponent implements OnInit {
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
     this.initForm();
+    this.setupConsultancySearch();
     this.loadDropdowns();
+  }
+
+  /** Debounced API search for consultancy / firm name (mapping modal). */
+  onConSearchInput(value: string): void {
+    this.conSearch.set(value);
+    this.conSearch$.next(value);
+  }
+
+  private setupConsultancySearch(): void {
+    if (!this.needsConsultancyList()) return;
+
+    this.conSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => this.fetchConsultancies(term)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(items => {
+      this.consultancies = items.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      );
+    });
+  }
+
+  private needsConsultancyList(): boolean {
+    return this.isStudents || this.isUsers || this.isCourses;
+  }
+
+  private fetchConsultancies(term: string) {
+    this.conSearchLoading.set(true);
+    return this.consultancyService.searchConsultanciesForMapping(term).pipe(
+      tap(items => items.forEach(c => this.consultancyCache.set(c.id, c))),
+      catchError(() => of([] as any[])),
+      finalize(() => this.conSearchLoading.set(false))
+    );
+  }
+
+  private consultancyMatchesTerm(c: any, term: string): boolean {
+    const fields = [c.name, c.firmName, c.email, c.city, c.mobile];
+    return fields.some(v => v && String(v).toLowerCase().includes(term));
+  }
+
+  private withPinnedConsultancies(list: any[]): any[] {
+    const idsToPin = new Set<number>();
+    if (this.isStudents) {
+      const selectedId = this.mappingForm.get('consultancyId')?.value;
+      if (selectedId) idsToPin.add(selectedId);
+    } else {
+      this.selectedConsultancyIds.forEach(id => idsToPin.add(id));
+    }
+
+    if (idsToPin.size === 0) return list;
+
+    const pinned: any[] = [];
+    idsToPin.forEach(id => {
+      if (list.some(c => c.id === id)) return;
+      const cached = this.consultancyCache.get(id);
+      if (cached) pinned.push(cached);
+    });
+
+    if (pinned.length === 0) return list;
+    return [...pinned, ...list.filter(c => !idsToPin.has(c.id))];
   }
 
   // ── Form Initialisation ────────────────────────────────────────────────────
@@ -202,9 +270,10 @@ export class MappingModalComponent implements OnInit {
 
   // ── Data Loading ───────────────────────────────────────────────────────────
   loadDropdowns(): void {
-    this.dropdownLoading = true;
+    const needsUsers = this.isStudents || this.isConsultanciesUsers;
+    this.dropdownLoading = needsUsers || this.isConsultanciesCourses;
 
-    if (this.isStudents || this.isConsultanciesUsers) {
+    if (needsUsers) {
       this.userService.getUsersByStatus('ACTIVE').subscribe(res => {
         this.users = (res.users || res as any) ?? [];
         this.buildMappingCache();
@@ -212,11 +281,8 @@ export class MappingModalComponent implements OnInit {
       });
     }
 
-    if (this.isStudents || this.isUsers || this.isCourses) {
-      this.consultancyService.getConsultancyData().subscribe(res => {
-        this.consultancies = (res.consultancies ?? []).sort((a: any, b: any) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
-        this.dropdownLoading = false;
-      });
+    if (this.needsConsultancyList()) {
+      this.conSearch$.next(this.conSearch());
     }
 
     if (this.isStudents) {
@@ -343,22 +409,38 @@ export class MappingModalComponent implements OnInit {
   }
 
   get filteredConsultancies(): any[] {
-    const t = this.conSearch().toLowerCase();
+    const t = this.conSearch().trim().toLowerCase();
     const src = this.mappingForm.get('admissionSource')?.value;
     const repId = this.mappingForm.get('admittedByUserId')?.value;
 
-    return this.consultancies.filter(c => {
-      const matchesSearch = !t || c.name?.toLowerCase().includes(t) || c.email?.toLowerCase().includes(t);
+    let list = this.consultancies;
+    if (t) {
+      list = list.filter(c => this.consultancyMatchesTerm(c, t));
+    }
+
+    list = list.filter(c => {
       if (this.isStudents) {
         if (src === 'USER') return false;
         if (src === 'CONSULTANCY' && repId) {
-          // Bi-directional: if rep selected, filter consultancies
           const mappedCons = this.userConsultanciesMap.get(repId) || [];
-          return matchesSearch && mappedCons.includes(c.id);
+          return mappedCons.includes(c.id);
         }
       }
-      return matchesSearch;
+      return true;
     });
+
+    return this.withPinnedConsultancies(list);
+  }
+
+  get conSearchEmptyMessage(): string {
+    const term = this.conSearch().trim();
+    if (term) {
+      return `No consultancies matching "${term}"`;
+    }
+    if (this.isStudents && this.mappingForm.get('admittedByUserId')?.value) {
+      return 'No consultancies linked with the selected representative';
+    }
+    return 'No consultancies found';
   }
 
   get filteredCourses(): any[] {
@@ -451,6 +533,8 @@ export class MappingModalComponent implements OnInit {
     }
 
     this.mappingForm.patchValue({ consultancyId: cId });
+    const selected = this.consultancies.find(c => c.id === cId);
+    if (selected) this.consultancyCache.set(cId, selected);
     this.selectedCourseIds.clear();
     this.selectedInstitutionIds.clear();
 
@@ -499,7 +583,7 @@ export class MappingModalComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadDropdowns();
+        this.conSearch$.next(this.conSearch());
         this.toastr.success('New consultancy added successfully');
       }
     });
@@ -523,7 +607,11 @@ export class MappingModalComponent implements OnInit {
   }
 
   // ── Multi-select toggles ───────────────────────────────────────────────────
-  toggleConsultancy(id: number): void { this._toggle(this.selectedConsultancyIds, id); }
+  toggleConsultancy(id: number): void {
+    this._toggle(this.selectedConsultancyIds, id);
+    const item = this.consultancies.find(c => c.id === id);
+    if (item) this.consultancyCache.set(id, item);
+  }
   toggleUser(id: number): void { this._toggle(this.selectedUserIds, id); }
   toggleCourse(id: number): void { this._toggle(this.selectedCourseIds, id); }
   toggleInstitution(id: number): void { this._toggle(this.selectedInstitutionIds, id); }
@@ -560,7 +648,17 @@ export class MappingModalComponent implements OnInit {
   get selectedInstitutionArray(): number[] { return Array.from(this.selectedInstitutionIds); }
 
   // ── Name helpers ───────────────────────────────────────────────────────────
-  getConName(id: number): string { return this.consultancies.find(c => c.id === id)?.name || '—'; }
+  getConName(id: number): string {
+    return this.consultancyCache.get(id)?.name
+      || this.consultancies.find(c => c.id === id)?.name
+      || '—';
+  }
+
+  getConFirmName(id: number): string {
+    return this.consultancyCache.get(id)?.firmName
+      || this.consultancies.find(c => c.id === id)?.firmName
+      || '';
+  }
   getUserName(id: number): string {
     const u = this.users.find(u => u.id === id);
     return u?.fullName || u?.username || '—';

@@ -45,7 +45,8 @@ export class AdmissionService {
     appStartDate?: string,
     appEndDate?: string,
     admStartDate?: string,
-    admEndDate?: string
+    admEndDate?: string,
+    isDiscounted?: boolean
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -76,6 +77,7 @@ export class AdmissionService {
     if (appEndDate) params = params.set('appEndDate', appEndDate);
     if (admStartDate) params = params.set('admStartDate', admStartDate);
     if (admEndDate) params = params.set('admEndDate', admEndDate);
+    if (isDiscounted !== undefined && isDiscounted !== null) params = params.set('isDiscounted', isDiscounted.toString());
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -165,7 +167,50 @@ export class AdmissionService {
   }
 
   revokeCancellation(id: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}/revoke-cancellation`, {});
+    return this.http.put<any>(`${this.apiUrl}/${id}/revoke-cancellation`, {});
+  }
+
+  /**
+   * Export students to Excel using the currently applied filters.
+   * Returns a Blob so the caller can trigger a download.
+   */
+  exportStudents(
+    tab?: string,
+    statusFilter?: string,
+    source?: string,
+    isScholar?: string,
+    statFilter?: string,
+    state?: string,
+    city?: string,
+    session?: string,
+    commissionStatus?: string,
+    fiftyPercentFeesPaid?: boolean,
+    startDate?: string,
+    endDate?: string,
+    leadSourceId?: string,
+    search?: string,
+    isDiscounted?: boolean
+  ): Observable<Blob> {
+    let params = new HttpParams();
+    if (tab) params = params.set('tab', tab);
+    if (statusFilter) params = params.set('statusFilter', statusFilter);
+    if (source) params = params.set('source', source);
+    if (isScholar != null && isScholar !== '') params = params.set('isScholar', isScholar);
+    if (statFilter) params = params.set('statFilter', statFilter);
+    if (state) params = params.set('state', state);
+    if (city) params = params.set('city', city);
+    if (session) params = params.set('session', session);
+    if (commissionStatus) params = params.set('commissionStatus', commissionStatus);
+    if (fiftyPercentFeesPaid !== undefined && fiftyPercentFeesPaid !== null)
+      params = params.set('fiftyPercentFeesPaid', fiftyPercentFeesPaid.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    if (leadSourceId) params = params.set('leadSourceId', leadSourceId);
+    if (search) params = params.set('search', search);
+    if (isDiscounted !== undefined && isDiscounted !== null)
+      params = params.set('isDiscounted', isDiscounted.toString());
+
+    return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
   }
 
   private mapStudentToAdmissionItem(s: any, sNo?: number): AdmissionItem {
@@ -178,6 +223,7 @@ export class AdmissionService {
       status: s.isCancelled ? 'Cancelled' : 'Active',
       duration: s.duration || 'N/A',
       discountPercentageDisplay: s.discountType === 'PERCENTAGE' ? `${s.discountValue}%` : (s.isScholar ? 'Scholarship' : '-'),
+      discountedAmount: s.discountedAmount || 'No Discount Applied',
 
       // Dynamic financial fields
       percentagePaid: s.finalFeesAfterDiscount > 0 ? (s.totalFeesPaid / s.finalFeesAfterDiscount) * 100 : 0,

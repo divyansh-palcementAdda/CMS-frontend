@@ -59,6 +59,20 @@ export class ConsultancyService {
     );
   }
 
+  /** Debounced mapping-modal search — uses paged API (name, email, firm name, mobile). */
+  searchConsultanciesForMapping(search: string, page = 0, size = 100): Observable<ConsultancyItem[]> {
+    const request: ConsultancyPageRequest = {
+      search: search?.trim() || undefined,
+      page,
+      size,
+      sortBy: 'name',
+      sortDirection: 'asc'
+    };
+    return this.getConsultancyPage(request).pipe(
+      map(response => response.content ?? [])
+    );
+  }
+
   getConsultancyData(): Observable<ConsultancyPageData> {
     return this.http.get<any>(this.apiUrl).pipe(
       map(response => {
@@ -365,6 +379,11 @@ export class ConsultancyService {
 
   downloadExcel(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/download-excel`, { responseType: 'blob' });
+  }
+
+  /** Filter-aware export — sends the current request config as POST body. */
+  exportExcel(request: ConsultancyPageRequest): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/export`, request, { responseType: 'blob' });
   }
 
   getActiveInstitutions(): Observable<any> {
