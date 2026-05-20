@@ -131,6 +131,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
   overallTotalConfirmed = 0;
   overallTotalFeesReceived = 0;
   aggregatedTotals: any = null;
+  projectedRevenue = 0;
+  userPerformanceGrandTotal: { totalForms: number; totalConfirmed: number } = {
+    totalForms: 0,
+    totalConfirmed: 0
+  };
 
   sessions: string[] = [];
   
@@ -330,13 +335,35 @@ export class ReportsComponent implements OnInit, OnDestroy {
         };
     }
 
+    if (this.activeReport === 'USER_ADMISSION') {
+        return {
+            revConfirmed: 0,
+            revProjected: 0,
+            revCollected: 0,
+            revRefunded: 0,
+            revNet: 0,
+            revRemaining: 0,
+            totalForms: this.userPerformanceGrandTotal.totalForms,
+            totalConfirmed: this.userPerformanceGrandTotal.totalConfirmed,
+            totalFeesCollected: 0,
+            totalRemaining: 0,
+            totalRevenue: 0,
+            totalFeesPaid: 0,
+            totalRemainingFees: 0,
+            totalRefunded: 0,
+            totalStudents: this.totalElements,
+            totalFeesReceived: 0,
+            leadSourceTotals: []
+        };
+    }
+
     if (this.activeReport === 'COURSE_REVENUE') {
         const revConfirmed = this.serverSummary.confirmedAdmissions || 0;
         const revCollected = this.serverSummary.realizedRevenue || 0;
         const revRefunded = this.serverSummary.totalRefunded || 0;
         const revNet = this.serverSummary.netCollected || 0;
         const revRemaining = this.serverSummary.outstandingDues || 0;
-        const revProjected = revNet + revRemaining;
+        const revProjected = this.projectedRevenue || (revCollected + revRemaining);
 
         return {
             revConfirmed,
@@ -402,6 +429,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
         }
         return prefix;
     }
+  }
+
+  formatUserContribution(userName: string, formCount: number): string {
+    const name = (userName || 'Unknown').trim();
+    return `${name} → ${formCount ?? 0}`;
   }
 
   getLeadVal(d: any, h: string, type: 'forms' | 'fees'): number {
@@ -494,7 +526,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
     switch (baseType) {
       case 'COURSE_ANALYTICS':
-        obs = this.reportsService.getCourseAnalyticsReport(apiFilter);
+        obs = this.activeReport === 'COURSE_REVENUE'
+          ? this.reportsService.getCourseRevenueReport(apiFilter)
+          : this.reportsService.getCourseAnalyticsReport(apiFilter);
         break;
       case 'COURSE_LEAD_SOURCE':
         obs = this.reportsService.getCourseLeadSourceReport(apiFilter);
@@ -536,8 +570,15 @@ export class ReportsComponent implements OnInit, OnDestroy {
           } else {
             this.dailySummaryData = null;
             this.reportData = (apiData.content || []).filter((d: any) => {
-              // Exclude courses with 0 forms, but preserve student detail records
               if (this.activeReport === 'STUDENT_DETAIL') return true;
+              if (this.activeReport === 'COURSE_LEAD_SOURCE') {
+                return (d.totalForms || 0) > 0
+                  || (d.totalFeesReceived || 0) > 0
+                  || (d.totalConfirmedAdmissions || 0) > 0;
+              }
+              if (this.activeReport === 'COURSE_REVENUE') {
+                return (d.totalConfirmedAdmissions || 0) > 0;
+              }
               return (d.totalForms || 0) > 0;
             });
           }
@@ -562,11 +603,20 @@ export class ReportsComponent implements OnInit, OnDestroy {
             this.overallTotalForms = apiData.meta.overallTotalForms || 0;
             this.overallTotalConfirmed = apiData.meta.overallTotalConfirmed || 0;
             this.overallTotalFeesReceived = apiData.meta.overallTotalFeesReceived || 0;
+            this.projectedRevenue = apiData.meta.projectedRevenue != null
+              ? Number(apiData.meta.projectedRevenue)
+              : 0;
+            this.userPerformanceGrandTotal = {
+              totalForms: Number(apiData.meta.grandTotalForms || 0),
+              totalConfirmed: Number(apiData.meta.grandTotalConfirmed || 0)
+            };
           } else {
             this.overallLeadSourceTotals = [];
             this.overallTotalForms = 0;
             this.overallTotalConfirmed = 0;
             this.overallTotalFeesReceived = 0;
+            this.projectedRevenue = 0;
+            this.userPerformanceGrandTotal = { totalForms: 0, totalConfirmed: 0 };
           }
 
           if (baseType === 'COURSE_LEAD_SOURCE' && this.reportData.length > 0 && this.reportData[0].leadSources) {
