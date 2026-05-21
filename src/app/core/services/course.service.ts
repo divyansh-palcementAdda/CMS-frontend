@@ -93,6 +93,7 @@ export class CourseService {
         institutionsText,
         hasInstitutions,
         totalApplications: course.totalApplications || 0,
+        remainingApplications: course.remainingApplications || 0,
         totalAdmissions: course.totalAdmissions || 0,
         cancelledApplications: course.cancelledApplications || 0,
         cancelledAdmissions: course.cancelledAdmissions || 0,
@@ -138,5 +139,64 @@ export class CourseService {
     return this.http.get(`${this.apiUrl}/bulk-upload/template`, {
       responseType: 'blob'
     });
+  }
+
+  getCoursesPaged(
+    page: number,
+    size: number,
+    search: string = '',
+    active: boolean | null = null,
+    sortBy: string = 'name',
+    sortDirection: string = 'asc'
+  ): Observable<{ content: CourseItem[], totalElements: number, totalPages: number, stats: CourseStats }> {
+    let params = `?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`;
+    if (search) params += `&search=${encodeURIComponent(search)}`;
+    if (active !== null) params += `&active=${active}`;
+
+    return this.http.get<any>(`${this.apiUrl}/paged${params}`).pipe(
+      map(res => {
+        const pagedData = res.data || res;
+        const rawContent = pagedData.content || [];
+        const content = rawContent.map((c: any, i: number) => {
+          const isActive = c.active !== false;
+          const instCount = c.institutionCount || 0;
+          const hasInstitutions = instCount > 0;
+          const institutionsText = hasInstitutions ? `${instCount} Institution${instCount > 1 ? 's' : ''}` : 'No Institutions';
+
+          return {
+            id: c.id || 0,
+            sNo: page * size + i + 1,
+            name: c.name || 'N/A',
+            courseType: c.courseTypeName || 'N/A',
+            duration: c.duration ? `${c.duration} yrs` : 'N/A',
+            students: c.studentCount || 0,
+            status: isActive ? 'Active' : 'Inactive',
+            institutionCount: instCount,
+            institutionsText,
+            hasInstitutions,
+            totalApplications: c.totalApplications || 0,
+            remainingApplications: c.remainingApplications || 0,
+            totalAdmissions: c.totalAdmissions || 0,
+            cancelledApplications: c.cancelledApplications || 0,
+            cancelledAdmissions: c.cancelledAdmissions || 0,
+            totalFeesCollected: c.totalFeesCollected || 0
+          };
+        });
+
+        const stats: CourseStats = {
+          totalCourses: pagedData.totalElements || 0,
+          activeCourses: pagedData.totalElements || 0,
+          offlineCourses: 0,
+          totalStudents: 0
+        };
+
+        return {
+          content,
+          totalElements: pagedData.totalElements || 0,
+          totalPages: pagedData.totalPages || 0,
+          stats
+        };
+      })
+    );
   }
 }

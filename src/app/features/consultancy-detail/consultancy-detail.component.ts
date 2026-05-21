@@ -1,5 +1,6 @@
+
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConsultancyService } from '../../core/services/consultancy.service';
@@ -79,6 +80,7 @@ export class ConsultancyDetailComponent implements OnInit {
   showDeleteModal = false;
   itemToDelete: any = null;
   deleteType: 'consultancy' | 'course' | 'user' | 'institution' | 'admission' = 'consultancy';
+  exporting: { [key: string]: boolean } = {};
 
   // Chart Options
   public chartOptions: {
@@ -161,7 +163,8 @@ export class ConsultancyDetailComponent implements OnInit {
     private courseService: CourseService,
     private userService: UserService,
     private institutionService: InstitutionService,
-    private admissionService: AdmissionService
+    private admissionService: AdmissionService,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -338,7 +341,7 @@ export class ConsultancyDetailComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/consultancy-management']);
+    this.location.back();
   }
 
   scrollToTable(id: string) {
@@ -430,5 +433,52 @@ export class ConsultancyDetailComponent implements OnInit {
         this.showDeleteModal = false;
       }
     });
+  }
+
+  downloadExcel(tab: string) {
+    this.exporting[tab] = true;
+
+    let search = '';
+    let source = '';
+    let scholar: boolean | null = null;
+
+    if (tab === 'remaining_applications') {
+      search = this.totalAppSearch;
+    } else if (tab === 'cancelled_applications') {
+      search = this.cancelledAppSearch;
+    } else if (tab === 'confirmed_admissions') {
+      search = this.totalAdmSearch;
+    } else if (tab === 'cancelled_admissions') {
+      search = this.cancelledAdmSearch;
+    } else if (tab === 'total_applications') {
+      search = this.admSearch;
+    }
+
+    if (!this.consultancy?.id) return;
+
+    this.consultancyService.exportConsultancyStudents(this.consultancy.id, tab, search, source, scholar)
+      .subscribe({
+        next: (blob: Blob) => {
+          this.exporting[tab] = false;
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+
+          const now = new Date();
+          const pad = (n: number) => n.toString().padStart(2, '0');
+          const timestamp = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+          a.download = `consultancy_${tab}_${timestamp}.xlsx`;
+
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('Failed to export Excel', err);
+          this.exporting[tab] = false;
+          alert('Failed to export Excel data. Please try again.');
+        }
+      });
   }
 }

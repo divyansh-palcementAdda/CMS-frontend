@@ -37,6 +37,17 @@
             </div>
           </div>
           <div class="header-actions">
+            <button class="action-btn btn-export" style="background: #EEF2FF; color: #4F46E5; border-color: #C7D2FE; display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 10px 24px; border-radius: 10px; border: 1px solid #BFDBFE;" (click)="downloadExcel('total_applications')" [disabled]="exporting['total_applications']">
+              <span *ngIf="!exporting['total_applications']" style="display: flex; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download Master List
+              </span>
+              <span *ngIf="exporting['total_applications']" class="loader-spinner" style="color: #4F46E5;">Exporting...</span>
+            </button>
             <button class="action-btn edit" (click)="onEdit()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -343,8 +354,19 @@
         <!-- Section: Categorized Student Tables -->
         <div id="total-apps" class="table-card mb-32">
           <div class="table-header-row">
-            <h3>Total Applications</h3>
+            <h3>Remaining Applications</h3>
             <div class="table-tools">
+              <button class="btn-export" (click)="downloadExcel('remaining_applications')" [disabled]="exporting['remaining_applications']">
+                <span *ngIf="!exporting['remaining_applications']" style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download Excel
+                </span>
+                <span *ngIf="exporting['remaining_applications']" class="loader-spinner">Exporting...</span>
+              </button>
               <div class="search-box">
                 <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch">
                 <span class="material-symbols-outlined">search</span>
@@ -423,6 +445,17 @@
           <div class="table-header-row">
             <h3>Cancelled Applications</h3>
             <div class="table-tools">
+              <button class="btn-export" (click)="downloadExcel('cancelled_applications')" [disabled]="exporting['cancelled_applications']">
+                <span *ngIf="!exporting['cancelled_applications']" style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download Excel
+                </span>
+                <span *ngIf="exporting['cancelled_applications']" class="loader-spinner">Exporting...</span>
+              </button>
               <div class="search-box">
                 <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -495,8 +528,19 @@
 
         <div id="total-adms" class="table-card mb-32">
           <div class="table-header-row">
-            <h3>Total Admissions</h3>
+            <h3>Confirmed Admissions</h3>
             <div class="table-tools">
+              <button class="btn-export" (click)="downloadExcel('confirmed_admissions')" [disabled]="exporting['confirmed_admissions']">
+                <span *ngIf="!exporting['confirmed_admissions']" style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download Excel
+                </span>
+                <span *ngIf="exporting['confirmed_admissions']" class="loader-spinner">Exporting...</span>
+              </button>
               <div class="search-box">
                 <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -575,6 +619,17 @@
           <div class="table-header-row">
             <h3>Cancelled Admissions</h3>
             <div class="table-tools">
+              <button class="btn-export" (click)="downloadExcel('cancelled_admissions')" [disabled]="exporting['cancelled_admissions']">
+                <span *ngIf="!exporting['cancelled_admissions']" style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download Excel
+                </span>
+                <span *ngIf="exporting['cancelled_admissions']" class="loader-spinner">Exporting...</span>
+              </button>
               <div class="search-box">
                 <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

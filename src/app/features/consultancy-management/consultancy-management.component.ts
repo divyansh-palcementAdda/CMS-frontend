@@ -15,6 +15,7 @@ import { AddConsultancyModalComponent } from './components/add-consultancy-modal
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 import { BulkMapModalComponent } from '../../shared/components/bulk-map-modal/bulk-map-modal.component';
 import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
+import { StatePreservationService } from '../../core/services/state-preservation.service';
 
 
 @Component({
@@ -57,6 +58,7 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     return result;
   })();
   showYearDropdown = false;
+  isUpdatingUrl = false;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -81,7 +83,8 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private eRef: ElementRef,
-    private location: Location
+    private location: Location,
+    private statePreservationService: StatePreservationService
   ) {
     this.searchSubject.pipe(
       debounceTime(500),
@@ -101,21 +104,110 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
     }
   }
 
+  parseQueryParams(params: any) {
+    if (params['page'] !== undefined) {
+      this.requestConfig.page = +params['page'];
+    } else {
+      this.requestConfig.page = 0;
+    }
+
+    if (params['size'] !== undefined) {
+      this.requestConfig.size = +params['size'];
+    } else {
+      this.requestConfig.size = 10;
+    }
+
+    if (params['search'] !== undefined) {
+      this.requestConfig.search = params['search'];
+      this.searchTerm = params['search'];
+    } else {
+      this.requestConfig.search = '';
+      this.searchTerm = '';
+    }
+
+    if (params['status'] !== undefined) {
+      this.selectedFilter = params['status'].toUpperCase();
+    } else {
+      this.selectedFilter = 'TOTAL';
+    }
+
+    if (params['sortBy'] !== undefined) {
+      this.requestConfig.sortBy = params['sortBy'];
+    } else {
+      this.requestConfig.sortBy = 'name';
+    }
+
+    if (params['sortDirection'] !== undefined) {
+      this.requestConfig.sortDirection = params['sortDirection'];
+    } else {
+      this.requestConfig.sortDirection = 'asc';
+    }
+
+    if (params['years'] !== undefined && params['years']) {
+      this.requestConfig.years = params['years'].split(',').map((y: string) => +y);
+    } else {
+      this.requestConfig.years = [];
+    }
+
+    if (params['state'] !== undefined) {
+      this.requestConfig.state = params['state'];
+      if (this.requestConfig.state) {
+        this.loadCities(this.requestConfig.state);
+      }
+    } else {
+      this.requestConfig.state = '';
+    }
+
+    if (params['city'] !== undefined) {
+      this.requestConfig.city = params['city'];
+    } else {
+      this.requestConfig.city = '';
+    }
+
+    if (params['leadSourceId'] !== undefined) {
+      this.requestConfig.leadSourceId = params['leadSourceId'] || '';
+    } else {
+      this.requestConfig.leadSourceId = '';
+    }
+  }
+
+  updateUrlQueryParams() {
+    const queryParams: any = {
+      page: this.requestConfig.page,
+      size: this.requestConfig.size,
+      search: this.requestConfig.search || null,
+      status: this.selectedFilter !== 'TOTAL' ? this.selectedFilter : null,
+      sortBy: this.requestConfig.sortBy,
+      sortDirection: this.requestConfig.sortDirection,
+      years: this.requestConfig.years && this.requestConfig.years.length ? this.requestConfig.years.join(',') : null,
+      state: this.requestConfig.state || null,
+      city: this.requestConfig.city || null,
+      leadSourceId: this.requestConfig.leadSourceId || null
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams,
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
   ngOnInit() {
     this.fetchActiveLeadSources();
-    this.route.queryParams.subscribe(params => {
-      const status = params['status'];
-      const editId = params['id'];
 
+    this.route.queryParams.subscribe(params => {
+      if (this.isUpdatingUrl) {
+        return;
+      }
+
+      const editId = params['id'];
       if (editId && this.route.snapshot.fragment === 'edit') {
         this.onEdit(+editId);
       }
 
-      if (status) {
-        this.setFilter(status); // also loads data
-      } else {
-        this.loadData();
-      }
+      this.parseQueryParams(params);
+      this.loadData();
     });
 
     this.loadStates();
@@ -231,6 +323,21 @@ export class ConsultancyManagementComponent implements OnInit, OnDestroy {
   loadData() {
     this.loading = true;
     this.updateActiveFilterCount();
+
+    // Save state in URL
+    this.isUpdatingUrl = true;
+    this.updateUrlQueryParams();
+    setTimeout(() => {
+      this.isUpdatingUrl = false;
+    }, 100);
+
+    // Save state in SessionStorage (as redundant backup)
+    this.statePreservationService.saveState('cms_consultancy_management_state', {
+      requestConfig: this.requestConfig,
+      searchTerm: this.searchTerm,
+      selectedFilter: this.selectedFilter
+    });
+
     this.consultancyService.getConsultancyPage(this.requestConfig)
       .pipe(takeUntil(this.destroy$))
       .subscribe({

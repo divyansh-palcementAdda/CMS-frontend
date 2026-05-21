@@ -136,7 +136,8 @@ export class UserService {
       })),
       admissionStats: u.admissionStats,
       totalAdmissions: u.admissionStats?.activeAdmissions || 0,
-      totalApplications: u.admissionStats?.activeApplications || 0,
+      totalApplications: u.admissionStats?.admissionInAllCourses || 0,
+      remainingApplications: u.admissionStats?.activeApplications || 0,
       cancelledAdmissions: u.admissionStats?.cancelledAdmissions || 0,
       cancelledApplications: u.admissionStats?.cancelledApplications || 0
     };
@@ -149,6 +150,45 @@ export class UserService {
     } catch {
       return fallback;
     }
+  }
+
+  getUsersPaged(
+    page: number,
+    size: number,
+    search: string = '',
+    role: string = '',
+    status: string = '',
+    sortBy: string = 'name',
+    sortDirection: string = 'asc'
+  ): Observable<{ content: UserItem[], totalElements: number, totalPages: number, stats: UserStats }> {
+    let params = `?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`;
+    if (search) params += `&search=${encodeURIComponent(search)}`;
+    if (role)   params += `&role=${encodeURIComponent(role)}`;
+    if (status) params += `&status=${encodeURIComponent(status)}`;
+
+    return this.http.get<any>(`${this.apiUrl}/paged${params}`).pipe(
+      map(res => {
+        const pagedData = res.data || res;
+        const rawContent = pagedData.content || [];
+        const content = rawContent.map((u: any, i: number) => this.mapUserItem(u, page * size + i));
+
+        // Parse real stats returned by the optimized backend query
+        const backendStats = pagedData.stats || {};
+        const stats: UserStats = {
+          totalUsers:    backendStats.totalUsers    ?? pagedData.totalElements ?? 0,
+          activeUsers:   backendStats.activeUsers   ?? 0,
+          inactiveUsers: backendStats.inactiveUsers ?? 0,
+          adminUsers:    backendStats.adminUsers    ?? 0
+        };
+
+        return {
+          content,
+          totalElements: pagedData.totalElements || 0,
+          totalPages:    pagedData.totalPages    || 0,
+          stats
+        };
+      })
+    );
   }
 
   createUser(user: CreateUserDTO): Observable<UserItem> {
@@ -177,5 +217,17 @@ export class UserService {
     return this.http.get<any>(`${environment.apiUrl}/roles`).pipe(
       map(response => response.data || [])
     );
+  }
+
+  exportUserStudents(userId: number, tabName: string, search: string, source: string, scholar: boolean | null): Observable<Blob> {
+    let params: any = { tab: tabName };
+    if (search) params.search = search;
+    if (source) params.source = source;
+    if (scholar !== null) params.scholar = scholar;
+
+    return this.http.get(`${this.apiUrl}/${userId}/export-excel`, {
+      params,
+      responseType: 'blob'
+    });
   }
 }

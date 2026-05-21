@@ -11,6 +11,7 @@ import { UserPageData, UserItem } from '../../core/models/user.model';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddUserModalComponent } from './components/add-user-modal/add-user-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
+import { StatePreservationService } from '../../core/services/state-preservation.service';
 
 @Component({
   selector: 'app-user-management',
@@ -24,7 +25,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   loading = true;
   pageData: UserPageData | null = null;
-  filteredUsers: UserItem[] = [];
   paginatedUsers: UserItem[] = [];
   searchTerm: string = '';
 
@@ -42,16 +42,28 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   // Filtering & Sorting
   currentFilter: 'ALL' | 'ACTIVE' | 'INACTIVE' | 'ADMIN' = 'ALL';
-  sortOrder: 'asc' | 'desc' | 'none' = 'asc';
+  sortBy: string = 'name';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
     public userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private statePreservationService: StatePreservationService
   ) { }
 
   ngOnInit() {
+    const savedState = this.statePreservationService.getState<any>('cms_user_management_state');
+    if (savedState) {
+      this.currentPage = savedState.currentPage || 1;
+      this.pageSize = savedState.pageSize || 10;
+      this.sortBy = savedState.sortBy || 'name';
+      this.sortDirection = savedState.sortDirection || 'asc';
+      this.searchTerm = savedState.searchTerm || '';
+      this.currentFilter = savedState.currentFilter || 'ALL';
+    }
+
     this.route.queryParams.subscribe(params => {
       const status = params['status'];
       if (status) {
@@ -69,27 +81,33 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   fetchFilteredData(status: string | null) {
-    this.loading = true;
     const filterStatus = status ? status.toUpperCase() : 'ALL';
     
-    // Convert status to internal filter type
     if (filterStatus === 'ACTIVE') this.currentFilter = 'ACTIVE';
     else if (filterStatus === 'INACTIVE') this.currentFilter = 'INACTIVE';
     else this.currentFilter = 'ALL';
 
-    this.sub = this.userService.getUsersData().subscribe(data => {
-      this.pageData = data;
-      this.applyFiltersAndSort();
-      this.loading = false;
-    });
+    this.currentPage = 1;
+    this.fetchData();
   }
+
   onView(id: number) {
     this.router.navigate(['/users', id]);
   }
 
   onEdit(id: number) {
-    this.selectedUser = this.pageData?.users.find(u => u.id === id) || null;
-    this.showAddModal = true;
+    this.loading = true;
+    this.userService.getUserById(id).subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+        this.showAddModal = true;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching user for edit', err);
+        this.loading = false;
+      }
+    });
   }
 
   onAddUser() {
@@ -143,91 +161,85 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       });
     }
   }
+
   fetchData() {
     this.loading = true;
-    this.sub = this.userService.getUsersData().subscribe(data => {
-      this.pageData = data;
-      this.applyFiltersAndSort();
-      this.loading = false;
+
+    // Save state
+    this.statePreservationService.saveState('cms_user_management_state', {
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+      sortBy: this.sortBy,
+      sortDirection: this.sortDirection,
+      searchTerm: this.searchTerm,
+      currentFilter: this.currentFilter
+    });
+
+    let statusParam = '';
+    let roleParam   = '';
+    if (this.currentFilter === 'ACTIVE')   statusParam = 'ACTIVE';
+    else if (this.currentFilter === 'INACTIVE') statusParam = 'INACTIVE';
+    else if (this.currentFilter === 'ADMIN')    roleParam   = 'ADMIN';
+
+    // Single API call — stats and user list returned together
+    this.sub = this.userService.getUsersPaged(
+      this.currentPage - 1,
+      this.pageSize,
+      this.searchTerm,
+      roleParam,
+      statusParam,
+      this.sortBy,
+      this.sortDirection
+    ).subscribe({
+      next: (res) => {
+        this.paginatedUsers = res.content;
+        this.totalPages     = res.totalPages;
+        this.pageData = {
+          stats: res.stats,
+          users: res.content,
+          totalCount: res.totalElements
+        };
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching paged users', err);
+        this.loading = false;
+      }
     });
   }
 
   setFilter(filter: 'ALL' | 'ACTIVE' | 'INACTIVE' | 'ADMIN') {
     this.currentFilter = filter;
     this.currentPage = 1;
-    this.applyFiltersAndSort();
+    this.fetchData();
   }
 
-  toggleSort() {
-    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-    this.applyFiltersAndSort();
+  toggleSort(column: string) {
+    if (this.sortBy === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortDirection = 'asc';
+    }
+    this.currentPage = 1;
+    this.fetchData();
   }
 
   onSearchChange() {
     this.currentPage = 1;
-    this.applyFiltersAndSort();
+    this.fetchData();
   }
 
-  applyFiltersAndSort() {
-    if (!this.pageData) return;
-
-    let users = [...this.pageData.users];
-
-    // 1. Search Filter
-    const term = this.searchTerm.toLowerCase().trim();
-    if (term) {
-      users = users.filter(u =>
-        (u.fullName || '').toLowerCase().includes(term) ||
-        (u.email || '').toLowerCase().includes(term) ||
-        (u.role || '').toLowerCase().includes(term)
-      );
-    }
-
-    // 2. Status/Admin Filter
-    if (this.currentFilter === 'ACTIVE') {
-      users = users.filter(u => u.status === 'Active');
-    } else if (this.currentFilter === 'INACTIVE') {
-      users = users.filter(u => u.status === 'Inactive');
-    } else if (this.currentFilter === 'ADMIN') {
-      users = users.filter(u => 
-        (u.role || '').toUpperCase().includes('ADMIN') || 
-        u.roles?.some(r => r.name.toUpperCase().includes('ADMIN'))
-      );
-    }
-
-    // 3. Sorting (Admins on top ALWAYS, then by name)
-    users.sort((a, b) => {
-      const aIsAdmin = (a.role || '').toUpperCase().includes('ADMIN') || a.roles?.some(r => r.name.toUpperCase().includes('ADMIN'));
-      const bIsAdmin = (b.role || '').toUpperCase().includes('ADMIN') || b.roles?.some(r => r.name.toUpperCase().includes('ADMIN'));
-
-      if (aIsAdmin && !bIsAdmin) return -1;
-      if (!aIsAdmin && bIsAdmin) return 1;
-
-      // Same category, sort by name
-      const nameA = (a.fullName || '').toLowerCase();
-      const nameB = (b.fullName || '').toLowerCase();
-      
-      if (this.sortOrder === 'asc') return nameA.localeCompare(nameB);
-      if (this.sortOrder === 'desc') return nameB.localeCompare(nameA);
-      return 0;
-    });
-
-    this.filteredUsers = users;
-    this.calculatePagination();
-  }
-
-  calculatePagination() {
-    this.totalPages = Math.ceil(this.filteredUsers.length / this.pageSize) || 1;
-    if (this.currentPage > this.totalPages) this.currentPage = 1;
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.paginatedUsers = this.filteredUsers.slice(startIndex, startIndex + this.pageSize);
+  onPageSizeChange(newSize: number) {
+    this.pageSize = newSize;
+    this.currentPage = 1;
+    this.fetchData();
   }
 
   goToPage(page: number | string) {
     if (typeof page === 'number' && page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.calculatePagination();
+      this.fetchData();
     }
   }
 
@@ -235,7 +247,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     const total = this.totalPages;
     const current = this.currentPage;
     const range: (number | string)[] = [];
-    const delta = 1; // Number of pages around current
+    const delta = 1;
 
     if (total <= 7) {
       for (let i = 1; i <= total; i++) range.push(i);
@@ -258,9 +270,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   getRoleClass(roleStr: string | undefined): string {
     if (!roleStr) return 'NA';
-    // Use the first role for styling if there are multiple
     const firstRole = roleStr.split(',')[0].trim().toLowerCase();
-    // Replace spaces with dashes
     return firstRole.replace(/\s+/g, '-');
   }
 

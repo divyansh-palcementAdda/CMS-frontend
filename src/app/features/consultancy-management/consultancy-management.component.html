@@ -214,11 +214,11 @@
                 <h3 class="table-title">All Consultancies</h3>
                 <div class="entries-selector">
                   <span>Show</span>
-                  <select [(ngModel)]="requestConfig.size" (change)="onPageSizeChange()">
-                    <option [value]="5">5</option>
+                  <select [(ngModel)]="requestConfig.size" (change)="onPageSizeChange()" style="padding: 6px 10px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: white; font-weight: 600; color: #1E293B; cursor: pointer; outline: none; margin: 0 4px;">
                     <option [value]="10">10</option>
-                    <option [value]="25">25</option>
+                    <option [value]="20">20</option>
                     <option [value]="50">50</option>
+                    <option [value]="100">100</option>
                   </select>
                   <span>Entries</span>
                 </div>
@@ -304,6 +304,7 @@
                     <th class="text-center cursor-pointer" (click)="setSort('totalApplications')">
                       Applications <span>{{getSortIcon('totalApplications')}}</span>
                     </th>
+                    <th class="text-center">Remaining Applications</th>
                     <th class="text-center cursor-pointer" (click)="setSort('totalCancelledAdmissions')">
                       Can. Adm. <span>{{getSortIcon('totalCancelledAdmissions')}}</span>
                     </th>
@@ -336,6 +337,7 @@
 
                     <td class="stats-cell">{{ item.totalAdmissions }}</td>
                     <td class="stats-cell">{{ item.totalApplications }}</td>
+                    <td class="stats-cell" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
                     <td class="stats-cell" [style.color]="item.totalCancelledAdmissions > 0 ? '#EF4444' : 'inherit'">
                       {{ item.totalCancelledAdmissions }}
                     </td>
@@ -381,11 +383,11 @@
                     *ngIf="paginatedConsultancies.length > 0 && paginatedConsultancies.length < requestConfig.size">
                     <tr
                       *ngFor="let empty of [].constructor(requestConfig.size - paginatedConsultancies.length); let i = index">
-                      <td colspan="11" style="padding: 24px; border: none;"></td>
+                      <td colspan="12" style="padding: 24px; border: none;"></td>
                     </tr>
                   </ng-container>
                   <tr *ngIf="paginatedConsultancies.length === 0">
-                    <td colspan="11" class="text-center py-5">
+                    <td colspan="12" class="text-center py-5">
                       <div
                         style="display: flex; flex-direction: column; align-items: center; gap: 12px; color: #94A3B8;">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"

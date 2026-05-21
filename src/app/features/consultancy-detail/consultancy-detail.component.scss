@@ -615,3 +615,53 @@ thead.orange-header { background: #F59E0B !important; }
   font-weight: 700 !important;
   color: #1E293B !important;
 }
+
+.btn-export {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #EFF6FF !important;
+  color: #3B82F6 !important;
+  border: 1px solid #BFDBFE !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out !important;
+
+  &:hover:not(:disabled) {
+    background: #DBEAFE !important;
+    border-color: #93C5FD !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) !important;
+  }
+
+  &:disabled {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+  }
+
+  .loader-spinner {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    &::before {
+      content: '' !important;
+      width: 14px !important;
+      height: 14px !important;
+      border: 2px solid #3B82F6 !important;
+      border-top-color: transparent !important;
+      border-radius: 50% !important;
+      animation: spin-anim 0.8s linear infinite !important;
+    }
+  }
+}
+
+@keyframes spin-anim {
+  to { transform: rotate(360deg); }
+}

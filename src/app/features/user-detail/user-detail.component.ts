@@ -65,6 +65,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   itemToDelete: any = null;
   deleteType: 'user' | 'consultancy' = 'user';
+  exporting: { [key: string]: boolean } = {};
 
   // Filters
   consultancyStatusFilter: string | null = null;
@@ -397,6 +398,56 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   goBack() {
     this.router.navigate(['/users']);
+  }
+
+  downloadExcel(tab: string) {
+    this.exporting[tab] = true;
+    
+    let search = '';
+    let source = '';
+    let scholar: boolean | null = null;
+    
+    if (tab === 'remaining_applications') {
+      search = this.totalAppSearch;
+      source = this.appFilterSource || '';
+      scholar = this.appFilterScholar;
+    } else if (tab === 'cancelled_applications') {
+      search = this.cancelledAppSearch;
+    } else if (tab === 'confirmed_admissions') {
+      search = this.totalAdmSearch;
+      source = this.admFilterSource || '';
+      scholar = this.admFilterScholar;
+    } else if (tab === 'cancelled_admissions') {
+      search = this.cancelledAdmSearch;
+    } else if (tab === 'total_applications') {
+      search = this.masterSearch;
+    }
+    
+    this.userService.exportUserStudents(this.userId, tab, search, source, scholar)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob: Blob) => {
+          this.exporting[tab] = false;
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          
+          const now = new Date();
+          const pad = (n: number) => n.toString().padStart(2, '0');
+          const timestamp = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+          a.download = `user_${tab}_${timestamp}.xlsx`;
+          
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('Failed to export Excel', err);
+          this.exporting[tab] = false;
+          alert('Failed to export Excel data. Please try again.');
+        }
+      });
   }
 
   ngOnDestroy() {

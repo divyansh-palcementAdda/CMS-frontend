@@ -32,6 +32,7 @@ export class ConsultancyService {
               commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-',
               totalAdmissions: Number(dto.totalAdmissions) || 0,
               totalApplications: Number(dto.totalApplications) || 0,
+              remainingApplications: Number(dto.totalRemainingApplications) || 0,
               totalCancelledAdmissions: Number(dto.totalCancelledAdmissions) || 0,
               totalCancelledApplications: Number(dto.totalCancelledApplications) || 0
             };
@@ -396,5 +397,17 @@ export class ConsultancyService {
 
   getActiveUsers(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/user/status/ACTIVE`);
+  }
+
+  exportConsultancyStudents(consultancyId: number, tabName: string, search: string, source: string, scholar: boolean | null): Observable<Blob> {
+    let params: any = { tab: tabName };
+    if (search) params.search = search;
+    if (source) params.source = source;
+    if (scholar !== null) params.scholar = scholar;
+
+    return this.http.get(`${this.apiUrl}/${consultancyId}/export-excel`, {
+      params,
+      responseType: 'blob'
+    });
   }
 }

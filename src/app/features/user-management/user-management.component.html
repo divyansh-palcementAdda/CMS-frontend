@@ -114,14 +114,28 @@
                     <div class="table-card stat-card table-only" style="padding: 24px">
                         <div class="table-header">
                             <h3 class="table-title">All Users</h3>
-                            <div class="search-box">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                </svg>
-                                <input type="text" placeholder="Search Users" [(ngModel)]="searchTerm"
-                                    (ngModelChange)="onSearchChange()">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <div class="entries-selector"
+                                    style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748B;">
+                                    <span>Show</span>
+                                    <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)"
+                                        style="padding: 8px 12px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: white; font-weight: 600; color: #1E293B; cursor: pointer; outline: none; transition: all 0.2s;">
+                                        <option [value]="10">10</option>
+                                        <option [value]="20">20</option>
+                                        <option [value]="50">50</option>
+                                        <option [value]="100">100</option>
+                                    </select>
+                                    <span>entries</span>
+                                </div>
+                                <div class="search-box">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <input type="text" placeholder="Search Users" [(ngModel)]="searchTerm"
+                                        (ngModelChange)="onSearchChange()">
+                                </div>
                             </div>
                         </div>
 
@@ -130,17 +144,47 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">S.NO</th>
-                                        <th class="sortable" (click)="toggleSort()">
+                                        <th class="sortable" (click)="toggleSort('name')" style="cursor: pointer;">
                                             Name
-                                            <span class="sort-icon">
+                                            <span class="sort-icon" style="margin-left: 4px;">
                                                 <i class="fas"
-                                                    [ngClass]="sortOrder === 'asc' ? 'fa-sort-up' : (sortOrder === 'desc' ? 'fa-sort-down' : 'fa-sort')"></i>
+                                                    [ngClass]="sortBy === 'name' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                                             </span>
                                         </th>
-                                        <th>Total Admissions</th>
-                                        <th>Total Applications</th>
-                                        <th>Cancelled Admissions</th>
-                                        <th>Cancelled Applications</th>
+                                        <th class="sortable" (click)="toggleSort('totalApplications')"
+                                            style="cursor: pointer;">
+                                            Total Applications
+                                            <span class="sort-icon" style="margin-left: 4px;">
+                                                <i class="fas"
+                                                    [ngClass]="sortBy === 'totalApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                                            </span>
+                                        </th>
+                                        <th class="sortable" (click)="toggleSort('totalAdmissions')"
+                                            style="cursor: pointer;">
+                                            Total Admissions
+                                            <span class="sort-icon" style="margin-left: 4px;">
+                                                <i class="fas"
+                                                    [ngClass]="sortBy === 'totalAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                                            </span>
+                                        </th>
+
+                                        <th>Remaining Applications</th>
+                                        <th class="sortable" (click)="toggleSort('cancelledAdmissions')"
+                                            style="cursor: pointer;">
+                                            Cancelled Admissions
+                                            <span class="sort-icon" style="margin-left: 4px;">
+                                                <i class="fas"
+                                                    [ngClass]="sortBy === 'cancelledAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                                            </span>
+                                        </th>
+                                        <th class="sortable" (click)="toggleSort('cancelledApplications')"
+                                            style="cursor: pointer;">
+                                            Cancelled Applications
+                                            <span class="sort-icon" style="margin-left: 4px;">
+                                                <i class="fas"
+                                                    [ngClass]="sortBy === 'cancelledApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                                            </span>
+                                        </th>
                                         <th>Role</th>
                                         <th>Status</th>
                                         <th class="text-center">Actions</th>
@@ -148,10 +192,13 @@
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let item of paginatedUsers; let i = index">
-                                        <td class="text-center text-bold num-col ">{{ i+1 }}</td>
+                                        <td class="text-center text-bold num-col ">{{ (currentPage - 1) * pageSize + i +
+                                            1 }}</td>
                                         <td class="user-name">{{ item.fullName }}</td>
-                                        <td class="user-counts">{{ item.totalAdmissions }}</td>
                                         <td class="user-counts">{{ item.totalApplications }}</td>
+                                        <td class="user-counts">{{ item.totalAdmissions }}</td>
+                                        <td class="user-counts" style="color: #6366F1; font-weight: 600;">{{
+                                            item.remainingApplications }}</td>
                                         <td class="user-counts">{{ item.cancelledAdmissions }}</td>
                                         <td class="user-counts">{{ item.cancelledApplications }}</td>
                                         <td>
@@ -204,7 +251,8 @@
                                         </td>
                                     </tr>
                                     <tr *ngIf="paginatedUsers.length === 0">
-                                        <td colspan="6" class="text-center p-4">No users found matching "{{searchTerm}}"
+                                        <td colspan="10" class="text-center p-4">No users found matching
+                                            "{{searchTerm}}"
                                         </td>
                                     </tr>
                                 </tbody>
@@ -246,8 +294,8 @@
                     (confirm)="confirmDelete()" (cancel)="cancelDelete()">
                 </app-confirmation-modal>
 
-                <app-add-user-modal *ngIf="showAddModal" [userToEdit]="selectedUser"
-                    (close)="closeAddModal()" (success)="onAddSuccess()">
+                <app-add-user-modal *ngIf="showAddModal" [userToEdit]="selectedUser" (close)="closeAddModal()"
+                    (success)="onAddSuccess()">
                 </app-add-user-modal>
 
                 <!-- Bulk Upload Modal -->

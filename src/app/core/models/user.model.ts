@@ -39,6 +39,7 @@ export interface UserItem {
   // Flattened stats for table display
   totalAdmissions?: number;
   totalApplications?: number;
+  remainingApplications?: number;
   cancelledAdmissions?: number;
   cancelledApplications?: number;
 
