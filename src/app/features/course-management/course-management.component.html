@@ -116,7 +116,8 @@
           <div class="fee-filter-bar">
             <div class="filter-section-header">
               <div class="filter-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <line x1="4" y1="21" x2="4" y2="14"></line>
                   <line x1="4" y1="10" x2="4" y2="3"></line>
                   <line x1="12" y1="21" x2="12" y2="12"></line>
@@ -161,8 +162,10 @@
               </div>
 
               <div class="filter-group auto-width" style="flex: 0 0 auto;">
-                <button class="reset-btn" (click)="feeFilter = 'ALL_TIME'; startDate=''; endDate=''; sessionFilter=''; onFeeFilterChange()">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <button class="reset-btn"
+                  (click)="feeFilter = 'ALL_TIME'; startDate=''; endDate=''; sessionFilter=''; onFeeFilterChange()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
                     <path d="M23 4v6h-6"></path>
                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                   </svg>
@@ -176,9 +179,11 @@
             <div class="table-header">
               <h3 class="table-title">All Courses</h3>
               <div style="display: flex; align-items: center; gap: 16px;">
-                <div class="entries-selector" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748B;">
+                <div class="entries-selector"
+                  style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748B;">
                   <span>Show</span>
-                  <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange(+$event)" style="padding: 8px 12px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: white; font-weight: 600; color: #1E293B; cursor: pointer; outline: none; transition: all 0.2s;">
+                  <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange(+$event)"
+                    style="padding: 8px 12px; border-radius: 8px; border: 1.5px solid #E2E8F0; background: white; font-weight: 600; color: #1E293B; cursor: pointer; outline: none; transition: all 0.2s;">
                     <option [value]="10">10</option>
                     <option [value]="20">20</option>
                     <option [value]="50">50</option>
@@ -205,38 +210,46 @@
                     <th class="sortable" (click)="toggleSort('name')" style="cursor: pointer;">
                       Course Name
                       <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas" [ngClass]="sortBy === 'name' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                        <i class="fas"
+                          [ngClass]="sortBy === 'name' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
                     <th>Course Type</th>
-                    <th class="sortable" (click)="toggleSort('totalAdmissions')" style="cursor: pointer;">
-                      Total Admissions
-                      <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas" [ngClass]="sortBy === 'totalAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
-                      </span>
-                    </th>
+
                     <th class="sortable" (click)="toggleSort('totalApplications')" style="cursor: pointer;">
                       Total Applications
                       <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas" [ngClass]="sortBy === 'totalApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                        <i class="fas"
+                          [ngClass]="sortBy === 'totalApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
+                    <th class="sortable" (click)="toggleSort('totalAdmissions')" style="cursor: pointer;">
+                      Total Admissions
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'totalAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+
                     <th class="sortable" (click)="toggleSort('remainingApplications')" style="cursor: pointer;">
                       Remaining Applications
                       <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas" [ngClass]="sortBy === 'remainingApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                        <i class="fas"
+                          [ngClass]="sortBy === 'remainingApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
                     <th class="sortable" (click)="toggleSort('cancelledAdmissions')" style="cursor: pointer;">
                       Cancelled Admissions
                       <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas" [ngClass]="sortBy === 'cancelledAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                        <i class="fas"
+                          [ngClass]="sortBy === 'cancelledAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
                     <th class="sortable" (click)="toggleSort('cancelledApplications')" style="cursor: pointer;">
                       Cancelled Applications
                       <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas" [ngClass]="sortBy === 'cancelledApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                        <i class="fas"
+                          [ngClass]="sortBy === 'cancelledApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
                     <th>Total Fees Collected</th>
@@ -252,9 +265,10 @@
                       <span class="course-type filter-pill" [ngClass]="item.courseType.toLowerCase()">{{ item.courseType
                         }}</span>
                     </td>
-                    <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
                     <td class="text-center text-bold">{{ item.totalApplications }}</td>
-                    <td class="text-center text-bold" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                    <td class="text-center text-bold" style="color: #6366F1; font-weight: 600;">{{
+                      item.remainingApplications }}</td>
                     <td class="text-center text-bold">{{ item.cancelledAdmissions }}</td>
                     <td class="text-center text-bold">{{ item.cancelledApplications }}</td>
                     <td class="text-center">
@@ -290,7 +304,8 @@
                     </td>
                   </tr>
                   <tr *ngIf="paginatedCourses.length === 0">
-                    <td colspan="11" class="text-center py-4 text-gray-500">No courses found matching "{{searchTerm}}"</td>
+                    <td colspan="11" class="text-center py-4 text-gray-500">No courses found matching "{{searchTerm}}"
+                    </td>
                   </tr>
                 </tbody>
               </table>
