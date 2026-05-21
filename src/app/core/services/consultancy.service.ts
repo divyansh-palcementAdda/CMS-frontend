@@ -32,7 +32,7 @@ export class ConsultancyService {
               commission: dto.commissionPercentage != null ? `${dto.commissionPercentage}%` : '-',
               totalAdmissions: Number(dto.totalAdmissions) || 0,
               totalApplications: Number(dto.totalApplications) || 0,
-              remainingApplications: Number(dto.totalRemainingApplications) || 0,
+              remainingApplications: Number(dto.remainingApplications) || 0,
               totalCancelledAdmissions: Number(dto.totalCancelledAdmissions) || 0,
               totalCancelledApplications: Number(dto.totalCancelledApplications) || 0
             };

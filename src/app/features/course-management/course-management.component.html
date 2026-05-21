@@ -221,7 +221,12 @@
                         <i class="fas" [ngClass]="sortBy === 'totalApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
-                    <th>Remaining Applications</th>
+                    <th class="sortable" (click)="toggleSort('remainingApplications')" style="cursor: pointer;">
+                      Remaining Applications
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas" [ngClass]="sortBy === 'remainingApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
                     <th class="sortable" (click)="toggleSort('cancelledAdmissions')" style="cursor: pointer;">
                       Cancelled Admissions
                       <span class="sort-icon" style="margin-left: 4px;">

@@ -24,7 +24,7 @@ export interface ConsultancyDTO {
   totalApplications?: number;
   totalCancelledAdmissions?: number;
   totalCancelledApplications?: number;
-  totalRemainingApplications?: number;
+  remainingApplications?: number;
 }
 
 export interface ConsultancyItem {

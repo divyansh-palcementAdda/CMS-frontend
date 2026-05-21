@@ -304,7 +304,9 @@
                     <th class="text-center cursor-pointer" (click)="setSort('totalApplications')">
                       Applications <span>{{getSortIcon('totalApplications')}}</span>
                     </th>
-                    <th class="text-center">Remaining Applications</th>
+                    <th class="text-center cursor-pointer" (click)="setSort('remainingApplications')">
+                      Remaining App. <span>{{getSortIcon('remainingApplications')}}</span>
+                    </th>
                     <th class="text-center cursor-pointer" (click)="setSort('totalCancelledAdmissions')">
                       Can. Adm. <span>{{getSortIcon('totalCancelledAdmissions')}}</span>
                     </th>
