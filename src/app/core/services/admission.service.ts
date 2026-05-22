@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AdmissionItem, AdmissionPageData } from '../models/admission.model';
+import { computeFeeStatus } from '../utils/fee-status.util';
 
 @Injectable({
   providedIn: 'root'
@@ -219,7 +220,7 @@ export class AdmissionService {
       sNo: sNo,
       fullName: s.fullName || 'Unknown Student',
       courseName: s.courseName || 'N/A',
-      feeStatus: s.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid',
+      feeStatus: computeFeeStatus(s.totalFeesPaid, s.finalFeesAfterDiscount),
       status: s.isCancelled ? 'Cancelled' : 'Active',
       duration: s.duration || 'N/A',
       discountPercentageDisplay: s.discountType === 'PERCENTAGE' ? `${s.discountValue}%` : (s.isScholar ? 'Scholarship' : '-'),

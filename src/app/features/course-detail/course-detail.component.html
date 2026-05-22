@@ -395,8 +395,9 @@
                       </span>
                     </td>
                     <td><span class="status-badge"
-                        [class.active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
-                        [class.inactive]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || item.admissionSource || 'N/A' }}</td>
                     <td>{{ (item.admissionDate && item.admissionDate !== 'N/A' ? item.admissionDate : (item.createdAt &&
                       item.createdAt !== 'N/A' ? item.createdAt : null)) | date:'mediumDate' }}</td>
@@ -480,8 +481,9 @@
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
                     <td><span class="status-badge"
-                        [class.active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
-                        [class.inactive]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || item.admissionSource || 'N/A' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -564,7 +566,10 @@
                     <td>{{ (cancelledAppPage - 1) * cancelledAppPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge inactive">{{ item.feeStatus }}</span></td>
+                    <td><span class="status-badge"
+                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
                     <td><span class="status-badge inactive">Cancelled</span></td>
                     <td>₹{{ (item.commissionAmount || 0) | number:'1.0-0' }}</td>
                     <td>{{ item.session }}</td>
@@ -648,7 +653,10 @@
                     <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge active">{{ item.feeStatus }}</span></td>
+                    <td><span class="status-badge"
+                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || item.admissionSource || 'N/A' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -726,7 +734,10 @@
                     <td>{{ (cancelledAdmPage - 1) * cancelledAdmPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge inactive">{{ item.feeStatus }}</span></td>
+                    <td><span class="status-badge"
+                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
                     <td>₹{{ (item.commissionAmount || 0) | number:'1.0-0' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">

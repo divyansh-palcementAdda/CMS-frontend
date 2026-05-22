@@ -638,9 +638,11 @@
                                         </td>
 
                                         <td *ngIf="!isApplicationTab">
-                                            <span class="status-pill" [class.paid]="item.fiftyPercentFeesPaid"
-                                                [class.unpaid]="!item.fiftyPercentFeesPaid">
-                                                {{item.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid'}}
+                                            <span class="status-pill"
+                                                [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                                                [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                                                [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">
+                                                {{ item.feeStatus }}
                                             </span>
                                         </td>
 

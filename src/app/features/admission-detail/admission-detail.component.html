@@ -338,9 +338,11 @@
                             (click)="toggleFeeStatus($event)">
                           <span class="slider round"></span>
                         </label>
-                        <span class="status-badge" [class.paid]="detail.fiftyPercentFeesPaid"
-                          [class.unpaid]="!detail.fiftyPercentFeesPaid">
-                          {{ detail.fiftyPercentFeesPaid ? 'Paid' : 'Unpaid' }}
+                        <span class="status-badge"
+                          [class.fee-status-unpaid]="!detail.fiftyPercentFeesPaid && (detail.totalFeesPaid || 0) <= 0"
+                          [class.fee-status-provisional]="(detail.totalFeesPaid || 0) > 0 && !detail.fiftyPercentFeesPaid"
+                          [class.fee-status-fifty]="detail.fiftyPercentFeesPaid">
+                          {{ detail.fiftyPercentFeesPaid ? '50% FEES PAID' : ((detail.totalFeesPaid || 0) > 0 ? 'PROVISIONAL PAID' : 'UNPAID') }}
                         </span>
                       </div>
                     </div>
