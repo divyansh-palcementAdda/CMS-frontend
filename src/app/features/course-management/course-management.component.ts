@@ -7,7 +7,7 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 import { CourseService } from '../../core/services/course.service';
 import { CourseItem, CoursePageData } from '../../core/models/course.model';
 import { Subject } from 'rxjs';
-import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddCourseModalComponent } from './components/add-course-modal/add-course-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
@@ -16,7 +16,11 @@ import { StatePreservationService } from '../../core/services/state-preservation
 @Component({
   selector: 'app-course-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddCourseModalComponent, BulkUploadModalComponent],
+  imports: [
+    CommonModule, FormsModule, RouterModule,
+    SidebarComponent, TopbarComponent,
+    ConfirmationModalComponent, AddCourseModalComponent, BulkUploadModalComponent
+  ],
   templateUrl: './course-management.component.html',
   styleUrls: ['./course-management.component.scss']
 })
@@ -25,17 +29,14 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   loading = true;
   searchTerm = '';
   Math = Math;
-  
+
   currentPage = 1;
   pageSize = 10;
   sortBy = 'name';
   sortDirection = 'asc';
   activeFilter: boolean | null = null;
   totalElements = 0;
-  
-  private destroy$ = new Subject<void>();
-  private searchSubject = new Subject<string>();
-  
+
   feeFilter = 'ALL_TIME';
   startDate = '';
   endDate = '';
@@ -49,6 +50,11 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   showBulkUploadModal = false;
   editCourseId: number | null = null;
 
+  // ── RxJS teardown + search debounce ─────────────────────────────────────────
+  private readonly destroy$ = new Subject<void>();
+  // searchSubject is set up ONCE here; never re-subscribed
+  private readonly searchSubject = new Subject<string>();
+
   constructor(
     public courseService: CourseService,
     private router: Router,
@@ -57,132 +63,141 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
     private statePreservationService: StatePreservationService
   ) {
     this.generateSessions();
+  }
 
+  ngOnInit(): void {
+    // ── 1. Restore persisted state ───────────────────────────────────────────
+    const savedState = this.statePreservationService.getState<any>('cms_course_management_state');
+    if (savedState) {
+      this.currentPage   = savedState.currentPage   || 1;
+      this.pageSize      = savedState.pageSize       || 10;
+      this.sortBy        = savedState.sortBy         || 'name';
+      this.sortDirection = savedState.sortDirection  || 'asc';
+      this.searchTerm    = savedState.searchTerm     || '';
+      this.activeFilter  = savedState.activeFilter   !== undefined ? savedState.activeFilter : null;
+      this.feeFilter     = savedState.feeFilter      || 'ALL_TIME';
+      this.startDate     = savedState.startDate      || '';
+      this.endDate       = savedState.endDate        || '';
+      this.sessionFilter = savedState.sessionFilter  || '';
+    }
+
+    // ── 2. Handle query params ONCE (take(1) or takeUntil) ───────────────────
+    // Using takeUntil so it cleans up on destroy; the subscription only
+    // fires when queryParams actually change (Angular emits once on load).
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        const active = params['active'];
+        if (active !== undefined) {
+          this.activeFilter = active === 'true';
+        }
+
+        // Handle route-triggered edit
+        const editId = params['id'];
+        if (editId && this.route.snapshot.fragment === 'edit') {
+          this.onEdit(+editId);
+        }
+      });
+
+    // ── 3. Wire search debounce ONCE — never re-subscribe ────────────────────
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged(),
       takeUntil(this.destroy$)
-    ).subscribe(term => {
-      this.searchTerm = term;
+    ).subscribe(() => {
       this.currentPage = 1;
       this.loadData();
     });
+
+    // ── 4. Initial data load ──────────────────────────────────────────────────
+    this.loadData();
   }
 
-  generateSessions() {
+  // ── Actions ──────────────────────────────────────────────────────────────────
+
+  generateSessions(): void {
     const currentYear = new Date().getFullYear();
     for (let i = 0; i < 5; i++) {
       this.availableSessions.push((currentYear - i).toString());
     }
   }
 
-  onView(id: number) {
+  onView(id: number): void {
     this.router.navigate(['/courses', id]);
   }
 
-  onEdit(id: number) {
+  onEdit(id: number): void {
     this.editCourseId = id;
     this.showAddModal = true;
   }
 
-  openAddModal() {
+  openAddModal(): void {
     this.editCourseId = null;
     this.showAddModal = true;
   }
 
-  closeAddModal() {
+  closeAddModal(): void {
     const hasRouteTrigger = this.route.snapshot.fragment === 'edit' || !!this.route.snapshot.queryParams['id'];
     this.showAddModal = false;
     this.editCourseId = null;
-
     if (hasRouteTrigger) {
       this.location.back();
     }
   }
 
-  onAddSuccess() {
+  onAddSuccess(): void {
     this.closeAddModal();
     this.loadData();
   }
 
-  onBulkUploadSuccess(result: any) {
+  onBulkUploadSuccess(_result: any): void {
     this.loadData();
   }
 
-  onDelete(course: CourseItem) {
+  onDelete(course: CourseItem): void {
     this.selectedCourse = course;
     this.showDeleteModal = true;
   }
 
-  cancelDelete() {
+  cancelDelete(): void {
     this.selectedCourse = null;
     this.showDeleteModal = false;
   }
 
-  confirmDelete() {
-    if (this.selectedCourse) {
-      this.loading = true;
-      this.courseService.deleteCourse(this.selectedCourse.id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.selectedCourse = null;
-            this.showDeleteModal = false;
-            this.loadData();
-          },
-          error: (err: any) => {
-            console.error('Error deleting course', err);
-            this.loading = false;
-            this.showDeleteModal = false;
-          }
-        });
-    }
+  confirmDelete(): void {
+    if (!this.selectedCourse) return;
+    this.loading = true;
+    this.courseService.deleteCourse(this.selectedCourse.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.selectedCourse = null;
+          this.showDeleteModal = false;
+          this.loadData();
+        },
+        error: (err: any) => {
+          console.error('Error deleting course', err);
+          this.loading = false;
+          this.showDeleteModal = false;
+        }
+      });
   }
 
-  ngOnInit() {
-    const savedState = this.statePreservationService.getState<any>('cms_course_management_state');
-    if (savedState) {
-      this.currentPage = savedState.currentPage || 1;
-      this.pageSize = savedState.pageSize || 10;
-      this.sortBy = savedState.sortBy || 'name';
-      this.sortDirection = savedState.sortDirection || 'asc';
-      this.searchTerm = savedState.searchTerm || '';
-      this.activeFilter = savedState.activeFilter !== undefined ? savedState.activeFilter : null;
-      this.feeFilter = savedState.feeFilter || 'ALL_TIME';
-      this.startDate = savedState.startDate || '';
-      this.endDate = savedState.endDate || '';
-      this.sessionFilter = savedState.sessionFilter || '';
-    }
+  // ── Data loading ──────────────────────────────────────────────────────────────
 
-    this.route.queryParams.subscribe(params => {
-      const active = params['active'];
-      if (active !== undefined) {
-        this.activeFilter = active === 'true';
-      }
-      this.loadData();
-
-      // Handle route-triggered edit
-      const editId = params['id'];
-      if (editId && this.route.snapshot.fragment === 'edit') {
-        this.onEdit(+editId);
-      }
-    });
-  }
-
-  loadData() {
+  loadData(): void {
     this.loading = true;
 
-    // Save state
     this.statePreservationService.saveState('cms_course_management_state', {
-      currentPage: this.currentPage,
-      pageSize: this.pageSize,
-      sortBy: this.sortBy,
+      currentPage:   this.currentPage,
+      pageSize:      this.pageSize,
+      sortBy:        this.sortBy,
       sortDirection: this.sortDirection,
-      searchTerm: this.searchTerm,
-      activeFilter: this.activeFilter,
-      feeFilter: this.feeFilter,
-      startDate: this.startDate,
-      endDate: this.endDate,
+      searchTerm:    this.searchTerm,
+      activeFilter:  this.activeFilter,
+      feeFilter:     this.feeFilter,
+      startDate:     this.startDate,
+      endDate:       this.endDate,
       sessionFilter: this.sessionFilter
     });
 
@@ -193,82 +208,51 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
       this.activeFilter,
       this.sortBy,
       this.sortDirection
-    ).pipe(takeUntil(this.destroy$))
-     .subscribe({
-       next: (res) => {
-         this.pageData = {
-           stats: res.stats,
-           courses: res.content,
-           totalCount: res.totalElements
-         };
-         this.totalElements = res.totalElements;
-         this.loading = false;
-       },
-       error: (err) => {
-         console.error('Error loading courses paged', err);
-         this.loading = false;
-       }
-     });
+    )
+    // takeUntil cleans up if component is destroyed mid-flight;
+    // switchMap is NOT used here because loadData() is already called
+    // imperatively (one call = one response), preventing duplication.
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (res) => {
+        this.pageData = {
+          stats: res.stats,
+          courses: res.content,
+          totalCount: res.totalElements
+        };
+        this.totalElements = res.totalElements;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading courses paged', err);
+        this.loading = false;
+      }
+    });
   }
 
-  onFeeFilterChange() {
+  // ── Search ────────────────────────────────────────────────────────────────────
+
+  /** Called by (ngModelChange) on the search input. Emits to the debounced subject. */
+  onSearchChange(): void {
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  // ── Filters ───────────────────────────────────────────────────────────────────
+
+  onFeeFilterChange(): void {
     this.currentPage = 1;
     this.loadData();
   }
 
-  get paginatedCourses(): CourseItem[] {
-    return this.pageData?.courses || [];
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalElements / this.pageSize) || 1;
-  }
-
-  getPagesArray(): (number | string)[] {
-    const total = this.totalPages;
-    const current = this.currentPage;
-    const pages: (number | string)[] = [];
-
-    if (total <= 7) {
-      for (let i = 1; i <= total; i++) pages.push(i);
-    } else {
-      pages.push(1);
-
-      if (current > 3) {
-        pages.push('...');
-      }
-
-      const start = Math.max(2, current - 1);
-      const end = Math.min(total - 1, current + 1);
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      if (current < total - 2) {
-        pages.push('...');
-      }
-
-      pages.push(total);
-    }
-
-    return pages;
-  }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.loadData();
-    }
-  }
-
-  onPageSizeChange(size: number) {
-    this.pageSize = size;
+  setFilter(filter: boolean | null): void {
+    this.activeFilter = filter;
     this.currentPage = 1;
     this.loadData();
   }
 
-  toggleSort(column: string) {
+  // ── Sorting ───────────────────────────────────────────────────────────────────
+
+  toggleSort(column: string): void {
     if (this.sortBy === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -279,11 +263,52 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  onSearchChange() {
-    this.searchSubject.next(this.searchTerm);
+  // ── Pagination ────────────────────────────────────────────────────────────────
+
+  get totalPages(): number {
+    return Math.ceil(this.totalElements / this.pageSize) || 1;
   }
 
-  ngOnDestroy() {
+  get paginatedCourses(): CourseItem[] {
+    return this.pageData?.courses || [];
+  }
+
+  getPagesArray(): (number | string)[] {
+    const total   = this.totalPages;
+    const current = this.currentPage;
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (current > 3) pages.push('...');
+      const start = Math.max(2, current - 1);
+      const end   = Math.min(total - 1, current + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (current < total - 2) pages.push('...');
+      pages.push(total);
+    }
+
+    return pages;
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadData();
+    }
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    this.loadData();
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────────
+
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }

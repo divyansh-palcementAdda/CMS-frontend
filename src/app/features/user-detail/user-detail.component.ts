@@ -14,11 +14,12 @@ import { AdmissionItem } from '../../core/models/admission.model';
 
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddUserModalComponent } from '../user-management/components/add-user-modal/add-user-modal.component';
+import { FeeStatusPipe, FeeStatusClassPipe } from '../../shared/pipes/fee-status.pipe';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent, FeeStatusClassPipe],
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss']
 })

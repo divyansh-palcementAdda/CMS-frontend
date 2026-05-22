@@ -25,6 +25,35 @@ export class CourseService {
     );
   }
 
+  getCourseStudentsPaged(id: number, page: number, size: number, tab: string, search: string, source: string, scholar: boolean | null, sortBy: string, sortDirection: string): Observable<any> {
+    let params: any = { page: page.toString(), size: size.toString(), tab, sortBy, sortDirection };
+    if (search) params.search = search;
+    if (source) params.source = source;
+    if (scholar !== null) params.scholar = scholar.toString();
+    return this.http.get<any>(`${this.apiUrl}/${id}/students/paged`, { params }).pipe(map(res => res.data));
+  }
+
+  getCourseConsultanciesPaged(id: number, page: number, size: number, search: string, sortBy: string, sortDirection: string): Observable<any> {
+    let params: any = { page: page.toString(), size: size.toString(), sortBy, sortDirection };
+    if (search) params.search = search;
+    return this.http.get<any>(`${this.apiUrl}/${id}/consultancies/paged`, { params }).pipe(map(res => res.data));
+  }
+
+  getCourseInstitutionsPaged(id: number, page: number, size: number, search: string, sortBy: string, sortDirection: string): Observable<any> {
+    let params: any = { page: page.toString(), size: size.toString(), sortBy, sortDirection };
+    if (search) params.search = search;
+    return this.http.get<any>(`${this.apiUrl}/${id}/institutions/paged`, { params }).pipe(map(res => res.data));
+  }
+
+  exportCourseStudentsExcel(id: number, tab: string, search: string, source: string, scholar: boolean | null): Observable<Blob> {
+    let params: any = { tab };
+    if (search) params.search = search;
+    if (source) params.source = source;
+    if (scholar !== null) params.scholar = scholar.toString();
+    
+    return this.http.get(`${this.apiUrl}/${id}/students/export`, { params, responseType: 'blob' });
+  }
+
   getCoursesData(filters?: { feeFilter?: string, startDate?: string, endDate?: string, session?: string }): Observable<CoursePageData> {
     let params: any = {};
     if (filters) {

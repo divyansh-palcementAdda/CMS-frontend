@@ -538,6 +538,36 @@
 .table-tools {
   display: flex;
   gap: 16px;
+  align-items: center;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+
+    &.primary {
+      background-color: #6366F1;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: #4F46E5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
 
   .search-box {
     position: relative;

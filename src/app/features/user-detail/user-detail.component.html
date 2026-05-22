@@ -424,14 +424,10 @@
                     <td>{{ item.courseName }}</td>
                     <td>
                       <span class="status-badge"
-                        [ngClass]="item.totalFeesPaid && item.totalFeesPaid > 0 ? 'active' : 'pending'">
-                        {{ item.totalFeesPaid && item.totalFeesPaid > 0 ? 'Admission' : 'Application' }}
+                        [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}
                       </span>
                     </td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || 'N/A' }}</td>
                     <td>{{ item.admissionDate | date:'mediumDate' }}</td>
                     <td class="text-center">
@@ -522,10 +518,7 @@
                     <td>{{ (totalAppPage - 1) * totalAppPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || 'N/A' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -618,10 +611,7 @@
                     <td>{{ (cancelledAppPage - 1) * cancelledAppPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                     <td><span class="status-badge inactive">Cancelled</span></td>
                     <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
                     <td>{{ item.session }}</td>
@@ -714,10 +704,7 @@
                     <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || 'N/A' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -805,10 +792,7 @@
                     <td>{{ (cancelledAdmPage - 1) * cancelledAdmPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                     <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">

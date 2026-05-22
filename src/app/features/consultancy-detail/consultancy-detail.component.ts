@@ -24,6 +24,7 @@ import { InstitutionService } from '../../core/services/institution.service';
 import { AdmissionService } from '../../core/services/admission.service';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddConsultancyModalComponent } from '../consultancy-management/components/add-consultancy-modal/add-consultancy-modal.component';
+import { FeeStatusPipe, FeeStatusClassPipe } from '../../shared/pipes/fee-status.pipe';
 
 /**
  * Component to display detailed information about a specific consultancy.
@@ -31,7 +32,7 @@ import { AddConsultancyModalComponent } from '../consultancy-management/componen
 @Component({
   selector: 'app-consultancy-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgApexchartsModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent],
+  imports: [CommonModule, FormsModule, NgApexchartsModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddConsultancyModalComponent, FeeStatusClassPipe],
   templateUrl: './consultancy-detail.component.html',
   styleUrl: './consultancy-detail.component.scss'
 })

@@ -124,7 +124,7 @@
           <div class="stat-premium-card blue" (click)="onStatClick('total_all')">
             <div class="card-content">
               <div class="info">
-                <span class="label">Total Applications (Active)</span>
+                <span class="label">Remaining Applications</span>
                 <span class="value">{{ courseDetail.admissionStats?.activeApplications || 0 }}</span>
               </div>
               <div class="icon">
@@ -252,9 +252,9 @@
             </div>
           </div>
 
-          <!-- <div class="stat-card" (click)="onStatClick('total_all')">
+          <div class="stat-card" (click)="onStatClick('total_all')">
             <div class="stat-info">
-              <span class="label">Total Addmissions and Applications</span>
+              <span class="label">Total Applications</span>
               <div class="value">{{ courseDetail.admissionStats?.admissionInAllCourses || 0 }}</div>
             </div>
             <div class="icon-box blue">
@@ -263,7 +263,7 @@
                 <path d="M3 3h18v18H3zM9 9h6M9 15h6" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
-          </div> -->
+          </div>
 
 
           <div class="stat-card" (click)="onStatClick('scholar_adm')">
@@ -394,10 +394,7 @@
                         {{ item.totalFeesPaid && item.totalFeesPaid > 0 ? 'Admission' : 'Application' }}
                       </span>
                     </td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                     <td>{{ item.source || item.admissionSource || 'N/A' }}</td>
                     <td>{{ (item.admissionDate && item.admissionDate !== 'N/A' ? item.admissionDate : (item.createdAt &&
                       item.createdAt !== 'N/A' ? item.createdAt : null)) | date:'mediumDate' }}</td>
@@ -431,35 +428,42 @@
               </table>
             </div>
             <div class="table-footer">
-              <span class="record-count">Showing {{ paginatedMasterList.length }} of {{ filteredMasterList.length }}
+              <span class="record-count">Showing {{ paginatedMasterList.length }} of {{ masterTotal }}
                 records</span>
               <div class="pagination">
                 <button class="nav-btn" (click)="masterPage = 1" [disabled]="masterPage === 1">First</button>
                 <button class="nav-btn" (click)="changePage('master', -1)" [disabled]="masterPage === 1">Prev</button>
-                <span class="page-info">Page {{ masterPage }} of {{ getTotalPages(filteredMasterList.length,
+                <span class="page-info">Page {{ masterPage }} of {{ getTotalPages(masterTotal,
                   masterPageSize) }}</span>
                 <button class="nav-btn" (click)="changePage('master', 1)"
-                  [disabled]="masterPage >= getTotalPages(filteredMasterList.length, masterPageSize)">Next</button>
-                <button class="nav-btn" (click)="masterPage = getTotalPages(filteredMasterList.length, masterPageSize)"
-                  [disabled]="masterPage >= getTotalPages(filteredMasterList.length, masterPageSize)">Last</button>
+                  [disabled]="masterPage >= getTotalPages(masterTotal, masterPageSize)">Next</button>
+                <button class="nav-btn" (click)="masterPage = getTotalPages(masterTotal, masterPageSize)"
+                  [disabled]="masterPage >= getTotalPages(masterTotal, masterPageSize)">Last</button>
               </div>
             </div>
           </div> -->
           <!-- Total Applications Table -->
           <div id="total-apps" class="table-card mb-32">
             <div class="table-header-row">
-              <h3>Total Applications (Active) <span *ngIf="appFilterSource || appFilterScholar"
-                  class="active-filter">({{ appFilterSource || 'Scholar' }})</span></h3>
+              <h3>Remaining Applications <span *ngIf="appFilterSource || appFilterScholar" class="active-filter">({{
+                  appFilterSource || 'Scholar' }})</span></h3>
               <div class="table-tools">
                 <button *ngIf="appFilterSource || appFilterScholar" class="btn-clear"
                   (click)="clearApplicationFilter()">Clear Filter</button>
                 <div class="search-box">
-                  <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch">
+                  <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch"
+                    (ngModelChange)="onTotalAppSearchChange()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
                 </div>
+                <button class="btn primary" (click)="exportExcel('remaining_applications')"
+                  [disabled]="exporting['remaining_applications']">
+                  <i class="bx"
+                    [ngClass]="exporting['remaining_applications'] ? 'bx-loader-alt bx-spin' : 'bx-export'"></i>
+                  {{ exporting['remaining_applications'] ? 'Exporting...' : 'Export' }}
+                </button>
               </div>
             </div>
             <div class="table-wrapper">
@@ -480,10 +484,8 @@
                     <td>{{ (totalAppPage - 1) * totalAppPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{
+                        item.feeStatus }}</span></td>
                     <td>{{ item.source || item.admissionSource || 'N/A' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -517,18 +519,17 @@
             </div>
             <div class="table-footer">
               <span class="record-count">Showing {{ paginatedTotalApplications.length }} of {{
-                filteredTotalApplications.length }} records</span>
+                totalAppTotal }} records</span>
               <div class="pagination">
                 <button class="nav-btn" (click)="totalAppPage = 1" [disabled]="totalAppPage === 1">First</button>
                 <button class="nav-btn" (click)="changePage('totalApp', -1)"
                   [disabled]="totalAppPage === 1">Prev</button>
-                <span class="page-info">Page {{ totalAppPage }} of {{ getTotalPages(filteredTotalApplications.length,
+                <span class="page-info">Page {{ totalAppPage }} of {{ getTotalPages(totalAppTotal,
                   totalAppPageSize) }}</span>
                 <button class="nav-btn" (click)="changePage('totalApp', 1)"
-                  [disabled]="totalAppPage >= getTotalPages(filteredTotalApplications.length, totalAppPageSize)">Next</button>
-                <button class="nav-btn"
-                  (click)="totalAppPage = getTotalPages(filteredTotalApplications.length, totalAppPageSize)"
-                  [disabled]="totalAppPage >= getTotalPages(filteredTotalApplications.length, totalAppPageSize)">Last</button>
+                  [disabled]="totalAppPage >= getTotalPages(totalAppTotal, totalAppPageSize)">Next</button>
+                <button class="nav-btn" (click)="totalAppPage = getTotalPages(totalAppTotal, totalAppPageSize)"
+                  [disabled]="totalAppPage >= getTotalPages(totalAppTotal, totalAppPageSize)">Last</button>
               </div>
             </div>
           </div>
@@ -539,12 +540,19 @@
               <h3>Cancelled Applications</h3>
               <div class="table-tools">
                 <div class="search-box">
-                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch">
+                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch"
+                    (ngModelChange)="onCancelledAppSearchChange()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
                 </div>
+                <button class="btn primary" (click)="exportExcel('cancelled_applications')"
+                  [disabled]="exporting['cancelled_applications']">
+                  <i class="bx"
+                    [ngClass]="exporting['cancelled_applications'] ? 'bx-loader-alt bx-spin' : 'bx-export'"></i>
+                  {{ exporting['cancelled_applications'] ? 'Exporting...' : 'Export' }}
+                </button>
               </div>
             </div>
             <div class="table-wrapper">
@@ -566,10 +574,8 @@
                     <td>{{ (cancelledAppPage - 1) * cancelledAppPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{
+                        item.feeStatus }}</span></td>
                     <td><span class="status-badge inactive">Cancelled</span></td>
                     <td>₹{{ (item.commissionAmount || 0) | number:'1.0-0' }}</td>
                     <td>{{ item.session }}</td>
@@ -601,19 +607,19 @@
             </div>
             <div class="table-footer">
               <span class="record-count">Showing {{ paginatedCancelledApplications.length }} of {{
-                filteredCancelledApplications.length }} records</span>
+                cancelledAppTotal }} records</span>
               <div class="pagination">
                 <button class="nav-btn" (click)="cancelledAppPage = 1"
                   [disabled]="cancelledAppPage === 1">First</button>
                 <button class="nav-btn" (click)="changePage('cancelledApp', -1)"
                   [disabled]="cancelledAppPage === 1">Prev</button>
                 <span class="page-info">Page {{ cancelledAppPage }} of {{
-                  getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize) }}</span>
+                  getTotalPages(cancelledAppTotal, cancelledAppPageSize) }}</span>
                 <button class="nav-btn" (click)="changePage('cancelledApp', 1)"
-                  [disabled]="cancelledAppPage >= getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)">Next</button>
+                  [disabled]="cancelledAppPage >= getTotalPages(cancelledAppTotal, cancelledAppPageSize)">Next</button>
                 <button class="nav-btn"
-                  (click)="cancelledAppPage = getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)"
-                  [disabled]="cancelledAppPage >= getTotalPages(filteredCancelledApplications.length, cancelledAppPageSize)">Last</button>
+                  (click)="cancelledAppPage = getTotalPages(cancelledAppTotal, cancelledAppPageSize)"
+                  [disabled]="cancelledAppPage >= getTotalPages(cancelledAppTotal, cancelledAppPageSize)">Last</button>
               </div>
             </div>
           </div>
@@ -627,12 +633,19 @@
                 <button *ngIf="admFilterSource || admFilterScholar" class="btn-clear"
                   (click)="clearAdmissionFilter()">Clear Filter</button>
                 <div class="search-box">
-                  <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch">
+                  <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch"
+                    (ngModelChange)="onTotalAdmSearchChange()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
                 </div>
+                <button class="btn primary" (click)="exportExcel('confirmed_admissions')"
+                  [disabled]="exporting['confirmed_admissions']">
+                  <i class="bx"
+                    [ngClass]="exporting['confirmed_admissions'] ? 'bx-loader-alt bx-spin' : 'bx-export'"></i>
+                  {{ exporting['confirmed_admissions'] ? 'Exporting...' : 'Export' }}
+                </button>
               </div>
             </div>
             <div class="table-wrapper">
@@ -653,10 +666,8 @@
                     <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{
+                        item.feeStatus }}</span></td>
                     <td>{{ item.source || item.admissionSource || 'N/A' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -690,18 +701,17 @@
             </div>
             <div class="table-footer">
               <span class="record-count">Showing {{ paginatedTotalAdmissions.length }} of {{
-                filteredTotalAdmissions.length }} records</span>
+                totalAdmTotal }} records</span>
               <div class="pagination">
                 <button class="nav-btn" (click)="totalAdmPage = 1" [disabled]="totalAdmPage === 1">First</button>
                 <button class="nav-btn" (click)="changePage('totalAdm', -1)"
                   [disabled]="totalAdmPage === 1">Prev</button>
-                <span class="page-info">Page {{ totalAdmPage }} of {{ getTotalPages(filteredTotalAdmissions.length,
+                <span class="page-info">Page {{ totalAdmPage }} of {{ getTotalPages(totalAdmTotal,
                   totalAdmPageSize) }}</span>
                 <button class="nav-btn" (click)="changePage('totalAdm', 1)"
-                  [disabled]="totalAdmPage >= getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)">Next</button>
-                <button class="nav-btn"
-                  (click)="totalAdmPage = getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)"
-                  [disabled]="totalAdmPage >= getTotalPages(filteredTotalAdmissions.length, totalAdmPageSize)">Last</button>
+                  [disabled]="totalAdmPage >= getTotalPages(totalAdmTotal, totalAdmPageSize)">Next</button>
+                <button class="nav-btn" (click)="totalAdmPage = getTotalPages(totalAdmTotal, totalAdmPageSize)"
+                  [disabled]="totalAdmPage >= getTotalPages(totalAdmTotal, totalAdmPageSize)">Last</button>
               </div>
             </div>
           </div>
@@ -712,8 +722,15 @@
               <h3>Cancelled Admissions</h3>
               <div class="table-tools">
                 <div class="search-box">
-                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch">
+                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch"
+                    (ngModelChange)="onCancelledAdmSearchChange()">
                 </div>
+                <button class="btn primary" (click)="exportExcel('cancelled_admissions')"
+                  [disabled]="exporting['cancelled_admissions']">
+                  <i class="bx"
+                    [ngClass]="exporting['cancelled_admissions'] ? 'bx-loader-alt bx-spin' : 'bx-export'"></i>
+                  {{ exporting['cancelled_admissions'] ? 'Exporting...' : 'Export' }}
+                </button>
               </div>
             </div>
             <div class="table-wrapper">
@@ -734,10 +751,8 @@
                     <td>{{ (cancelledAdmPage - 1) * cancelledAdmPageSize + i + 1 }}</td>
                     <td class="bold-text">{{ item.studentName || item.fullName }}</td>
                     <td>{{ item.courseName }}</td>
-                    <td><span class="status-badge"
-                        [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
-                        [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
-                        [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">{{ item.feeStatus }}</span></td>
+                    <td><span class="fee-status-badge status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{
+                        item.feeStatus }}</span></td>
                     <td>₹{{ (item.commissionAmount || 0) | number:'1.0-0' }}</td>
                     <td>{{ item.session }}</td>
                     <td class="text-center">
@@ -768,19 +783,19 @@
             </div>
             <div class="table-footer">
               <span class="record-count">Showing {{ paginatedCancelledAdmissions.length }} of {{
-                filteredCancelledAdmissions.length }} records</span>
+                cancelledAdmTotal }} records</span>
               <div class="pagination">
                 <button class="nav-btn" (click)="cancelledAdmPage = 1"
                   [disabled]="cancelledAdmPage === 1">First</button>
                 <button class="nav-btn" (click)="changePage('cancelledAdm', -1)"
                   [disabled]="cancelledAdmPage === 1">Prev</button>
                 <span class="page-info">Page {{ cancelledAdmPage }} of {{
-                  getTotalPages(filteredCancelledAdmissions.length, cancelledAdmPageSize) }}</span>
+                  getTotalPages(cancelledAdmTotal, cancelledAdmPageSize) }}</span>
                 <button class="nav-btn" (click)="changePage('cancelledAdm', 1)"
-                  [disabled]="cancelledAdmPage >= getTotalPages(filteredCancelledAdmissions.length, cancelledAdmPageSize)">Next</button>
+                  [disabled]="cancelledAdmPage >= getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)">Next</button>
                 <button class="nav-btn"
-                  (click)="cancelledAdmPage = getTotalPages(filteredCancelledAdmissions.length, cancelledAdmPageSize)"
-                  [disabled]="cancelledAdmPage >= getTotalPages(filteredCancelledAdmissions.length, cancelledAdmPageSize)">Last</button>
+                  (click)="cancelledAdmPage = getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)"
+                  [disabled]="cancelledAdmPage >= getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)">Last</button>
               </div>
             </div>
           </div>
@@ -843,17 +858,17 @@
             </table>
           </div>
           <div class="table-footer">
-            <span class="record-count">Showing {{ paginatedConsultancies.length }} of {{ filteredConsultancies.length }}
+            <span class="record-count">Showing {{ paginatedConsultancies.length }} of {{ consTotal }}
               records</span>
             <div class="pagination">
               <button class="nav-btn" (click)="consPage = 1" [disabled]="consPage === 1">First</button>
               <button class="nav-btn" (click)="changePage('cons', -1)" [disabled]="consPage === 1">Prev</button>
-              <span class="page-info">Page {{ consPage }} of {{ getTotalPages(filteredConsultancies.length,
+              <span class="page-info">Page {{ consPage }} of {{ getTotalPages(consTotal,
                 consPageSize) }}</span>
               <button class="nav-btn" (click)="changePage('cons', 1)"
-                [disabled]="consPage >= getTotalPages(filteredConsultancies.length, consPageSize)">Next</button>
-              <button class="nav-btn" (click)="consPage = getTotalPages(filteredConsultancies.length, consPageSize)"
-                [disabled]="consPage >= getTotalPages(filteredConsultancies.length, consPageSize)">Last</button>
+                [disabled]="consPage >= getTotalPages(consTotal, consPageSize)">Next</button>
+              <button class="nav-btn" (click)="consPage = getTotalPages(consTotal, consPageSize)"
+                [disabled]="consPage >= getTotalPages(consTotal, consPageSize)">Last</button>
             </div>
           </div>
         </section>
@@ -869,7 +884,8 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" placeholder="Search Institution" [(ngModel)]="searchTerm">
+              <input type="text" placeholder="Search Institution" [(ngModel)]="instSearch"
+                (ngModelChange)="onInstSearchChange()">
             </div>
           </div>
           <div class="table-wrapper">
@@ -920,17 +936,17 @@
             </table>
           </div>
           <div class="table-footer">
-            <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ filteredInstitutions.length }}
+            <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ instTotal }}
               records</span>
             <div class="pagination">
               <button class="nav-btn" (click)="instPage = 1" [disabled]="instPage === 1">First</button>
               <button class="nav-btn" (click)="changePage('inst', -1)" [disabled]="instPage === 1">Prev</button>
-              <span class="page-info">Page {{ instPage }} of {{ getTotalPages(filteredInstitutions.length, instPageSize)
+              <span class="page-info">Page {{ instPage }} of {{ getTotalPages(instTotal, instPageSize)
                 }}</span>
               <button class="nav-btn" (click)="changePage('inst', 1)"
-                [disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">Next</button>
-              <button class="nav-btn" (click)="instPage = getTotalPages(filteredInstitutions.length, instPageSize)"
-                [disabled]="instPage >= getTotalPages(filteredInstitutions.length, instPageSize)">Last</button>
+                [disabled]="instPage >= getTotalPages(instTotal, instPageSize)">Next</button>
+              <button class="nav-btn" (click)="instPage = getTotalPages(instTotal, instPageSize)"
+                [disabled]="instPage >= getTotalPages(instTotal, instPageSize)">Last</button>
             </div>
           </div>
         </section>

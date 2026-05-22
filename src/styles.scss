@@ -392,6 +392,38 @@ button {
   }
 }
 
+/* Global Fee Status Badges */
+.fee-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  &.fee-status-unpaid {
+    background: #FEF2F2;
+    color: #EF4444;
+    border: 1px solid #FEE2E2;
+  }
+
+  &.fee-status-provisional {
+    background: #FFFBEB;
+    color: #F59E0B;
+    border: 1px solid #FEF3C7;
+  }
+
+  &.fee-status-fifty {
+    background: #ECFDF5;
+    color: #10B981;
+    border: 1px solid #D1FAE5;
+  }
+}
+
 /* Utility for Responsive Tables */
 .table-wrapper {
   overflow-x: auto;

@@ -6,13 +6,13 @@
 
     <main class="main-content" style="padding: 0; background: transparent;">
       <div class="course-page-wrapper">
-        <div *ngIf="loading" class="flex justify-center items-center h-full min-h-[400px]">
+        <div *ngIf="loading && !pageData" class="flex justify-center items-center h-full min-h-[400px]">
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
 
-        <ng-container *ngIf="!loading && pageData">
+        <ng-container *ngIf="pageData">
           <div class="header-section">
             <div class="title-container">
               <div class="back-btn" title="Back" routerLink="/admin/dashboard">

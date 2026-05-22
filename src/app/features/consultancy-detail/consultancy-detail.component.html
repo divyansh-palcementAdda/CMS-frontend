@@ -392,9 +392,7 @@
                   <td>{{ (totalAppPage - 1) * totalAppPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ item.studentName }}</td>
                   <td>{{ item.courseName }}</td>
-                  <td><span class="status-badge"
-                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
-                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                   <td><span class="status-badge" [class.Active]="item.commissionStatus === 'Paid'"
                       [class.Partial]="item.commissionStatus === 'Pending'">{{ item.commissionStatus }}</span></td>
                   <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
@@ -484,9 +482,7 @@
                   <td>{{ (cancelledAppPage - 1) * cancelledAppPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ item.studentName }}</td>
                   <td>{{ item.courseName }}</td>
-                  <td><span class="status-badge"
-                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
-                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                   <td><span class="status-badge Partial">Cancelled</span></td>
                   <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
                   <td>{{ item.session }}</td>
@@ -569,9 +565,7 @@
                   <td>{{ (totalAdmPage - 1) * totalAdmPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ item.studentName }}</td>
                   <td>{{ item.courseName }}</td>
-                  <td><span class="status-badge"
-                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
-                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                   <td><span class="status-badge" [class.Active]="item.commissionStatus === 'Paid'"
                       [class.Partial]="item.commissionStatus === 'Pending'">{{ item.commissionStatus }}</span></td>
                   <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
@@ -658,9 +652,7 @@
                   <td>{{ (cancelledAdmPage - 1) * cancelledAdmPageSize + i + 1 }}</td>
                   <td class="bold-text">{{ item.studentName }}</td>
                   <td>{{ item.courseName }}</td>
-                  <td><span class="status-badge"
-                      [class.Active]="item.feeStatus === 'Paid' || item.feeStatus === 'Partial'"
-                      [class.Partial]="item.feeStatus === 'Unpaid'">{{ item.feeStatus }}</span></td>
+                  <td><span class="fee-status-badge" [ngClass]="item.feeStatus | feeStatusClass">{{ item.feeStatus }}</span></td>
                   <td><span class="status-badge Partial">Cancelled</span></td>
                   <td>₹{{ item.commissionAmount || 0 | number:'1.0-0' }}</td>
                   <td>{{ item.session }}</td>

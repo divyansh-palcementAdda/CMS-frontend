@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { UserService } from '../../core/services/user.service';
@@ -33,6 +34,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   totalPages = 1;
 
   private sub!: Subscription;
+  private searchSubject = new Subject<string>();
+  private searchSub!: Subscription;
 
   // Actions
   showAddModal = false;
@@ -64,7 +67,15 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.currentFilter = savedState.currentFilter || 'ALL';
     }
 
-    this.route.queryParams.subscribe(params => {
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.fetchData();
+    });
+
+    this.sub = this.route.queryParams.subscribe(params => {
       const status = params['status'];
       if (status) {
         this.fetchFilteredData(status);
@@ -226,8 +237,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange() {
-    this.currentPage = 1;
-    this.fetchData();
+    this.searchSubject.next(this.searchTerm);
   }
 
   onPageSizeChange(newSize: number) {
@@ -276,5 +286,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.sub) this.sub.unsubscribe();
+    if (this.searchSub) this.searchSub.unsubscribe();
   }
 }
