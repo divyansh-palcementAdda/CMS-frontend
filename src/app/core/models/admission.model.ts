@@ -2,6 +2,8 @@ export interface AdmissionStats {
   directAdmission: number;
   indirectAdmission: number;
   scholarAdmission: number;
+  todayApplications: number;
+  todayConfirmedAdmissions: number;
   totalApplication: number;
   partialFeesPaid: number;
   tokenAmountPaid: number;

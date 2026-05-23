@@ -1,0 +1,106 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title }}</h3>
+      <button class="close-btn" (click)="close.emit()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-wrapper">
+      <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input 
+          type="text" 
+          [placeholder]="placeholder" 
+          [(ngModel)]="searchText" 
+          (input)="onSearchChange()"
+          class="search-input"
+          autofocus
+        />
+        <button class="clear-search-btn" *ngIf="searchText" (click)="searchText = ''; onSearchChange()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Clear Selection Helper -->
+    <div class="action-bar" *ngIf="selectedId !== null">
+      <button class="clear-selection-btn" (click)="clearSelection()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Clear Selection
+      </button>
+    </div>
+
+    <!-- Items List -->
+    <div class="list-container">
+      <!-- Loading Overlay -->
+      <div class="loading-overlay" *ngIf="loading">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && items.length === 0">
+        <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+        </svg>
+        <p class="empty-title">No records found</p>
+        <p class="empty-sub">Try adjusting your search criteria</p>
+      </div>
+
+      <!-- Item Rows -->
+      <div class="items-list" *ngIf="!loading && items.length > 0">
+        <div 
+          *ngFor="let item of items" 
+          [class.active]="item.id === selectedId || item.userId === selectedId || item.courseId === selectedId"
+          (click)="selectItem(item)"
+          class="item-row"
+        >
+          <div class="item-info">
+            <span class="item-name">{{ getDisplayText(item) }}</span>
+            <span class="item-sub" *ngIf="getSubtitleText(item)">{{ getSubtitleText(item) }}</span>
+          </div>
+          
+          <div class="item-meta">
+            <span class="item-tag" *ngIf="getTagText(item)">{{ getTagText(item) }}</span>
+            <!-- Selected Icon checkmark -->
+            <div class="checkmark-circle" *ngIf="item.id === selectedId || item.userId === selectedId || item.courseId === selectedId">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="modal-footer" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        Page <strong>{{ currentPage }}</strong> of {{ totalPages }}
+      </div>
+      <div class="pagination-actions">
+        <button class="nav-btn" [disabled]="currentPage <= 1" (click)="onPrevPage()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button class="nav-btn" [disabled]="currentPage >= totalPages" (click)="onNextPage()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

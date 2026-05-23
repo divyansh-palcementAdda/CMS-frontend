@@ -400,6 +400,18 @@
                                     </select>
                                 </div>
 
+                                <!-- Session Selection -->
+                                <div class="control-item"
+                                    style="min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
+                                    <label
+                                        style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Session</label>
+                                    <select [(ngModel)]="filters.session" (change)="onSessionChange()"
+                                        style="height: 52px; padding: 0 40px 0 16px; border-radius: 12px; border: 1px solid var(--slate-200); background: rgba(248, 250, 252, 0.5); font-size: 14px; font-weight: 700; color: var(--slate-800); outline: none; transition: var(--transition);">
+                                        <option *ngFor="let s of sessions" [value]="s">{{s === 'OVERALL' ? 'Overall /
+                                            All Sessions' : s}}</option>
+                                    </select>
+                                </div>
+
                                 <!-- Display active timeframe range details if custom -->
                                 <div class="custom-range-badge"
                                     *ngIf="(filters.filterType === 'CUSTOM_DATE' || filters.filterType === 'CUSTOM') && filters.startDate && filters.endDate"
@@ -538,8 +550,9 @@
                                                     0}}</span>
                                             </div>
                                             <div class="sub-metric highlight-actual">
-                                                <span class="label">Actual Adm</span>
-                                                <span class="val">{{sessionCumulativeStats?.actualAdmissions ??
+                                                <span class="label">Actual Active Admissions (Excluding Cancelled &
+                                                    Scholarship)</span> <span
+                                                    class="val">{{sessionCumulativeStats?.actualAdmissions ??
                                                     0}}</span>
                                             </div>
                                         </div>
@@ -771,105 +784,6 @@
                                 </div>
                             </div>
 
-                            <!-- Premium Dropdown Custom Date Panel -->
-                            <div class="custom-date-picker-panel" *ngIf="showCustomDatePicker">
-                                <div class="panel-header">
-                                    <div class="panel-title">
-                                        <span class="material-symbols-outlined">date_range</span>
-                                        <h4>Select Custom Date Range</h4>
-                                    </div>
-                                    <button class="btn-close-panel" (click)="cancelCustomDate()">
-                                        <span class="material-symbols-outlined">close</span>
-                                    </button>
-                                </div>
-
-                                <div class="panel-body">
-                                    <div class="date-inputs-group">
-                                        <div class="date-input-field">
-                                            <label>Start Date</label>
-                                            <div class="input-wrapper">
-                                                <span class="material-symbols-outlined input-icon">calendar_month</span>
-                                                <input type="date" [(ngModel)]="customStartDate"
-                                                    (change)="onCustomDateChange()">
-                                            </div>
-                                        </div>
-                                        <div class="date-input-field">
-                                            <label>End Date</label>
-                                            <div class="input-wrapper">
-                                                <span class="material-symbols-outlined input-icon">calendar_month</span>
-                                                <input type="date" [(ngModel)]="customEndDate"
-                                                    (change)="onCustomDateChange()">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="validation-message-container" *ngIf="dateRangeValidationError">
-                                        <span class="material-symbols-outlined">error</span>
-                                        <span class="message-text">{{dateRangeValidationError}}</span>
-                                    </div>
-                                </div>
-
-                                <div class="panel-footer">
-                                    <button class="btn-panel-action secondary" (click)="cancelCustomDate()">
-                                        Cancel
-                                    </button>
-                                    <button class="btn-panel-action primary"
-                                        [disabled]="!!dateRangeValidationError || !customStartDate || !customEndDate"
-                                        (click)="applyCustomDateRange()">
-                                        Apply Range
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Premium Dropdown Custom Date & Time Panel -->
-                            <div class="custom-date-picker-panel" *ngIf="showCustomDateTimePicker">
-                                <div class="panel-header">
-                                    <div class="panel-title">
-                                        <span class="material-symbols-outlined">schedule</span>
-                                        <h4>Select Custom Date & Time Range</h4>
-                                    </div>
-                                    <button class="btn-close-panel" (click)="cancelCustomDateTime()">
-                                        <span class="material-symbols-outlined">close</span>
-                                    </button>
-                                </div>
-
-                                <div class="panel-body">
-                                    <div class="date-inputs-group">
-                                        <div class="date-input-field">
-                                            <label>Start Date & Time</label>
-                                            <div class="input-wrapper">
-                                                <span class="material-symbols-outlined input-icon">calendar_month</span>
-                                                <input type="datetime-local" [(ngModel)]="customStartDateTime"
-                                                    (change)="onCustomDateTimeChange()">
-                                            </div>
-                                        </div>
-                                        <div class="date-input-field">
-                                            <label>End Date & Time</label>
-                                            <div class="input-wrapper">
-                                                <span class="material-symbols-outlined input-icon">calendar_month</span>
-                                                <input type="datetime-local" [(ngModel)]="customEndDateTime"
-                                                    (change)="onCustomDateTimeChange()">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="validation-message-container" *ngIf="dateTimeRangeValidationError">
-                                        <span class="material-symbols-outlined">error</span>
-                                        <span class="message-text">{{dateTimeRangeValidationError}}</span>
-                                    </div>
-                                </div>
-
-                                <div class="panel-footer">
-                                    <button class="btn-panel-action secondary" (click)="cancelCustomDateTime()">
-                                        Cancel
-                                    </button>
-                                    <button class="btn-panel-action primary"
-                                        [disabled]="!!dateTimeRangeValidationError || !customStartDateTime || !customEndDateTime"
-                                        (click)="applyCustomDateTimeRange()">
-                                        Apply Range
-                                    </button>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="table-container-v2">
@@ -1260,6 +1174,108 @@
                         </div>
                     </section>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Centered Custom Date Modal Overlay -->
+    <div class="modal-overlay" *ngIf="showCustomDatePicker" (click)="$event.stopPropagation()">
+        <div class="custom-date-picker-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="material-symbols-outlined">date_range</span>
+                    <h4>Select Custom Date Range</h4>
+                </div>
+                <button class="btn-close-panel" (click)="cancelCustomDate()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="date-inputs-group">
+                    <div class="date-input-field">
+                        <label>Start Date</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">calendar_month</span>
+                            <input type="date" [(ngModel)]="customStartDate" (change)="onCustomDateChange()">
+                        </div>
+                    </div>
+                    <div class="date-input-field">
+                        <label>End Date</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">calendar_month</span>
+                            <input type="date" [(ngModel)]="customEndDate" (change)="onCustomDateChange()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validation-message-container" *ngIf="dateRangeValidationError">
+                    <span class="material-symbols-outlined">error</span>
+                    <span class="message-text">{{dateRangeValidationError}}</span>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <button class="btn-panel-action secondary" (click)="cancelCustomDate()">
+                    Cancel
+                </button>
+                <button class="btn-panel-action primary"
+                    [disabled]="!!dateRangeValidationError || !customStartDate || !customEndDate"
+                    (click)="applyCustomDateRange()">
+                    Apply Range
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Centered Custom Date & Time Modal Overlay -->
+    <div class="modal-overlay" *ngIf="showCustomDateTimePicker" (click)="$event.stopPropagation()">
+        <div class="custom-date-picker-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="material-symbols-outlined">schedule</span>
+                    <h4>Select Custom Date & Time Range</h4>
+                </div>
+                <button class="btn-close-panel" (click)="cancelCustomDateTime()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="date-inputs-group">
+                    <div class="date-input-field">
+                        <label>Start Date & Time</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">calendar_month</span>
+                            <input type="datetime-local" [(ngModel)]="customStartDateTime"
+                                (change)="onCustomDateTimeChange()">
+                        </div>
+                    </div>
+                    <div class="date-input-field">
+                        <label>End Date & Time</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">calendar_month</span>
+                            <input type="datetime-local" [(ngModel)]="customEndDateTime"
+                                (change)="onCustomDateTimeChange()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validation-message-container" *ngIf="dateTimeRangeValidationError">
+                    <span class="material-symbols-outlined">error</span>
+                    <span class="message-text">{{dateTimeRangeValidationError}}</span>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <button class="btn-panel-action secondary" (click)="cancelCustomDateTime()">
+                    Cancel
+                </button>
+                <button class="btn-panel-action primary"
+                    [disabled]="!!dateTimeRangeValidationError || !customStartDateTime || !customEndDateTime"
+                    (click)="applyCustomDateTimeRange()">
+                    Apply Range
+                </button>
             </div>
         </div>
     </div>

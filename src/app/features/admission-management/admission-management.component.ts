@@ -18,8 +18,10 @@ import { FilterDrawerComponent } from '../../shared/components/filter-drawer/fil
 import { LeadSourceService } from '../../core/services/lead-source.service';
 import { ConsultancyService } from '../../core/services/consultancy.service';
 import { UserService } from '../../core/services/user.service';
+import { CourseService } from '../../core/services/course.service';
 import { CancellationModalComponent } from './components/cancellation-modal/cancellation-modal.component';
 import { CalendarModalComponent } from '../../shared/components/calendar-modal/calendar-modal.component';
+import { SearchableSelectorModalComponent } from '../../shared/components/searchable-selector-modal/searchable-selector-modal.component';
 
 
 /**
@@ -71,7 +73,8 @@ export interface ActiveFilters {
     BulkUploadModalComponent,
     FilterDrawerComponent,
     CancellationModalComponent,
-    CalendarModalComponent
+    CalendarModalComponent,
+    SearchableSelectorModalComponent
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -143,7 +146,18 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   private leadSourceService = inject(LeadSourceService);
   private consultancyService = inject(ConsultancyService);
   private userService = inject(UserService);
+  private courseService = inject(CourseService);
   public authService = inject(AuthService);
+
+  // Searchable Selector Modal State
+  activeModal: 'user' | 'consultancy' | 'course' | null = null;
+  modalItems: any[] = [];
+  modalLoading: boolean = false;
+  modalSearchText: string = '';
+  modalCurrentPage: number = 1;
+  modalTotalPages: number = 1;
+  modalTotalElements: number = 0;
+  modalPageSize: number = 10;
 
   // ── Report Modal State ────────────────────────────────────────────────
   showReportModal: boolean = false;
@@ -1087,5 +1101,132 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       parts.push(`Counselor: ${user ? (user.fullName || user.name) : this.filters.userId}`);
     }
     return parts;
+  }
+
+  openUserFilter() {
+    this.activeModal = 'user';
+    this.modalCurrentPage = 1;
+    this.modalSearchText = '';
+    this.loadModalData();
+  }
+
+  openConsultancyFilter() {
+    this.activeModal = 'consultancy';
+    this.modalCurrentPage = 1;
+    this.modalSearchText = '';
+    this.loadModalData();
+  }
+
+  openCourseFilter() {
+    this.activeModal = 'course';
+    this.modalCurrentPage = 1;
+    this.modalSearchText = '';
+    this.loadModalData();
+  }
+
+  loadModalData() {
+    this.modalLoading = true;
+    this.modalItems = [];
+    if (this.activeModal === 'user') {
+      this.userService.getUsersPaged(
+        this.modalCurrentPage - 1, // converting 1-based page to 0-based for service
+        this.modalPageSize,
+        this.modalSearchText,
+        '',
+        'ACTIVE'
+      ).subscribe({
+        next: (res: any) => {
+          this.modalItems = res.content || [];
+          this.modalTotalElements = res.totalElements || 0;
+          this.modalTotalPages = res.totalPages || 0;
+          this.modalLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading user modal data', err);
+          this.modalLoading = false;
+        }
+      });
+    } else if (this.activeModal === 'consultancy') {
+      this.consultancyService.getConsultancyPage({
+        page: this.modalCurrentPage - 1, // converting 1-based page to 0-based for service
+        size: this.modalPageSize,
+        search: this.modalSearchText || undefined,
+        status: 'ACTIVE'
+      }).subscribe({
+        next: (res: any) => {
+          this.modalItems = res.content || [];
+          this.modalTotalElements = res.totalElements || 0;
+          this.modalTotalPages = res.totalPages || 0;
+          this.modalLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading consultancy modal data', err);
+          this.modalLoading = false;
+        }
+      });
+    } else if (this.activeModal === 'course') {
+      this.courseService.getCoursesPaged(
+        this.modalCurrentPage - 1, // converting 1-based page to 0-based for service
+        this.modalPageSize,
+        this.modalSearchText,
+        true
+      ).subscribe({
+        next: (res: any) => {
+          this.modalItems = res.content || [];
+          this.modalTotalElements = res.totalElements || 0;
+          this.modalTotalPages = res.totalPages || 0;
+          this.modalLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading course modal data', err);
+          this.modalLoading = false;
+        }
+      });
+    }
+  }
+
+  onModalSearch(term: string) {
+    this.modalSearchText = term;
+    this.modalCurrentPage = 1;
+    this.loadModalData();
+  }
+
+  onModalPageChange(page: number) {
+    this.modalCurrentPage = page;
+    this.loadModalData();
+  }
+
+  onModalSelect(item: any) {
+    if (this.activeModal === 'user') {
+      this.filters.userId = item ? item.id : null;
+    } else if (this.activeModal === 'consultancy') {
+      this.filters.consultancyId = item ? item.id : null;
+    } else if (this.activeModal === 'course') {
+      this.filters.courseId = item ? item.id : null;
+    }
+    this.activeModal = null;
+    this.updateActiveFilterCount();
+  }
+
+  onModalClose() {
+    this.activeModal = null;
+  }
+
+  getSelectedUserName(): string {
+    if (!this.filters.userId) return '';
+    const u = this.users.find(x => (x.id || x.userId) === this.filters.userId);
+    return u ? (u.fullName || u.name) : `User ID: ${this.filters.userId}`;
+  }
+
+  getSelectedConsultancyName(): string {
+    if (!this.filters.consultancyId) return '';
+    const c = this.consultancies.find(x => x.id === this.filters.consultancyId);
+    return c ? c.name : `Consultancy ID: ${this.filters.consultancyId}`;
+  }
+
+  getSelectedCourseName(): string {
+    if (!this.filters.courseId) return '';
+    const c = this.courses.find(x => x.id === this.filters.courseId);
+    return c ? c.name : `Course ID: ${this.filters.courseId}`;
   }
 }

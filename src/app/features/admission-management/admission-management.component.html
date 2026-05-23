@@ -89,6 +89,43 @@
                         </div><!-- /.header-actions -->
                     </div><!-- /.header-section -->
 
+                    <!-- Live Today Counters Grid -->
+                    <div class="today-counters-grid" *ngIf="pageData">
+                        <!-- Today's Applications Card -->
+                        <div class="today-stat-card app-today-card" *ngIf="filters.tab === '' || filters.tab === 'applications'">
+                            <div class="today-card-glow"></div>
+                            <div class="today-card-content">
+                                <div class="today-icon-container">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M12 20h9M3 20h4M3 12h18M3 4h18" stroke-linecap="round"></path>
+                                    </svg>
+                                </div>
+                                <div class="today-card-details">
+                                    <span class="today-label">Today's Applications</span>
+                                    <span class="today-value">{{ pageData.stats.todayApplications || 0 }}</span>
+                                    <span class="today-desc">Created today</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Today's Confirmed Admissions Card -->
+                        <div class="today-stat-card adm-today-card" *ngIf="filters.tab === '' || filters.tab === 'Admission'">
+                            <div class="today-card-glow"></div>
+                            <div class="today-card-content">
+                                <div class="today-icon-container">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="today-card-details">
+                                    <span class="today-label">Today's Confirmed Admissions</span>
+                                    <span class="today-value">{{ pageData.stats.todayConfirmedAdmissions || 0 }}</span>
+                                    <span class="today-desc">Paid initial fees today</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Unified Stats Section -->
                     <div class="stats-container" *ngIf="pageData">
                         <!-- Hero Card & Sub Grids Layout -->
@@ -285,7 +322,7 @@
                                     </div>
 
                                     <!-- Admissions Tab Status Breakdown -->
-                                    <div class="breakdown-grid status-grid tri-column"
+                                    <div class="breakdown-grid status-grid"
                                         *ngIf="filters.tab === 'Admission'">
                                         <div class="stat-mini-card status-confirmed"
                                             [class.active]="filters.statFilter === 'CONFIRMED'"
@@ -329,7 +366,7 @@
                                             </div>
                                             <div class="mini-data">
                                                 <span class="mini-val">{{ pageData.stats.admRemainingActive }}</span>
-                                                <span class="mini-label">Remaining Active Admissions</span>
+                                                <span class="mini-label">Remaining Applications</span>
                                             </div>
                                         </div>
                                     </div>
@@ -508,6 +545,18 @@
                                             filters[key] }}</span>
                                         <button class="chip-close" (click)="clearFilter(key)">&times;</button>
                                     </ng-container>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.userId">
+                                    <span class="chip-text">Counselor: {{ getSelectedUserName() }}</span>
+                                    <button class="chip-close" (click)="filters.userId = null; applyFilters()">&times;</button>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.consultancyId">
+                                    <span class="chip-text">Consultancy: {{ getSelectedConsultancyName() }}</span>
+                                    <button class="chip-close" (click)="filters.consultancyId = null; applyFilters()">&times;</button>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.courseId">
+                                    <span class="chip-text">Course: {{ getSelectedCourseName() }}</span>
+                                    <button class="chip-close" (click)="filters.courseId = null; applyFilters()">&times;</button>
                                 </div>
                                 <button class="clear-all-link" (click)="resetFilters()">Clear All</button>
                             </div>
@@ -1009,6 +1058,38 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Advanced Filters -->
+                        <div class="filter-group">
+                            <h4 class="group-title">Advanced Filters</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Filter by User (Admitted By)</label>
+                                <div class="custom-select-trigger" (click)="openUserFilter()">
+                                    <span>{{ filters.userId ? getSelectedUserName() : 'Select Counselor' }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Filter by Consultancy</label>
+                                <div class="custom-select-trigger" (click)="openConsultancyFilter()">
+                                    <span>{{ filters.consultancyId ? getSelectedConsultancyName() : 'Select Consultancy' }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Filter by Course</label>
+                                <div class="custom-select-trigger" (click)="openCourseFilter()">
+                                    <span>{{ filters.courseId ? getSelectedCourseName() : 'Select Course' }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </app-filter-drawer>
 
@@ -1022,6 +1103,64 @@
                 <app-cancellation-modal *ngIf="showCancellationModal" [isRevoke]="isRevokingCancellation"
                     (confirm)="confirmCancellationAction($event)" (cancel)="showCancellationModal = false">
                 </app-cancellation-modal>
+
+                <!-- Searchable Selection Modals -->
+                <app-searchable-selector-modal
+                    *ngIf="activeModal === 'user'"
+                    [title]="'Select Counselor / User'"
+                    [placeholder]="'Search counselor by name, email, or phone...'"
+                    [items]="modalItems"
+                    [loading]="modalLoading"
+                    [totalElements]="modalTotalElements"
+                    [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages"
+                    [selectedId]="filters.userId"
+                    [displayField]="'fullName'"
+                    [subtitleField]="'email'"
+                    [tagField]="'mobile'"
+                    (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)"
+                    (select)="onModalSelect($event)"
+                    (close)="onModalClose()"
+                ></app-searchable-selector-modal>
+
+                <app-searchable-selector-modal
+                    *ngIf="activeModal === 'consultancy'"
+                    [title]="'Select Consultancy'"
+                    [placeholder]="'Search consultancy by name or firm name...'"
+                    [items]="modalItems"
+                    [loading]="modalLoading"
+                    [totalElements]="modalTotalElements"
+                    [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages"
+                    [selectedId]="filters.consultancyId"
+                    [displayField]="'name'"
+                    [subtitleField]="'firmName'"
+                    [tagField]="'city'"
+                    (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)"
+                    (select)="onModalSelect($event)"
+                    (close)="onModalClose()"
+                ></app-searchable-selector-modal>
+
+                <app-searchable-selector-modal
+                    *ngIf="activeModal === 'course'"
+                    [title]="'Select Course'"
+                    [placeholder]="'Search course by name or code...'"
+                    [items]="modalItems"
+                    [loading]="modalLoading"
+                    [totalElements]="modalTotalElements"
+                    [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages"
+                    [selectedId]="filters.courseId"
+                    [displayField]="'name'"
+                    [subtitleField]="'duration'"
+                    [tagField]="'courseType'"
+                    (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)"
+                    (select)="onModalSelect($event)"
+                    (close)="onModalClose()"
+                ></app-searchable-selector-modal>
 
                 <!-- ===== Download Confirmation Modal ===== -->
                 <div class="download-modal-overlay" *ngIf="showDownloadModal" (click)="showDownloadModal = false">
