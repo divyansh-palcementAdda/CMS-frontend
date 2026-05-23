@@ -378,12 +378,68 @@
                     <!-- Session Operational Summary (Special View) -->
                     <section class="daily-summary-operational-view"
                         *ngIf="activeReport === 'DAILY_SESSION_SUMMARY' && dailySummaryData">
+
+                        <!-- Dedicated Advanced Filters Panel -->
+                        <div class="session-filters-panel" style="margin-bottom: 1.5rem;">
+                            <div class="filter-toolbar"
+                                style="display: flex; align-items: center; justify-content: flex-start; gap: 1.5rem; flex-wrap: wrap; padding: 1rem 1.5rem; background: #ffffff; border-radius: 16px; border: 1px solid var(--slate-200); box-shadow: var(--shadow-sm);">
+                                <!-- Timeframe Selection -->
+                                <div class="control-item"
+                                    style="min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
+                                    <label
+                                        style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Timeframe</label>
+                                    <select [(ngModel)]="filters.filterType" (change)="onDateFilterChange()"
+                                        style="height: 52px; padding: 0 40px 0 16px; border-radius: 12px; border: 1px solid var(--slate-200); background: rgba(248, 250, 252, 0.5); font-size: 14px; font-weight: 700; color: var(--slate-800); outline: none; transition: var(--transition);">
+                                        <option value="TODAY">Today</option>
+                                        <option value="YESTERDAY">Yesterday</option>
+                                        <option value="THIS_WEEK">This Week</option>
+                                        <option value="THIS_MONTH">This Month</option>
+                                        <option value="ALL_TIME">All Time</option>
+                                        <option value="CUSTOM_DATE">Custom Date</option>
+                                        <option value="CUSTOM_DATE_TIME">Custom Date & Time</option>
+                                    </select>
+                                </div>
+
+                                <!-- Display active timeframe range details if custom -->
+                                <div class="custom-range-badge"
+                                    *ngIf="(filters.filterType === 'CUSTOM_DATE' || filters.filterType === 'CUSTOM') && filters.startDate && filters.endDate"
+                                    style="height: 52px; margin: 0; margin-top: auto;">
+                                    <span class="material-symbols-outlined icon">calendar_today</span>
+                                    <span class="range-text">{{formatCustomDate(filters.startDate)}} -
+                                        {{formatCustomDate(filters.endDate)}}</span>
+                                    <button class="btn-clear-badge" (click)="clearCustomDateRange()"
+                                        title="Clear Range">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+
+                                <div class="custom-range-badge"
+                                    *ngIf="filters.filterType === 'CUSTOM_DATE_TIME' && filters.startDateTime && filters.endDateTime"
+                                    style="height: 52px; margin: 0; margin-top: auto;">
+                                    <span class="material-symbols-outlined icon">schedule</span>
+                                    <span class="range-text">{{formatCustomDateTime(filters.startDateTime)}} -
+                                        {{formatCustomDateTime(filters.endDateTime)}}</span>
+                                    <button class="btn-clear-badge" (click)="clearCustomDateTimeRange()"
+                                        title="Clear Range">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+
+                                <button class="btn-sync" (click)="syncReport()" [class.syncing]="loading"
+                                    title="Synchronize Data"
+                                    style="margin-top: auto; height: 52px; width: 52px; border-radius: 12px; margin-bottom: 0;">
+                                    <span class="material-symbols-outlined">sync</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="summary-card-v2 premium-card">
                             <div class="card-header">
                                 <div class="title-area">
                                     <span class="report-badge">OPERATIONAL MIS</span>
                                     <h2>{{dailySummaryData.reportTitle}}</h2>
-                                    <p class="date-label">Status as of: <strong>{{dailySummaryData.dateLabel}}</strong>
+                                    <p class="date-label">Status as of:
+                                        <strong>{{dailySummaryData.dateLabel}}</strong>
                                     </p>
                                 </div>
                                 <div class="action-badges">
@@ -496,7 +552,8 @@
                                                     <span class="sub">Forms cancelled without fees</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.applicationCancelled ??
+                                            <span class="metric-value">{{sessionCumulativeStats?.applicationCancelled
+                                                ??
                                                 0}}</span>
                                         </div>
 
@@ -508,7 +565,8 @@
                                                     <span class="sub">Confirmed admissions cancelled</span>
                                                 </div>
                                             </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.admissionCancelled ??
+                                            <span class="metric-value">{{sessionCumulativeStats?.admissionCancelled
+                                                ??
                                                 0}}</span>
                                         </div>
 
@@ -527,10 +585,93 @@
                                 </div>
                             </div>
 
+                            <!-- Course-wise First Fees Paid Analytics -->
+                            <div class="op-section first-fees-analytics-section"
+                                style="margin-top: 2rem; border-top: 1px solid var(--slate-200); padding-top: 2rem; width: 100%;">
+                                <div class="section-header"
+                                    style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                                    <span class="material-symbols-outlined"
+                                        style="color: var(--primary); font-size: 24px;">leaderboard</span>
+                                    <h3
+                                        style="margin: 0; font-size: 16px; font-weight: 800; color: var(--slate-800); text-transform: uppercase; letter-spacing: 0.5px;">
+                                        Course-wise First Fees Paid Analytics</h3>
+                                </div>
+
+                                <!-- Loading state -->
+                                <div class="loading-state-inline" *ngIf="loading"
+                                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; gap: 1rem; background: rgba(248, 250, 252, 0.5); border-radius: 16px; border: 1px solid var(--slate-100);">
+                                    <div class="premium-loader"
+                                        style="width: 32px; height: 32px; border: 3px solid var(--slate-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;">
+                                    </div>
+                                    <span style="font-size: 13px; font-weight: 600; color: var(--slate-500);">Analyzing
+                                        First Fees collections...</span>
+                                </div>
+
+                                <!-- Table / Grid Content -->
+                                <div class="first-fees-content" *ngIf="!loading">
+                                    <div class="table-container-v2"
+                                        style="border: 1px solid var(--slate-200); border-radius: 16px; overflow: hidden; background: #ffffff; box-shadow: var(--shadow-sm);"
+                                        *ngIf="dailySummaryData.courseWiseFirstFeesPaid && dailySummaryData.courseWiseFirstFeesPaid.length > 0">
+                                        <table
+                                            style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                                            <thead>
+                                                <tr
+                                                    style="background: var(--slate-50); border-bottom: 1px solid var(--slate-200); color: var(--slate-600); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
+                                                    <th style="padding: 1rem 1.5rem;">Course Name</th>
+                                                    <th style="padding: 1rem 1.5rem; text-align: right;">Students Count
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let item of dailySummaryData.courseWiseFirstFeesPaid"
+                                                    style="border-bottom: 1px solid var(--slate-100); transition: background-color 0.2s;"
+                                                    onmouseover="this.style.backgroundColor='#f8fafc'"
+                                                    onmouseout="this.style.backgroundColor='transparent'">
+                                                    <td
+                                                        style="padding: 1rem 1.5rem; font-weight: 700; color: var(--slate-800);">
+                                                        {{item.courseName}}</td>
+                                                    <td
+                                                        style="padding: 1rem 1.5rem; text-align: right; font-weight: 700; color: var(--slate-600);">
+                                                        {{item.studentCount}} {{item.studentCount === 1 ? 'Student' :
+                                                        'Students'}}</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr
+                                                    style="background: var(--slate-50); border-top: 2px solid var(--slate-200); font-weight: 800; color: var(--slate-800); font-size: 13px;">
+                                                    <td style="padding: 1.25rem 1.5rem;">Total Aggregate</td>
+                                                    <td
+                                                        style="padding: 1.25rem 1.5rem; text-align: right; font-size: 14px;">
+                                                        {{courseWiseFirstFeesTotalStudents}}
+                                                        {{courseWiseFirstFeesTotalStudents === 1 ? 'Student' :
+                                                        'Students'}}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+
+                                    <!-- Empty state when no data exists -->
+                                    <div class="empty-state-inline"
+                                        *ngIf="!dailySummaryData.courseWiseFirstFeesPaid || dailySummaryData.courseWiseFirstFeesPaid.length === 0"
+                                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 0.75rem; background: rgba(248, 250, 252, 0.5); border-radius: 16px; border: 1px dashed var(--slate-300); text-align: center;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 40px; color: var(--slate-400);">info</span>
+                                        <h4
+                                            style="margin: 0; font-size: 14px; font-weight: 700; color: var(--slate-700);">
+                                            No Confirmed Admissions Found</h4>
+                                        <p
+                                            style="margin: 0; font-size: 12px; color: var(--slate-500); max-width: 320px;">
+                                            There are no confirmed student first-fee collections recorded for this
+                                            session within the selected timeframe.</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="card-footer-info">
                                 <div class="footer-item">
                                     <span class="material-symbols-outlined">how_to_reg</span>
-                                    <span>Students paid first fee: <strong>{{dailySummaryData.feesReceivedTodayCount |
+                                    <span>Students paid first fee: <strong>{{dailySummaryData.feesReceivedTodayCount
+                                            |
                                             number}}</strong></span>
                                 </div>
                                 <div class="footer-item note">
@@ -582,11 +723,23 @@
                                 <div class="filter-controls">
                                     <!-- Custom Date Applied Badge (Premium UI) -->
                                     <div class="custom-range-badge"
-                                        *ngIf="filters.filterType === 'CUSTOM' && filters.startDate && filters.endDate">
+                                        *ngIf="(filters.filterType === 'CUSTOM' || filters.filterType === 'CUSTOM_DATE') && filters.startDate && filters.endDate">
                                         <span class="material-symbols-outlined icon">calendar_today</span>
                                         <span class="range-text">{{formatCustomDate(filters.startDate)}} -
                                             {{formatCustomDate(filters.endDate)}}</span>
                                         <button class="btn-clear-badge" (click)="clearCustomDateRange()"
+                                            title="Clear Range">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Custom Date & Time Applied Badge -->
+                                    <div class="custom-range-badge"
+                                        *ngIf="filters.filterType === 'CUSTOM_DATE_TIME' && filters.startDateTime && filters.endDateTime">
+                                        <span class="material-symbols-outlined icon">schedule</span>
+                                        <span class="range-text">{{formatCustomDateTime(filters.startDateTime)}} -
+                                            {{formatCustomDateTime(filters.endDateTime)}}</span>
+                                        <button class="btn-clear-badge" (click)="clearCustomDateTimeRange()"
                                             title="Clear Range">
                                             <span class="material-symbols-outlined">close</span>
                                         </button>
@@ -600,7 +753,8 @@
                                             <option value="THIS_WEEK">This Week</option>
                                             <option value="THIS_MONTH">This Month</option>
                                             <option value="ALL_TIME">All Time</option>
-                                            <option value="CUSTOM">Custom Range</option>
+                                            <option value="CUSTOM_DATE">Custom Date</option>
+                                            <option value="CUSTOM_DATE_TIME">Custom Date & Time</option>
                                         </select>
                                     </div>
                                     <div class="control-item">
@@ -662,6 +816,56 @@
                                     <button class="btn-panel-action primary"
                                         [disabled]="!!dateRangeValidationError || !customStartDate || !customEndDate"
                                         (click)="applyCustomDateRange()">
+                                        Apply Range
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Premium Dropdown Custom Date & Time Panel -->
+                            <div class="custom-date-picker-panel" *ngIf="showCustomDateTimePicker">
+                                <div class="panel-header">
+                                    <div class="panel-title">
+                                        <span class="material-symbols-outlined">schedule</span>
+                                        <h4>Select Custom Date & Time Range</h4>
+                                    </div>
+                                    <button class="btn-close-panel" (click)="cancelCustomDateTime()">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+
+                                <div class="panel-body">
+                                    <div class="date-inputs-group">
+                                        <div class="date-input-field">
+                                            <label>Start Date & Time</label>
+                                            <div class="input-wrapper">
+                                                <span class="material-symbols-outlined input-icon">calendar_month</span>
+                                                <input type="datetime-local" [(ngModel)]="customStartDateTime"
+                                                    (change)="onCustomDateTimeChange()">
+                                            </div>
+                                        </div>
+                                        <div class="date-input-field">
+                                            <label>End Date & Time</label>
+                                            <div class="input-wrapper">
+                                                <span class="material-symbols-outlined input-icon">calendar_month</span>
+                                                <input type="datetime-local" [(ngModel)]="customEndDateTime"
+                                                    (change)="onCustomDateTimeChange()">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="validation-message-container" *ngIf="dateTimeRangeValidationError">
+                                        <span class="material-symbols-outlined">error</span>
+                                        <span class="message-text">{{dateTimeRangeValidationError}}</span>
+                                    </div>
+                                </div>
+
+                                <div class="panel-footer">
+                                    <button class="btn-panel-action secondary" (click)="cancelCustomDateTime()">
+                                        Cancel
+                                    </button>
+                                    <button class="btn-panel-action primary"
+                                        [disabled]="!!dateTimeRangeValidationError || !customStartDateTime || !customEndDateTime"
+                                        (click)="applyCustomDateTimeRange()">
                                         Apply Range
                                     </button>
                                 </div>

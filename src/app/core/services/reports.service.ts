@@ -7,8 +7,10 @@ export interface ReportFilter {
   startDate?: string;
   endDate?: string;
   session?: string;
-  filterType?: 'TODAY' | 'YESTERDAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'THIS_YEAR' | 'ALL_TIME' | 'CUSTOM';
+  filterType?: 'TODAY' | 'YESTERDAY' | 'THIS_WEEK' | 'THIS_MONTH' | 'THIS_YEAR' | 'ALL_TIME' | 'CUSTOM' | 'CUSTOM_DATE' | 'CUSTOM_DATE_TIME';
   search?: string;
+  startDateTime?: string;
+  endDateTime?: string;
   page?: number;
   size?: number;
   sortBy?: string;

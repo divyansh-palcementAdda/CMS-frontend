@@ -751,7 +751,7 @@
                 transition: var(--transition);
             }
 
-            input[type="date"] {
+            input[type="date"], input[type="datetime-local"] {
                 width: 100%;
                 height: 52px;
                 padding: 0 16px 0 46px;
