@@ -6,6 +6,7 @@ import { Subscription, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
 import { AdmissionService } from '../../core/services/admission.service';
+import { AuthService } from '../../core/services/auth.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -15,6 +16,8 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
 import { LocationService } from '../../core/services/location.service';
 import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
 import { LeadSourceService } from '../../core/services/lead-source.service';
+import { ConsultancyService } from '../../core/services/consultancy.service';
+import { UserService } from '../../core/services/user.service';
 import { CancellationModalComponent } from './components/cancellation-modal/cancellation-modal.component';
 import { CalendarModalComponent } from '../../shared/components/calendar-modal/calendar-modal.component';
 
@@ -42,6 +45,8 @@ export interface ActiveFilters {
   endDate: string;
   leadSourceId: string;
   isDiscounted: boolean | null;
+  consultancyId: number | null;  // Filter by consultancy
+  userId: number | null;          // Filter by counselor (admitted-by user)
 
   // Dedicated Date Filters
   appDateRangeType: string; // 'today' | 'week' | 'month' | 'custom' | ''
@@ -99,6 +104,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     endDate: '',
     leadSourceId: '',
     isDiscounted: null,
+    consultancyId: null,
+    userId: null,
     appDateRangeType: '',
     admDateRangeType: '',
     appStartDate: '',
@@ -120,6 +127,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   calendarTarget: 'application' | 'admission' = 'application';
 
   courses: any[] = [];
+  consultancies: any[] = [];
+  users: any[] = [];
   sessions: string[] = (() => {
     const currentYear = new Date().getFullYear();
     const result = [];
@@ -132,6 +141,15 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   activeLeadSources: any[] = [];
   private leadSourceService = inject(LeadSourceService);
+  private consultancyService = inject(ConsultancyService);
+  private userService = inject(UserService);
+  public authService = inject(AuthService);
+
+  // ── Report Modal State ────────────────────────────────────────────────
+  showReportModal: boolean = false;
+  reportModalMessage: string = '';
+  selectedAdmissionForReport: AdmissionItem | null = null;
+  targetReportStatus: string = '';
 
   commissionStatuses: string[] = [
     'PENDING',
@@ -213,6 +231,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         endDate: params['endDate'] || '',
         leadSourceId: params['leadSourceId'] || '',
         isDiscounted: params['isDiscounted'] === 'true' ? true : (params['isDiscounted'] === 'false' ? false : null),
+        consultancyId: params['consultancyId'] ? +params['consultancyId'] : null,
+        userId: params['userId'] ? +params['userId'] : null,
         appDateRangeType: params['appDateRangeType'] || '',
         admDateRangeType: params['admDateRangeType'] || '',
         appStartDate: params['appStartDate'] || '',
@@ -252,11 +272,31 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.loadStates();
     this.loadCourses();
     this.fetchActiveLeadSources();
+    this.loadConsultancies();
+    this.loadUsers();
   }
 
   fetchActiveLeadSources() {
     this.leadSourceService.getActive().subscribe(res => {
       this.activeLeadSources = res.data;
+    });
+  }
+
+  loadConsultancies(): void {
+    this.consultancyService.getConsultanciesByStatusAndDeleted('ACTIVE', false).subscribe({
+      next: (res: any) => {
+        this.consultancies = res?.consultancies || [];
+      },
+      error: (err: any) => console.error('Error loading consultancies', err)
+    });
+  }
+
+  loadUsers(): void {
+    this.userService.getUsersData().subscribe({
+      next: (res: any) => {
+        this.users = res?.users || [];
+      },
+      error: (err: any) => console.error('Error loading users', err)
     });
   }
 
@@ -284,6 +324,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.endDate) count++;
     if (this.filters.leadSourceId) count++;
     if (this.filters.isDiscounted !== null) count++;
+    if (this.filters.consultancyId) count++;
+    if (this.filters.userId) count++;
 
     // New Date filters count
     if (this.filters.appStartDate) count++;
@@ -336,7 +378,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.appEndDate,
       this.filters.admStartDate,
       this.filters.admEndDate,
-      this.filters.isDiscounted ?? undefined
+      this.filters.isDiscounted ?? undefined,
+      this.filters.consultancyId ?? undefined,
+      this.filters.userId ?? undefined
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -390,7 +434,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       endDate: null,
       state: null,
       city: null,
-      leadSourceId: null
+      leadSourceId: null,
+      consultancyId: null,
+      userId: null
     };
 
     // 3. If we have saved state for the target tab, restore it
@@ -410,7 +456,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         endDate: savedState.filters.endDate || null,
         state: savedState.filters.state || null,
         city: savedState.filters.city || null,
-        leadSourceId: savedState.filters.leadSourceId || null
+        leadSourceId: savedState.filters.leadSourceId || null,
+        consultancyId: savedState.filters.consultancyId || null,
+        userId: savedState.filters.userId || null
       });
       this.searchTerm = savedState.searchTerm || '';
       this.currentPage = savedState.currentPage || 1;
@@ -463,6 +511,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       isScholar: this.filters.isScholar || null,
       leadSourceId: this.filters.leadSourceId || null,
       isDiscounted: this.filters.isDiscounted !== null ? this.filters.isDiscounted.toString() : null,
+      consultancyId: this.filters.consultancyId || null,
+      userId: this.filters.userId || null,
       appDateRangeType: this.filters.appDateRangeType || null,
       admDateRangeType: this.filters.admDateRangeType || null,
       appStartDate: this.filters.appStartDate || null,
@@ -494,6 +544,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       endDate: '',
       leadSourceId: '',
       isDiscounted: null,
+      consultancyId: null,
+      userId: null,
       appDateRangeType: '',
       admDateRangeType: '',
       appStartDate: '',
@@ -804,6 +856,57 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ── Report Status ─────────────────────────────────────────────────────
+  onToggleReportStatus(item: AdmissionItem) {
+    const isReported = item.reportStatus === 'REPORTED';
+    const targetStatus = isReported ? 'NOT_REPORTED' : 'REPORTED';
+    
+    if (targetStatus === 'NOT_REPORTED' && !this.authService.isAdmin()) {
+      return; // Reverting is blocked for non-admin
+    }
+    
+    this.selectedAdmissionForReport = item;
+    this.targetReportStatus = targetStatus;
+    
+    if (targetStatus === 'REPORTED') {
+      this.reportModalMessage = `Are you sure you want to mark '${item.fullName}' as REPORTED? Once reported, duplicate counselor credits are prevented and non-admin users cannot revert this status.`;
+    } else {
+      this.reportModalMessage = `Are you sure you want to revert '${item.fullName}' to NOT_REPORTED?`;
+    }
+    
+    this.showReportModal = true;
+  }
+
+  confirmReportStatus() {
+    if (!this.selectedAdmissionForReport || !this.selectedAdmissionForReport.id) return;
+    
+    const id = this.selectedAdmissionForReport.id;
+    const status = this.targetReportStatus;
+    this.loading = true;
+    
+    this.admissionService.updateReportStatus(id, status).subscribe({
+      next: () => {
+        this.showReportModal = false;
+        this.selectedAdmissionForReport = null;
+        this.targetReportStatus = '';
+        this.fetchData();
+      },
+      error: (err) => {
+        this.showReportModal = false;
+        this.selectedAdmissionForReport = null;
+        this.targetReportStatus = '';
+        this.loading = false;
+        alert(err.error?.message || 'Failed to update report status');
+      }
+    });
+  }
+
+  cancelReportStatus() {
+    this.showReportModal = false;
+    this.selectedAdmissionForReport = null;
+    this.targetReportStatus = '';
+  }
+
   // ── Fee Payment ───────────────────────────────────────────────────────
 
   onPay(item: AdmissionItem): void {
@@ -934,7 +1037,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       finalEndDate   || this.filters.endDate,
       this.filters.leadSourceId,
       this.searchTerm,
-      this.filters.isDiscounted ?? undefined
+      this.filters.isDiscounted ?? undefined,
+      this.filters.consultancyId ?? undefined,
+      this.filters.userId ?? undefined
     ).subscribe({
       next: (blob: Blob) => {
         const tab = this.filters.tab || 'all';
@@ -969,6 +1074,18 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.state) parts.push(`State: ${this.filters.state}`);
     if (this.filters.city) parts.push(`City: ${this.filters.city}`);
     if (this.filters.isDiscounted === true) parts.push('Discount: Discounted Only');
+    if (this.filters.courseId) {
+      const course = this.courses.find(c => c.id === this.filters.courseId);
+      parts.push(`Course: ${course ? course.name : this.filters.courseId}`);
+    }
+    if (this.filters.consultancyId) {
+      const con = this.consultancies.find(c => c.id === this.filters.consultancyId);
+      parts.push(`Consultancy: ${con ? con.name : this.filters.consultancyId}`);
+    }
+    if (this.filters.userId) {
+      const user = this.users.find(u => u.id === this.filters.userId);
+      parts.push(`Counselor: ${user ? (user.fullName || user.name) : this.filters.userId}`);
+    }
     return parts;
   }
 }

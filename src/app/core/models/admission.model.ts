@@ -81,6 +81,7 @@ export interface AdmissionItem {
   discountedAmount?: string;
   isScholar?: boolean;
   scholarshipDetails?: string;
+  reportStatus?: string;
 
   commissionStatus?: string;
   commissionAmount?: number;

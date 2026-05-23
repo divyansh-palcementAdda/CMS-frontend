@@ -47,7 +47,9 @@ export class AdmissionService {
     appEndDate?: string,
     admStartDate?: string,
     admEndDate?: string,
-    isDiscounted?: boolean
+    isDiscounted?: boolean,
+    consultancyId?: number,
+    userId?: number
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -79,6 +81,8 @@ export class AdmissionService {
     if (admStartDate) params = params.set('admStartDate', admStartDate);
     if (admEndDate) params = params.set('admEndDate', admEndDate);
     if (isDiscounted !== undefined && isDiscounted !== null) params = params.set('isDiscounted', isDiscounted.toString());
+    if (consultancyId) params = params.set('consultancyId', consultancyId.toString());
+    if (userId) params = params.set('userId', userId.toString());
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -159,6 +163,12 @@ export class AdmissionService {
     return this.http.patch(`${this.apiUrl}/${id}/fee-status`, { fiftyPercentFeesPaid: isPaid });
   }
 
+  updateReportStatus(id: number, reportStatus: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/report-status`, null, {
+      params: new HttpParams().set('reportStatus', reportStatus)
+    });
+  }
+
   addFeePayment(studentId: number, request: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/${studentId}/fees`, request);
   }
@@ -190,7 +200,9 @@ export class AdmissionService {
     endDate?: string,
     leadSourceId?: string,
     search?: string,
-    isDiscounted?: boolean
+    isDiscounted?: boolean,
+    consultancyId?: number,
+    userId?: number
   ): Observable<Blob> {
     let params = new HttpParams();
     if (tab) params = params.set('tab', tab);
@@ -210,6 +222,8 @@ export class AdmissionService {
     if (search) params = params.set('search', search);
     if (isDiscounted !== undefined && isDiscounted !== null)
       params = params.set('isDiscounted', isDiscounted.toString());
+    if (consultancyId) params = params.set('consultancyId', consultancyId.toString());
+    if (userId) params = params.set('userId', userId.toString());
 
     return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
   }

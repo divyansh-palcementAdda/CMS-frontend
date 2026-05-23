@@ -35,10 +35,6 @@ export class ReportsService {
     return this.http.post(`${this.apiUrl}/course-analytics`, filter);
   }
 
-  getCourseRevenueReport(filter: ReportFilter): Observable<any> {
-    return this.http.post(`${this.apiUrl}/course-revenue`, filter);
-  }
-
   getLeadSourceConversionReport(filter: ReportFilter): Observable<any> {
     return this.http.post(`${this.apiUrl}/lead-source-conversion`, filter);
   }

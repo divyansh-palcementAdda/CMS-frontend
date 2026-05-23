@@ -597,6 +597,8 @@
                                         </th>
 
                                         <th style="min-width:130px; white-space:nowrap;">Disc. Amount</th>
+                                        
+                                        <th class="text-center" style="min-width:150px; white-space:nowrap;">Reported Status</th>
 
                                         <th class="text-center" style="min-width:180px; white-space:nowrap;">Actions
                                         </th>
@@ -723,6 +725,22 @@
                                             <ng-template #noDiscAmt>
                                                 <span class="discount-none">No Discount</span>
                                             </ng-template>
+                                        </td>
+
+                                        <!-- ── REPORT STATUS TOGGLE & BADGE ── -->
+                                        <td class="text-center" (click)="$event.stopPropagation()">
+                                            <div class="report-status-container">
+                                                <label class="toggle-switch" [class.disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()">
+                                                    <input type="checkbox" 
+                                                           [checked]="item.reportStatus === 'REPORTED'"
+                                                           [disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()"
+                                                           (change)="onToggleReportStatus(item)">
+                                                    <span class="slider round"></span>
+                                                </label>
+                                                <span class="report-badge" [class.reported]="item.reportStatus === 'REPORTED'" [class.not-reported]="item.reportStatus !== 'REPORTED'">
+                                                    {{ item.reportStatus === 'REPORTED' ? 'Reported' : 'Not Reported' }}
+                                                </span>
+                                            </div>
                                         </td>
 
                                         <td class="text-center" (click)="$event.stopPropagation()">
@@ -1052,6 +1070,44 @@
                                     <line x1="12" y1="15" x2="12" y2="3"></line>
                                 </svg>
                                 Yes, Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== Report Status Confirmation Modal ===== -->
+                <div class="download-modal-overlay" *ngIf="showReportModal" (click)="cancelReportStatus()">
+                    <div class="download-modal-card" (click)="$event.stopPropagation()">
+                        <div class="dmodal-header">
+                            <div class="dmodal-icon" [style.background]="targetReportStatus === 'REPORTED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'" [style.color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="dmodal-title">Confirm Report Status</h3>
+                                <p class="dmodal-subtitle">Review the action below before confirming</p>
+                            </div>
+                        </div>
+
+                        <div class="dmodal-body">
+                            <div style="font-size: 14px; line-height: 1.6; color: #475569; text-align: center; margin: 10px 0;">
+                                {{ reportModalMessage }}
+                            </div>
+                        </div>
+
+                        <div class="dmodal-actions">
+                            <button class="dmodal-btn-cancel" (click)="cancelReportStatus()">Cancel</button>
+                            <button class="dmodal-btn-confirm" 
+                                    [style.background]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
+                                    [style.border-color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
+                                    (click)="confirmReportStatus()">
+                                Yes, Confirm
                             </button>
                         </div>
                     </div>

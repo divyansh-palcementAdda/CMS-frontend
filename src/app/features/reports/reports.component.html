@@ -482,7 +482,7 @@
                                                     0}}</span>
                                             </div>
                                             <div class="sub-metric highlight-actual">
-                                                <span class="label">Actual Adm (incl. scholars)</span>
+                                                <span class="label">Actual Adm</span>
                                                 <span class="val">{{sessionCumulativeStats?.actualAdmissions ??
                                                     0}}</span>
                                             </div>
@@ -693,8 +693,8 @@
                                             <th *ngFor="let h of leadSourceHeaders" colspan="2"
                                                 class="text-center group-border">{{h}}</th>
                                             <th rowspan="2" class="text-right align-middle">Total Forms</th>
-                                            <th rowspan="2" class="text-right align-middle">Total Fees</th>
                                             <th rowspan="2" class="text-right align-middle">Confirmed</th>
+                                            <th rowspan="2" class="text-right align-middle">Total Fees</th>
                                         </tr>
                                         <tr>
                                             <ng-container *ngFor="let h of leadSourceHeaders">
@@ -722,10 +722,10 @@
                                             </ng-container>
                                             <td class="text-right">{{d.totalForms}}</td>
                                             <td class="text-right"><span
-                                                    class="pill-status primary">{{d.totalFeesReceived}}</span>
+                                                    class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
                                             </td>
                                             <td class="text-right"><span
-                                                    class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
+                                                    class="pill-status primary">{{d.totalFeesReceived}}</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -748,11 +748,11 @@
                                             </td>
                                             <td class="text-right">
                                                 <span class="footer-val is-confirmed"
-                                                    [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
+                                                    [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
                                             </td>
                                             <td class="text-right">
                                                 <span class="footer-val is-confirmed"
-                                                    [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
+                                                    [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -786,25 +786,14 @@
                                                 <span class="contribution-count">{{d.userContributions.length}}
                                                     Contributions</span>
                                             </div>
-                                            <div class="contribution-horizontal-strip"
-                                                *ngIf="d.userContributions?.length">
-                                                <span class="contrib-chip"
-                                                    *ngFor="let u of d.userContributions"
-                                                    [title]="formatUserContribution(u.userName, u.formCount)">
-                                                    {{ formatUserContribution(u.userName, u.formCount) }}
-                                                </span>
-                                            </div>
                                             <div class="contribution-graph-grid">
                                                 <div class="contribution-item" *ngFor="let u of d.userContributions">
                                                     <div class="user-info">
                                                         <div class="u-avatar">{{u.userName.substring(0, 1)}}</div>
                                                         <div class="u-details">
                                                             <span class="u-name">{{u.userName}}</span>
-                                                            <span class="u-stat">
-                                                                <span class="u-arrow">→</span>
-                                                                {{u.formCount}} Forms
-                                                                <span class="u-pct">({{((u.formCount / d.totalForms) * 100) | number:'1.0-0'}}%)</span>
-                                                            </span>
+                                                            <span class="u-stat">{{u.formCount}} Forms ({{((u.formCount
+                                                                / d.totalForms) * 100) | number:'1.0-0'}}%)</span>
                                                         </div>
                                                     </div>
                                                     <div class="u-progress-track">
@@ -835,18 +824,10 @@
                                     <!-- User Performance Footer -->
                                     <div class="performance-matrix-footer" *ngIf="totalsRow">
                                         <div class="footer-stat">
-                                            <span class="label">Grand Total Forms</span>
-                                            <span class="value">{{totalsRow.totalForms | number}}</span>
+                                            <span class="label">Total Enterprise Forms</span>
+                                            <span class="value">{{totalsRow.totalForms}}</span>
                                         </div>
-                                        <div class="footer-stat">
-                                            <span class="label">Grand Total Admissions</span>
-                                            <span class="value">{{totalsRow.totalConfirmed | number}}</span>
-                                        </div>
-                                        <div class="footer-stat">
-                                            <span class="label">Programs Tracked</span>
-                                            <span class="value">{{totalElements | number}}</span>
-                                        </div>
-                                        <div class="footer-note">Enterprise-wide counselor performance totals</div>
+                                        <div class="footer-note">Enterprise Wide Performance Insights</div>
                                     </div>
                                 </div>
 
