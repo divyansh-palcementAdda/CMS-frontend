@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import { Observable, tap, catchError, throwError, BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginRequest, LoginResponse, User, JwtPayload } from '../models/auth.model';
 
@@ -12,6 +12,25 @@ export class AuthService {
   private readonly USER_KEY = 'user';
 
   private _user = signal<User | null>(null);
+
+  private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+
+  getIsRefreshing(): boolean {
+    return this.isRefreshing;
+  }
+
+  setIsRefreshing(val: boolean): void {
+    this.isRefreshing = val;
+  }
+
+  getRefreshTokenSubject(): BehaviorSubject<string | null> {
+    return this.refreshTokenSubject;
+  }
+
+  setRefreshTokenSubject(val: string | null): void {
+    this.refreshTokenSubject.next(val);
+  }
 
   readonly user = this._user.asReadonly();
   readonly isLoggedIn = computed(() => !!this._user());
@@ -55,10 +74,35 @@ export class AuthService {
   }
 
   logout(): void {
-    this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({ error: () => {} });
+    const refreshToken = this.getRefreshToken();
+    if (refreshToken) {
+      this.http.post(`${environment.apiUrl}/auth/logout`, { refreshToken }).subscribe({
+        next: () => {},
+        error: (err) => console.error('Logout error', err)
+      });
+    }
     this.clearStorage();
     this._user.set(null);
     this.router.navigate(['/login']);
+  }
+
+  logoutAllDevices(): void {
+    const refreshToken = this.getRefreshToken();
+    if (refreshToken) {
+      this.http.post(`${environment.apiUrl}/auth/logout-all`, { refreshToken }).subscribe({
+        next: () => {},
+        error: (err) => console.error('Global logout error', err)
+      });
+    }
+    this.clearStorage();
+    this._user.set(null);
+    this.router.navigate(['/login']);
+  }
+
+  logoutWithExpiredMessage(): void {
+    this.clearStorage();
+    this._user.set(null);
+    this.router.navigate(['/login'], { queryParams: { expired: 'true' } });
   }
 
   getToken(): string | null {

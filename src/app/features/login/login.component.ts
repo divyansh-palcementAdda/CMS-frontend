@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -360,7 +360,17 @@ export class LoginComponent {
   loading = signal(false);
   error = signal<string | null>(null);
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.route.queryParams.subscribe(params => {
+      if (params['expired'] === 'true') {
+        this.error.set('Your session has expired. Please log in again.');
+      }
+    });
+  }
 
   onSubmit(): void {
     if (!this.emailOrUsername || !this.password) return;

@@ -157,6 +157,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   sessions: string[] = [];
 
+  // WhatsApp Preview Modal State
+  showWhatsAppPreview = false;
+  whatsappPreviewText = '';
+  whatsappCopiedText = false;
+
   // Chart configs
   public barChartOptions: Partial<ChartOptions> | any;
   public pieChartOptions: Partial<ChartOptions> | any;
@@ -1066,8 +1071,10 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   exportWhatsApp() {
+    this.loading = true;
     this.reportsService.exportWhatsApp(this.activeReport, this.filters).subscribe({
       next: (res: any) => {
+        this.loading = false;
         // Debug logs to verify payload structure
         console.log('WhatsApp API Response:', res);
 
@@ -1076,15 +1083,35 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
         if (reportContent && reportContent !== 'Success') {
           console.log('Generated Analytics Message (Length):', reportContent.length);
-          const encoded = encodeURIComponent(reportContent);
-          window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+          this.whatsappPreviewText = reportContent;
+          this.showWhatsAppPreview = true;
+          this.whatsappCopiedText = false;
         } else {
           console.error('WhatsApp report content is missing in payload:', res);
         }
       },
       error: (err) => {
+        this.loading = false;
         console.error('Failed to generate WhatsApp report:', err);
       }
     });
+  }
+
+  copyWhatsAppToClipboard() {
+    if (!this.whatsappPreviewText) return;
+    navigator.clipboard.writeText(this.whatsappPreviewText).then(() => {
+      this.whatsappCopiedText = true;
+      setTimeout(() => {
+        this.whatsappCopiedText = false;
+      }, 2000);
+    }).catch(err => {
+      console.error('Could not copy WhatsApp report text: ', err);
+    });
+  }
+
+  shareOnWhatsApp() {
+    if (!this.whatsappPreviewText) return;
+    const encoded = encodeURIComponent(this.whatsappPreviewText);
+    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
   }
 }
