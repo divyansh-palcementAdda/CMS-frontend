@@ -1,0 +1,331 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <div class="analytics-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        </div>
+        <div>
+          <h3>Student Contribution Analytics</h3>
+          <p class="subtitle">
+            Counselor: <span class="highlight">{{ counselorName }}</span> &nbsp;•&nbsp;
+            Course: <span class="highlight">{{ courseName }}</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Header Action Buttons -->
+      <div class="header-actions">
+
+        <!-- Export Success / Error feedback badges -->
+        <div class="export-feedback-badge success-badge" *ngIf="exportSuccess">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Downloaded!</span>
+        </div>
+        <div class="export-feedback-badge error-badge" *ngIf="exportError">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span>{{ exportError }}</span>
+        </div>
+
+        <!-- Download Excel Button -->
+        <button class="btn-excel-export" (click)="exportToExcel()" [disabled]="exporting" [class.loading]="exporting"
+          title="Download current filtered dataset as Excel">
+          <span class="btn-icon" *ngIf="!exporting">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </span>
+          <span class="spinner" *ngIf="exporting"></span>
+          <span class="btn-label">{{ exporting ? 'Exporting...' : 'Download Excel' }}</span>
+        </button>
+
+        <!-- Close Button -->
+        <button class="close-btn" (click)="onClose()" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+
+    <!-- Modal Body (relative viewport container for drawer) -->
+    <div class="modal-body">
+
+      <!-- Toolbar Section: Tabs, Search, and Filter Drawer Toggle -->
+      <div class="toolbar-box">
+        <!-- Dynamic Tabs -->
+        <div class="tabs-container">
+          <button *ngFor="let t of tabs" [class.active]="activeTab === t.id" (click)="onTabChange(t.id)"
+            class="tab-btn">
+            {{ t.label }}
+          </button>
+        </div>
+
+        <div class="toolbar-actions">
+          <!-- Search Bar -->
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()"
+              placeholder="Search by Name, Mobile, ID..." />
+          </div>
+
+          <!-- Filter Toggle Button -->
+          <button class="filter-toggle-btn" [class.active-filters]="getActiveFiltersCount() > 0"
+            (click)="toggleFilters()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>Filters</span>
+            <span class="badge-count-pill" *ngIf="getActiveFiltersCount() > 0">{{ getActiveFiltersCount() }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Drawer Dimming Backdrop overlay -->
+      <div class="drawer-backdrop" *ngIf="showFilterDrawer" (click)="toggleFilters()"></div>
+
+      <!-- Premium Sliding Side Filter Drawer Overlay -->
+      <div class="filter-side-drawer" [class.open]="showFilterDrawer">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+          <div class="header-left-box">
+            <svg class="filter-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <h4>Filters Panel</h4>
+          </div>
+          <button class="drawer-close-btn" (click)="toggleFilters()" aria-label="Close filters">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Scrollable content inside side drawer -->
+        <div class="drawer-scroll-content">
+          <!-- Session Filter Field -->
+          <div class="filter-field">
+            <label>Session Year</label>
+            <input type="text" [(ngModel)]="session" (ngModelChange)="onFilterChange()" placeholder="e.g. 2026" />
+          </div>
+
+          <!-- Date Range Fields -->
+          <div class="filter-field-group">
+            <div class="filter-field">
+              <label>Application Date From</label>
+              <input type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()" />
+            </div>
+            <div class="filter-field">
+              <label>Application Date To</label>
+              <input type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()" />
+            </div>
+          </div>
+
+          <!-- Fees Status Field -->
+          <div class="filter-field">
+            <label>Fees Payment Status</label>
+            <select [(ngModel)]="feesStatus" (change)="onFilterChange()">
+              <option value="ALL">All Payments</option>
+              <option value="PAID">Paid (50%+)</option>
+              <option value="UNPAID">Partially Paid / Unpaid</option>
+            </select>
+          </div>
+
+          <!-- Lead Source Field -->
+          <div class="filter-field">
+            <label>Lead Source Channel</label>
+            <select [(ngModel)]="leadSourceId" (change)="onFilterChange()">
+              <option value="">All Sources</option>
+              <option *ngFor="let ls of leadSources" [value]="ls.id">{{ ls.name }}</option>
+            </select>
+          </div>
+
+          <!-- Reported Status Field -->
+          <div class="filter-field">
+            <label>Reported Status</label>
+            <select [(ngModel)]="reportedStatus" (change)="onFilterChange()">
+              <option value="ALL">All Statuses</option>
+              <option value="REPORTED">Reported</option>
+              <option value="NOT_REPORTED">Not Reported</option>
+            </select>
+          </div>
+
+          <!-- Source Type Field -->
+          <div class="filter-field">
+            <label>Admission Source Type</label>
+            <select [(ngModel)]="sourceType" (change)="onFilterChange()">
+              <option value="">All Types</option>
+              <option value="USER">User/Direct</option>
+              <option value="CONSULTANCY">Consultancy</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sticky Footer inside side drawer -->
+        <div class="drawer-footer">
+          <button class="btn-drawer-reset" (click)="resetFilters()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="margin-right: 4px;">
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M21 3v5h-5"></path>
+            </svg>
+            <span>Reset All</span>
+          </button>
+          <button class="btn-drawer-apply" (click)="toggleFilters()">
+            <span>Apply Filters</span>
+          </button>
+        </div>
+      </div>
+      <!-- Data Table -->
+      <div class="table-container">
+        <table *ngIf="!loading && admissions.length > 0" class="analytics-table">
+          <thead>
+            <tr>
+              <th class="w-sno">SNo</th>
+              <th (click)="onSort('fullName')" class="sortable">
+                Student details
+                <span class="sort-indicator" *ngIf="sortColumn === 'fullName'">{{ sortDirection === 'asc' ? '▲' : '▼'
+                  }}</span>
+              </th>
+              <th>Session</th>
+              <th>Contact Details</th>
+              <th (click)="onSort('admissionDate')" class="sortable">
+                Application Date
+                <span class="sort-indicator" *ngIf="sortColumn === 'admissionDate'">{{ sortDirection === 'asc' ? '▲' :
+                  '▼' }}</span>
+              </th>
+              <th>Lead Source</th>
+              <th>Fee Status</th>
+              <th>Report Status</th>
+              <th class="text-center w-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of admissions" class="table-row">
+              <td class="w-sno font-mono">{{ s.sNo }}</td>
+              <td>
+                <div class="student-profile-cell">
+                  <span class="font-semibold text-primary block-text">{{ s.fullName }}</span>
+                  <span class="enrollment-id-sub text-secondary font-mono">{{ s.enrollmentId || 'N/A' }}</span>
+                </div>
+              </td>
+              <td><span class="session-badge">{{ s.session || 'N/A' }}</span></td>
+              <td>
+                <div class="contact-info">
+                  <span class="phone font-mono">{{ s.phoneNumber || 'N/A' }}</span>
+                  <span class="email text-xs">{{ s.email || 'N/A' }}</span>
+                </div>
+              </td>
+              <td>{{ s.admissionDate ? (s.admissionDate | date:'dd/MM/yyyy') : 'N/A' }}</td>
+              <td><span class="source-badge">{{ s.leadSourceName || s.leadSource?.name || 'N/A' }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-success': s.feeStatus === 'PAID',
+                  'badge-warning': s.feeStatus === 'PARTIALLY_PAID',
+                  'badge-danger': s.feeStatus === 'UNPAID'
+                }">
+                  {{ s.feeStatus }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-info': s.reportStatus === 'REPORTED',
+                  'badge-neutral': s.reportStatus === 'NOT_REPORTED' || !s.reportStatus
+                }">
+                  {{ s.reportStatus || 'NOT_REPORTED' }}
+                </span>
+              </td>
+              <td class="text-center w-actions">
+                <button class="btn-action-view" (click)="onViewStudentDetail(s.id)" title="View Student Detail">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <span>View</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Loading Skeleton State -->
+        <div *ngIf="loading" class="skeleton-state">
+          <div class="skeleton-row header-skeleton"></div>
+          <div *ngFor="let i of [1, 2, 3, 4, 5]" class="skeleton-row"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && admissions.length === 0" class="empty-state">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h4>No Students Found</h4>
+          <p>We couldn't find any students matching the selected criteria.</p>
+          <button class="btn-clear-filters" (click)="resetFilters()">Clear Filters</button>
+        </div>
+
+      </div>
+
+      <!-- Pagination Footer -->
+      <div *ngIf="admissions.length > 0 || totalCount > 0" class="modal-footer">
+        <div class="pagination-left">
+          <span>Showing {{ (page - 1) * size + 1 }} - {{ Math.min(page * size, totalCount) }} of {{ totalCount }}
+            students</span>
+          <select (change)="onSizeChange($event)" class="size-select">
+            <option [value]="10" [selected]="size === 10">10 / page</option>
+            <option [value]="20" [selected]="size === 20">20 / page</option>
+            <option [value]="50" [selected]="size === 50">50 / page</option>
+            <option [value]="100" [selected]="size === 100">100 / page</option>
+          </select>
+        </div>
+
+        <div class="pagination-right">
+          <button [disabled]="page === 1" (click)="onPageChange(page - 1)" class="p-btn">
+            Previous
+          </button>
+
+          <span class="p-info">Page {{ page }} of {{ totalPages }}</span>
+
+          <button [disabled]="page === totalPages" (click)="onPageChange(page + 1)" class="p-btn">
+            Next
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

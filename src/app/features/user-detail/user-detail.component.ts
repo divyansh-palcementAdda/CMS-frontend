@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { StatePreservationService } from '../../core/services/state-preservation.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { UserService } from '../../core/services/user.service';
@@ -59,6 +60,26 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   consPage = 1;
   consPageSize = 5;
+  consSearch = '';
+
+  // Sorting columns & directions
+  totalAppSortBy = 'studentName';
+  totalAppSortDir = 'asc';
+
+  cancelledAppSortBy = 'studentName';
+  cancelledAppSortDir = 'asc';
+
+  totalAdmSortBy = 'studentName';
+  totalAdmSortDir = 'asc';
+
+  cancelledAdmSortBy = 'studentName';
+  cancelledAdmSortDir = 'asc';
+
+  masterSortBy = 'studentName';
+  masterSortDir = 'asc';
+
+  consSortBy = 'name';
+  consSortDir = 'asc';
 
   private destroy$ = new Subject<void>();
 
@@ -84,7 +105,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     public router: Router,
     private userService: UserService,
     private consultancyService: ConsultancyService,
-    private admissionService: AdmissionService
+    private admissionService: AdmissionService,
+    private location: Location,
+    private statePreservationService: StatePreservationService
   ) { }
 
   ngOnInit() {
@@ -92,9 +115,108 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       const idParam = params.get('id');
       if (idParam) {
         this.userId = +idParam;
+        this.restoreState();
         this.loadData();
       }
     });
+  }
+
+  saveState() {
+    if (!this.userId) return;
+    this.statePreservationService.saveState(`cms_user_detail_state_${this.userId}`, {
+      totalAppSearch: this.totalAppSearch,
+      totalAppPage: this.totalAppPage,
+      totalAppPageSize: this.totalAppPageSize,
+
+      cancelledAppSearch: this.cancelledAppSearch,
+      cancelledAppPage: this.cancelledAppPage,
+      cancelledAppPageSize: this.cancelledAppPageSize,
+
+      totalAdmSearch: this.totalAdmSearch,
+      totalAdmPage: this.totalAdmPage,
+      totalAdmPageSize: this.totalAdmPageSize,
+
+      cancelledAdmSearch: this.cancelledAdmSearch,
+      cancelledAdmPage: this.cancelledAdmPage,
+      cancelledAdmPageSize: this.cancelledAdmPageSize,
+
+      masterSearch: this.masterSearch,
+      masterPage: this.masterPage,
+      masterPageSize: this.masterPageSize,
+
+      consPage: this.consPage,
+      consPageSize: this.consPageSize,
+      consSearch: this.consSearch,
+
+      consultancyStatusFilter: this.consultancyStatusFilter,
+      admFilterSource: this.admFilterSource,
+      admFilterScholar: this.admFilterScholar,
+      appFilterSource: this.appFilterSource,
+      appFilterScholar: this.appFilterScholar,
+
+      // Sorting
+      totalAppSortBy: this.totalAppSortBy,
+      totalAppSortDir: this.totalAppSortDir,
+      cancelledAppSortBy: this.cancelledAppSortBy,
+      cancelledAppSortDir: this.cancelledAppSortDir,
+      totalAdmSortBy: this.totalAdmSortBy,
+      totalAdmSortDir: this.totalAdmSortDir,
+      cancelledAdmSortBy: this.cancelledAdmSortBy,
+      cancelledAdmSortDir: this.cancelledAdmSortDir,
+      masterSortBy: this.masterSortBy,
+      masterSortDir: this.masterSortDir,
+      consSortBy: this.consSortBy,
+      consSortDir: this.consSortDir
+    });
+  }
+
+  restoreState() {
+    if (!this.userId) return;
+    const savedState = this.statePreservationService.getState<any>(`cms_user_detail_state_${this.userId}`);
+    if (savedState) {
+      this.totalAppSearch = savedState.totalAppSearch || '';
+      this.totalAppPage = savedState.totalAppPage || 1;
+      this.totalAppPageSize = savedState.totalAppPageSize || 5;
+
+      this.cancelledAppSearch = savedState.cancelledAppSearch || '';
+      this.cancelledAppPage = savedState.cancelledAppPage || 1;
+      this.cancelledAppPageSize = savedState.cancelledAppPageSize || 5;
+
+      this.totalAdmSearch = savedState.totalAdmSearch || '';
+      this.totalAdmPage = savedState.totalAdmPage || 1;
+      this.totalAdmPageSize = savedState.totalAdmPageSize || 5;
+
+      this.cancelledAdmSearch = savedState.cancelledAdmSearch || '';
+      this.cancelledAdmPage = savedState.cancelledAdmPage || 1;
+      this.cancelledAdmPageSize = savedState.cancelledAdmPageSize || 5;
+
+      this.masterSearch = savedState.masterSearch || '';
+      this.masterPage = savedState.masterPage || 1;
+      this.masterPageSize = savedState.masterPageSize || 5;
+
+      this.consPage = savedState.consPage || 1;
+      this.consPageSize = savedState.consPageSize || 5;
+      this.consSearch = savedState.consSearch || '';
+
+      this.consultancyStatusFilter = savedState.consultancyStatusFilter || null;
+      this.admFilterSource = savedState.admFilterSource || null;
+      this.admFilterScholar = savedState.admFilterScholar !== undefined ? savedState.admFilterScholar : null;
+      this.appFilterSource = savedState.appFilterSource || null;
+      this.appFilterScholar = savedState.appFilterScholar !== undefined ? savedState.appFilterScholar : null;
+
+      this.totalAppSortBy = savedState.totalAppSortBy || 'studentName';
+      this.totalAppSortDir = savedState.totalAppSortDir || 'asc';
+      this.cancelledAppSortBy = savedState.cancelledAppSortBy || 'studentName';
+      this.cancelledAppSortDir = savedState.cancelledAppSortDir || 'asc';
+      this.totalAdmSortBy = savedState.totalAdmSortBy || 'studentName';
+      this.totalAdmSortDir = savedState.totalAdmSortDir || 'asc';
+      this.cancelledAdmSortBy = savedState.cancelledAdmSortBy || 'studentName';
+      this.cancelledAdmSortDir = savedState.cancelledAdmSortDir || 'asc';
+      this.masterSortBy = savedState.masterSortBy || 'studentName';
+      this.masterSortDir = savedState.masterSortDir || 'asc';
+      this.consSortBy = savedState.consSortBy || 'name';
+      this.consSortDir = savedState.consSortDir || 'asc';
+    }
   }
 
   loadData() {
@@ -136,10 +258,30 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Generic sorting helper
+  sortList(list: any[], sortBy: string, sortDir: string): any[] {
+    return [...list].sort((a, b) => {
+      let valA = a[sortBy];
+      let valB = b[sortBy];
+
+      if (valA === undefined || valA === null) valA = '';
+      if (valB === undefined || valB === null) valB = '';
+
+      if (typeof valA === 'string') {
+        valA = valA.toLowerCase();
+        valB = String(valB).toLowerCase();
+      }
+
+      if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
   // Pagination & Filtering Getters
   get filteredTotalApplications() {
     const search = this.totalAppSearch.toLowerCase();
-    return this.totalApplications().filter(item => {
+    const filtered = this.totalApplications().filter(item => {
       const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
 
       const itemSource = (item.source || '').toLowerCase();
@@ -153,6 +295,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
       return matchesSearch && matchesSource && matchesScholar && matchesFee;
     });
+    return this.sortList(filtered, this.totalAppSortBy, this.totalAppSortDir);
   }
   get paginatedTotalApplications() {
     const start = (this.totalAppPage - 1) * this.totalAppPageSize;
@@ -161,10 +304,11 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   get filteredCancelledApplications() {
     const search = this.cancelledAppSearch.toLowerCase();
-    return this.cancelledApplications().filter(item =>
+    const filtered = this.cancelledApplications().filter(item =>
       item.studentName.toLowerCase().includes(search) ||
       item.courseName.toLowerCase().includes(search)
     );
+    return this.sortList(filtered, this.cancelledAppSortBy, this.cancelledAppSortDir);
   }
   get paginatedCancelledApplications() {
     const start = (this.cancelledAppPage - 1) * this.cancelledAppPageSize;
@@ -173,7 +317,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   get filteredTotalAdmissions() {
     const search = this.totalAdmSearch.toLowerCase();
-    return this.totalAdmissionsSignal().filter(item => {
+    const filtered = this.totalAdmissionsSignal().filter(item => {
       const matchesSearch = item.studentName.toLowerCase().includes(search) || item.courseName.toLowerCase().includes(search);
 
       // Robust source matching
@@ -189,6 +333,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
       return matchesSearch && matchesSource && matchesScholar && matchesFee;
     });
+    return this.sortList(filtered, this.totalAdmSortBy, this.totalAdmSortDir);
   }
   get paginatedTotalAdmissions() {
     const start = (this.totalAdmPage - 1) * this.totalAdmPageSize;
@@ -197,10 +342,11 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   get filteredCancelledAdmissions() {
     const search = this.cancelledAdmSearch.toLowerCase();
-    return this.cancelledAdmissions().filter(item =>
+    const filtered = this.cancelledAdmissions().filter(item =>
       item.studentName.toLowerCase().includes(search) ||
       item.courseName.toLowerCase().includes(search)
     );
+    return this.sortList(filtered, this.cancelledAdmSortBy, this.cancelledAdmSortDir);
   }
   get paginatedCancelledAdmissions() {
     const start = (this.cancelledAdmPage - 1) * this.cancelledAdmPageSize;
@@ -209,10 +355,11 @@ export class UserDetailComponent implements OnInit, OnDestroy {
 
   get filteredMasterList() {
     const search = this.masterSearch.toLowerCase();
-    return this.masterList().filter(item =>
+    const filtered = this.masterList().filter(item =>
       item.studentName.toLowerCase().includes(search) ||
       item.courseName.toLowerCase().includes(search)
     );
+    return this.sortList(filtered, this.masterSortBy, this.masterSortDir);
   }
   get paginatedMasterList() {
     const start = (this.masterPage - 1) * this.masterPageSize;
@@ -235,7 +382,84 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     if (type === 'cancelledAdm') this.cancelledAdmPage += delta;
     if (type === 'master') this.masterPage += delta;
     if (type === 'cons') this.consPage += delta;
+    this.saveState();
   }
+
+  // Sorting handlers for each table
+  sortTotalApp(col: string) {
+    if (this.totalAppSortBy === col) {
+      this.totalAppSortDir = this.totalAppSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.totalAppSortBy = col;
+      this.totalAppSortDir = 'asc';
+    }
+    this.totalAppPage = 1;
+    this.saveState();
+  }
+
+  sortCancelledApp(col: string) {
+    if (this.cancelledAppSortBy === col) {
+      this.cancelledAppSortDir = this.cancelledAppSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.cancelledAppSortBy = col;
+      this.cancelledAppSortDir = 'asc';
+    }
+    this.cancelledAppPage = 1;
+    this.saveState();
+  }
+
+  sortTotalAdm(col: string) {
+    if (this.totalAdmSortBy === col) {
+      this.totalAdmSortDir = this.totalAdmSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.totalAdmSortBy = col;
+      this.totalAdmSortDir = 'asc';
+    }
+    this.totalAdmPage = 1;
+    this.saveState();
+  }
+
+  sortCancelledAdm(col: string) {
+    if (this.cancelledAdmSortBy === col) {
+      this.cancelledAdmSortDir = this.cancelledAdmSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.cancelledAdmSortBy = col;
+      this.cancelledAdmSortDir = 'asc';
+    }
+    this.cancelledAdmPage = 1;
+    this.saveState();
+  }
+
+  sortMaster(col: string) {
+    if (this.masterSortBy === col) {
+      this.masterSortDir = this.masterSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.masterSortBy = col;
+      this.masterSortDir = 'asc';
+    }
+    this.masterPage = 1;
+    this.saveState();
+  }
+
+  sortCons(col: string) {
+    if (this.consSortBy === col) {
+      this.consSortDir = this.consSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.consSortBy = col;
+      this.consSortDir = 'asc';
+    }
+    this.consPage = 1;
+    this.saveState();
+  }
+
+  // Sort Icon Getters
+  getTotalAppSortIcon(col: string) { return this.totalAppSortBy === col ? (this.totalAppSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+  getCancelledAppSortIcon(col: string) { return this.cancelledAppSortBy === col ? (this.cancelledAppSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+  getTotalAdmSortIcon(col: string) { return this.totalAdmSortBy === col ? (this.totalAdmSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+  getCancelledAdmSortIcon(col: string) { return this.cancelledAdmSortBy === col ? (this.cancelledAdmSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+  getMasterSortIcon(col: string) { return this.masterSortBy === col ? (this.masterSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+  getConsSortIcon(col: string) { return this.consSortBy === col ? (this.consSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+
   getRoleClass(roleStr: string | undefined): string {
     if (!roleStr) return 'NA';
     // Use the first role for styling if there are multiple
@@ -245,8 +469,18 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
   get filteredConsultancies() {
     if (!this.user || !this.user.consultancies) return [];
-    if (!this.consultancyStatusFilter) return this.user.consultancies;
-    return this.user.consultancies.filter(c => c.status === this.consultancyStatusFilter);
+    const search = this.consSearch.toLowerCase();
+    const statusFiltered = !this.consultancyStatusFilter
+      ? this.user.consultancies
+      : this.user.consultancies.filter(c => c.status === this.consultancyStatusFilter);
+    const searched = !search
+      ? statusFiltered
+      : statusFiltered.filter(c =>
+          (c.name || '').toLowerCase().includes(search) ||
+          (c.email || '').toLowerCase().includes(search) ||
+          (c.city || '').toLowerCase().includes(search)
+        );
+    return this.sortList(searched, this.consSortBy, this.consSortDir);
   }
 
   // Interaction Handlers
@@ -300,20 +534,24 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       this.appFilterSource = 'CONSULTANCY';
       this.scrollToTable('total-apps');
     }
+    this.saveState();
   }
 
   clearConsultancyFilter() {
     this.consultancyStatusFilter = null;
+    this.saveState();
   }
 
   clearApplicationFilter() {
     this.appFilterSource = null;
     this.appFilterScholar = null;
+    this.saveState();
   }
 
   clearAdmissionFilter() {
     this.admFilterSource = null;
     this.admFilterScholar = null;
+    this.saveState();
   }
 
   onViewAdmission(id: number | undefined) {
@@ -398,7 +636,11 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['/users']);
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/users']);
+    }
   }
 
   downloadExcel(tab: string) {

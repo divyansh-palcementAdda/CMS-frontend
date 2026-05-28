@@ -109,6 +109,12 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' }
   },
   {
+    path: 'historical-analytics',
+    loadComponent: () => import('./features/historical-course-analytics/historical-course-analytics.component').then(m => m.HistoricalCourseAnalyticsComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
     path: 'lead-sources',
     loadComponent: () => import('./features/lead-source-management/lead-source-management.component').then(m => m.LeadSourceManagementComponent),
     canActivate: [authGuard, roleGuard],

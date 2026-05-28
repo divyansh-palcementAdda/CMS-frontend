@@ -37,6 +37,12 @@ export interface AdmissionStats {
   admConfirmed: number;
   admCancelled: number;
   admRemainingActive: number;
+
+  // FOC & SBS counters
+  appFoc: number;
+  appSbs: number;
+  admFoc: number;
+  admSbs: number;
 }
 
 export interface AdmissionItem {
@@ -132,6 +138,10 @@ export interface AdmissionItem {
   };
 
   feeHistory?: StudentFee[];
+
+  // FOC / SBS fields
+  focType?: string; // 'FOC' | 'SBS' | 'NONE'
+  focRemarks?: string;
 }
 
 export interface StudentFee {

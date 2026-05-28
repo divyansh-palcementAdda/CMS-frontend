@@ -3688,3 +3688,59 @@
         }
     }
 }
+
+/* Session Comparison Report Premium Styling Overrides */
+.session-comparison-view {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    .enterprise-table {
+        .table-row {
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            
+            &:hover {
+                background: rgba(67, 95, 255, 0.03) !important;
+                transform: scale(1.002);
+            }
+        }
+    }
+    
+    .badge {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        
+        &.success {
+            background: rgba(16, 185, 129, 0.08) !important;
+            color: #10b981 !important;
+            border: 1px solid rgba(16, 185, 129, 0.15) !important;
+        }
+        
+        &.danger {
+            background: rgba(244, 63, 94, 0.08) !important;
+            color: #f43f5e !important;
+            border: 1px solid rgba(244, 63, 94, 0.15) !important;
+        }
+    }
+    
+    .totals-row {
+        td {
+            border-top: 2px solid var(--slate-300) !important;
+        }
+        
+        .badge {
+            &.success {
+                background: rgba(16, 185, 129, 0.15) !important;
+                border: 1px solid rgba(16, 185, 129, 0.25) !important;
+                box-shadow: 0 4px 10px rgba(16, 185, 129, 0.1);
+            }
+            
+            &.danger {
+                background: rgba(244, 63, 94, 0.15) !important;
+                border: 1px solid rgba(244, 63, 94, 0.25) !important;
+                box-shadow: 0 4px 10px rgba(244, 63, 94, 0.1);
+            }
+        }
+    }
+}

@@ -23,6 +23,9 @@ export class FeePaymentModalComponent implements OnInit {
   @Input() alreadyPaidAmount = 0;
   @Input() triggeredBySync = false;
   @Input() feeId?: number; // Added for Edit Mode
+  
+  @Input() focType = 'NONE';
+  @Input() focRemarksInput = '';
 
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<boolean>(); // Emits true if 50% condition met
@@ -33,6 +36,9 @@ export class FeePaymentModalComponent implements OnInit {
 
   thresholdAmount = 0;
   remainingToThreshold = 0;
+
+  selectedFocType = 'NONE';
+  focRemarks = '';
 
   paymentModes = [
     { value: 'CASH', label: 'Cash' },
@@ -64,6 +70,9 @@ export class FeePaymentModalComponent implements OnInit {
   ngOnInit(): void {
     if (this.isVisible) {
       this.error = null;
+      this.selectedFocType = this.focType || 'NONE';
+      this.focRemarks = this.focRemarksInput || '';
+      
       if (this.feeId) {
         this.loadFeeDetails();
       } else {
@@ -72,6 +81,26 @@ export class FeePaymentModalComponent implements OnInit {
         });
         this.calculateThreshold(0);
       }
+      this.onFocTypeChange(this.selectedFocType);
+    }
+  }
+
+  onFocTypeChange(newVal: string) {
+    this.selectedFocType = newVal;
+    if (newVal === 'FOC' || newVal === 'SBS') {
+      this.paymentForm.get('amount')?.disable();
+      this.paymentForm.get('paymentMode')?.disable();
+      this.paymentForm.get('referenceNo')?.disable();
+      this.paymentForm.get('remarks')?.disable();
+      this.paymentForm.get('amount')?.clearValidators();
+      this.paymentForm.get('amount')?.updateValueAndValidity();
+    } else {
+      this.paymentForm.get('amount')?.enable();
+      this.paymentForm.get('paymentMode')?.enable();
+      this.paymentForm.get('referenceNo')?.enable();
+      this.paymentForm.get('remarks')?.enable();
+      this.paymentForm.get('amount')?.setValidators([Validators.required, Validators.min(1)]);
+      this.paymentForm.get('amount')?.updateValueAndValidity();
     }
   }
 
@@ -109,6 +138,49 @@ export class FeePaymentModalComponent implements OnInit {
   }
 
   async onSubmit() {
+    if (this.selectedFocType !== 'NONE') {
+      this.isSubmitting = true;
+      this.error = null;
+      this.admissionService.updateFocStatus(this.studentId!, this.selectedFocType, this.focRemarks).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.saved.emit(true);
+          this.onClose();
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.error = err.error?.message || 'Failed to update FOC status.';
+        }
+      });
+      return;
+    }
+
+    if (this.focType !== 'NONE' && this.selectedFocType === 'NONE') {
+      this.isSubmitting = true;
+      this.error = null;
+      this.admissionService.updateFocStatus(this.studentId!, 'NONE', '').subscribe({
+        next: () => {
+          this.focType = 'NONE';
+          this.isSubmitting = false;
+          if (this.paymentForm.valid && this.paymentForm.get('amount')?.value) {
+            this.recordPayment();
+          } else {
+            this.saved.emit(true);
+            this.onClose();
+          }
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.error = err.error?.message || 'Failed to clear FOC status.';
+        }
+      });
+      return;
+    }
+
+    this.recordPayment();
+  }
+
+  async recordPayment() {
     if (this.paymentForm.invalid || !this.studentId) {
       this.paymentForm.markAllAsTouched();
       return;

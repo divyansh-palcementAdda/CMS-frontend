@@ -228,4 +228,55 @@ export class CourseService {
       })
     );
   }
+
+  getCourseUserBreakdown(id: number, page: number = 0, size: number = 10, sortBy?: string, sortDirection?: string, session?: string): Observable<any> {
+    const params: any = { page: page.toString(), size: size.toString() };
+    if (sortBy) params.sortBy = sortBy;
+    if (sortDirection) params.sortDirection = sortDirection;
+    if (session) params.session = session;
+    return this.http.get<any>(`${this.apiUrl}/${id}/user-breakdown`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0, totalPages: 0 })
+    );
+  }
+
+  downloadCourseUserBreakdownExcel(id: number, sortBy?: string, sortDirection?: string, session?: string): Observable<Blob> {
+    const params: any = {};
+    if (sortBy) params.sortBy = sortBy;
+    if (sortDirection) params.sortDirection = sortDirection;
+    if (session) params.session = session;
+    return this.http.get(`${this.apiUrl}/${id}/user-breakdown/export`, { params, responseType: 'blob' });
+  }
+
+  exportCourseUserBreakdownExcel(
+    courseId: number,
+    userId: number,
+    tab: string,
+    search?: string,
+    session?: string,
+    fiftyPercentFeesPaid?: boolean,
+    startDate?: string,
+    endDate?: string,
+    leadSourceId?: string,
+    reportedStatus?: string,
+    sourceType?: string,
+    sortBy: string = 'createdAt',
+    sortDirection: string = 'desc'
+  ): Observable<Blob> {
+    const params: any = { tab, sortBy, sortDirection };
+    if (search) params.search = search;
+    if (session) params.session = session;
+    if (fiftyPercentFeesPaid !== undefined && fiftyPercentFeesPaid !== null) {
+      params.fiftyPercentFeesPaid = String(fiftyPercentFeesPaid);
+    }
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (leadSourceId) params.leadSourceId = leadSourceId;
+    if (reportedStatus && reportedStatus !== 'ALL') params.reportedStatus = reportedStatus;
+    if (sourceType) params.sourceType = sourceType;
+
+    return this.http.get(`${this.apiUrl}/${courseId}/user/${userId}/export`, {
+      params,
+      responseType: 'blob'
+    });
+  }
 }

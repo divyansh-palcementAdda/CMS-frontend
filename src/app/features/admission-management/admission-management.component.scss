@@ -363,6 +363,12 @@ $text-light: #64748B;
           box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
           animation: pulse-blue 2s infinite;
         }
+
+        &.foc-pulse {
+          background: #8B5CF6;
+          box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+          animation: pulse-foc 2s infinite;
+        }
       }
 
       h4 {
@@ -386,6 +392,12 @@ $text-light: #64748B;
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
     70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  }
+
+  @keyframes pulse-foc {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
   }
 
   .breakdown-grid {
@@ -504,6 +516,26 @@ $text-light: #64748B;
     }
     &.status-remaining-active {
       .mini-icon { background: #F9F5FF; color: #7C3AED; }
+    }
+    &.source-sbs {
+      .mini-icon { background: #FFF7ED; color: #D97706; }
+      &.active {
+        border-color: #D97706;
+        background: #FFFBEB;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+        .mini-icon { background: #D97706; color: white; }
+        .mini-val { color: #D97706; }
+      }
+    }
+    &.source-foc {
+      .mini-icon { background: #F5F3FF; color: #7C3AED; }
+      &.active {
+        border-color: #7C3AED;
+        background: #FAF5FF;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+        .mini-icon { background: #7C3AED; color: white; }
+        .mini-val { color: #7C3AED; }
+      }
     }
   }
 
@@ -818,6 +850,19 @@ $text-light: #64748B;
               gap: 2px;
               .student-name { display: block; font-weight: 700; color: $text-dark; font-size: 13.5px; }
               .enrollment-id { display: block; font-size: 11px; color: #6366F1; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+              .foc-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 1px 7px;
+                border-radius: 4px;
+                font-size: 9px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                width: fit-content;
+                &.sbs-badge { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+                &.foc-type-badge { background: #FAF5FF; color: #6D28D9; border: 1px solid #DDD6FE; }
+              }
             }
 
             .course-wrapper {

@@ -801,6 +801,174 @@
           </div>
         </div>
 
+        <!-- User Wise Breakdown Table -->
+        <section class="table-card user-breakdown-section mb-32">
+          <div class="table-header-box">
+            <div class="header-left-title">
+              <h2>User Wise Breakdown</h2>
+              <p>Performance contribution of counselors for this course (Click counts to view student details)</p>
+            </div>
+            <div class="header-badges">
+              <div class="stat-badge purple-badge">
+                <span class="label">Counselors</span>
+                <span class="value">{{ breakdownTotal }}</span>
+              </div>
+              <button
+                style="display: flex; align-items: center; gap: 6px; padding: 9px 18px; background: #10B981; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;"
+                (click)="openBreakdownDownloadModal()"
+                title="Download User Wise Breakdown as Excel">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export Excel</span>
+              </button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th class="sortable" (click)="sortBreakdown('userName')" style="cursor: pointer;">
+                    User/Counselor <i class="bx" [ngClass]="getBreakdownSortIcon('userName')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('totalApplications')" style="cursor: pointer;">
+                    Total Applications <i class="bx" [ngClass]="getBreakdownSortIcon('totalApplications')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('totalAdmissions')" style="cursor: pointer;">
+                    Total Admissions <i class="bx" [ngClass]="getBreakdownSortIcon('totalAdmissions')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('cancelledApplications')" style="cursor: pointer;">
+                    Cancelled Applications <i class="bx" [ngClass]="getBreakdownSortIcon('cancelledApplications')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('cancelledAdmissions')" style="cursor: pointer;">
+                    Cancelled Admissions <i class="bx" [ngClass]="getBreakdownSortIcon('cancelledAdmissions')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('remainingApplications')" style="cursor: pointer;">
+                    Remaining Applications <i class="bx" [ngClass]="getBreakdownSortIcon('remainingApplications')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('focStudents')" style="cursor: pointer;">
+                    FOC <i class="bx" [ngClass]="getBreakdownSortIcon('focStudents')"></i>
+                  </th>
+                  <th class="text-center sortable" (click)="sortBreakdown('sbsStudents')" style="cursor: pointer;">
+                    SBS <i class="bx" [ngClass]="getBreakdownSortIcon('sbsStudents')"></i>
+                  </th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of userBreakdownList(); let i = index">
+                  <td>{{ (breakdownPage - 1) * breakdownPageSize + i + 1 }}</td>
+                  <td>
+                    <div class="user-cell">
+                      <span class="bold-text">{{ item.userName }}</span>
+                      <a class="view-profile" (click)="onViewUser(item.userId)">View Profile</a>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge-count blue clickable"
+                      (click)="onViewDetails(item.userId, item.userName, 'ALL_APPLICATIONS')">
+                      {{ item.totalApplications | number:'2.0-0' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge-count green clickable"
+                      (click)="onViewDetails(item.userId, item.userName, 'TOTAL_ADMISSIONS')">
+                      {{ item.totalAdmissions | number:'2.0-0' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge-count red clickable"
+                      (click)="onViewDetails(item.userId, item.userName, 'CANCELLED_APP')">
+                      {{ item.cancelledApplications | number:'2.0-0' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge-count orange clickable"
+                      (click)="onViewDetails(item.userId, item.userName, 'CANCELLED_ADM')">
+                      {{ item.cancelledAdmissions | number:'2.0-0' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge-count grey clickable"
+                      (click)="onViewDetails(item.userId, item.userName, 'REMAINING_APP')">
+                      {{ item.remainingApplications | number:'2.0-0' }}
+                    </span>
+                  </td>
+                  <!-- FOC count -->
+                  <td class="text-center">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; background: #FAF5FF; color: #6D28D9; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid #DDD6FE;">
+                      {{ item.focStudents || 0 }}
+                    </span>
+                  </td>
+                  <!-- SBS count -->
+                  <td class="text-center">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; background: #FFFBEB; color: #B45309; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid #FDE68A;">
+                      {{ item.sbsStudents || 0 }}
+                    </span>
+                  </td>
+                  <!-- Actions column with View button -->
+                  <td class="text-center">
+                    <button class="btn-breakdown-view"
+                      (click)="onViewDetails(item.userId, item.userName, 'ALL_APPLICATIONS')"
+                      title="Open Student Analytics for {{ item.userName }}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <span>View Analytics</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="userBreakdownList().length === 0">
+                  <td colspan="10" class="empty-state-cell" style="text-align: center; padding: 48px; color: #64748b;">
+                    <div class="empty-state-content">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" style="margin-bottom: 8px; opacity: 0.7;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      <p>No user breakdown data available for this course.</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer" *ngIf="userBreakdownList().length > 0">
+            <span class="record-count">
+              Showing {{ (breakdownPage - 1) * breakdownPageSize + 1 }} to {{ (breakdownPage - 1) * breakdownPageSize +
+              userBreakdownList().length }} of {{ breakdownTotal }} records
+            </span>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #64748B;">
+                <span>Page Size:</span>
+                <select [(ngModel)]="breakdownPageSize" (change)="onBreakdownSizeChange()"
+                  style="background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px; font-size: 12px; outline: none; cursor: pointer; height: 30px;">
+                  <option [value]="10">10</option>
+                  <option [value]="20">20</option>
+                  <option [value]="50">50</option>
+                  <option [value]="100">100</option>
+                </select>
+              </div>
+              <div class="pagination">
+                <button class="nav-btn" (click)="breakdownPage = 1" [disabled]="breakdownPage === 1">First</button>
+                <button class="nav-btn" (click)="changeBreakdownPage(-1)" [disabled]="breakdownPage === 1">Prev</button>
+                <span class="page-info">Page {{ breakdownPage }} of {{ getTotalPages(breakdownTotal, breakdownPageSize)
+                  }}</span>
+                <button class="nav-btn" (click)="changeBreakdownPage(1)"
+                  [disabled]="breakdownPage >= getTotalPages(breakdownTotal, breakdownPageSize)">Next</button>
+                <button class="nav-btn" (click)="breakdownPage = getTotalPages(breakdownTotal, breakdownPageSize)"
+                  [disabled]="breakdownPage >= getTotalPages(breakdownTotal, breakdownPageSize)">Last</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- Consultancy Partners & Enrollment Table -->
         <section class="table-card consultancy-section">
           <div class="table-header-box">
@@ -972,6 +1140,24 @@
         [message]="'Are you sure you want to delete \'' + (itemToDelete?.name || 'this record') + '\'?'"
         (confirm)="confirmDelete()" (cancel)="cancelDelete()">
       </app-confirmation-modal>
+
+      <!-- Reusable Student Analytics Modal -->
+      <app-student-analytics-modal *ngIf="showAnalyticsModal" [courseId]="courseId" [userId]="modalUserId"
+        [courseName]="courseDetail?.basicInfo?.name || ''" [counselorName]="modalUserName"
+        [initialTab]="modalInitialTab" (close)="onCloseAnalyticsModal()">
+      </app-student-analytics-modal>
+
+      <!-- User Wise Breakdown Download Confirmation Modal -->
+      <app-download-confirmation-modal
+        *ngIf="showBreakdownDownloadModal"
+        title="Download User Wise Breakdown"
+        [totalRecords]="breakdownTotal"
+        [sorting]="breakdownSortBy + ' ' + breakdownSortDir"
+        [loading]="breakdownDownloading"
+        [extraMeta]="[{ label: 'Course ID', value: courseId }, { label: 'Includes', value: 'FOC & SBS columns' }]"
+        (confirm)="confirmBreakdownDownload()"
+        (cancel)="showBreakdownDownloadModal = false">
+      </app-download-confirmation-modal>
 
       <!-- Loading State -->
       <ng-template #loadingState>

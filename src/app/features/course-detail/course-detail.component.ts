@@ -13,6 +13,8 @@ import { FeeStatusPipe, FeeStatusClassPipe } from '../../shared/pipes/fee-status
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { StudentAnalyticsModalComponent } from '../../shared/components/student-analytics-modal/student-analytics-modal.component';
+import { DownloadConfirmationModalComponent } from '../../shared/components/download-confirmation-modal/download-confirmation-modal.component';
 
 import {
   ApexAxisChartSeries,
@@ -48,7 +50,7 @@ export type ChartOptions = {
 @Component({
   selector: 'app-course-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgApexchartsModule, SidebarComponent, TopbarComponent, FormsModule, ConfirmationModalComponent, FeeStatusClassPipe],
+  imports: [CommonModule, RouterModule, NgApexchartsModule, SidebarComponent, TopbarComponent, FormsModule, ConfirmationModalComponent, FeeStatusClassPipe, StudentAnalyticsModalComponent, DownloadConfirmationModalComponent],
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.scss']
 })
@@ -70,6 +72,20 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   cancelledAdmissions = signal<any[]>([]);
   consultanciesList = signal<any[]>([]);
   institutionsList = signal<any[]>([]);
+  userBreakdownList = signal<any[]>([]);
+
+  // Modal Control
+  showAnalyticsModal = false;
+  modalUserId = 0;
+  modalUserName = '';
+  modalInitialTab = 'ALL_APPLICATIONS';
+
+  // Outer Table Breakdown Pagination
+  breakdownPage = 1;
+  breakdownPageSize = 10;
+  breakdownTotal = 0;
+  breakdownSortBy = 'userName';
+  breakdownSortDir = 'asc';
 
   // Search & Pagination States
   masterSearch = '';
@@ -134,6 +150,10 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   itemToDelete: any = null;
   exporting: { [key: string]: boolean } = {};
 
+  // Breakdown Download Modal
+  showBreakdownDownloadModal = false;
+  breakdownDownloading = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -152,6 +172,17 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         this.loadCourseDetail();
       }
     });
+
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      if (params['showAnalyticsModal'] === 'true') {
+        this.modalUserId = Number(params['modalUserId'] || 0);
+        this.modalUserName = params['modalUserName'] || '';
+        this.modalInitialTab = params['modalInitialTab'] || 'ALL_APPLICATIONS';
+        this.showAnalyticsModal = true;
+      } else {
+        this.showAnalyticsModal = false;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -167,6 +198,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         this.updateChartData();
 
         // Fetch all paginated data
+        this.loadCourseUserBreakdown();
         this.fetchCourseStudents('remaining_applications');
         this.fetchCourseStudents('cancelled_applications');
         this.fetchCourseStudents('confirmed_admissions');
@@ -318,6 +350,17 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     this.fetchCourseInstitutions();
   }
 
+  sortBreakdown(col: string) {
+    if (this.breakdownSortBy === col) {
+      this.breakdownSortDir = this.breakdownSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.breakdownSortBy = col;
+      this.breakdownSortDir = 'asc';
+    }
+    this.breakdownPage = 1;
+    this.loadCourseUserBreakdown();
+  }
+
   // --- Getters for Sorting Icons ---
   getMasterSortIcon(col: string) { return this.masterSortBy === col ? (this.masterSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
   getTotalAppSortIcon(col: string) { return this.totalAppSortBy === col ? (this.totalAppSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
@@ -326,6 +369,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   getCancelledAdmSortIcon(col: string) { return this.cancelledAdmSortBy === col ? (this.cancelledAdmSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
   getConsSortIcon(col: string) { return this.consSortBy === col ? (this.consSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
   getInstSortIcon(col: string) { return this.instSortBy === col ? (this.instSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
+  getBreakdownSortIcon(col: string) { return this.breakdownSortBy === col ? (this.breakdownSortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort'; }
 
   // --- Export Excel ---
   exportExcel(tab: string) {
@@ -670,5 +714,110 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         }
       };
     }
+  }
+
+  loadCourseUserBreakdown(): void {
+    this.courseService.getCourseUserBreakdown(this.courseId, this.breakdownPage - 1, this.breakdownPageSize, this.breakdownSortBy, this.breakdownSortDir).subscribe({
+      next: (data) => {
+        this.userBreakdownList.set(data.content || []);
+        this.breakdownTotal = data.totalElements || 0;
+      },
+      error: (err) => {
+        console.error('Error loading course user breakdown:', err);
+      }
+    });
+  }
+
+  onBreakdownSizeChange(): void {
+    this.breakdownPage = 1;
+    this.loadCourseUserBreakdown();
+  }
+
+  changeBreakdownPage(delta: number): void {
+    this.breakdownPage += delta;
+    this.loadCourseUserBreakdown();
+  }
+
+  onViewDetails(userId: number, userName: string, initialTab: string): void {
+    this.modalUserId = userId;
+    this.modalUserName = userName;
+    this.modalInitialTab = initialTab;
+    this.showAnalyticsModal = true;
+
+    // Push state into query parameters
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        showAnalyticsModal: 'true',
+        modalUserId: userId,
+        modalUserName: userName,
+        modalInitialTab: initialTab
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onCloseAnalyticsModal(): void {
+    this.showAnalyticsModal = false;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        showAnalyticsModal: null,
+        modalUserId: null,
+        modalUserName: null,
+        modalInitialTab: null,
+        modalTab: null,
+        modalSearch: null,
+        modalSession: null,
+        modalStartDate: null,
+        modalEndDate: null,
+        modalFeesStatus: null,
+        modalLeadSourceId: null,
+        modalReportedStatus: null,
+        modalSourceType: null,
+        modalConsultancyId: null,
+        modalSelectedCourseId: null,
+        modalSelectedUserId: null,
+        modalShowFilterDrawer: null,
+        modalSortColumn: null,
+        modalSortDirection: null
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onViewUser(userId: number): void {
+    this.router.navigate(['/users', userId]);
+  }
+
+  openBreakdownDownloadModal(): void {
+    this.showBreakdownDownloadModal = true;
+  }
+
+  confirmBreakdownDownload(): void {
+    this.breakdownDownloading = true;
+    this.courseService.downloadCourseUserBreakdownExcel(
+      this.courseId,
+      this.breakdownSortBy,
+      this.breakdownSortDir
+    ).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `User_Wise_Breakdown_Course_${this.courseId}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        this.breakdownDownloading = false;
+        this.showBreakdownDownloadModal = false;
+      },
+      error: (err) => {
+        console.error('Error downloading breakdown excel:', err);
+        this.breakdownDownloading = false;
+        this.showBreakdownDownloadModal = false;
+      }
+    });
   }
 }

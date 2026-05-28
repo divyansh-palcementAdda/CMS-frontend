@@ -492,7 +492,7 @@
                   <span *ngIf="exporting['remaining_applications']" class="loader-spinner">Exporting...</span>
                 </button>
                 <div class="search-box">
-                  <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch">
+                  <input type="text" placeholder="Search Applications" [(ngModel)]="totalAppSearch" (ngModelChange)="saveState()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -505,11 +505,21 @@
                 <thead class="blue-header">
                   <tr>
                     <th>S.NO</th>
-                    <th>Name</th>
-                    <th>Course</th>
-                    <th>Fee Status</th>
-                    <th>Source</th>
-                    <th>Session</th>
+                    <th class="sortable-header" (click)="sortTotalApp('studentName')" style="cursor: pointer;">
+                      Name <i class="bx" [ngClass]="getTotalAppSortIcon('studentName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalApp('courseName')" style="cursor: pointer;">
+                      Course <i class="bx" [ngClass]="getTotalAppSortIcon('courseName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalApp('feeStatus')" style="cursor: pointer;">
+                      Fee Status <i class="bx" [ngClass]="getTotalAppSortIcon('feeStatus')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalApp('source')" style="cursor: pointer;">
+                      Source <i class="bx" [ngClass]="getTotalAppSortIcon('source')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalApp('session')" style="cursor: pointer;">
+                      Session <i class="bx" [ngClass]="getTotalAppSortIcon('session')"></i>
+                    </th>
                     <th class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -584,7 +594,7 @@
                   <span *ngIf="exporting['cancelled_applications']" class="loader-spinner">Exporting...</span>
                 </button>
                 <div class="search-box">
-                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch">
+                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAppSearch" (ngModelChange)="saveState()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -597,12 +607,22 @@
                 <thead class="red-header">
                   <tr>
                     <th>S.NO</th>
-                    <th>Name</th>
-                    <th>Course</th>
-                    <th>Fee Status</th>
+                    <th class="sortable-header" (click)="sortCancelledApp('studentName')" style="cursor: pointer;">
+                      Name <i class="bx" [ngClass]="getCancelledAppSortIcon('studentName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledApp('courseName')" style="cursor: pointer;">
+                      Course <i class="bx" [ngClass]="getCancelledAppSortIcon('courseName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledApp('feeStatus')" style="cursor: pointer;">
+                      Fee Status <i class="bx" [ngClass]="getCancelledAppSortIcon('feeStatus')"></i>
+                    </th>
                     <th>Commission Status</th>
-                    <th>Commission Amnt</th>
-                    <th>Session</th>
+                    <th class="sortable-header" (click)="sortCancelledApp('commissionAmount')" style="cursor: pointer;">
+                      Commission Amnt <i class="bx" [ngClass]="getCancelledAppSortIcon('commissionAmount')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledApp('session')" style="cursor: pointer;">
+                      Session <i class="bx" [ngClass]="getCancelledAppSortIcon('session')"></i>
+                    </th>
                     <th class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -678,7 +698,7 @@
                   <span *ngIf="exporting['confirmed_admissions']" class="loader-spinner">Exporting...</span>
                 </button>
                 <div class="search-box">
-                  <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch">
+                  <input type="text" placeholder="Search Admissions" [(ngModel)]="totalAdmSearch" (ngModelChange)="saveState()">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -691,11 +711,21 @@
                 <thead class="green-header">
                   <tr>
                     <th>S.NO</th>
-                    <th>Name</th>
-                    <th>Course</th>
-                    <th>Fee Status</th>
-                    <th>Source</th>
-                    <th>Session</th>
+                    <th class="sortable-header" (click)="sortTotalAdm('studentName')" style="cursor: pointer;">
+                      Name <i class="bx" [ngClass]="getTotalAdmSortIcon('studentName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalAdm('courseName')" style="cursor: pointer;">
+                      Course <i class="bx" [ngClass]="getTotalAdmSortIcon('courseName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalAdm('feeStatus')" style="cursor: pointer;">
+                      Fee Status <i class="bx" [ngClass]="getTotalAdmSortIcon('feeStatus')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalAdm('source')" style="cursor: pointer;">
+                      Source <i class="bx" [ngClass]="getTotalAdmSortIcon('source')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortTotalAdm('session')" style="cursor: pointer;">
+                      Session <i class="bx" [ngClass]="getTotalAdmSortIcon('session')"></i>
+                    </th>
                     <th class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -770,7 +800,7 @@
                   <span *ngIf="exporting['cancelled_admissions']" class="loader-spinner">Exporting...</span>
                 </button>
                 <div class="search-box">
-                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch">
+                  <input type="text" placeholder="Search Cancelled" [(ngModel)]="cancelledAdmSearch" (ngModelChange)="saveState()">
                 </div>
               </div>
             </div>
@@ -779,11 +809,21 @@
                 <thead class="orange-header">
                   <tr>
                     <th>S.NO</th>
-                    <th>Name</th>
-                    <th>Course</th>
-                    <th>Fee Status</th>
-                    <th>Commission</th>
-                    <th>Session</th>
+                    <th class="sortable-header" (click)="sortCancelledAdm('studentName')" style="cursor: pointer;">
+                      Name <i class="bx" [ngClass]="getCancelledAdmSortIcon('studentName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledAdm('courseName')" style="cursor: pointer;">
+                      Course <i class="bx" [ngClass]="getCancelledAdmSortIcon('courseName')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledAdm('feeStatus')" style="cursor: pointer;">
+                      Fee Status <i class="bx" [ngClass]="getCancelledAdmSortIcon('feeStatus')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledAdm('commissionAmount')" style="cursor: pointer;">
+                      Commission <i class="bx" [ngClass]="getCancelledAdmSortIcon('commissionAmount')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCancelledAdm('session')" style="cursor: pointer;">
+                      Session <i class="bx" [ngClass]="getCancelledAdmSortIcon('session')"></i>
+                    </th>
                     <th class="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -842,20 +882,37 @@
             <div class="table-header-row">
               <h3>Consultancy Ownership <span *ngIf="consultancyStatusFilter" class="active-filter">({{
                   consultancyStatusFilter }})</span></h3>
-              <button *ngIf="consultancyStatusFilter" class="btn-clear" (click)="clearConsultancyFilter()">Clear
-                Filter</button>
+              <div class="table-tools">
+                <button *ngIf="consultancyStatusFilter" class="btn-clear" (click)="clearConsultancyFilter()">Clear
+                  Filter</button>
+                <div class="search-box">
+                  <input type="text" placeholder="Search Consultancy" [(ngModel)]="consSearch" (ngModelChange)="saveState()">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
+              </div>
             </div>
             <div class="table-wrapper">
               <table class="custom-table">
                 <thead class="header-blue">
                   <tr>
                     <th>S.No</th>
-                    <th>Name</th>
+                    <th class="sortable-header" (click)="sortCons('name')" style="cursor: pointer;">
+                      Name <i class="bx" [ngClass]="getConsSortIcon('name')"></i>
+                    </th>
                     <th>Email Id</th>
                     <th>Mobile Number</th>
-                    <th>City</th>
-                    <th>Status</th>
-                    <th>Commission %</th>
+                    <th class="sortable-header" (click)="sortCons('city')" style="cursor: pointer;">
+                      City <i class="bx" [ngClass]="getConsSortIcon('city')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCons('status')" style="cursor: pointer;">
+                      Status <i class="bx" [ngClass]="getConsSortIcon('status')"></i>
+                    </th>
+                    <th class="sortable-header" (click)="sortCons('commissionPercentage')" style="cursor: pointer;">
+                      Commission % <i class="bx" [ngClass]="getConsSortIcon('commissionPercentage')"></i>
+                    </th>
                     <th>Actions</th>
                   </tr>
                 </thead>

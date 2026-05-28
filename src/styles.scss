@@ -16,6 +16,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.modal-open {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
 h1,
 h2,
 h3,

@@ -22,6 +22,33 @@
         <div class="payment-form-section">
           <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
             <div class="form-grid-v2">
+              <!-- FOC Status Dropdown -->
+              <div class="premium-input-group full-width">
+                <label>FOC Type</label>
+                <div class="input-focus-wrapper">
+                  <span class="material-symbols-outlined prefix">volunteer_activism</span>
+                  <select [ngModel]="selectedFocType" (ngModelChange)="onFocTypeChange($event)" [ngModelOptions]="{standalone: true}" class="premium-select">
+                    <option value="NONE">NONE (NON-FOC)</option>
+                    <option value="FOC">FOC (Free Of Cost)</option>
+                    <option value="SBS">SBS (Sarva Brahmin Samaj)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- FOC Warning Banner (if selectedFocType != 'NONE') -->
+              <div *ngIf="selectedFocType !== 'NONE'" class="error-hint active" style="grid-column: span 2; padding: 12px; border-radius: 8px; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 500;">
+                <span class="material-symbols-outlined" style="font-size: 20px; color: #dc2626;">warning</span>
+                <span>This student is marked as FOC/SBS. Please mark student as NON-FOC before adding fees.</span>
+              </div>
+
+              <!-- FOC Remarks -->
+              <div *ngIf="selectedFocType !== 'NONE'" class="premium-input-group full-width">
+                <label>FOC Remarks</label>
+                <div class="input-focus-wrapper">
+                  <span class="material-symbols-outlined prefix">notes</span>
+                  <textarea [ngModel]="focRemarks" (ngModelChange)="focRemarks = $event" [ngModelOptions]="{standalone: true}" placeholder="Add FOC sponsorship / trust remarks..." class="premium-textarea"></textarea>
+                </div>
+              </div>
               <!-- Amount Field -->
               <div class="premium-input-group">
                 <label>Amount (₹) <span class="required">*</span></label>

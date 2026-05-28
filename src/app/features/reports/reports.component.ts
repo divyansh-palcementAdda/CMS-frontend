@@ -132,6 +132,23 @@ export class ReportsComponent implements OnInit, OnDestroy {
   };
   dailySummaryData: any = null;
   sessionCumulativeStats: any = null;
+
+  // Session Comparison State
+  comparisonPrevSession = (new Date().getFullYear() - 1).toString();
+  comparisonCurrSession = new Date().getFullYear().toString();
+  comparisonData: any[] = [];
+  comparisonSummary = {
+    prevTotalForms: 0,
+    currTotalForms: 0,
+    formsGrowth: 0,
+    formsGrowthPct: 0,
+    prevTotalFees: 0,
+    currTotalFees: 0,
+    feesGrowth: 0,
+    feesGrowthPct: 0
+  };
+  comparisonFormsChartOptions: any = null;
+  comparisonFeesChartOptions: any = null;
   totalElements = 0;
   serverPages = 0;
 
@@ -570,6 +587,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     { id: 'LEAD_SOURCE_CONVERSION', label: 'Lead Conversion', icon: 'query_stats', desc: 'Conversion rate by source', color: 'amber' },
     { id: 'COURSE_SUMMARY', label: 'Program Summary', icon: 'summarize', desc: 'Full academic year overview', color: 'slate' },
     { id: 'STUDENT_DETAIL', label: 'Student Thresholds', icon: 'group', desc: '50% fee payment status', color: 'violet' },
+    { id: 'SESSION_COMPARISON', label: 'Session Comparison', icon: 'compare_arrows', desc: 'Compare course performance between sessions', color: 'indigo' }
   ];
 
   setReport(type: string) {
@@ -579,6 +597,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.barChartOptions = null;
     this.pieChartOptions = null;
     this.lineChartOptions = null;
+    this.comparisonFormsChartOptions = null;
+    this.comparisonFeesChartOptions = null;
     this.loadReport();
     if (type === 'DAILY_SESSION_SUMMARY') {
       this.loadSessionCumulativeStats();
@@ -621,6 +641,10 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   loadReport() {
+    if (this.activeReport === 'SESSION_COMPARISON') {
+      this.loadComparisonReport();
+      return;
+    }
     if (this.filters.filterType === 'CUSTOM' || this.filters.filterType === 'CUSTOM_DATE') {
       if (!this.filters.startDate || !this.filters.endDate) {
         this.showCustomDatePicker = true;
@@ -1113,5 +1137,239 @@ export class ReportsComponent implements OnInit, OnDestroy {
     if (!this.whatsappPreviewText) return;
     const encoded = encodeURIComponent(this.whatsappPreviewText);
     window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+  }
+
+  loadComparisonReport() {
+    this.loading = true;
+    const apiFilter: ReportFilter = { ...this.filters };
+    if (apiFilter.session === 'OVERALL') {
+      apiFilter.session = undefined;
+    }
+
+    this.reportsService.getSessionComparisonReport(
+      this.comparisonPrevSession,
+      this.comparisonCurrSession,
+      apiFilter
+    ).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: (res: any) => {
+        console.log('Comparison Report Response:', res);
+        this.comparisonData = res.data || [];
+        this.calculateComparisonSummary();
+        setTimeout(() => this.initComparisonCharts(), 10);
+      },
+      error: (err) => {
+        console.error('Failed to load comparison report:', err);
+        this.comparisonData = [];
+        this.calculateComparisonSummary();
+        setTimeout(() => this.initComparisonCharts(), 10);
+      }
+    });
+  }
+
+  calculateComparisonSummary() {
+    let prevForms = 0;
+    let currForms = 0;
+    let prevFees = 0;
+    let currFees = 0;
+
+    this.comparisonData.forEach(d => {
+      prevForms += (d.prevSessionForms || 0);
+      currForms += (d.currentSessionForms || 0);
+      prevFees += (d.prevSessionFees || 0);
+      currFees += (d.currentSessionFees || 0);
+    });
+
+    const formsGrowth = currForms - prevForms;
+    const formsGrowthPct = prevForms > 0 ? (formsGrowth / prevForms) * 100 : 0;
+
+    const feesGrowth = currFees - prevFees;
+    const feesGrowthPct = prevFees > 0 ? (feesGrowth / prevFees) * 100 : 0;
+
+    this.comparisonSummary = {
+      prevTotalForms: prevForms,
+      currTotalForms: currForms,
+      formsGrowth: formsGrowth,
+      formsGrowthPct: formsGrowthPct,
+      prevTotalFees: prevFees,
+      currTotalFees: currFees,
+      feesGrowth: feesGrowth,
+      feesGrowthPct: feesGrowthPct
+    };
+  }
+
+  initComparisonCharts() {
+    if (!this.comparisonData || this.comparisonData.length === 0) {
+      this.comparisonFormsChartOptions = null;
+      this.comparisonFeesChartOptions = null;
+      return;
+    }
+
+    // Sort by current forms descending to show most active programs first, slice to top 10
+    const chartData = [...this.comparisonData]
+      .sort((a, b) => (b.currentSessionForms || 0) - (a.currentSessionForms || 0))
+      .slice(0, 10);
+
+    const categories = chartData.map(d => {
+      const name = d.courseName || 'N/A';
+      return name.length > 20 ? name.substring(0, 18) + '...' : name;
+    });
+
+    // Forms Comparison Chart
+    this.comparisonFormsChartOptions = {
+      series: [
+        {
+          name: `Session ${this.comparisonPrevSession}`,
+          data: chartData.map(d => d.prevSessionForms || 0)
+        },
+        {
+          name: `Session ${this.comparisonCurrSession}`,
+          data: chartData.map(d => d.currentSessionForms || 0)
+        }
+      ],
+      chart: {
+        ...COMMON_CHART_OPTIONS,
+        type: 'bar',
+        height: 385
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '50%',
+          borderRadius: 6,
+          dataLabels: { position: 'top' }
+        }
+      },
+      colors: ['#94a3b8', '#435fff'], // Slate grey for previous, Indigo for current
+      dataLabels: {
+        enabled: true,
+        formatter: (val: any) => val > 0 ? val.toString() : '',
+        offsetY: -20,
+        style: {
+          fontSize: '10px',
+          colors: ['#304758']
+        }
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+      },
+      xaxis: {
+        categories: categories,
+        labels: {
+          style: {
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontWeight: 600
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: 'Number of Applications',
+          style: {
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontWeight: 700
+          }
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      tooltip: {
+        theme: 'dark',
+        y: {
+          formatter: (val: any) => val + ' Forms'
+        }
+      },
+      grid: {
+        borderColor: '#f1f5f9',
+        strokeDashArray: 4
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'center',
+        fontFamily: 'Plus Jakarta Sans, sans-serif',
+        fontWeight: 600
+      }
+    };
+
+    // Fees Comparison Chart
+    this.comparisonFeesChartOptions = {
+      series: [
+        {
+          name: `Session ${this.comparisonPrevSession}`,
+          data: chartData.map(d => d.prevSessionFees || 0)
+        },
+        {
+          name: `Session ${this.comparisonCurrSession}`,
+          data: chartData.map(d => d.currentSessionFees || 0)
+        }
+      ],
+      chart: {
+        ...COMMON_CHART_OPTIONS,
+        type: 'bar',
+        height: 385
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '50%',
+          borderRadius: 6,
+          dataLabels: { position: 'top' }
+        }
+      },
+      colors: ['#cbd5e1', '#10b981'], // Light grey for previous, Emerald green for current
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+      },
+      xaxis: {
+        categories: categories,
+        labels: {
+          style: {
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontWeight: 600
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: 'Fees Amount (₹)',
+          style: {
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            fontWeight: 700
+          }
+        },
+        labels: {
+          formatter: (val: any) => '₹' + (val >= 1000 ? (val / 1000).toFixed(0) + 'k' : val)
+        }
+      },
+      fill: {
+        opacity: 1
+      },
+      tooltip: {
+        theme: 'dark',
+        y: {
+          formatter: (val: any) => '₹' + val.toLocaleString('en-IN')
+        }
+      },
+      grid: {
+        borderColor: '#f1f5f9',
+        strokeDashArray: 4
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'center',
+        fontFamily: 'Plus Jakarta Sans, sans-serif',
+        fontWeight: 600
+      }
+    };
   }
 }

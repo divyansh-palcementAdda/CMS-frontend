@@ -92,7 +92,8 @@
                     <!-- Live Today Counters Grid -->
                     <div class="today-counters-grid" *ngIf="pageData">
                         <!-- Today's Applications Card -->
-                        <div class="today-stat-card app-today-card" *ngIf="filters.tab === '' || filters.tab === 'applications'">
+                        <div class="today-stat-card app-today-card"
+                            *ngIf="filters.tab === '' || filters.tab === 'applications'">
                             <div class="today-card-glow"></div>
                             <div class="today-card-content">
                                 <div class="today-icon-container">
@@ -109,7 +110,8 @@
                         </div>
 
                         <!-- Today's Confirmed Admissions Card -->
-                        <div class="today-stat-card adm-today-card" *ngIf="filters.tab === '' || filters.tab === 'Admission'">
+                        <div class="today-stat-card adm-today-card"
+                            *ngIf="filters.tab === '' || filters.tab === 'Admission'">
                             <div class="today-card-glow"></div>
                             <div class="today-card-content">
                                 <div class="today-icon-container">
@@ -322,8 +324,7 @@
                                     </div>
 
                                     <!-- Admissions Tab Status Breakdown -->
-                                    <div class="breakdown-grid status-grid"
-                                        *ngIf="filters.tab === 'Admission'">
+                                    <div class="breakdown-grid status-grid" *ngIf="filters.tab === 'Admission'">
                                         <div class="stat-mini-card status-confirmed"
                                             [class.active]="filters.statFilter === 'CONFIRMED'"
                                             (click)="onStatFilter('CONFIRMED')">
@@ -373,6 +374,52 @@
 
                                 </div>
 
+                                <!-- 3rd Breakdown (FOC / SBS Wise) — Admission tab or All tab -->
+                                <div class="breakdown-row" *ngIf="filters.tab !== 'applications'">
+                                    <div class="breakdown-title">
+                                        <span class="pulse-indicator foc-pulse"></span>
+                                        <h4>3rd Breakdown (FOC / SBS Wise)</h4>
+                                    </div>
+                                    <div class="breakdown-grid source-grid">
+                                        <!-- SBS -->
+                                        <div class="stat-mini-card source-sbs"
+                                            [class.active]="filters.statFilter === 'SBS'" (click)="onStatFilter('SBS')">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                                    <path d="M2 17l10 5 10-5"></path>
+                                                    <path d="M2 12l10 5 10-5"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ isApplicationTab ? (pageData.stats.appSbs ||
+                                                    0) : (filters.tab === 'Admission' ? (pageData.stats.admSbs || 0) :
+                                                    (pageData.stats.admSbs || 0)) }}</span>
+                                                <span class="mini-label">SBS (Trust)</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- FOC -->
+                                        <div class="stat-mini-card source-foc"
+                                            [class.active]="filters.statFilter === 'FOC'" (click)="onStatFilter('FOC')">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <path d="M8 12h8M12 8v8"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ isApplicationTab ? (pageData.stats.appFoc ||
+                                                    0) : (filters.tab === 'Admission' ? (pageData.stats.admFoc || 0) :
+                                                    (pageData.stats.admFoc || 0)) }}</span>
+                                                <span class="mini-label">FOC (Free of Cost)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
                         </div>
@@ -409,21 +456,6 @@
                                     <div class="stat-desc">Pending initial fees</div>
                                 </div>
                             </div>
-
-                            <!-- <div class="stat-card finance-card" [class.active]="filters.statFilter === 'TOKEN_PAID'"
-                                (click)="onStatFilter('TOKEN_PAID')" [class.provisional]="true">
-                                <div class="stat-icon-wrapper">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                                        <line x1="2" y1="10" x2="22" y2="10"></line>
-                                    </svg>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="stat-label">Provisional Amount</div>
-                                    <div class="stat-value">{{ pageData.stats.tokenAmountPaid }}</div>
-                                    <div class="stat-desc">Token payments received</div>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
 
@@ -548,15 +580,18 @@
                                 </div>
                                 <div class="filter-chip" *ngIf="filters.userId">
                                     <span class="chip-text">Counselor: {{ getSelectedUserName() }}</span>
-                                    <button class="chip-close" (click)="filters.userId = null; applyFilters()">&times;</button>
+                                    <button class="chip-close"
+                                        (click)="filters.userId = null; applyFilters()">&times;</button>
                                 </div>
                                 <div class="filter-chip" *ngIf="filters.consultancyId">
                                     <span class="chip-text">Consultancy: {{ getSelectedConsultancyName() }}</span>
-                                    <button class="chip-close" (click)="filters.consultancyId = null; applyFilters()">&times;</button>
+                                    <button class="chip-close"
+                                        (click)="filters.consultancyId = null; applyFilters()">&times;</button>
                                 </div>
                                 <div class="filter-chip" *ngIf="filters.courseId">
                                     <span class="chip-text">Course: {{ getSelectedCourseName() }}</span>
-                                    <button class="chip-close" (click)="filters.courseId = null; applyFilters()">&times;</button>
+                                    <button class="chip-close"
+                                        (click)="filters.courseId = null; applyFilters()">&times;</button>
                                 </div>
                                 <button class="clear-all-link" (click)="resetFilters()">Clear All</button>
                             </div>
@@ -646,8 +681,9 @@
                                         </th>
 
                                         <th style="min-width:130px; white-space:nowrap;">Disc. Amount</th>
-                                        
-                                        <th class="text-center" style="min-width:150px; white-space:nowrap;">Reported Status</th>
+
+                                        <th class="text-center" style="min-width:150px; white-space:nowrap;">Reported
+                                            Status</th>
 
                                         <th class="text-center" style="min-width:180px; white-space:nowrap;">Actions
                                         </th>
@@ -664,6 +700,9 @@
                                             <div class="name-wrapper">
                                                 <span class="student-name">{{ item.fullName }}</span>
                                                 <span class="enrollment-id">{{ item.enrollmentId }}</span>
+                                                <!-- FOC / SBS Badge -->
+                                                <span *ngIf="item.focType === 'SBS'" class="foc-badge sbs-badge" title="{{ item.focRemarks || 'Sarva Brahmin Samaj sponsored' }}">SBS</span>
+                                                <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge" title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
                                             </div>
                                         </td>
 
@@ -671,7 +710,8 @@
                                         <td class="course-cell">
                                             <div class="course-wrapper">
                                                 <span class="course-main">{{ item.courseName.split(' ')[0] }}</span>
-                                                <span class="course-sub">{{ item.courseName.split(' ').slice(1).join(' ') }}</span>
+                                                <span class="course-sub">{{ item.courseName.split(' ').slice(1).join('
+                                                    ') }}</span>
                                             </div>
                                         </td>
 
@@ -779,14 +819,16 @@
                                         <!-- ── REPORT STATUS TOGGLE & BADGE ── -->
                                         <td class="text-center" (click)="$event.stopPropagation()">
                                             <div class="report-status-container">
-                                                <label class="toggle-switch" [class.disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()">
-                                                    <input type="checkbox" 
-                                                           [checked]="item.reportStatus === 'REPORTED'"
-                                                           [disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()"
-                                                           (change)="onToggleReportStatus(item)">
+                                                <label class="toggle-switch"
+                                                    [class.disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()">
+                                                    <input type="checkbox" [checked]="item.reportStatus === 'REPORTED'"
+                                                        [disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()"
+                                                        (change)="onToggleReportStatus(item)">
                                                     <span class="slider round"></span>
                                                 </label>
-                                                <span class="report-badge" [class.reported]="item.reportStatus === 'REPORTED'" [class.not-reported]="item.reportStatus !== 'REPORTED'">
+                                                <span class="report-badge"
+                                                    [class.reported]="item.reportStatus === 'REPORTED'"
+                                                    [class.not-reported]="item.reportStatus !== 'REPORTED'">
                                                     {{ item.reportStatus === 'REPORTED' ? 'Reported' : 'Not Reported' }}
                                                 </span>
                                             </div>
@@ -1066,7 +1108,8 @@
                                 <label class="filter-label">Filter by User (Admitted By)</label>
                                 <div class="custom-select-trigger" (click)="openUserFilter()">
                                     <span>{{ filters.userId ? getSelectedUserName() : 'Select Counselor' }}</span>
-                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
@@ -1074,8 +1117,10 @@
                             <div class="filter-section">
                                 <label class="filter-label">Filter by Consultancy</label>
                                 <div class="custom-select-trigger" (click)="openConsultancyFilter()">
-                                    <span>{{ filters.consultancyId ? getSelectedConsultancyName() : 'Select Consultancy' }}</span>
-                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <span>{{ filters.consultancyId ? getSelectedConsultancyName() : 'Select Consultancy'
+                                        }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
@@ -1084,7 +1129,8 @@
                                 <label class="filter-label">Filter by Course</label>
                                 <div class="custom-select-trigger" (click)="openCourseFilter()">
                                     <span>{{ filters.courseId ? getSelectedCourseName() : 'Select Course' }}</span>
-                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
@@ -1105,62 +1151,28 @@
                 </app-cancellation-modal>
 
                 <!-- Searchable Selection Modals -->
-                <app-searchable-selector-modal
-                    *ngIf="activeModal === 'user'"
-                    [title]="'Select Counselor / User'"
-                    [placeholder]="'Search counselor by name, email, or phone...'"
-                    [items]="modalItems"
-                    [loading]="modalLoading"
-                    [totalElements]="modalTotalElements"
-                    [currentPage]="modalCurrentPage"
-                    [totalPages]="modalTotalPages"
-                    [selectedId]="filters.userId"
-                    [displayField]="'fullName'"
-                    [subtitleField]="'email'"
-                    [tagField]="'mobile'"
-                    (search)="onModalSearch($event)"
-                    (pageChange)="onModalPageChange($event)"
-                    (select)="onModalSelect($event)"
-                    (close)="onModalClose()"
-                ></app-searchable-selector-modal>
+                <app-searchable-selector-modal *ngIf="activeModal === 'user'" [title]="'Select Counselor / User'"
+                    [placeholder]="'Search counselor by name, email, or phone...'" [items]="modalItems"
+                    [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages" [selectedId]="filters.userId" [displayField]="'fullName'"
+                    [subtitleField]="'email'" [tagField]="'mobile'" (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)" (select)="onModalSelect($event)"
+                    (close)="onModalClose()"></app-searchable-selector-modal>
 
-                <app-searchable-selector-modal
-                    *ngIf="activeModal === 'consultancy'"
-                    [title]="'Select Consultancy'"
-                    [placeholder]="'Search consultancy by name or firm name...'"
-                    [items]="modalItems"
-                    [loading]="modalLoading"
-                    [totalElements]="modalTotalElements"
-                    [currentPage]="modalCurrentPage"
-                    [totalPages]="modalTotalPages"
-                    [selectedId]="filters.consultancyId"
-                    [displayField]="'name'"
-                    [subtitleField]="'firmName'"
-                    [tagField]="'city'"
-                    (search)="onModalSearch($event)"
-                    (pageChange)="onModalPageChange($event)"
-                    (select)="onModalSelect($event)"
-                    (close)="onModalClose()"
-                ></app-searchable-selector-modal>
+                <app-searchable-selector-modal *ngIf="activeModal === 'consultancy'" [title]="'Select Consultancy'"
+                    [placeholder]="'Search consultancy by name or firm name...'" [items]="modalItems"
+                    [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages" [selectedId]="filters.consultancyId" [displayField]="'name'"
+                    [subtitleField]="'firmName'" [tagField]="'city'" (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)" (select)="onModalSelect($event)"
+                    (close)="onModalClose()"></app-searchable-selector-modal>
 
-                <app-searchable-selector-modal
-                    *ngIf="activeModal === 'course'"
-                    [title]="'Select Course'"
-                    [placeholder]="'Search course by name or code...'"
-                    [items]="modalItems"
-                    [loading]="modalLoading"
-                    [totalElements]="modalTotalElements"
-                    [currentPage]="modalCurrentPage"
-                    [totalPages]="modalTotalPages"
-                    [selectedId]="filters.courseId"
-                    [displayField]="'name'"
-                    [subtitleField]="'duration'"
-                    [tagField]="'courseType'"
-                    (search)="onModalSearch($event)"
-                    (pageChange)="onModalPageChange($event)"
-                    (select)="onModalSelect($event)"
-                    (close)="onModalClose()"
-                ></app-searchable-selector-modal>
+                <app-searchable-selector-modal *ngIf="activeModal === 'course'" [title]="'Select Course'"
+                    [placeholder]="'Search course by name or code...'" [items]="modalItems" [loading]="modalLoading"
+                    [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage" [totalPages]="modalTotalPages"
+                    [selectedId]="filters.courseId" [displayField]="'name'" [subtitleField]="'duration'"
+                    [tagField]="'courseType'" (search)="onModalSearch($event)" (pageChange)="onModalPageChange($event)"
+                    (select)="onModalSelect($event)" (close)="onModalClose()"></app-searchable-selector-modal>
 
                 <!-- ===== Download Confirmation Modal ===== -->
                 <div class="download-modal-overlay" *ngIf="showDownloadModal" (click)="showDownloadModal = false">
@@ -1218,7 +1230,9 @@
                 <div class="download-modal-overlay" *ngIf="showReportModal" (click)="cancelReportStatus()">
                     <div class="download-modal-card" (click)="$event.stopPropagation()">
                         <div class="dmodal-header">
-                            <div class="dmodal-icon" [style.background]="targetReportStatus === 'REPORTED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'" [style.color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'">
+                            <div class="dmodal-icon"
+                                [style.background]="targetReportStatus === 'REPORTED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'"
+                                [style.color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'">
                                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -1235,17 +1249,18 @@
                         </div>
 
                         <div class="dmodal-body">
-                            <div style="font-size: 14px; line-height: 1.6; color: #475569; text-align: center; margin: 10px 0;">
+                            <div
+                                style="font-size: 14px; line-height: 1.6; color: #475569; text-align: center; margin: 10px 0;">
                                 {{ reportModalMessage }}
                             </div>
                         </div>
 
                         <div class="dmodal-actions">
                             <button class="dmodal-btn-cancel" (click)="cancelReportStatus()">Cancel</button>
-                            <button class="dmodal-btn-confirm" 
-                                    [style.background]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
-                                    [style.border-color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
-                                    (click)="confirmReportStatus()">
+                            <button class="dmodal-btn-confirm"
+                                [style.background]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
+                                [style.border-color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
+                                (click)="confirmReportStatus()">
                                 Yes, Confirm
                             </button>
                         </div>

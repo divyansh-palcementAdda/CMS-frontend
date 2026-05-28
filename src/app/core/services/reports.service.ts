@@ -60,4 +60,8 @@ export class ReportsService {
   getSessionCumulativeStats(session: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/session/cumulative-stats`, { params: { session } });
   }
+
+  getSessionComparisonReport(prevSession: string, currSession: string, filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/session-comparison?prevSession=${prevSession}&currSession=${currSession}`, filter);
+  }
 }

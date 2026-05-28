@@ -290,4 +290,8 @@ export class AdmissionService {
   getRefundHistory(studentId: number): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/v1/refunds/student/${studentId}/history`);
   }
+
+  updateFocStatus(studentId: number, focType: string, focRemarks?: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${studentId}/foc-status`, { focType, focRemarks });
+  }
 }
