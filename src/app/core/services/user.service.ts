@@ -3,7 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { UserPageData, UserItem, UserStats, UserRole, CreateUserDTO, BulkUserUploadResponse } from '../models/user.model';
+import { UserPageData, UserItem, UserStats, UserRole, CreateUserDTO, BulkUserUploadResponse,
+         MyProfileDTO, UpdateProfileRequest, ChangePasswordRequest, EmailChangeRequest, EmailVerifyRequest } from '../models/user.model';
+
 import { DatePipe } from '@angular/common';
 
 @Injectable({
@@ -230,4 +232,67 @@ export class UserService {
       responseType: 'blob'
     });
   }
+
+  // ─── My Profile APIs ──────────────────────────────────────────────────────────
+
+  /** Fetch the currently-authenticated user's full profile */
+  getMyProfile(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/me`);
+  }
+
+  /**
+   * Update only fullName and mobile.
+   * NEVER sends email, role, or status — those are intentionally excluded.
+   */
+  updateMyProfile(data: UpdateProfileRequest): Observable<any> {
+    const safePayload: UpdateProfileRequest = {
+      fullName: data.fullName,
+      mobile: data.mobile
+    };
+    return this.http.put<any>(`${this.apiUrl}/me`, safePayload);
+  }
+
+  /** Change password — requires current password for verification */
+  changeMyPassword(data: ChangePasswordRequest): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/me/change-password`, data);
+  }
+
+  /**
+   * Step 1 of email change: request OTP to new email.
+   * Does NOT update the email immediately — triggers verification flow.
+   */
+  requestEmailChange(data: EmailChangeRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/me/request-email-change`, data);
+  }
+
+  /** Step 2: verify OTP and complete email change */
+  verifyEmailChange(data: EmailVerifyRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/me/verify-email-change`, data);
+  }
+
+  /** Resend OTP to pendingEmail (rate-limited server-side) */
+  resendEmailOtp(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/me/resend-email-otp`, {});
+  }
+
+  /** Fetch active devices */
+  getMyDevices(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/me/devices`);
+  }
+
+  /** Fetch historical login activities */
+  getMyLoginActivities(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/me/login-activities`);
+  }
+
+  /** Logout a specific device */
+  logoutDevice(deviceId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/me/devices/${deviceId}`);
+  }
+
+  /** Logout all devices */
+  logoutAllDevicesApi(): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/me/devices`);
+  }
 }
+

@@ -1,11 +1,13 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <header class="topbar">
       <div class="topbar-left-mobile">
@@ -36,7 +38,7 @@ import { AuthService } from '../../../core/services/auth.service';
           </div>
           <div class="dropdown-divider"></div>
           <ul class="dropdown-menu">
-            <li class="menu-item">
+            <li class="menu-item" [routerLink]="['/admin/profile']" (click)="closeDropdown($event)">
               <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               <span>Profile</span>
             </li>
@@ -104,7 +106,7 @@ export class TopbarComponent {
   showLogoutThisDeviceModal = false;
   showLogoutAllDevicesModal = false;
 
-  constructor(private auth: AuthService) { }
+  constructor(private auth: AuthService, private router: Router) { }
 
   get initials(): string {
     const u = this.auth.user();

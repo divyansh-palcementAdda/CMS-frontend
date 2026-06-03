@@ -132,5 +132,11 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  {
+    path: 'admin/profile',
+    loadComponent: () => import('./features/my-profile/my-profile.component').then(m => m.MyProfileComponent),
+    canActivate: [authGuard]  // All authenticated users — no roleGuard restriction
+  },
   { path: '**', redirectTo: '/admin/dashboard' }
 ];
+

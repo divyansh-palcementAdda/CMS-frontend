@@ -136,28 +136,43 @@ export class ReportsComponent implements OnInit, OnDestroy {
   // Session Comparison State
   comparisonPrevSession = (new Date().getFullYear() - 1).toString();
   comparisonCurrSession = new Date().getFullYear().toString();
+  comparisonDate = new Date().toISOString().split('T')[0];
   comparisonData: any[] = [];
   comparisonSummary = {
     prevTotalForms: 0,
     currTotalForms: 0,
     formsGrowth: 0,
     formsGrowthPct: 0,
-    prevTotalFees: 0,
-    currTotalFees: 0,
-    feesGrowth: 0,
-    feesGrowthPct: 0
+    prevTotalAdmissions: 0,
+    currTotalAdmissions: 0,
+    admissionsGrowth: 0,
+    admissionsGrowthPct: 0
   };
   comparisonFormsChartOptions: any = null;
   comparisonFeesChartOptions: any = null;
   totalElements = 0;
   serverPages = 0;
 
+  get comparisonPrevCutoffDate(): string {
+    if (!this.comparisonDate) return '';
+    try {
+      const date = new Date(this.comparisonDate);
+      const prevSessionYear = parseInt(this.comparisonPrevSession);
+      const currSessionYear = parseInt(this.comparisonCurrSession);
+      const yearDiff = isNaN(prevSessionYear) || isNaN(currSessionYear) ? 1 : Math.max(1, currSessionYear - prevSessionYear);
+      date.setFullYear(date.getFullYear() - yearDiff);
+      return date.toISOString().split('T')[0];
+    } catch (e) {
+      return '';
+    }
+  }
+
   // Custom Date Picker State
   showCustomDatePicker = false;
   customStartDate = '';
   customEndDate = '';
   dateRangeValidationError = '';
-  
+
   // Custom Date & Time Picker State
   showCustomDateTimePicker = false;
   customStartDateTime = '';
@@ -441,7 +456,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     try {
       const date = new Date(dateTimeStr);
       if (isNaN(date.getTime())) return dateTimeStr;
-      
+
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const day = date.getDate().toString().padStart(2, '0');
       const month = months[date.getMonth()];
@@ -452,7 +467,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       hours = hours % 12;
       hours = hours ? hours : 12; // the hour '0' should be '12'
       const formattedHours = hours.toString().padStart(2, '0');
-      
+
       return `${day} ${month} ${year} ${formattedHours}:${minutes} ${ampm}`;
     } catch (e) {
       return dateTimeStr;
@@ -581,13 +596,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
     { id: 'USER_ADMISSION', label: 'User Performance', icon: 'person_search', desc: 'Counselor-wise form volume', color: 'purple' },
     { id: 'COURSE_REVENUE', label: 'Revenue Analysis', icon: 'payments', desc: 'Fees collection vs pending dues', color: 'emerald' },
     { id: 'DAILY_SESSION_SUMMARY', label: 'Session Operational Report', icon: 'analytics', desc: 'Daily MIS & Session Summary', color: 'orange' },
+    { id: 'SESSION_COMPARISON', label: 'Session Comparison', icon: 'compare_arrows', desc: 'Compare course performance between sessions', color: 'indigo' },
     { id: 'COURSE_ANALYTICS_APP', label: 'Application Trends', icon: 'description', desc: 'Form volume and status tracking', color: 'blue' },
     { id: 'COURSE_ANALYTICS_ADMISSION', label: 'Admission Metrics', icon: 'how_to_reg', desc: 'Confirmed vs cancelled adms', color: 'rose' },
     { id: 'DAILY_FEES', label: 'Daily Collection', icon: 'account_balance_wallet', desc: 'Real-time financial tracking', color: 'cyan' },
     { id: 'LEAD_SOURCE_CONVERSION', label: 'Lead Conversion', icon: 'query_stats', desc: 'Conversion rate by source', color: 'amber' },
     { id: 'COURSE_SUMMARY', label: 'Program Summary', icon: 'summarize', desc: 'Full academic year overview', color: 'slate' },
     { id: 'STUDENT_DETAIL', label: 'Student Thresholds', icon: 'group', desc: '50% fee payment status', color: 'violet' },
-    { id: 'SESSION_COMPARISON', label: 'Session Comparison', icon: 'compare_arrows', desc: 'Compare course performance between sessions', color: 'indigo' }
   ];
 
   setReport(type: string) {
@@ -1145,6 +1160,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     if (apiFilter.session === 'OVERALL') {
       apiFilter.session = undefined;
     }
+    apiFilter.endDate = this.comparisonDate;
 
     this.reportsService.getSessionComparisonReport(
       this.comparisonPrevSession,
@@ -1172,31 +1188,31 @@ export class ReportsComponent implements OnInit, OnDestroy {
   calculateComparisonSummary() {
     let prevForms = 0;
     let currForms = 0;
-    let prevFees = 0;
-    let currFees = 0;
+    let prevAdmissions = 0;
+    let currAdmissions = 0;
 
     this.comparisonData.forEach(d => {
       prevForms += (d.prevSessionForms || 0);
       currForms += (d.currentSessionForms || 0);
-      prevFees += (d.prevSessionFees || 0);
-      currFees += (d.currentSessionFees || 0);
+      prevAdmissions += (d.prevSessionConfirmedAdmissions || 0);
+      currAdmissions += (d.currentSessionConfirmedAdmissions || 0);
     });
 
     const formsGrowth = currForms - prevForms;
     const formsGrowthPct = prevForms > 0 ? (formsGrowth / prevForms) * 100 : 0;
 
-    const feesGrowth = currFees - prevFees;
-    const feesGrowthPct = prevFees > 0 ? (feesGrowth / prevFees) * 100 : 0;
+    const admissionsGrowth = currAdmissions - prevAdmissions;
+    const admissionsGrowthPct = prevAdmissions > 0 ? (admissionsGrowth / prevAdmissions) * 100 : 0;
 
     this.comparisonSummary = {
       prevTotalForms: prevForms,
       currTotalForms: currForms,
       formsGrowth: formsGrowth,
       formsGrowthPct: formsGrowthPct,
-      prevTotalFees: prevFees,
-      currTotalFees: currFees,
-      feesGrowth: feesGrowth,
-      feesGrowthPct: feesGrowthPct
+      prevTotalAdmissions: prevAdmissions,
+      currTotalAdmissions: currAdmissions,
+      admissionsGrowth: admissionsGrowth,
+      admissionsGrowthPct: admissionsGrowthPct
     };
   }
 
@@ -1296,16 +1312,16 @@ export class ReportsComponent implements OnInit, OnDestroy {
       }
     };
 
-    // Fees Comparison Chart
+    // Confirmed Admissions Comparison Chart
     this.comparisonFeesChartOptions = {
       series: [
         {
           name: `Session ${this.comparisonPrevSession}`,
-          data: chartData.map(d => d.prevSessionFees || 0)
+          data: chartData.map(d => d.prevSessionConfirmedAdmissions || 0)
         },
         {
           name: `Session ${this.comparisonCurrSession}`,
-          data: chartData.map(d => d.currentSessionFees || 0)
+          data: chartData.map(d => d.currentSessionConfirmedAdmissions || 0)
         }
       ],
       chart: {
@@ -1323,7 +1339,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
       },
       colors: ['#cbd5e1', '#10b981'], // Light grey for previous, Emerald green for current
       dataLabels: {
-        enabled: false
+        enabled: true,
+        formatter: (val: any) => val > 0 ? val.toString() : '',
+        offsetY: -20,
+        style: {
+          fontSize: '10px',
+          colors: ['#304758']
+        }
       },
       stroke: {
         show: true,
@@ -1341,14 +1363,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
       },
       yaxis: {
         title: {
-          text: 'Fees Amount (₹)',
+          text: 'Confirmed Admissions (Count)',
           style: {
             fontFamily: 'Plus Jakarta Sans, sans-serif',
             fontWeight: 700
           }
-        },
-        labels: {
-          formatter: (val: any) => '₹' + (val >= 1000 ? (val / 1000).toFixed(0) + 'k' : val)
         }
       },
       fill: {
@@ -1357,7 +1376,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       tooltip: {
         theme: 'dark',
         y: {
-          formatter: (val: any) => '₹' + val.toLocaleString('en-IN')
+          formatter: (val: any) => val + ' Admissions'
         }
       },
       grid: {

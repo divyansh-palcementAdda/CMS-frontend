@@ -27,7 +27,7 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
   // Summary KPI values
   totalCourses = 0;
   totalForms = 0;
-  totalFees = 0;
+  totalConfirmedAdmissions = 0;
   totalEntries = 0;
 
   // Search Filters
@@ -45,7 +45,7 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
 
   // Pagination helper
   totalPages = 0;
-  pagesArray: number[] = [];
+  readonly PAGE_WINDOW = 2; // pages shown on each side of current page
 
   // Add/Edit Single Record
   showAddEditModal = false;
@@ -105,7 +105,7 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
           this.records = pageData.content || [];
           this.totalEntries = pageData.totalElements || 0;
           this.totalPages = pageData.totalPages || 0;
-          this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i);
+          // pagesArray removed — use getVisiblePages() in template
           
           this.calculateSummary();
         }
@@ -118,17 +118,17 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
     // Dynamic KPI based on current filtered view
     const coursesSet = new Set<string>();
     let forms = 0;
-    let fees = 0;
+    let admissions = 0;
 
     this.records.forEach(r => {
       if (r.courseName) coursesSet.add(r.courseName);
       forms += r.formsCount || 0;
-      fees += r.feesCount || 0;
+      admissions += r.feesCount || 0;  // feesCount = confirmed admission count (business re-definition)
     });
 
     this.totalCourses = coursesSet.size;
     this.totalForms = forms;
-    this.totalFees = fees;
+    this.totalConfirmedAdmissions = admissions;
   }
 
   onSearchChange() {
@@ -141,6 +141,65 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
       this.filter.page = p;
       this.search();
     }
+  }
+
+  goToFirst() {
+    this.changePage(0);
+  }
+
+  goToLast() {
+    this.changePage(this.totalPages - 1);
+  }
+
+  onPageSizeChange() {
+    this.filter.page = 0;
+    this.search();
+  }
+
+  /**
+   * Returns a compact page-number window for enterprise-style pagination.
+   * Uses (string) '...' as an ellipsis marker.
+   * Example for 87 pages on page 15:
+   *   [0, '...', 13, 14, 15, 16, 17, '...', 86]
+   */
+  getVisiblePages(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.filter.page ?? 0;
+    const W = this.PAGE_WINDOW;
+
+    if (total <= 1) return [];
+
+    // If total pages fits in a small set, show all without ellipsis
+    if (total <= 2 * W + 5) {
+      return Array.from({ length: total }, (_, i) => i);
+    }
+
+    const pages: (number | string)[] = [];
+    const rangeStart = Math.max(1, current - W);
+    const rangeEnd = Math.min(total - 2, current + W);
+
+    // Always include first page
+    pages.push(0);
+
+    // Left ellipsis
+    if (rangeStart > 1) {
+      pages.push('...');
+    }
+
+    // Middle window
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      pages.push(i);
+    }
+
+    // Right ellipsis
+    if (rangeEnd < total - 2) {
+      pages.push('...');
+    }
+
+    // Always include last page
+    pages.push(total - 1);
+
+    return pages;
   }
 
   setSort(field: string) {

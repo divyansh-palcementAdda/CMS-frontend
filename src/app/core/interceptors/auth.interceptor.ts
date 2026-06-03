@@ -14,6 +14,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
       if (err.status === 401 && !req.url.includes('/auth/')) {
+        const currentToken = auth.getToken();
+        const requestToken = req.headers.get('Authorization')?.replace('Bearer ', '');
+
+        if (currentToken && requestToken && currentToken !== requestToken) {
+          // A token refresh has already occurred! Retry immediately with the new token.
+          const retried = req.clone({ setHeaders: { Authorization: `Bearer ${currentToken}` } });
+          return next(retried);
+        }
+
         if (!auth.getIsRefreshing()) {
           auth.setIsRefreshing(true);
           auth.setRefreshTokenSubject(null);
@@ -31,7 +40,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               auth.setIsRefreshing(false);
               auth.setRefreshTokenSubject(null);
               auth.logoutWithExpiredMessage();
-              return throwError(() => err);
+              return throwError(() => refreshErr);
             })
           );
         } else {

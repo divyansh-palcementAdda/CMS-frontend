@@ -1203,6 +1203,13 @@
                                     </select>
                                 </div>
 
+                                <!-- Comparison Date Selection -->
+                                <div class="control-item" style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
+                                    <label style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Comparison Date (Till Date)</label>
+                                    <input type="date" [(ngModel)]="comparisonDate" (change)="loadComparisonReport()"
+                                        style="height: 52px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--slate-200); background: rgba(248, 250, 252, 0.5); font-size: 14px; font-weight: 700; color: var(--slate-800); outline: none; transition: var(--transition);">
+                                </div>
+
                                 <!-- Sync Button -->
                                 <button class="btn-sync" (click)="loadComparisonReport()" [class.syncing]="loading"
                                     title="Refresh Comparison"
@@ -1212,12 +1219,20 @@
                             </div>
                         </div>
 
+                        <!-- Comparison Period Info Alert Banner -->
+                        <div class="comparison-period-info" *ngIf="comparisonDate" 
+                            style="background: rgba(67, 95, 255, 0.05); border: 1px solid rgba(67, 95, 255, 0.15); border-radius: 16px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; font-size: 14px; color: var(--primary); font-weight: 700; box-shadow: var(--shadow-sm);">
+                            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary);">info</span>
+                            <span>Comparing cumulative progress: Session {{comparisonPrevSession}} (Start to {{formatCustomDate(comparisonPrevCutoffDate)}}) vs Session {{comparisonCurrSession}} (Start to {{formatCustomDate(comparisonDate)}})</span>
+                        </div>
+
+
                         <!-- KPI Growth Cards Grid -->
                         <div class="kpi-grid-premium" style="margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
                             <!-- Forms Comparison Card -->
                             <div class="kpi-card-v2" [class.is-loading]="loading" style="border-left: 4px solid var(--primary);">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: var(--primary);">compare_arrows</span></div>
-                                <div class="kpi-label">Forms Volume (Previous vs Current)</div>
+                                <div class="kpi-label" title="Comparing total forms received from session start till the selected cutoff dates">Forms Volume Till Date (Previous vs Current)</div>
                                 <div class="value-group" style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
                                     <div style="display: flex; align-items: baseline; gap: 8px;">
                                         <span class="kpi-value" style="font-size: 26px;">{{comparisonSummary.prevTotalForms | number}}</span>
@@ -1234,22 +1249,22 @@
                                 </div>
                             </div>
 
-                            <!-- Fees Comparison Card -->
+                            <!-- Confirmed Admissions Comparison Card -->
                             <div class="kpi-card-v2" [class.is-loading]="loading" style="border-left: 4px solid #10b981;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #10b981;">payments</span></div>
-                                <div class="kpi-label">Fees Realized (Previous vs Current)</div>
+                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #10b981;">how_to_reg</span></div>
+                                <div class="kpi-label" title="Comparing total confirmed admissions from session start till the selected cutoff dates">Confirmed Admissions Till Date (Previous vs Current)</div>
                                 <div class="value-group" style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
                                     <div style="display: flex; align-items: baseline; gap: 8px;">
-                                        <span class="kpi-value" style="font-size: 22px; font-weight: 800;">₹{{comparisonSummary.prevTotalFees | number:'1.0-0'}}</span>
+                                        <span class="kpi-value" style="font-size: 26px;">{{comparisonSummary.prevTotalAdmissions | number}}</span>
                                         <span style="font-size: 14px; color: var(--slate-400); font-weight: 600;">to</span>
-                                        <span class="kpi-value" style="font-size: 22px; font-weight: 800; color: #10b981;">₹{{comparisonSummary.currTotalFees | number:'1.0-0'}}</span>
+                                        <span class="kpi-value" style="font-size: 26px; color: #10b981;">{{comparisonSummary.currTotalAdmissions | number}}</span>
                                     </div>
                                     <div class="trend-indicator" style="display: flex; align-items: center; gap: 8px;">
-                                        <span class="percentage" [class.success]="comparisonSummary.feesGrowth >= 0" [class.danger]="comparisonSummary.feesGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
-                                            <span class="badge-icon">{{comparisonSummary.feesGrowth >= 0 ? '↗' : '↘'}}</span> 
-                                            {{comparisonSummary.feesGrowth >= 0 ? '+' : ''}}₹{{comparisonSummary.feesGrowth | number:'1.0-0'}} ({{comparisonSummary.feesGrowthPct | number:'1.1-1'}}%)
+                                        <span class="percentage" [class.success]="comparisonSummary.admissionsGrowth >= 0" [class.danger]="comparisonSummary.admissionsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
+                                            <span class="badge-icon">{{comparisonSummary.admissionsGrowth >= 0 ? '&#x2197;' : '&#x2198;'}}</span> 
+                                            {{comparisonSummary.admissionsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.admissionsGrowth | number}} ({{comparisonSummary.admissionsGrowthPct | number:'1.1-1'}}%)
                                         </span>
-                                        <span class="trend-label">Revenue Growth</span>
+                                        <span class="trend-label">Admissions Growth</span>
                                     </div>
                                 </div>
                             </div>
@@ -1282,12 +1297,12 @@
                                 </div>
                             </div>
 
-                            <!-- Fees Comparison Chart -->
+                            <!-- Admissions Comparison Chart -->
                             <div class="analytics-chart-card side-distribution" *ngIf="comparisonFeesChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
-                                        <span class="material-symbols-outlined icon" style="color: #10b981;">payments</span>
-                                        <h3>Program Revenue Comparison (Top 10)</h3>
+                                        <span class="material-symbols-outlined icon" style="color: #10b981;">how_to_reg</span>
+                                        <h3>Program Admissions Comparison (Top 10)</h3>
                                     </div>
                                 </div>
                                 <div class="chart-wrapper" style="padding: 1rem;">
@@ -1325,7 +1340,7 @@
                                         <h3 style="font-size: 18px; font-weight: 800; color: var(--slate-800); margin: 0;">Course Performance Comparison Metrics</h3>
                                         <span class="badge premium" style="font-weight: 700; background: linear-gradient(135deg, #435fff 0%, #00d2ff 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px;">Previous (Manual) vs Current (Live)</span>
                                     </div>
-                                    <p class="subtitle" style="font-size: 13px; color: var(--slate-500); margin: 4px 0 0 0;">Comprehensive breakdown of applications and financial volume variance course-wise.</p>
+                                    <p class="subtitle" style="font-size: 13px; color: var(--slate-500); margin: 4px 0 0 0;">Comprehensive breakdown of cumulative applications and confirmed admissions variance course-wise till the selected date.</p>
                                 </div>
                             </div>
 
@@ -1334,12 +1349,12 @@
                                     <thead>
                                         <tr style="background: var(--slate-50); border-bottom: 2px solid var(--slate-200);">
                                             <th style="min-width: 250px; text-align: left; padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Course Program</th>
-                                            <th class="text-center" style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonPrevSession}} Forms</th>
-                                            <th class="text-center" style="background: rgba(67, 95, 255, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonCurrSession}} Forms</th>
+                                            <th class="text-center" style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonPrevSession}} Forms Till Date</th>
+                                            <th class="text-center" style="background: rgba(67, 95, 255, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonCurrSession}} Forms Till Date</th>
                                             <th class="text-center" style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Forms Growth</th>
-                                            <th class="text-right" style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonPrevSession}} Fees</th>
-                                            <th class="text-right" style="background: rgba(16, 185, 129, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonCurrSession}} Fees</th>
-                                            <th class="text-right" style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Fees Growth</th>
+                                            <th class="text-center" style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonPrevSession}} Confirmed Adm. Till Date</th>
+                                            <th class="text-center" style="background: rgba(16, 185, 129, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonCurrSession}} Confirmed Adm. Till Date</th>
+                                            <th class="text-center" style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Admissions Growth</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1363,22 +1378,22 @@
                                                 </span>
                                             </td>
 
-                                            <!-- Fees Column -->
-                                            <td class="text-right font-monospace" style="background: rgba(148, 163, 184, 0.02); font-weight: 600; color: var(--slate-600); padding: 14px 18px; text-align: right;">
-                                                ₹{{item.prevSessionFees || 0 | number:'1.0-0'}}
+                                            <!-- Confirmed Admissions Column -->
+                                            <td class="text-center font-monospace" style="background: rgba(148, 163, 184, 0.02); font-weight: 600; color: var(--slate-600); padding: 14px 18px; text-align: center;">
+                                                {{item.prevSessionConfirmedAdmissions || 0}}
                                             </td>
-                                            <td class="text-right font-monospace" style="background: rgba(16, 185, 129, 0.02); font-weight: 700; color: #10b981; padding: 14px 18px; text-align: right;">
-                                                ₹{{item.currentSessionFees || 0 | number:'1.0-0'}}
+                                            <td class="text-center font-monospace" style="background: rgba(16, 185, 129, 0.02); font-weight: 700; color: #10b981; padding: 14px 18px; text-align: center;">
+                                                {{item.currentSessionConfirmedAdmissions || 0}}
                                             </td>
-                                            <td class="text-right" style="padding: 14px 18px; text-align: right;">
-                                                <span class="badge" [class.success]="item.feesGrowth >= 0" [class.danger]="item.feesGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 12px;">
-                                                    <span style="font-size: 10px;">{{item.feesGrowth >= 0 ? '▲' : '▼'}}</span>
-                                                    {{item.feesGrowth >= 0 ? '+' : ''}}₹{{item.feesGrowth | number:'1.0-0'}} 
-                                                    ({{item.feesGrowthPercent || 0 | number:'1.1-1'}}%)
+                                            <td class="text-center" style="padding: 14px 18px; text-align: center;">
+                                                <span class="badge" [class.success]="item.admissionsGrowth >= 0" [class.danger]="item.admissionsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 12px;">
+                                                    <span style="font-size: 10px;">{{item.admissionsGrowth >= 0 ? '&#9650;' : '&#9660;'}}</span>
+                                                    {{item.admissionsGrowth >= 0 ? '+' : ''}}{{item.admissionsGrowth || 0}} 
+                                                    ({{item.admissionsGrowthPercent || 0 | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
                                         </tr>
-                                        <!-- Table Totals Summary Row -->
+                                        <!-- Totals Row -->
                                         <tr class="totals-row" style="background: var(--slate-50); border-top: 2px solid var(--slate-300); font-weight: 800;">
                                             <td style="font-weight: 800; color: var(--slate-900); padding: 16px 18px;">Total Aggregated Summary</td>
                                             <td class="text-center font-monospace" style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: center;">
@@ -1389,22 +1404,22 @@
                                             </td>
                                             <td class="text-center" style="padding: 16px 18px; text-align: center;">
                                                 <span class="badge" [class.success]="comparisonSummary.formsGrowth >= 0" [class.danger]="comparisonSummary.formsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
-                                                    <span>{{comparisonSummary.formsGrowth >= 0 ? '▲' : '▼'}}</span>
+                                                    <span>{{comparisonSummary.formsGrowth >= 0 ? '&#9650;' : '&#9660;'}}</span>
                                                     {{comparisonSummary.formsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.formsGrowth}} 
                                                     ({{comparisonSummary.formsGrowthPct | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
-                                            <td class="text-right font-monospace" style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: right;">
-                                                ₹{{comparisonSummary.prevTotalFees | number:'1.0-0'}}
+                                            <td class="text-center font-monospace" style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: center;">
+                                                {{comparisonSummary.prevTotalAdmissions | number}}
                                             </td>
-                                            <td class="text-right font-monospace" style="font-weight: 800; color: #10b981; padding: 16px 18px; text-align: right;">
-                                                ₹{{comparisonSummary.currTotalFees | number:'1.0-0'}}
+                                            <td class="text-center font-monospace" style="font-weight: 800; color: #10b981; padding: 16px 18px; text-align: center;">
+                                                {{comparisonSummary.currTotalAdmissions | number}}
                                             </td>
-                                            <td class="text-right" style="padding: 16px 18px; text-align: right;">
-                                                <span class="badge" [class.success]="comparisonSummary.feesGrowth >= 0" [class.danger]="comparisonSummary.feesGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
-                                                    <span>{{comparisonSummary.feesGrowth >= 0 ? '▲' : '▼'}}</span>
-                                                    {{comparisonSummary.feesGrowth >= 0 ? '+' : ''}}₹{{comparisonSummary.feesGrowth | number:'1.0-0'}} 
-                                                    ({{comparisonSummary.feesGrowthPct | number:'1.1-1'}}%)
+                                            <td class="text-center" style="padding: 16px 18px; text-align: center;">
+                                                <span class="badge" [class.success]="comparisonSummary.admissionsGrowth >= 0" [class.danger]="comparisonSummary.admissionsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
+                                                    <span>{{comparisonSummary.admissionsGrowth >= 0 ? '&#9650;' : '&#9660;'}}</span>
+                                                    {{comparisonSummary.admissionsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.admissionsGrowth}} 
+                                                    ({{comparisonSummary.admissionsGrowthPct | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
                                         </tr>

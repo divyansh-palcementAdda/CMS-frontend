@@ -372,61 +372,164 @@ $danger-color: hsl(350, 70%, 45%);
   }
 }
 
-// Paginator
+// ─── Enterprise Pagination Footer ───────────────────────────────────────────
+.pagination-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 20px 16px;
+  border-top: 1px solid $border-color;
+  margin-top: 4px;
+}
+
+.pagination-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.entries-info {
+  font-size: 13px;
+  color: $text-muted;
+
+  strong {
+    color: $text-main;
+    font-weight: 600;
+  }
+}
+
+.page-size-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-size-label {
+  font-size: 13px;
+  color: $text-muted;
+  font-weight: 500;
+}
+
+.page-size-select {
+  padding: 5px 28px 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid $border-color;
+  background: white;
+  font-size: 13px;
+  font-family: inherit;
+  color: $text-main;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.12);
+  }
+}
+
+// Paginator row
 .paginator {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  margin-top: 8px;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-  .btn-page {
-    background: white;
-    border: 1px solid $border-color;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+.btn-page {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid $border-color;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-main;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  white-space: nowrap;
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    
-    &:not(:disabled):hover {
-      background: hsl(220, 10%, 95%);
-    }
+  &:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
-  .page-numbers {
-    display: flex;
-    gap: 6px;
+  &:not(:disabled):hover {
+    background: rgba($primary-color, 0.06);
+    border-color: rgba($primary-color, 0.35);
+    color: $primary-color;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba($primary-color, 0.12);
+  }
+}
+
+.btn-page-edge {
+  padding: 6px 10px;
+  color: $text-muted;
+
+  &:not(:disabled):hover {
+    color: $primary-color;
+  }
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.btn-page-num {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-main;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+
+  &:hover:not(.active) {
+    background: rgba($primary-color, 0.06);
+    color: $primary-color;
+    border-color: rgba($primary-color, 0.2);
   }
 
-  .btn-page-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    background: transparent;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background: rgba($primary-color, 0.05);
-      color: $primary-color;
-    }
-
-    &.active {
-      background: $primary-color;
-      color: white;
-      font-weight: 600;
-    }
+  &.active {
+    background: $primary-color;
+    color: white;
+    font-weight: 700;
+    border-color: $primary-color;
+    box-shadow: 0 2px 8px rgba($primary-color, 0.3);
+    pointer-events: none;
   }
+}
+
+.page-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 34px;
+  font-size: 14px;
+  color: $text-muted;
+  letter-spacing: 1px;
+  user-select: none;
 }
 
 // Modal dialogs
@@ -708,3 +811,27 @@ $danger-color: hsl(350, 70%, 45%);
 .text-indigo-600 { color: $primary-color; }
 .text-slate-700 { color: $secondary-color; }
 .text-red-600 { color: $danger-color; }
+
+// S.No Column Styles
+.sno-header {
+  width: 56px;
+  min-width: 56px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: default;
+  user-select: none;
+}
+
+.sno-cell {
+  width: 56px;
+  min-width: 56px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-muted;
+  font-variant-numeric: tabular-nums;
+}

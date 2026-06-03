@@ -140,3 +140,39 @@ export interface BulkUserUploadResponse {
   successes: SuccessEntry[];
   failures: FailureEntry[];
 }
+
+// ─── My Profile ────────────────────────────────────────────────────────────────
+
+export interface MyProfileDTO {
+  userId: number;
+  username: string;
+  fullName: string;
+  email: string;
+  mobile?: string;
+  roles: string[];
+  status: string;
+  emailVerified: boolean;
+  pendingEmail?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface UpdateProfileRequest {
+  fullName?: string;
+  mobile?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface EmailChangeRequest {
+  newEmail: string;
+}
+
+export interface EmailVerifyRequest {
+  otp: string;
+}
+

@@ -70,13 +70,15 @@
         <div class="summary-card">
           <div class="card-icon violet-gradient">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
           </div>
           <div class="card-info">
-            <span class="card-label">Total Fees</span>
-            <span class="card-value">₹{{ totalFees | number:'1.2-2' }}</span>
+            <span class="card-label">Confirmed Admissions</span>
+            <span class="card-value">{{ totalConfirmedAdmissions | number }}</span>
           </div>
         </div>
 
@@ -147,25 +149,27 @@
         <table class="data-table">
           <thead>
             <tr>
+              <th class="sno-header">S.No</th>
               <th (click)="setSort('courseNameSnapshot')">Course <span *ngIf="filter.sortBy === 'courseNameSnapshot'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
               <th (click)="setSort('reportDate')">Date <span *ngIf="filter.sortBy === 'reportDate'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
               <th (click)="setSort('session')">Session <span *ngIf="filter.sortBy === 'session'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
               <th (click)="setSort('formsCount')">Forms Count <span *ngIf="filter.sortBy === 'formsCount'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th (click)="setSort('feesCount')">Fees Count <span *ngIf="filter.sortBy === 'feesCount'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
+              <th (click)="setSort('feesCount')">Confirmed Admissions <span *ngIf="filter.sortBy === 'feesCount'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
               <th>Created By</th>
               <th (click)="setSort('createdAt')">Created Date <span *ngIf="filter.sortBy === 'createdAt'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
               <th class="actions-header">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of records" class="table-row">
+            <tr *ngFor="let row of records; let i = index" class="table-row">
+              <td class="sno-cell">{{ (filter.page! * filter.size!) + i + 1 }}</td>
               <td class="course-cell font-semibold">{{ row.courseNameSnapshot }}</td>
               <td>{{ row.reportDate | date:'dd MMM yyyy' }}</td>
               <td>
                 <span class="session-badge">{{ row.session }}</span>
               </td>
               <td class="font-semibold text-slate-700">{{ row.formsCount }}</td>
-              <td class="font-semibold text-indigo-600">₹{{ row.feesCount | number:'1.2-2' }}</td>
+              <td class="font-semibold text-indigo-600">{{ row.feesCount | number:'1.0-0' }}</td>
               <td>{{ row.uploadedByUsername }}</td>
               <td>{{ row.createdAt | date:'dd MMM yyyy HH:mm' }}</td>
               <td class="actions-cell">
@@ -201,19 +205,61 @@
           </tbody>
         </table>
 
-        <!-- Paginator -->
-        <div class="paginator" *ngIf="totalPages > 1 && filter.page !== undefined">
-          <button class="btn-page" [disabled]="filter.page === 0" (click)="changePage(filter.page - 1)">
-            <span>Prev</span>
-          </button>
-          <div class="page-numbers">
-            <button *ngFor="let p of pagesArray" class="btn-page-num" [class.active]="filter.page === p" (click)="changePage(p)">
-              {{ p + 1 }}
+        <!-- Enterprise Pagination Footer -->
+        <div class="pagination-footer" *ngIf="totalPages > 0">
+          <!-- Entries info + page size selector -->
+          <div class="pagination-meta">
+            <span class="entries-info">
+              Showing
+              <strong>{{ (filter.page! * filter.size!) + 1 }}</strong>–<strong>{{ ((filter.page! + 1) * filter.size!) < totalEntries ? ((filter.page! + 1) * filter.size!) : totalEntries }}</strong>
+              of <strong>{{ totalEntries }}</strong> entries
+            </span>
+            <div class="page-size-group">
+              <label class="page-size-label">Rows:</label>
+              <select class="page-size-select" [(ngModel)]="filter.size" (ngModelChange)="onPageSizeChange()">
+                <option [ngValue]="10">10</option>
+                <option [ngValue]="20">20</option>
+                <option [ngValue]="50">50</option>
+                <option [ngValue]="100">100</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Page navigation -->
+          <div class="paginator" *ngIf="totalPages > 1">
+            <!-- First -->
+            <button class="btn-page btn-page-edge" [disabled]="filter.page === 0" (click)="goToFirst()" title="First page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            </button>
+            <!-- Prev -->
+            <button class="btn-page" [disabled]="filter.page === 0" (click)="changePage(filter.page! - 1)" title="Previous page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              <span>Prev</span>
+            </button>
+
+            <!-- Smart page windows -->
+            <div class="page-numbers">
+              <ng-container *ngFor="let p of getVisiblePages()">
+                <span *ngIf="p === '...'" class="page-ellipsis">…</span>
+                <button *ngIf="p !== '...'"
+                        class="btn-page-num"
+                        [class.active]="filter.page === p"
+                        (click)="changePage(+p)">
+                  {{ +p + 1 }}
+                </button>
+              </ng-container>
+            </div>
+
+            <!-- Next -->
+            <button class="btn-page" [disabled]="filter.page === totalPages - 1" (click)="changePage(filter.page! + 1)" title="Next page">
+              <span>Next</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <!-- Last -->
+            <button class="btn-page btn-page-edge" [disabled]="filter.page === totalPages - 1" (click)="goToLast()" title="Last page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
             </button>
           </div>
-          <button class="btn-page" [disabled]="filter.page === totalPages - 1" (click)="changePage(filter.page + 1)">
-            <span>Next</span>
-          </button>
         </div>
       </div>
     </main>
@@ -255,8 +301,8 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Fees Count (Amount in ₹) *</label>
-          <input type="number" class="form-input" [(ngModel)]="formModel.feesCount" min="0" step="0.01" required />
+          <label class="form-label">Confirmed Admissions (Count) *</label>
+          <input type="number" class="form-input" [(ngModel)]="formModel.feesCount" min="0" step="1" required />
         </div>
 
         <div class="form-group full-width">
@@ -292,7 +338,7 @@
           <label class="form-label">Default Column Metric Type</label>
           <select class="form-input" [(ngModel)]="uploadDataType">
             <option value="FORMS">Forms Count</option>
-            <option value="FEES">Fees Count / Amount</option>
+            <option value="FEES">Confirmed Admissions Count</option>
           </select>
         </div>
       </div>
