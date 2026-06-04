@@ -37,6 +37,10 @@ export interface DashboardStats {
   consultanciesWithoutCourses: number;
   coursesWithoutConsultancy: number;
   totalUnmappedRecords: number;
+
+  actualAdmissions: number;
+  focStudentsCount: number;
+  sbsStudentsCount: number;
 }
 
 export interface ConsultancyItem {

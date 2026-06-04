@@ -153,9 +153,17 @@ export interface StudentFee {
   remarks?: string;
 }
 
+export interface LeadSourceStat {
+  id: string | null;
+  name: string;
+  count: number;
+  color?: string;
+}
+
 export interface AdmissionPageData {
   stats: AdmissionStats;
   admissions: AdmissionItem[];
+  leadSourceStats?: LeadSourceStat[];
   totalCount: number;
 }
 

@@ -36,14 +36,19 @@ export class HistoricalAnalyticsService {
     return this.http.get(`${this.apiUrl}/template`, { responseType: 'blob' });
   }
 
-  uploadExcel(file: File, session: string, dataType: string, remarks: string): Observable<any> {
+  uploadExcel(file: File, session: string, dataType: string, remarks: string, uploadMode: string = 'UPSERT'): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('session', session);
     formData.append('dataType', dataType);
+    formData.append('uploadMode', uploadMode);
     if (remarks) {
       formData.append('remarks', remarks);
     }
     return this.http.post(`${this.apiUrl}/upload`, formData);
+  }
+
+  getUploadJobStatus(jobId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/upload/status/${jobId}`);
   }
 }

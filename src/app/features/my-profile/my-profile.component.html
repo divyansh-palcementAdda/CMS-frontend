@@ -528,7 +528,7 @@
                           {{ device.browser }} on {{ device.os }} &bull; IP: <code>{{ device.ipAddress }}</code>
                         </div>
                         <div class="device-activity">
-                          Last activity: {{ formatDate(device.lastActivityAt, 'Just now') }}
+                          Login time: {{ formatDate(device.createdAt, 'N/A') }} &bull; Last activity: {{ formatDate(device.lastActivityAt, 'Just now') }}
                         </div>
                       </div>
                     </div>

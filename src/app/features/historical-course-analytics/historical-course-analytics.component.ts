@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -15,7 +15,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './historical-course-analytics.component.html',
   styleUrls: ['./historical-course-analytics.component.scss']
 })
-export class HistoricalCourseAnalyticsComponent implements OnInit {
+export class HistoricalCourseAnalyticsComponent implements OnInit, OnDestroy {
   private analyticsService = inject(HistoricalAnalyticsService);
   private courseService = inject(CourseService);
 
@@ -65,11 +65,13 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
   uploadFile: File | null = null;
   uploadSession = '';
   uploadDataType = 'FORMS';
+  uploadMode = 'UPSERT';
   uploadRemarks = '';
   uploadResult: any = null;
   uploadError = '';
   uploading = false;
   dragOver = false;
+  pollingInterval: any = null;
 
   apiUrl = environment.apiUrl;
 
@@ -303,6 +305,7 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
     this.uploadResult = null;
     this.uploadSession = '';
     this.uploadDataType = 'FORMS';
+    this.uploadMode = 'UPSERT';
     this.uploadRemarks = '';
     this.uploadFile = null;
     this.showBulkUploadModal = true;
@@ -352,25 +355,64 @@ export class HistoricalCourseAnalyticsComponent implements OnInit {
       this.uploadFile,
       this.uploadSession,
       this.uploadDataType,
-      this.uploadRemarks
+      this.uploadRemarks,
+      this.uploadMode
     ).subscribe({
       next: (res: any) => {
-        this.uploading = false;
-        this.uploadResult = res.data;
-        if (this.uploadResult.failureCount === 0) {
-          this.showBulkUploadModal = false;
-          this.search();
-          this.loadUniqueSessions();
-        } else {
-          this.search(); // load success rows anyway
-          this.loadUniqueSessions();
-        }
+        const jobId = res.data.jobId;
+        this.pollUploadStatus(jobId);
       },
       error: (err) => {
         this.uploading = false;
         this.uploadError = err.error?.message || 'Excel upload failed. Please verify format.';
       }
     });
+  }
+
+  pollUploadStatus(jobId: string) {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+
+    this.pollingInterval = setInterval(() => {
+      this.analyticsService.getUploadJobStatus(jobId).subscribe({
+        next: (res: any) => {
+          const job = res.data;
+          if (job.status === 'COMPLETED') {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+            this.uploading = false;
+            this.uploadResult = job.result;
+
+            if (this.uploadResult.failureCount === 0) {
+              this.showBulkUploadModal = false;
+              this.search();
+              this.loadUniqueSessions();
+            } else {
+              this.search();
+              this.loadUniqueSessions();
+            }
+          } else if (job.status === 'FAILED') {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+            this.uploading = false;
+            this.uploadError = job.errorMessage || 'Upload failed due to processing error.';
+          }
+        },
+        error: (err) => {
+          clearInterval(this.pollingInterval);
+          this.pollingInterval = null;
+          this.uploading = false;
+          this.uploadError = err.error?.message || 'Failed to check job status.';
+        }
+      });
+    }, 1500);
+  }
+
+  ngOnDestroy() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
 
   downloadErrors(fileId: string) {

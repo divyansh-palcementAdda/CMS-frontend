@@ -49,7 +49,10 @@ export class AdmissionService {
     admEndDate?: string,
     isDiscounted?: boolean,
     consultancyId?: number,
-    userId?: number
+    userId?: number,
+    showOnlyPaid?: boolean,
+    showOnlyFoc?: boolean,
+    showOnlySbs?: boolean
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -83,6 +86,9 @@ export class AdmissionService {
     if (isDiscounted !== undefined && isDiscounted !== null) params = params.set('isDiscounted', isDiscounted.toString());
     if (consultancyId) params = params.set('consultancyId', consultancyId.toString());
     if (userId) params = params.set('userId', userId.toString());
+    if (showOnlyPaid !== undefined && showOnlyPaid !== null) params = params.set('showOnlyPaid', showOnlyPaid.toString());
+    if (showOnlyFoc !== undefined && showOnlyFoc !== null) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== undefined && showOnlySbs !== null) params = params.set('showOnlySbs', showOnlySbs.toString());
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -101,6 +107,7 @@ export class AdmissionService {
         return {
           stats,
           admissions,
+          leadSourceStats: payload.leadSourceStats,
           totalCount: payload.totalCount || admissions.length
         };
       })

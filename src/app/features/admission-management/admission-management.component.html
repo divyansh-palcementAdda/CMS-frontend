@@ -30,17 +30,18 @@
                             </div>
                             <div>
                                 <h2 class="page-title">Admission Management</h2>
-                                <!-- Tab Switcher -->
-                                <div class="tab-switcher">
+                                <!-- <div class="tab-switcher">
                                     <button class="tab-btn" [class.tab-active]="filters.tab === ''"
-                                        (click)="setTab('')">All Records</button>
+                                        (click)="setTab('')">All
+                                        Records</button>
                                     <button class="tab-btn" [class.tab-active]="filters.tab === 'Admission'"
                                         (click)="setTab('Admission')">Admissions</button>
                                     <button class="tab-btn" [class.tab-active]="filters.tab === 'applications'"
                                         (click)="setTab('applications')">Applications</button>
-                                </div>
+                                </div> -->
                             </div>
-                        </div><!-- /.title-container -->
+                        </div>
+                        <!-- /.title-container -->
 
                         <div class="header-actions" style="display: flex; gap: 12px; align-items: center;">
                             <!-- Active Status Badge -->
@@ -184,7 +185,10 @@
                                                 <span class="mini-val">{{ isApplicationTab ? pageData.stats.appDirect :
                                                     (filters.tab === 'Admission' ? pageData.stats.admDirect :
                                                     pageData.stats.directAdmission) }}</span>
-                                                <span class="mini-label">Direct</span>
+                                                <span *ngIf="!isApplicationTab " class="mini-label">Direct
+                                                    Admissions</span>
+                                                <span *ngIf="isApplicationTab " class="mini-label">Direct Remaning
+                                                    Applications</span>
                                             </div>
                                         </div>
 
@@ -206,7 +210,10 @@
                                                     pageData.stats.appConsultancy : (filters.tab === 'Admission' ?
                                                     pageData.stats.admConsultancy : pageData.stats.indirectAdmission)
                                                     }}</span>
-                                                <span class="mini-label">Consultancy</span>
+                                                <span *ngIf="!isApplicationTab " class="mini-label">Consultancy
+                                                    Admissions</span>
+                                                <span *ngIf="isApplicationTab " class="mini-label">Consultancy Remaning
+                                                    Applications</span>
                                             </div>
                                         </div>
 
@@ -225,7 +232,10 @@
                                                 <span class="mini-val">{{ isApplicationTab ? pageData.stats.appScholar :
                                                     (filters.tab === 'Admission' ? pageData.stats.admScholar :
                                                     pageData.stats.scholarAdmission) }}</span>
-                                                <span class="mini-label">Scholar</span>
+                                                <span *ngIf="!isApplicationTab " class="mini-label">Scholar
+                                                    Admissions</span>
+                                                <span *ngIf="isApplicationTab " class="mini-label">Scholar Remaning
+                                                    Applications</span>
                                             </div>
                                         </div>
 
@@ -244,7 +254,10 @@
                                                 <span class="mini-val">{{ isApplicationTab ? pageData.stats.appUnmapped
                                                     : (filters.tab === 'Admission' ? pageData.stats.admUnmapped :
                                                     pageData.stats.appUnmapped) }}</span>
-                                                <span class="mini-label">Unmapped</span>
+                                                <span *ngIf="!isApplicationTab " class="mini-label">Unmapped
+                                                    Admissions</span>
+                                                <span *ngIf="isApplicationTab " class="mini-label">Unmapped Remaning
+                                                    Applications</span>
                                             </div>
                                         </div>
                                     </div>
@@ -305,7 +318,7 @@
                                                 <span class="mini-label">Canceled Admissions</span>
                                             </div>
                                         </div>
-                                        <div class="stat-mini-card status-remaining"
+                                        <div *ngIf="isApplicationTab" class="stat-mini-card status-remaining"
                                             [class.active]="filters.statFilter === 'REMAINING_APP'"
                                             (click)="onStatFilter('REMAINING_APP')">
                                             <div class="mini-icon">
@@ -374,11 +387,40 @@
 
                                 </div>
 
+                                <div class="breakdown-row"
+                                    *ngIf="pageData.leadSourceStats && pageData.leadSourceStats.length > 0">
+                                    <div class="breakdown-title">
+                                        <span class="pulse-indicator"></span>
+                                        <h4>3rd Breakdown (Lead Source Wise)</h4>
+                                    </div>
+                                    <div class="lead-source-grid">
+                                        <div *ngFor="let source of pageData.leadSourceStats"
+                                            class="stat-mini-card dynamic-source-card"
+                                            [class.active]="filters.leadSourceId === (source.id || '00000000-0000-0000-0000-000000000000')"
+                                            (click)="toggleLeadSourceFilter(source.id)"
+                                            [ngStyle]="getSourceStyle(source.name)">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="9" cy="7" r="4"></circle>
+                                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ source.count }}</span>
+                                                <span class="mini-label">{{ source.name }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- 3rd Breakdown (FOC / SBS Wise) — Admission tab or All tab -->
                                 <div class="breakdown-row" *ngIf="filters.tab !== 'applications'">
                                     <div class="breakdown-title">
                                         <span class="pulse-indicator foc-pulse"></span>
-                                        <h4>3rd Breakdown (FOC / SBS Wise)</h4>
+                                        <h4>4th Breakdown (FOC / SBS Wise)</h4>
                                     </div>
                                     <div class="breakdown-grid source-grid">
                                         <!-- SBS -->
@@ -419,6 +461,9 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- 4th Breakdown (Lead Source Wise) -->
+
 
                             </div>
 
@@ -571,12 +616,15 @@
                         <div class="filter-chips-section" *ngIf="activeFilterCount > 0">
                             <div class="chips-container">
                                 <div class="filter-chip"
-                                    *ngFor="let key of ['session', 'commissionStatus', 'state', 'city', 'leadSourceId', 'statusFilter', 'source']">
+                                    *ngFor="let key of ['session', 'commissionStatus', 'state', 'city', 'statusFilter', 'source']">
                                     <ng-container *ngIf="filters[key]">
-                                        <span class="chip-text">{{ key === 'leadSourceId' ? 'Source' : key }}: {{
-                                            filters[key] }}</span>
+                                        <span class="chip-text">{{ key }}: {{ filters[key] }}</span>
                                         <button class="chip-close" (click)="clearFilter(key)">&times;</button>
                                     </ng-container>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.leadSourceId">
+                                    <span class="chip-text">Source: {{ getSelectedLeadSourceName() }}</span>
+                                    <button class="chip-close" (click)="clearFilter('leadSourceId')">&times;</button>
                                 </div>
                                 <div class="filter-chip" *ngIf="filters.userId">
                                     <span class="chip-text">Counselor: {{ getSelectedUserName() }}</span>
@@ -701,8 +749,10 @@
                                                 <span class="student-name">{{ item.fullName }}</span>
                                                 <span class="enrollment-id">{{ item.enrollmentId }}</span>
                                                 <!-- FOC / SBS Badge -->
-                                                <span *ngIf="item.focType === 'SBS'" class="foc-badge sbs-badge" title="{{ item.focRemarks || 'Sarva Brahmin Samaj sponsored' }}">SBS</span>
-                                                <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge" title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
+                                                <span *ngIf="item.focType === 'SBS'" class="foc-badge sbs-badge"
+                                                    title="{{ item.focRemarks || 'Sarva Brahmin Samaj sponsored' }}">SBS</span>
+                                                <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge"
+                                                    title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
                                             </div>
                                         </td>
 

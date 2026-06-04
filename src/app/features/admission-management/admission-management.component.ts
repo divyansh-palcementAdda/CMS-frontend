@@ -49,6 +49,9 @@ export interface ActiveFilters {
   isDiscounted: boolean | null;
   consultancyId: number | null;  // Filter by consultancy
   userId: number | null;          // Filter by counselor (admitted-by user)
+  showOnlyPaid: boolean | null;
+  showOnlyFoc: boolean | null;
+  showOnlySbs: boolean | null;
 
   // Dedicated Date Filters
   appDateRangeType: string; // 'today' | 'week' | 'month' | 'custom' | ''
@@ -109,6 +112,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     isDiscounted: null,
     consultancyId: null,
     userId: null,
+    showOnlyPaid: null,
+    showOnlyFoc: null,
+    showOnlySbs: null,
     appDateRangeType: '',
     admDateRangeType: '',
     appStartDate: '',
@@ -229,12 +235,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Subscribe to queryParams — whenever the URL changes, re-read filters and fetch
     this.routeSub = this.route.queryParams.subscribe(params => {
+      const isFocOrSbs = params['status'] === 'FOC' || params['status'] === 'SBS';
       this.filters = {
         tab: params['tab'] || '',
-        statusFilter: params['status'] || '',
+        statusFilter: isFocOrSbs ? '' : (params['status'] || ''),
         source: params['source'] || '',
         isScholar: params['isScholar'] || '',
-        statFilter: params['statFilter'] || '',
+        statFilter: isFocOrSbs ? params['status'] : (params['statFilter'] || ''),
         state: params['state'] || '',
         city: params['city'] || '',
         courseId: params['courseId'] ? +params['courseId'] : null,
@@ -247,6 +254,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         isDiscounted: params['isDiscounted'] === 'true' ? true : (params['isDiscounted'] === 'false' ? false : null),
         consultancyId: params['consultancyId'] ? +params['consultancyId'] : null,
         userId: params['userId'] ? +params['userId'] : null,
+        showOnlyPaid: params['showOnlyPaid'] === 'true' ? true : (params['showOnlyPaid'] === 'false' ? false : null),
+        showOnlyFoc: params['showOnlyFoc'] === 'true' ? true : (params['showOnlyFoc'] === 'false' ? false : null),
+        showOnlySbs: params['showOnlySbs'] === 'true' ? true : (params['showOnlySbs'] === 'false' ? false : null),
         appDateRangeType: params['appDateRangeType'] || '',
         admDateRangeType: params['admDateRangeType'] || '',
         appStartDate: params['appStartDate'] || '',
@@ -340,6 +350,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.isDiscounted !== null) count++;
     if (this.filters.consultancyId) count++;
     if (this.filters.userId) count++;
+    if (this.filters.showOnlyPaid !== null) count++;
+    if (this.filters.showOnlyFoc !== null) count++;
+    if (this.filters.showOnlySbs !== null) count++;
 
     // New Date filters count
     if (this.filters.appStartDate) count++;
@@ -394,7 +407,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.admEndDate,
       this.filters.isDiscounted ?? undefined,
       this.filters.consultancyId ?? undefined,
-      this.filters.userId ?? undefined
+      this.filters.userId ?? undefined,
+      this.filters.showOnlyPaid ?? undefined,
+      this.filters.showOnlyFoc ?? undefined,
+      this.filters.showOnlySbs ?? undefined
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -510,6 +526,17 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
   }
 
+  toggleLeadSourceFilter(sourceId: string | null): void {
+    const targetId = sourceId || '00000000-0000-0000-0000-000000000000';
+    const currentId = this.filters.leadSourceId || '';
+    const newId = currentId === targetId ? '' : targetId;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { leadSourceId: newId || null, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
   applyFilters(): void {
     this.showFilterDrawer = false;
     const queryParams: any = {
@@ -527,6 +554,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       isDiscounted: this.filters.isDiscounted !== null ? this.filters.isDiscounted.toString() : null,
       consultancyId: this.filters.consultancyId || null,
       userId: this.filters.userId || null,
+      showOnlyPaid: this.filters.showOnlyPaid !== null ? this.filters.showOnlyPaid.toString() : null,
+      showOnlyFoc: this.filters.showOnlyFoc !== null ? this.filters.showOnlyFoc.toString() : null,
+      showOnlySbs: this.filters.showOnlySbs !== null ? this.filters.showOnlySbs.toString() : null,
       appDateRangeType: this.filters.appDateRangeType || null,
       admDateRangeType: this.filters.admDateRangeType || null,
       appStartDate: this.filters.appStartDate || null,
@@ -560,6 +590,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       isDiscounted: null,
       consultancyId: null,
       userId: null,
+      showOnlyPaid: null,
+      showOnlyFoc: null,
+      showOnlySbs: null,
       appDateRangeType: '',
       admDateRangeType: '',
       appStartDate: '',
@@ -1228,5 +1261,12 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (!this.filters.courseId) return '';
     const c = this.courses.find(x => x.id === this.filters.courseId);
     return c ? c.name : `Course ID: ${this.filters.courseId}`;
+  }
+
+  getSelectedLeadSourceName(): string {
+    if (!this.filters.leadSourceId) return '';
+    if (this.filters.leadSourceId === '00000000-0000-0000-0000-000000000000') return 'Unmapped';
+    const ls = this.activeLeadSources.find(x => x.id === this.filters.leadSourceId);
+    return ls ? ls.name : `Source ID: ${this.filters.leadSourceId}`;
   }
 }

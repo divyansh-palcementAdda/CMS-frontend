@@ -150,7 +150,35 @@ export class StatsCardsComponent {
         icon: this.svg(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M15.775 18.525Q16 18.3 16 18t-.225-.525t-.525-.225t-.525.225T14.5 18t.225.525t.525.225t.525-.225m2.75 0q.225-.225.225-.525t-.225-.525T18 17.25t-.525.225t-.225.525t.225.525t.525.225t.525-.225m2.75 0Q21.5 18.3 21.5 18t-.225-.525t-.525-.225t-.525.225T20 18t.225.525t.525.225t.525-.225M18 23q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23M7 9h10V7H7zm4.675 12H5q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v6.7q-.725-.35-1.463-.525T18 11q-.275 0-.513.012t-.487.063V11H7v2h6.125q-.45.425-.812.925T11.675 15H7v2h4.075q-.05.25-.062.488T11 18q0 .825.15 1.538T11.675 21"/></svg>`)
       },
       {
-        label: 'Total Applications',
+        label: 'Actual Admissions',
+        value: s.actualAdmissions,
+        gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        route: '/admin/admission-management', queryParams: { tab: 'Admission', isScholar: 'false', showOnlyPaid: 'true' }, trend: '1%', trendUp: true,
+        icon: this.svg(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg>`)
+      },
+      {
+        label: 'Scholar Admissions',
+        value: s.scholarStudents,
+        gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+        route: '/admin/admission-management', queryParams: { tab: 'Admission', isScholar: 'true' }, trend: '1%', trendUp: true,
+        icon: this.svg(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M12 3L1 9l11 6l9-4.91V17h2V9zM5 13.18v4L12 21l7-3.82v-4L12 17z"/></svg>`)
+      },
+      {
+        label: 'FOC Students',
+        value: s.focStudentsCount,
+        gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+        route: '/admin/admission-management', queryParams: { tab: 'Admission', status: 'FOC' }, trend: '1%', trendUp: true,
+        icon: this.svg(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M17.026 22.957c-.43.43-1.02.59-1.57.43l-4.48-1.3c-.3-.09-.62-.09-.92 0l-4.48 1.3c-.55.16-1.14 0-1.57-.43c-.43-.43-.59-1.02-.43-1.57l1.3-4.48c.09-.3.09-.62 0-.92l-1.3-4.48c-.16-.55 0-1.14.43-1.57c.43-.43 1.02-.59 1.57-.43l4.48 1.3c.3.09.62.09.92 0l4.48-1.3c.55-.16 1.14 0 1.57.43c.43.43.59 1.02.43 1.57l-1.3 4.48c-.09.3-.09.62 0 .92l1.3 4.48c.16.55 0 1.14-.43 1.57M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5s5-2.24 5-5s-2.24-5-5-5"/></svg>`)
+      },
+      {
+        label: 'SBS Students',
+        value: s.sbsStudentsCount,
+        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+        route: '/admin/admission-management', queryParams: { tab: 'Admission', status: 'SBS' }, trend: '1%', trendUp: true,
+        icon: this.svg(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M12 2L1 7v2h22V7zm1 19v-9h4v9zm-6 0v-9h4v9zm11 0v-9h4v9zM2 22h20v-1H2z"/></svg>`)
+      },
+      {
+        label: 'Remaining Applications',
         value: s.totalEnrolments,
         gradient: 'linear-gradient(135deg, #2dd4bf 0%, #0f766e 100%)',
         route: '/admin/admission-management', queryParams: { tab: 'applications' }, trend: '1%', trendUp: false,

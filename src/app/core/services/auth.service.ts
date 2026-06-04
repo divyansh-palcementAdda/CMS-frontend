@@ -43,21 +43,29 @@ export class AuthService {
   private restoreSession(): void {
     try {
       const token = localStorage.getItem(this.TOKEN_KEY);
+      const refreshToken = localStorage.getItem(this.REFRESH_KEY);
       const userStr = localStorage.getItem(this.USER_KEY);
-      if (token && userStr) {
-        const payload = this.decodeToken(token);
-        if (payload && payload.exp * 1000 > Date.now()) {
-          this._user.set({ ...JSON.parse(userStr), token });
-        } else {
-          this.clearStorage();
-        }
+      if (token && refreshToken && userStr) {
+        console.log('[AuthService] Restoring session. Token present. Expired status:', this.isTokenExpired(token));
+        this._user.set({ ...JSON.parse(userStr), token });
+      } else {
+        console.log('[AuthService] Cannot restore session: missing tokens or user profile from localStorage.');
+        this.clearStorage();
       }
-    } catch {
+    } catch (e) {
+      console.error('[AuthService] Error restoring session:', e);
       this.clearStorage();
     }
   }
 
+  private isTokenExpired(token: string): boolean {
+    const payload = this.decodeToken(token);
+    if (!payload || !payload.exp) return true;
+    return payload.exp * 1000 <= Date.now();
+  }
+
   login(request: LoginRequest): Observable<LoginResponse> {
+    console.log('[AuthService] login called for identifier:', request.emailOrUsername);
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, request).pipe(
       tap((res) => {
         if (res.success && res.data) {
@@ -67,18 +75,23 @@ export class AuthService {
           localStorage.setItem(this.REFRESH_KEY, refreshToken);
           localStorage.setItem(this.USER_KEY, JSON.stringify(user));
           this._user.set(user);
+          console.log('[AuthService] login success. Stored tokens and user profile.');
         }
       }),
-      catchError((err) => throwError(() => new Error(err.error?.message || 'Login failed')))
+      catchError((err) => {
+        console.error('[AuthService] login error:', err);
+        return throwError(() => new Error(err.error?.message || 'Login failed'));
+      })
     );
   }
 
   logout(): void {
+    console.log('[AuthService] logout triggered. Revoking current refresh token.');
     const refreshToken = this.getRefreshToken();
     if (refreshToken) {
       this.http.post(`${environment.apiUrl}/auth/logout`, { refreshToken }).subscribe({
-        next: () => {},
-        error: (err) => console.error('Logout error', err)
+        next: () => console.log('[AuthService] Backend logout successful'),
+        error: (err) => console.error('[AuthService] Backend logout error', err)
       });
     }
     this.clearStorage();
@@ -87,11 +100,12 @@ export class AuthService {
   }
 
   logoutAllDevices(): void {
+    console.log('[AuthService] logoutAllDevices triggered. Revoking all active sessions globally.');
     const refreshToken = this.getRefreshToken();
     if (refreshToken) {
       this.http.post(`${environment.apiUrl}/auth/logout-all`, { refreshToken }).subscribe({
-        next: () => {},
-        error: (err) => console.error('Global logout error', err)
+        next: () => console.log('[AuthService] Backend global logout successful'),
+        error: (err) => console.error('[AuthService] Backend global logout error', err)
       });
     }
     this.clearStorage();
@@ -100,6 +114,7 @@ export class AuthService {
   }
 
   logoutWithExpiredMessage(): void {
+    console.warn('[AuthService] Session expired or invalid. Logging out and redirecting to Login page.');
     this.clearStorage();
     this._user.set(null);
     this.router.navigate(['/login'], { queryParams: { expired: 'true' } });
@@ -114,14 +129,20 @@ export class AuthService {
   }
 
   refreshToken(): Observable<any> {
+    console.log('[AuthService] refresh called.');
     const refreshToken = this.getRefreshToken();
     return this.http.post<any>(`${environment.apiUrl}/auth/refresh`, { refreshToken }).pipe(
       tap((res) => {
         if (res.data?.accessToken) {
+          console.log('[AuthService] refresh success. Access token updated.');
           localStorage.setItem(this.TOKEN_KEY, res.data.accessToken);
           const current = this._user();
           if (current) this._user.set({ ...current, token: res.data.accessToken });
         }
+      }),
+      catchError((err) => {
+        console.error('[AuthService] refresh API error:', err);
+        return throwError(() => err);
       })
     );
   }

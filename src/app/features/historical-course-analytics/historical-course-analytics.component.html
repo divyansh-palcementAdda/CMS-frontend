@@ -344,6 +344,15 @@
       </div>
 
       <div class="form-group">
+        <label class="form-label">Duplicate Protection Mode</label>
+        <select class="form-input" [(ngModel)]="uploadMode">
+          <option value="UPSERT">UPSERT (Update existing or insert new)</option>
+          <option value="INSERT_ONLY">INSERT ONLY (Fail on duplicate database records)</option>
+          <option value="UPDATE_EXISTING">UPDATE EXISTING (Only update existing database records)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label class="form-label">Remarks</label>
         <input type="text" class="form-input" placeholder="e.g. Excel upload for 2024 session" [(ngModel)]="uploadRemarks" />
       </div>
