@@ -31,6 +31,7 @@ export interface DashboardStats {
   cancelledAdmissions: number;
   cancelledEnrolments: number;
   totalEnrolments: number;
+  totalApplications: number;
 
   usersWithoutConsultancy: number;
   consultanciesWithoutUsers: number;
