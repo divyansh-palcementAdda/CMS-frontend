@@ -94,7 +94,8 @@ export class AuthService {
         error: (err) => console.error('[AuthService] Backend logout error', err)
       });
     }
-    this.clearStorage();
+    localStorage.clear();
+    sessionStorage.clear();
     this._user.set(null);
     this.router.navigate(['/login']);
   }
@@ -108,14 +109,16 @@ export class AuthService {
         error: (err) => console.error('[AuthService] Backend global logout error', err)
       });
     }
-    this.clearStorage();
+    localStorage.clear();
+    sessionStorage.clear();
     this._user.set(null);
     this.router.navigate(['/login']);
   }
 
   logoutWithExpiredMessage(): void {
     console.warn('[AuthService] Session expired or invalid. Logging out and redirecting to Login page.');
-    this.clearStorage();
+    localStorage.clear();
+    sessionStorage.clear();
     this._user.set(null);
     this.router.navigate(['/login'], { queryParams: { expired: 'true' } });
   }

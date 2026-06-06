@@ -1,0 +1,1631 @@
+<div class="dashboard-layout">
+    <!-- White Sidebar -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Right body: topbar + content -->
+    <div class="dashboard-body">
+        <!-- Top navbar with role chips + avatar -->
+        <app-topbar></app-topbar>
+
+        <main class="main-content" style="padding: 0; background: transparent;">
+            <div class="admission-page-wrapper">
+                <!-- Loader -->
+                <div *ngIf="loading && !pageData" class="flex justify-center items-center h-full min-h-[400px]">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <ng-container *ngIf="pageData">
+                    <div class="header-section">
+                        <div class="title-container">
+                            <div class="back-btn" (click)="goBack()">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="12" fill="#6366F1" />
+                                    <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="page-title">Admission Management</h2>
+                                <!-- <div class="tab-switcher">
+                                    <button class="tab-btn" [class.tab-active]="filters.tab === ''"
+                                        (click)="setTab('')">All
+                                        Records</button>
+                                    <button class="tab-btn" [class.tab-active]="filters.tab === 'Admission'"
+                                        (click)="setTab('Admission')">Admissions</button>
+                                    <button class="tab-btn" [class.tab-active]="filters.tab === 'applications'"
+                                        (click)="setTab('applications')">Applications</button>
+                                </div> -->
+                            </div>
+                        </div>
+                        <!-- /.title-container -->
+
+                        <div class="header-actions" style="display: flex; gap: 12px; align-items: center;">
+                            <!-- Active Status Badge -->
+                            <div *ngIf="hasActiveFilters" class="active-filter-badge">
+                                <span>{{ activeFilterSummary }}</span>
+                                <button class="clear-filter-btn" (click)="setTab(filters.tab)"
+                                    title="Clear all sub-filters">&times;</button>
+                            </div>
+
+
+                            <button class="btn-secondary" (click)="showBulkUploadModal = true"
+                                style="display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1.5px solid #E2E8F0; background: white; color: #475569; cursor: pointer; transition: all 0.2s;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Bulk Import</span>
+                            </button>
+
+                            <!-- Download Excel Button -->
+                            <button class="btn-excel" (click)="openDownloadModal()" [disabled]="downloadingExcel"
+                                title="Download filtered data as Excel">
+                                <svg *ngIf="!downloadingExcel" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <svg *ngIf="downloadingExcel" class="spin-anim" width="18" height="18"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                                </svg>
+                                <span>{{ downloadingExcel ? 'Exporting...' : 'Download Excel' }}</span>
+                            </button>
+
+                            <button class="btn-primary" (click)="openAddAdmission()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" />
+                                    <path d="M12 8V16M8 12H16" stroke="white" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                                <span>Add New Application</span>
+                            </button>
+                        </div><!-- /.header-actions -->
+                    </div><!-- /.header-section -->
+
+                    <!-- Redesigned Stats for Applications Tab -->
+                    <ng-container *ngIf="pageData && isApplicationTab">
+                        <!-- Top Summary Cards (KPI Cards) -->
+                        <div class="kpi-cards-grid">
+                            <!-- Card 1: Total Applications -->
+                            <div class="kpi-card total-applications-card" [class.active]="filters.statFilter === ''"
+                                (click)="onStatFilter('')">
+                                <div class="kpi-card-header">
+                                    <div class="kpi-icon-circle bg-light-indigo color-indigo">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M23 6l-9.5 9.5-5-5L1 18" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M17 6h6v6" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <span class="kpi-card-tag">GLOBAL PERFORMANCE</span>
+                                </div>
+                                <div class="kpi-card-body">
+                                    <div class="kpi-card-title-group">
+                                        <h3 class="kpi-card-title">Total<br>Applications</h3>
+                                        <p class="kpi-card-desc">Real-time tracking of all incoming applications across
+                                            all admission channels and platforms.</p>
+                                    </div>
+                                    <div class="kpi-card-metric-row">
+                                        <div class="kpi-card-metric-col">
+                                            <span class="kpi-card-number">{{ pageData.stats.totalApplication | number
+                                                }}</span>
+                                            <span class="kpi-card-growth growth-up">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="3">
+                                                    <path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                                12.5% from last month
+                                            </span>
+                                        </div>
+                                        <!-- Mini Bar Chart Graphic -->
+                                        <div class="mini-bar-chart">
+                                            <div class="bar bar-1"></div>
+                                            <div class="bar bar-2"></div>
+                                            <div class="bar bar-3"></div>
+                                            <div class="bar bar-4"></div>
+                                            <div class="bar bar-5"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Card 3: Received Today -->
+                            <div class="kpi-card received-today-card">
+                                <div class="kpi-card-center-content">
+                                    <div class="kpi-icon-circle bg-light-indigo color-indigo calendar-icon-circle">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <span class="kpi-card-number centered-metric">{{ pageData.stats.todayApplications ||
+                                        0 }}</span>
+                                    <span class="kpi-card-tag centered-tag">FORMS RECEIVED TODAY</span>
+                                    <!-- <span class="kpi-card-growth growth-up centered-growth">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        +2 from yesterday
+                                    </span> -->
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Efficiency Score -->
+                            <div class="kpi-card efficiency-score-card">
+                                <!-- Faint star/diamond background overlay elements -->
+                                <div class="star-overlay star-1">✦</div>
+                                <div class="star-overlay star-2">✦</div>
+                                <div class="star-overlay star-3">✦</div>
+                                <div class="kpi-card-header">
+                                    <span class="kpi-card-tag text-white-opacity">Efficiency Score</span>
+                                </div>
+                                <div class="kpi-card-body flex-column-between">
+                                    <p class="kpi-card-desc text-white-opacity-7">Your application processing speed is
+                                        15% faster than last cycle.</p>
+                                    <div class="efficiency-bottom">
+                                        <div class="efficiency-target-row">
+                                            <span class="efficiency-target">Target: 10,000</span>
+                                            <span class="efficiency-percent">{{ (pageData.stats.totalApplication / 100)
+                                                | number:'1.0-0' }}%</span>
+                                        </div>
+                                        <div class="efficiency-progress-track">
+                                            <div class="efficiency-progress-bar"
+                                                [style.width.%]="(pageData.stats.totalApplication / 100) > 100 ? 100 : (pageData.stats.totalApplication / 100)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Application Status -->
+                        <div class="redesign-section">
+                            <span class="redesign-section-title">Status Wise Overview Of Total Applications</span>
+                            <!-- <div class="section-header-row">
+                                <h3 class="redesign-section-title">Application Status</h3>
+                                <div class="status-range-switcher">
+                                    <button class="switcher-btn"
+                                        [class.active]="selectedRange === 'LAST_30_DAYS'"
+                                        (click)="changeRange('LAST_30_DAYS')">
+                                        Last 30 Days
+                                    </button>
+                                    <button class="switcher-btn"
+                                        [class.active]="selectedRange === 'ALL_TIME'"
+                                        (click)="changeRange('ALL_TIME')">
+                                        All Time
+                                    </button>
+                                </div>
+                            </div> -->
+                            <div class="status-cards-grid">
+                                <!-- Confirmed -->
+                                <div class="status-accent-card border-green"
+                                    [class.active]="filters.statFilter === 'CONFIRMED'"
+                                    (click)="onStatFilter('CONFIRMED')">
+                                    <span class="status-card-label">CONFIRMED</span>
+                                    <span class="status-card-number">{{ displayStats.appConfirmed }}</span>
+                                    <div class="status-progress-track bg-light-green">
+                                        <div class="status-progress-bar bg-green"
+                                            [style.width.%]="(displayStats.appConfirmed / (totalRangeApplications || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cancelled App -->
+                                <div class="status-accent-card border-orange"
+                                    [class.active]="filters.statFilter === 'CANCELLED_APP'"
+                                    (click)="onStatFilter('CANCELLED_APP')">
+                                    <span class="status-card-label">CANCELLED APP</span>
+                                    <span class="status-card-number">{{ displayStats.appCancelled }}</span>
+                                    <div class="status-progress-track bg-light-orange">
+                                        <div class="status-progress-bar bg-orange"
+                                            [style.width.%]="(displayStats.appCancelled / (totalRangeApplications || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cancelled Adm -->
+                                <div class="status-accent-card border-red"
+                                    [class.active]="filters.statFilter === 'CANCELLED_ADM'"
+                                    (click)="onStatFilter('CANCELLED_ADM')">
+                                    <span class="status-card-label">CANCELLED ADM</span>
+                                    <span class="status-card-number">{{ displayStats.appCancelledAdmissions }}</span>
+                                    <div class="status-progress-track bg-light-red">
+                                        <div class="status-progress-bar bg-red"
+                                            [style.width.%]="(displayStats.appCancelledAdmissions / (totalRangeApplications || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Remaining -->
+                                <div class="status-accent-card border-indigo"
+                                    [class.active]="filters.statFilter === 'REMAINING_APP'"
+                                    (click)="onStatFilter('REMAINING_APP')">
+                                    <span class="status-card-label">REMAINING</span>
+                                    <span class="status-card-number">{{ displayStats.appRemaining }}</span>
+                                    <div class="status-progress-track bg-light-indigo">
+                                        <div class="status-progress-bar bg-indigo"
+                                            [style.width.%]="(displayStats.appRemaining / (totalRangeApplications || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Source Wise Overview -->
+                        <div class="redesign-section">
+                            <!-- <div class="section-header-row">
+                                <h3 class="redesign-section-title">Source Wise Overview</h3>
+                                <a class="redesign-section-link">View Detailed Report <span
+                                        class="arrow-icon">→</span></a>
+                            </div> -->
+                            <span class="redesign-section-title">Source Wise Overview Of Remaining Applications</span>
+
+                            <div class="source-wise-grid">
+                                <!-- Direct -->
+                                <div class="source-wise-card" [class.active]="filters.statFilter === 'DIRECT'"
+                                    (click)="onStatFilter('DIRECT')">
+                                    <div class="source-card-top">
+                                        <div class="source-icon-container bg-pastel-indigo color-indigo-dark">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                                <polyline points="9 11 11 13 15 9" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="source-info-stacked">
+                                            <span class="source-card-label">DIRECT</span>
+                                            <span class="source-card-value">{{ isApplicationTab ?
+                                                pageData.stats.appDirect : pageData.stats.directAdmission }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="source-card-bottom">
+                                        <span class="source-percentage">{{ ((isApplicationTab ? pageData.stats.appDirect
+                                            : pageData.stats.directAdmission) / (pageData.stats.totalApplication || 1) *
+                                            100) | number:'1.0-0' }}% of total</span>
+                                        <span class="source-growth growth-up">+5.2%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Consultancy -->
+                                <div class="source-wise-card" [class.active]="filters.statFilter === 'INDIRECT'"
+                                    (click)="onStatFilter('INDIRECT')">
+                                    <div class="source-card-top">
+                                        <div class="source-icon-container bg-pastel-purple color-purple-dark">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                                <circle cx="9" cy="7" r="4" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="source-info-stacked">
+                                            <span class="source-card-label">CONSULTANCY</span>
+                                            <span class="source-card-value">{{ isApplicationTab ?
+                                                pageData.stats.appConsultancy : pageData.stats.indirectAdmission
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="source-card-bottom">
+                                        <span class="source-percentage">{{ ((isApplicationTab ?
+                                            pageData.stats.appConsultancy : pageData.stats.indirectAdmission) /
+                                            (pageData.stats.totalApplication || 1) * 100) | number:'1.0-0' }}% of
+                                            total</span>
+                                        <span class="source-growth growth-down">-1.4%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Scholar -->
+                                <div class="source-wise-card" [class.active]="filters.statFilter === 'SCHOLAR'"
+                                    (click)="onStatFilter('SCHOLAR')">
+                                    <div class="source-card-top">
+                                        <div class="source-icon-container bg-pastel-orange color-orange-dark">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <path d="M6 12v5c3 3 9 3 12 0v-5" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="source-info-stacked">
+                                            <span class="source-card-label">SCHOLAR</span>
+                                            <span class="source-card-value">{{ isApplicationTab ?
+                                                pageData.stats.appScholar : pageData.stats.scholarAdmission }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="source-card-bottom">
+                                        <span class="source-percentage">{{ ((isApplicationTab ?
+                                            pageData.stats.appScholar : pageData.stats.scholarAdmission) /
+                                            (pageData.stats.totalApplication || 1) * 100) | number:'1.0-0' }}% of
+                                            total</span>
+                                        <span class="source-growth growth-up">+8.1%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Unmapped -->
+                                <div class="source-wise-card" [class.active]="filters.statFilter === 'UNMAPPED'"
+                                    (click)="onStatFilter('UNMAPPED')">
+                                    <div class="source-card-top">
+                                        <div class="source-icon-container bg-pastel-cyan color-cyan-dark">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="source-info-stacked">
+                                            <span class="source-card-label">UNMAPPED</span>
+                                            <span class="source-card-value">{{ pageData.stats.appUnmapped }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="source-card-bottom">
+                                        <span class="source-percentage">{{ (pageData.stats.appUnmapped /
+                                            (pageData.stats.totalApplication || 1) * 100) | number:'1.0-0' }}% of
+                                            total</span>
+                                        <span class="source-growth growth-stable">Stable</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Detailed Lead Sources -->
+                        <div class="redesign-section"
+                            *ngIf="pageData.leadSourceStats && pageData.leadSourceStats.length > 0">
+                            <h3 class="redesign-section-title spacing-bottom">Detailed Lead Sources</h3>
+                            <div class="detailed-lead-sources-grid">
+                                <div *ngFor="let source of pageData.leadSourceStats" class="lead-source-square-card"
+                                    [class.active]="filters.leadSourceId === (source.id || '00000000-0000-0000-0000-000000000000')"
+                                    (click)="toggleLeadSourceFilter(source.id)">
+
+                                    <!-- Dynamic Icon Circle based on helper mapping -->
+                                    <div class="lead-icon-circle" [ngClass]="getLeadSourceClass(source.name)">
+                                        <!-- Consultant -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-consultant'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <circle cx="12" cy="10" r="3" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        <!-- Digital -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-digital'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="2" y1="12" x2="22" y2="12" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <!-- Direct -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-direct'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <circle cx="12" cy="10" r="3" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        <!-- Reference -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-reference'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <!-- Raw Data -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-raw-data'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <polyline points="14 2 14 8 20 8" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="16" y1="13" x2="8" y2="13" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="16" y1="17" x2="8" y2="17" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <polyline points="10 9 9 9 8 9" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                        <!-- Orai -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-orai'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12 2v9M8 5h8" stroke-linecap="round" stroke-linejoin="round" />
+                                            <circle cx="8" cy="16" r="1" stroke-linecap="round" />
+                                            <circle cx="16" cy="16" r="1" stroke-linecap="round" />
+                                        </svg>
+                                        <!-- Unmapped / Other fallback -->
+                                        <svg *ngIf="getLeadSourceClass(source.name) === 'source-unmapped'"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <span class="lead-source-card-number">{{ source.count }}</span>
+                                    <span class="lead-source-card-label">{{ source.name }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <!-- Original Stats Layout (preserved for Admissions/All Tabs) -->
+                    <ng-container *ngIf="pageData && !isApplicationTab">
+                        <div class="adm-dashboard-container">
+
+                            <!-- 1. Top Summary Cards -->
+                            <div class="adm-top-summary-row">
+                                <!-- Total Admissions Card -->
+                                <div class="adm-hero-card" [class.active]="filters.statFilter === ''"
+                                    (click)="onStatFilter('')">
+                                    <div class="adm-hero-badge">ACTIVE</div>
+                                    <div class="adm-hero-content">
+                                        <div class="adm-hero-label">Total Admissions</div>
+                                        <div class="adm-hero-desc">All confirmed admission records</div>
+                                        <div class="adm-hero-number">{{ pageData.stats.admTotal }}</div>
+                                    </div>
+                                    <!-- Graduation Cap Watermark -->
+                                    <svg class="adm-hero-watermark" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="1.5">
+                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                        <path d="M6 12v5c3 3 9 3 12 0v-5" stroke-linecap="round"
+                                            stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+
+                                <!-- Today's Confirmed Admissions Card -->
+                                <div class="adm-today-card">
+                                    <div class="adm-today-header">
+                                        <div class="adm-today-title-group">
+                                            <div class="adm-today-title">Today's Confirmed Admissions</div>
+                                            <div class="adm-today-desc">Paid initial fees today</div>
+                                        </div>
+                                        <div class="adm-today-icon-circle">
+                                            <!-- Calendar check icon -->
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                                <line x1="16" y1="2" x2="16" y2="6" />
+                                                <line x1="8" y1="2" x2="8" y2="6" />
+                                                <line x1="3" y1="10" x2="21" y2="10" />
+                                                <polyline points="8 14 10 16 16 10" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="adm-today-number">{{ pageData.stats.todayConfirmedAdmissions || 0 }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Source Breakdown Cards -->
+                            <div class="adm-section-block">
+                                <h3 class="adm-section-title with-accent">Source Breakdown</h3>
+                                <div class="adm-source-grid">
+                                    <!-- Direct -->
+                                    <div class="adm-source-card source-direct-card"
+                                        [class.active]="filters.statFilter === 'DIRECT'"
+                                        (click)="onStatFilter('DIRECT')">
+                                        <div class="adm-source-icon-circle bg-direct">
+                                            <!-- Navigation marker -->
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                                <circle cx="12" cy="10" r="3" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-source-label">Direct</div>
+                                        <div class="adm-source-number">{{ filters.tab === 'Admission' ?
+                                            pageData.stats.admDirect : pageData.stats.directAdmission }}</div>
+                                    </div>
+
+                                    <!-- Consultancy -->
+                                    <div class="adm-source-card source-consultancy-card"
+                                        [class.active]="filters.statFilter === 'INDIRECT'"
+                                        (click)="onStatFilter('INDIRECT')">
+                                        <div class="adm-source-icon-circle bg-consultancy">
+                                            <!-- Handshake -->
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                                <circle cx="9" cy="7" r="4" />
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-source-label">Consultancy</div>
+                                        <div class="adm-source-number">{{ filters.tab === 'Admission' ?
+                                            pageData.stats.admConsultancy : pageData.stats.indirectAdmission }}</div>
+                                    </div>
+
+                                    <!-- Scholar -->
+                                    <div class="adm-source-card source-scholar-card"
+                                        [class.active]="filters.statFilter === 'SCHOLAR'"
+                                        (click)="onStatFilter('SCHOLAR')">
+                                        <div class="adm-source-icon-circle bg-scholar">
+                                            <!-- Graduation Cap -->
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-source-label">Scholar</div>
+                                        <div class="adm-source-number">{{ filters.tab === 'Admission' ?
+                                            pageData.stats.admScholar : pageData.stats.scholarAdmission }}</div>
+                                    </div>
+
+                                    <!-- Unmapped -->
+                                    <div class="adm-source-card source-unmapped-card"
+                                        [class.active]="filters.statFilter === 'UNMAPPED'"
+                                        (click)="onStatFilter('UNMAPPED')">
+                                        <div class="adm-source-icon-circle bg-unmapped">
+                                            <!-- Question mark -->
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-source-label">Unmapped</div>
+                                        <div class="adm-source-number">{{ filters.tab === 'Admission' ?
+                                            pageData.stats.admUnmapped : pageData.stats.appUnmapped }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Lead Source Wise Breakdown -->
+                            <div class="adm-section-block"
+                                *ngIf="pageData.leadSourceStats && pageData.leadSourceStats.length > 0">
+                                <h3 class="adm-section-title">
+                                    <span class="adm-dot">•</span>Lead Source Wise
+                                </h3>
+                                <div class="adm-lead-source-grid">
+                                    <div *ngFor="let source of pageData.leadSourceStats" class="adm-lead-card"
+                                        [class.active]="filters.leadSourceId === (source.id || '00000000-0000-0000-0000-000000000000')"
+                                        (click)="toggleLeadSourceFilter(source.id)">
+                                        <div class="adm-lead-icon-circle" [ngClass]="getLeadSourceClass(source.name)">
+                                            <!-- Consultant -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-consultant'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                                <circle cx="9" cy="7" r="4" />
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                            </svg>
+                                            <!-- Digital -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-digital'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="2" y1="12" x2="22" y2="12" />
+                                                <path
+                                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                            </svg>
+                                            <!-- Direct -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-direct'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                <circle cx="12" cy="7" r="4" />
+                                            </svg>
+                                            <!-- Reference -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-reference'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path
+                                                    d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                                            </svg>
+                                            <!-- Raw Data -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-raw-data'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                                                <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3" />
+                                            </svg>
+                                            <!-- Orai -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-orai'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path
+                                                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                            </svg>
+                                            <!-- Unmapped / Fallback -->
+                                            <svg *ngIf="getLeadSourceClass(source.name) === 'source-unmapped'"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="12" y1="8" x2="12" y2="12" />
+                                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-lead-content">
+                                            <div class="adm-lead-number">{{ source.count }}</div>
+                                            <div class="adm-lead-label">{{ source.name }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Application Status Cards -->
+                            <div class="adm-status-row">
+                                <!-- Confirmed -->
+                                <div class="adm-status-card status-confirmed-card"
+                                    [class.active]="filters.statFilter === 'CONFIRMED'"
+                                    (click)="onStatFilter('CONFIRMED')">
+                                    <div class="adm-status-card-inner">
+                                        <div class="adm-status-left">
+                                            <div class="adm-status-label font-green">CONFIRMED</div>
+                                            <div class="adm-status-number">{{ pageData.stats.admConfirmed }}</div>
+                                        </div>
+                                        <div class="adm-status-icon-circle bg-light-green">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="adm-status-progress-track">
+                                        <div class="adm-status-progress-bar bg-green"
+                                            [style.width.%]="(pageData.stats.admConfirmed / (pageData.stats.admTotal || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cancelled -->
+                                <div class="adm-status-card status-cancelled-card"
+                                    [class.active]="filters.statFilter === 'CANCELLED_ADM'"
+                                    (click)="onStatFilter('CANCELLED_ADM')">
+                                    <div class="adm-status-card-inner">
+                                        <div class="adm-status-left">
+                                            <div class="adm-status-label font-red">CANCELLED</div>
+                                            <div class="adm-status-number">{{ pageData.stats.admCancelled }}</div>
+                                        </div>
+                                        <div class="adm-status-icon-circle bg-light-red">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18" />
+                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="adm-status-progress-track">
+                                        <div class="adm-status-progress-bar bg-red"
+                                            [style.width.%]="(pageData.stats.admCancelled / (pageData.stats.admTotal || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Remaining Apps -->
+                                <div class="adm-status-card status-remaining-card"
+                                    [class.active]="filters.statFilter === 'REMAINING_APP'"
+                                    (click)="onStatFilter('REMAINING_APP')">
+                                    <div class="adm-status-card-inner">
+                                        <div class="adm-status-left">
+                                            <div class="adm-status-label font-indigo">REMAINING APPS</div>
+                                            <div class="adm-status-number">{{ pageData.stats.admRemainingActive }}</div>
+                                        </div>
+                                        <div class="adm-status-icon-circle bg-light-indigo">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="#4338CA" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                <polyline points="14 2 14 8 20 8" />
+                                                <circle cx="12" cy="14" r="3" />
+                                                <path d="M12 12v3l2 2" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="adm-status-progress-track">
+                                        <div class="adm-status-progress-bar bg-indigo"
+                                            [style.width.%]="(pageData.stats.admRemainingActive / (pageData.stats.admTotal || 1)) * 100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Fee Status Cards -->
+                            <div class="adm-fee-row">
+                                <!-- 60% Fee Paid -->
+                                <div class="adm-fee-card" [class.active]="filters.statFilter === 'PARTIAL_PAID'"
+                                    (click)="onStatFilter('PARTIAL_PAID')">
+                                    <div class="adm-fee-left">
+                                        <div class="adm-circle-ring-container">
+                                            <svg class="adm-progress-ring" width="80" height="80">
+                                                <circle class="adm-ring-circle-bg" stroke="#F1F5F9" stroke-width="7"
+                                                    fill="transparent" r="28" cx="40" cy="40" />
+                                                <circle class="adm-ring-circle stroke-green" stroke-width="7"
+                                                    fill="transparent" r="28" cx="40" cy="40" stroke-dasharray="175.9"
+                                                    [style.stroke-dashoffset]="175.9 - (175.9 * pageData.stats.partialFeesPaid / (pageData.stats.partialFeesPaid + pageData.stats.partialfessUnpaid || 1))" />
+                                            </svg>
+                                            <div class="adm-ring-value">{{ pageData.stats.partialFeesPaid }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="adm-fee-middle">
+                                        <div class="adm-fee-title-row">
+                                            <span class="adm-fee-title">50% Fee Paid</span>
+                                            <span class="adm-fee-badge bg-light-green font-green">HEALTHY</span>
+                                        </div>
+                                        <div class="adm-fee-desc">Total students with initial installment cleared.</div>
+                                    </div>
+                                </div>
+
+                                <!-- 60% Fee Unpaid -->
+                                <div class="adm-fee-card" [class.active]="filters.statFilter === 'UNPAID'"
+                                    (click)="onStatFilter('UNPAID')">
+                                    <div class="adm-fee-left">
+                                        <div class="adm-circle-ring-container">
+                                            <svg class="adm-progress-ring" width="80" height="80">
+                                                <circle class="adm-ring-circle-bg" stroke="#F1F5F9" stroke-width="7"
+                                                    fill="transparent" r="28" cx="40" cy="40" />
+                                                <circle class="adm-ring-circle stroke-red" stroke-width="7"
+                                                    fill="transparent" r="28" cx="40" cy="40" stroke-dasharray="175.9"
+                                                    [style.stroke-dashoffset]="175.9 - (175.9 * pageData.stats.partialfessUnpaid / (pageData.stats.partialFeesPaid + pageData.stats.partialfessUnpaid || 1))" />
+                                            </svg>
+                                            <div class="adm-ring-value">{{ pageData.stats.partialfessUnpaid }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="adm-fee-middle">
+                                        <div class="adm-fee-title-row">
+                                            <span class="adm-fee-title">50% Fee Unpaid</span>
+                                            <span class="adm-fee-badge bg-light-red font-red">ACTION REQUIRED</span>
+                                        </div>
+                                        <div class="adm-fee-desc">Follow-up needed for pending collections.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 6. Financial Summary -->
+                            <div class="adm-section-block">
+                                <h3 class="adm-section-title">Financial Summary</h3>
+                                <p class="adm-section-subtitle">Real-time revenue & collection overview across all
+                                    campuses.</p>
+
+                                <div class="adm-finance-grid">
+                                    <!-- Total Revenue -->
+                                    <div class="adm-finance-card">
+                                        <div class="adm-finance-icon-circle bg-light-blue font-blue">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="12" y1="1" x2="12" y2="23" />
+                                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-finance-content">
+                                            <div class="adm-finance-label">Total Revenue</div>
+                                            <div class="adm-finance-value">₹{{ (pageData.stats.totalRevenueExpected ||
+                                                0) | number:'1.0-0' }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Total Collected -->
+                                    <div class="adm-finance-card">
+                                        <div class="adm-finance-icon-circle bg-light-green font-green">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-finance-content">
+                                            <div class="adm-finance-label">Total Collected</div>
+                                            <div class="adm-finance-value">₹{{ (pageData.stats.totalAmountCollected ||
+                                                0) | number:'1.0-0' }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Total Outstanding -->
+                                    <div class="adm-finance-card">
+                                        <div class="adm-finance-icon-circle bg-light-orange font-orange">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <line x1="12" y1="8" x2="12" y2="12" />
+                                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-finance-content">
+                                            <div class="adm-finance-label">Total Outstanding</div>
+                                            <div class="adm-finance-value">₹{{ (pageData.stats.totalAmountPending || 0)
+                                                | number:'1.0-0' }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Total Discount -->
+                                    <div class="adm-finance-card">
+                                        <div class="adm-finance-icon-circle bg-light-purple font-purple">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path
+                                                    d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                                                <line x1="7" y1="7" x2="7.01" y2="7" />
+                                            </svg>
+                                        </div>
+                                        <div class="adm-finance-content">
+                                            <div class="adm-finance-label">Total Discount</div>
+                                            <div class="adm-finance-value">₹{{ (pageData.stats.totalAmountDiscounted ||
+                                                0) | number:'1.0-0' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </ng-container>
+
+                    <!-- Table Container -->
+                    <!-- Table Header -->
+                    <div class="table-card table-only">
+                        <div class="table-header">
+                            <h3 class="table-title">
+                                {{ activeTabLabel }}
+                                <span class="active-filter-badge" *ngIf="activeFilterCount > 0"
+                                    style="margin-left: 10px; font-size: 11px; padding: 2px 8px; background: #EEF2FF; color: #435FFF; border-radius: 4px; font-weight: 600;">
+                                    {{ activeFilterCount }} Active
+                                </span>
+                            </h3>
+                            <div class="header-actions">
+                                <div class="search-box">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <input type="text" [placeholder]="'Search students...'" [(ngModel)]="searchTerm"
+                                        (ngModelChange)="onSearchChange()">
+                                </div>
+                                <button class="filter-btn" (click)="showFilterDrawer = true"
+                                    [class.has-filters]="activeFilterCount > 0">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z" />
+                                    </svg>
+                                    <span>Filters</span>
+                                    <span class="filter-badge" *ngIf="activeFilterCount > 0">{{ activeFilterCount
+                                        }}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Filter Chips -->
+                        <div class="filter-chips-section" *ngIf="activeFilterCount > 0">
+                            <div class="chips-container">
+                                <div class="filter-chip"
+                                    *ngFor="let key of ['session', 'commissionStatus', 'state', 'city', 'statusFilter', 'source']">
+                                    <ng-container *ngIf="filters[key]">
+                                        <span class="chip-text">{{ key }}: {{ filters[key] }}</span>
+                                        <button class="chip-close" (click)="clearFilter(key)">&times;</button>
+                                    </ng-container>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.leadSourceId">
+                                    <span class="chip-text">Source: {{ getSelectedLeadSourceName() }}</span>
+                                    <button class="chip-close" (click)="clearFilter('leadSourceId')">&times;</button>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.userId">
+                                    <span class="chip-text">Counselor: {{ getSelectedUserName() }}</span>
+                                    <button class="chip-close"
+                                        (click)="filters.userId = null; applyFilters()">&times;</button>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.consultancyId">
+                                    <span class="chip-text">Consultancy: {{ getSelectedConsultancyName() }}</span>
+                                    <button class="chip-close"
+                                        (click)="filters.consultancyId = null; applyFilters()">&times;</button>
+                                </div>
+                                <div class="filter-chip" *ngIf="filters.courseId">
+                                    <span class="chip-text">Course: {{ getSelectedCourseName() }}</span>
+                                    <button class="chip-close"
+                                        (click)="filters.courseId = null; applyFilters()">&times;</button>
+                                </div>
+                                <button class="clear-all-link" (click)="resetFilters()">Clear All</button>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center sticky-col"
+                                            style="width:52px; min-width:52px; white-space:nowrap;">S.NO</th>
+
+                                        <th (click)="sortBy('fullName')" class="cursor-pointer sort-th"
+                                            style="min-width:160px; white-space:nowrap;">
+                                            Student &amp; Enrollment
+                                            <span class="sort-icon" [class.active]="sortColumn==='fullName'">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="10"
+                                                    height="10">
+                                                    <path d="M6 9l6-6 6 6M6 15l6 6 6-6" />
+                                                </svg>
+                                            </span>
+                                        </th>
+
+                                        <th style="min-width:120px; white-space:nowrap;">Course</th>
+
+                                        <th *ngIf="isApplicationTab" style="min-width:110px; white-space:nowrap;">
+                                            Counsellor</th>
+
+                                        <th style="min-width:110px; white-space:nowrap;">Lead Source</th>
+
+                                        <th *ngIf="!isApplicationTab" style="min-width:90px; white-space:nowrap;">Fee
+                                            Status</th>
+                                        <th *ngIf="!isApplicationTab" style="min-width:110px; white-space:nowrap;">
+                                            Commission</th>
+
+                                        <th *ngIf="isApplicationTab" style="min-width:115px; white-space:nowrap;">Mobile
+                                        </th>
+
+                                        <th *ngIf="!isApplicationTab" style="min-width:120px; white-space:nowrap;">
+                                            Provisional Amt</th>
+                                        <th *ngIf="!isApplicationTab" style="min-width:110px; white-space:nowrap;">Adm.
+                                            Date</th>
+
+                                        <th (click)="sortBy('session')" class="cursor-pointer sort-th"
+                                            style="min-width:90px; white-space:nowrap;">
+                                            Session
+                                            <span class="sort-icon" [class.active]="sortColumn==='session'">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="10"
+                                                    height="10">
+                                                    <path d="M6 9l6-6 6 6M6 15l6 6 6-6" />
+                                                </svg>
+                                            </span>
+                                        </th>
+
+                                        <th (click)="sortBy('admissionDate')" class="cursor-pointer sort-th"
+                                            style="min-width:100px; white-space:nowrap;">
+                                            App. Date
+                                            <span class="sort-icon" [class.active]="sortColumn==='admissionDate'">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="10"
+                                                    height="10">
+                                                    <path d="M6 9l6-6 6 6M6 15l6 6 6-6" />
+                                                </svg>
+                                            </span>
+                                        </th>
+
+                                        <!-- Discount Columns -->
+                                        <th (click)="sortBy('discountType')" class="cursor-pointer sort-th"
+                                            style="min-width:110px; white-space:nowrap;">
+                                            Disc. Type
+                                            <span class="sort-icon" [class.active]="sortColumn==='discountType'">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="10"
+                                                    height="10">
+                                                    <path d="M6 9l6-6 6 6M6 15l6 6 6-6" />
+                                                </svg>
+                                            </span>
+                                        </th>
+
+                                        <th (click)="sortBy('discountValue')" class="cursor-pointer sort-th"
+                                            style="min-width:110px; white-space:nowrap;">
+                                            Disc. Value
+                                            <span class="sort-icon" [class.active]="sortColumn==='discountValue'">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="10"
+                                                    height="10">
+                                                    <path d="M6 9l6-6 6 6M6 15l6 6 6-6" />
+                                                </svg>
+                                            </span>
+                                        </th>
+
+                                        <th style="min-width:130px; white-space:nowrap;">Disc. Amount</th>
+
+                                        <th class="text-center" style="min-width:150px; white-space:nowrap;">Reported
+                                            Status</th>
+
+                                        <th class="text-center" style="min-width:180px; white-space:nowrap;">Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of paginatedAdmissions; let i = index"
+                                        [class.cancelled-row]="item.isCancelled" (click)="onView(item.id!)"
+                                        style="cursor: pointer;">
+                                        <td class="text-center sticky-col" style="font-weight: 700; color: #64748B;">{{
+                                            item.sNo }}</td>
+
+                                        <td class="name-cell">
+                                            <div class="name-wrapper">
+                                                <span class="student-name">{{ item.fullName }}</span>
+                                                <span class="enrollment-id">{{ item.enrollmentId }}</span>
+                                                <!-- FOC / SBS Badge -->
+                                                <span *ngIf="item.focType === 'SBS'" class="foc-badge sbs-badge"
+                                                    title="{{ item.focRemarks || 'Sarva Brahmin Samaj sponsored' }}">SBS</span>
+                                                <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge"
+                                                    title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Course -->
+                                        <td class="course-cell">
+                                            <div class="course-wrapper">
+                                                <span class="course-main">{{ item.courseName.split(' ')[0] }}</span>
+                                                <span class="course-sub">{{ item.courseName.split(' ').slice(1).join('
+                                                    ') }}</span>
+                                            </div>
+                                        </td>
+
+                                        <td *ngIf="isApplicationTab" style="font-weight: 500;">
+                                            {{ item.counselorName || 'N/A' }}
+                                        </td>
+
+                                        <td>
+                                            <span *ngIf="item.leadSource" class="source-pill"
+                                                [ngStyle]="getSourceStyle(item.leadSource.name)">
+                                                {{ item.leadSource.name }}
+                                            </span>
+                                            <span *ngIf="!item.leadSource?.name"
+                                                style="color: #94A3B8; font-size: 11px; font-weight: 500;">N/A</span>
+                                        </td>
+
+                                        <td *ngIf="!isApplicationTab">
+                                            <span class="status-pill"
+                                                [class.fee-status-unpaid]="item.feeStatus === 'UNPAID'"
+                                                [class.fee-status-provisional]="item.feeStatus === 'PROVISIONAL PAID'"
+                                                [class.fee-status-fifty]="item.feeStatus === '50% FEES PAID'">
+                                                {{ item.feeStatus }}
+                                            </span>
+                                        </td>
+
+                                        <td *ngIf="!isApplicationTab">
+                                            <span class="commission-pill"
+                                                [class.pending]="item.commissionStatus === 'PENDING'"
+                                                [class.calculated]="item.commissionStatus === 'CALCULATED'"
+                                                [class.paid]="item.commissionStatus === 'PAID'"
+                                                [class.partially_paid]="item.commissionStatus === 'PARTIALLY_PAID'"
+                                                [class.waived]="item.commissionStatus === 'WAIVED'"
+                                                [class.disputed]="item.commissionStatus === 'DISPUTED'"
+                                                [class.not_applicable]="item.commissionStatus === 'NOT_APPLICABLE'"
+                                                [class.unmapped]="item.commissionStatus === 'UNMAPPED'">
+                                                {{ item.commissionStatus ? item.commissionStatus.replace('_', ' ') :
+                                                'N/A' }}
+                                            </span>
+                                        </td>
+
+                                        <td *ngIf="isApplicationTab"
+                                            style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">
+                                            {{item.phoneNumber}}
+                                        </td>
+
+                                        <td *ngIf="!isApplicationTab" class="fee-cell amount">
+                                            {{ (item.feeHistory?.[0]?.amountPaid || 0) | currency:'INR':'symbol':'1.0-0'
+                                            }}
+                                        </td>
+
+                                        <td *ngIf="!isApplicationTab" class="date-cell">
+                                            {{ item.feeHistory?.[0]?.paymentDate | date:'dd-MM-yyyy' }}
+                                        </td>
+
+                                        <!-- Session -->
+                                        <td style="font-weight:600; color:#475569; white-space:nowrap;">{{ item.session
+                                            || '—' }}</td>
+
+                                        <!-- App. Date -->
+                                        <td class="date-cell" style="white-space:nowrap;">{{ item.admissionDate |
+                                            date:'dd-MM-yyyy' }}</td>
+
+                                        <!-- ── DISCOUNT TYPE ── -->
+                                        <td style="white-space:nowrap;">
+                                            <ng-container *ngIf="item.discountType; else noDiscType">
+                                                <span class="discount-type-badge"
+                                                    [class.flat]="item.discountType === 'FLAT'"
+                                                    [class.percentage]="item.discountType === 'PERCENTAGE'">
+                                                    {{ item.discountType }}
+                                                </span>
+                                            </ng-container>
+                                            <ng-template #noDiscType>
+                                                <span class="discount-none">No Discount</span>
+                                            </ng-template>
+                                        </td>
+
+                                        <!-- ── DISCOUNT VALUE ── -->
+                                        <td style="white-space:nowrap;">
+                                            <ng-container *ngIf="item.discountType === 'FLAT'">
+                                                <span style="font-weight:700; color:#059669;">
+                                                    ₹{{ item.discountValue | number:'1.0-0' }}
+                                                </span>
+                                            </ng-container>
+                                            <ng-container *ngIf="item.discountType === 'PERCENTAGE'">
+                                                <span style="font-weight:700; color:#7C3AED;">
+                                                    {{ item.discountValue }}%
+                                                </span>
+                                            </ng-container>
+                                            <ng-container *ngIf="!item.discountType">
+                                                <span class="discount-none">—</span>
+                                            </ng-container>
+                                        </td>
+
+                                        <!-- ── DISCOUNTED AMOUNT (backend-calculated) ── -->
+                                        <td style="white-space:nowrap;">
+                                            <ng-container
+                                                *ngIf="item.discountedAmount && item.discountedAmount !== 'No Discount Applied'; else noDiscAmt">
+                                                <span class="discounted-amount">{{ item.discountedAmount }}</span>
+                                            </ng-container>
+                                            <ng-template #noDiscAmt>
+                                                <span class="discount-none">No Discount</span>
+                                            </ng-template>
+                                        </td>
+
+                                        <!-- ── REPORT STATUS TOGGLE & BADGE ── -->
+                                        <td class="text-center" (click)="$event.stopPropagation()">
+                                            <div class="report-status-container">
+                                                <label class="toggle-switch"
+                                                    [class.disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()">
+                                                    <input type="checkbox" [checked]="item.reportStatus === 'REPORTED'"
+                                                        [disabled]="item.reportStatus === 'REPORTED' && !authService.isAdmin()"
+                                                        (change)="onToggleReportStatus(item)">
+                                                    <span class="slider round"></span>
+                                                </label>
+                                                <span class="report-badge"
+                                                    [class.reported]="item.reportStatus === 'REPORTED'"
+                                                    [class.not-reported]="item.reportStatus !== 'REPORTED'">
+                                                    {{ item.reportStatus === 'REPORTED' ? 'Reported' : 'Not Reported' }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <td class="text-center" (click)="$event.stopPropagation()">
+                                            <div class="action-icons">
+                                                <button class="icon-btn view" title="View Details"
+                                                    (click)="onView(item.id!)">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                        <circle cx="12" cy="12" r="3" />
+                                                    </svg>
+                                                </button>
+                                                <button class="icon-btn edit" title="Edit Application"
+                                                    (click)="onEdit(item.id!)">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path
+                                                            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                        <path
+                                                            d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                    </svg>
+                                                </button>
+                                                <button class="icon-btn pay" title="Add Payment" (click)="onPay(item)"
+                                                    *ngIf="!item.isCancelled">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                                                        <line x1="2" y1="10" x2="22" y2="10" />
+                                                    </svg>
+                                                </button>
+                                                <button *ngIf="!item.isCancelled" class="icon-btn cancel"
+                                                    title="Cancel Admission" (click)="onCancelAdmission(item)">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <line x1="15" y1="9" x2="9" y2="15" />
+                                                        <line x1="9" y1="9" x2="15" y2="15" />
+                                                    </svg>
+                                                </button>
+                                                <button *ngIf="item.isCancelled" class="icon-btn revoke"
+                                                    title="Revoke Cancellation" (click)="onRevokeCancellation(item)">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                                        <path d="M3 3v5h5" />
+                                                    </svg>
+                                                </button>
+                                                <button class="icon-btn delete" title="Delete Permanent"
+                                                    (click)="onDelete(item)">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <polyline points="3 6 5 6 21 6" />
+                                                        <path
+                                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                                        <line x1="10" y1="11" x2="10" y2="17" />
+                                                        <line x1="14" y1="11" x2="14" y2="17" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="paginatedAdmissions.length === 0">
+                                        <td colspan="12" class="text-center p-5"
+                                            style="color: #64748B; font-weight: 500;">
+                                            No records found matching your search.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Standardized Pagination -->
+                        <div class="pagination-section">
+                            <span class="showing-text">Showing {{ pageSize }} of {{ pageData.totalCount }}
+                                records</span>
+                            <div class="pagination-controls">
+                                <button class="page-btn" (click)="goToPage(currentPage - 1)"
+                                    [disabled]="currentPage === 1">Prev</button>
+                                <button class="page-btn" *ngFor="let p of getVisiblePages()"
+                                    [class.active]="p === currentPage" (click)="p !== '...' && goToPage(+p)">{{ p
+                                    }}</button>
+                                <button class="page-btn" (click)="goToPage(currentPage + 1)"
+                                    [disabled]="currentPage === totalPages">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <app-admission-form-modal [isVisible]="showAdmissionModal" [studentId]="selectedStudentId"
+                    (close)="closeAdmissionModal()" (saved)="fetchData()">
+                </app-admission-form-modal>
+
+                <!-- Bulk Upload Modal -->
+                <app-bulk-upload-modal *ngIf="showBulkUploadModal" [title]="'Bulk Upload Admissions'"
+                    [moduleName]="'Admission'" [service]="admissionService" (uploaded)="onBulkUploadSuccess($event)"
+                    (closed)="showBulkUploadModal = false">
+                </app-bulk-upload-modal>
+
+                <!-- Bulk Update Enrollment Modal -->
+                <app-bulk-upload-modal *ngIf="showBulkUpdateEnrollmentModal" [title]="'Bulk Update Enrollment'"
+                    [moduleName]="'EnrollmentUpdate'" [service]="enrollmentUpdateService"
+                    (uploaded)="onBulkUploadSuccess($event)" (closed)="showBulkUpdateEnrollmentModal = false">
+                </app-bulk-upload-modal>
+
+                <!-- Bulk Update Admission Date Modal -->
+                <app-bulk-upload-modal *ngIf="showBulkUpdateAdmissionDateModal" [title]="'Bulk Update Admission Date'"
+                    [moduleName]="'AdmissionDateUpdate'" [service]="admissionDateUpdateService"
+                    (uploaded)="onBulkUploadSuccess($event)" (closed)="showBulkUpdateAdmissionDateModal = false">
+                </app-bulk-upload-modal>
+
+                <!-- Confirmation Modal -->
+                <app-confirmation-modal *ngIf="showDeleteModal" [title]="'Delete Admission'"
+                    [message]="'Are you sure you want to delete admission of \'' + selectedAdmission?.fullName + '\'?'"
+                    (confirm)="confirmDelete()" (cancel)="cancelDelete()">
+                </app-confirmation-modal>
+
+                <!-- Fee Payment Modal -->
+                <app-fee-payment-modal *ngIf="showPaymentModal" [isVisible]="showPaymentModal"
+                    [studentId]="selectedStudentIdForPayment" [studentName]="selectedStudentNameForPayment"
+                    [totalCourseFees]="selectedAdmissionForPayment?.totalCourseFees || 0"
+                    [discountAmount]="(selectedAdmissionForPayment?.totalCourseFees || 0) - (selectedAdmissionForPayment?.finalFeesAfterDiscount || 0)"
+                    [alreadyPaidAmount]="selectedAdmissionForPayment?.totalFeesPaid || 0"
+                    (close)="showPaymentModal = false" (saved)="onPaymentSaved()">
+                </app-fee-payment-modal>
+
+                <!-- Filter Drawer -->
+                <app-filter-drawer [isOpen]="showFilterDrawer" (close)="showFilterDrawer = false"
+                    (apply)="applyFilters()" (clear)="resetFilters()">
+                    <div class="filter-drawer-content">
+                        <div class="filter-group">
+                            <h4 class="group-title">Primary Filters</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Session</label>
+                                <select [(ngModel)]="filters.session" class="filter-input">
+                                    <option value="">All Sessions</option>
+                                    <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
+                                </select>
+                            </div>
+                            <div class="filter-section" *ngIf="!isApplicationTab">
+                                <label class="filter-label">Commission Status</label>
+                                <select [(ngModel)]="filters.commissionStatus" class="filter-input">
+                                    <option value="">All Statuses</option>
+                                    <option *ngFor="let s of commissionStatuses" [value]="s">{{ s }}</option>
+                                </select>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Admission Type</label>
+                                <select [(ngModel)]="filters.source" class="filter-input">
+                                    <option value="">All Types</option>
+                                    <option value="USER">Direct Admission</option>
+                                    <option value="CONSULTANCY">Via Consultancy</option>
+                                    <option value="UNMAPPED">Unmapped Admission</option>
+                                </select>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Scholarship</label>
+                                <select [(ngModel)]="filters.isScholar" class="filter-input">
+                                    <option value="">All Students</option>
+                                    <option value="true">Scholarship Students</option>
+                                    <option value="false">Non-Scholarship</option>
+                                </select>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Record Status</label>
+                                <select [(ngModel)]="filters.statusFilter" class="filter-input">
+                                    <option value="">Active Admissions</option>
+                                    <option value="CANCELLED">Cancelled Admissions</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="filter-group">
+                            <h4 class="group-title">Date Filters</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Application Date Range</label>
+                                <select [(ngModel)]="filters.appDateRangeType"
+                                    (change)="onDateRangeTypeChange('application')" class="filter-input">
+                                    <option value="">All Dates</option>
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                    <option value="custom">Custom Date</option>
+                                </select>
+                                <div class="range-preview" *ngIf="filters.appStartDate">
+                                    <span>{{ filters.appStartDate | date:'dd MMM' }} - {{ filters.appEndDate | date:'dd
+                                        MMM, yyyy' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="filter-section" *ngIf="!isApplicationTab">
+                                <label class="filter-label">Admission Date Range</label>
+                                <select [(ngModel)]="filters.admDateRangeType"
+                                    (change)="onDateRangeTypeChange('admission')" class="filter-input">
+                                    <option value="">All Dates</option>
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                    <option value="custom">Custom Date</option>
+                                </select>
+                                <div class="range-preview" *ngIf="filters.admStartDate">
+                                    <span>{{ filters.admStartDate | date:'dd MMM' }} - {{ filters.admEndDate | date:'dd
+                                        MMM, yyyy' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <h4 class="group-title">Source & Location</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Lead Source</label>
+                                <select [(ngModel)]="filters.leadSourceId" class="filter-input">
+                                    <option value="">All Lead Sources</option>
+                                    <option *ngFor="let s of activeLeadSources" [value]="s.id">{{ s.name }}</option>
+                                </select>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Location</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <select [(ngModel)]="filters.state" (change)="onStateChange()" class="filter-input">
+                                        <option value="">State</option>
+                                        <option *ngFor="let s of states" [value]="s">{{ s }}</option>
+                                    </select>
+                                    <select [(ngModel)]="filters.city" (change)="onCityChange()"
+                                        [disabled]="!filters.state" class="filter-input">
+                                        <option value="">City</option>
+                                        <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group" *ngIf="!isApplicationTab">
+                            <h4 class="group-title">Financial Status</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Fee Payment Status</label>
+                                <div class="radio-group">
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="null" [(ngModel)]="filters.fiftyPercentFeesPaid">
+                                        <span>All</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="true" [(ngModel)]="filters.fiftyPercentFeesPaid">
+                                        <span>Paid</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="false" [(ngModel)]="filters.fiftyPercentFeesPaid">
+                                        <span>Unpaid</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Discounted Students Filter -->
+                        <div class="filter-group">
+                            <h4 class="group-title">Discount Filter</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Discounted Students</label>
+                                <div class="radio-group">
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="null" [(ngModel)]="filters.isDiscounted">
+                                        <span>All Students</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="true" [(ngModel)]="filters.isDiscounted">
+                                        <span>Discounted</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="false" [(ngModel)]="filters.isDiscounted">
+                                        <span>No Discount</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Filters -->
+                        <div class="filter-group">
+                            <h4 class="group-title">Advanced Filters</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Filter by User (Admitted By)</label>
+                                <div class="custom-select-trigger" (click)="openUserFilter()">
+                                    <span>{{ filters.userId ? getSelectedUserName() : 'Select Counselor' }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Filter by Consultancy</label>
+                                <div class="custom-select-trigger" (click)="openConsultancyFilter()">
+                                    <span>{{ filters.consultancyId ? getSelectedConsultancyName() : 'Select Consultancy'
+                                        }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Filter by Course</label>
+                                <div class="custom-select-trigger" (click)="openCourseFilter()">
+                                    <span>{{ filters.courseId ? getSelectedCourseName() : 'Select Course' }}</span>
+                                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </app-filter-drawer>
+
+                <!-- Custom Calendar Modal -->
+                <app-calendar-modal *ngIf="showCalendarModal"
+                    [initialStartDate]="calendarTarget === 'application' ? filters.appStartDate : filters.admStartDate"
+                    [initialEndDate]="calendarTarget === 'application' ? filters.appEndDate : filters.admEndDate"
+                    (apply)="onCalendarApply($event)" (close)="showCalendarModal = false">
+                </app-calendar-modal>
+                <!-- Cancellation Modal -->
+                <app-cancellation-modal *ngIf="showCancellationModal" [isRevoke]="isRevokingCancellation"
+                    (confirm)="confirmCancellationAction($event)" (cancel)="showCancellationModal = false">
+                </app-cancellation-modal>
+
+                <!-- Searchable Selection Modals -->
+                <app-searchable-selector-modal *ngIf="activeModal === 'user'" [title]="'Select Counselor / User'"
+                    [placeholder]="'Search counselor by name, email, or phone...'" [items]="modalItems"
+                    [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages" [selectedId]="filters.userId" [displayField]="'fullName'"
+                    [subtitleField]="'email'" [tagField]="'mobile'" (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)" (select)="onModalSelect($event)"
+                    (close)="onModalClose()"></app-searchable-selector-modal>
+
+                <app-searchable-selector-modal *ngIf="activeModal === 'consultancy'" [title]="'Select Consultancy'"
+                    [placeholder]="'Search consultancy by name or firm name...'" [items]="modalItems"
+                    [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
+                    [totalPages]="modalTotalPages" [selectedId]="filters.consultancyId" [displayField]="'name'"
+                    [subtitleField]="'firmName'" [tagField]="'city'" (search)="onModalSearch($event)"
+                    (pageChange)="onModalPageChange($event)" (select)="onModalSelect($event)"
+                    (close)="onModalClose()"></app-searchable-selector-modal>
+
+                <app-searchable-selector-modal *ngIf="activeModal === 'course'" [title]="'Select Course'"
+                    [placeholder]="'Search course by name or code...'" [items]="modalItems" [loading]="modalLoading"
+                    [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage" [totalPages]="modalTotalPages"
+                    [selectedId]="filters.courseId" [displayField]="'name'" [subtitleField]="'duration'"
+                    [tagField]="'courseType'" (search)="onModalSearch($event)" (pageChange)="onModalPageChange($event)"
+                    (select)="onModalSelect($event)" (close)="onModalClose()"></app-searchable-selector-modal>
+
+                <!-- ===== Download Confirmation Modal ===== -->
+                <div class="download-modal-overlay" *ngIf="showDownloadModal" (click)="showDownloadModal = false">
+                    <div class="download-modal-card" (click)="$event.stopPropagation()">
+                        <div class="dmodal-header">
+                            <div class="dmodal-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="dmodal-title">Download Excel Export</h3>
+                                <p class="dmodal-subtitle">Review the filters below before downloading</p>
+                            </div>
+                        </div>
+
+                        <div class="dmodal-body">
+                            <div class="dmodal-count-box">
+                                <span class="dmodal-count">{{ pageData?.totalCount || 0 }}</span>
+                                <span class="dmodal-count-label">total records will be exported</span>
+                            </div>
+
+                            <div class="dmodal-filters" *ngIf="downloadFilterSummary.length > 0">
+                                <p class="dmodal-filters-title">Applied Filters:</p>
+                                <div class="dmodal-filter-tags">
+                                    <span class="dmodal-filter-tag" *ngFor="let f of downloadFilterSummary">{{ f
+                                        }}</span>
+                                </div>
+                            </div>
+                            <div class="dmodal-filters" *ngIf="downloadFilterSummary.length === 0">
+                                <p style="color: #64748B; font-size: 13px; text-align: center;">No filters applied
+                                    &mdash; all records will be exported.</p>
+                            </div>
+                        </div>
+
+                        <div class="dmodal-actions">
+                            <button class="dmodal-btn-cancel" (click)="showDownloadModal = false">Cancel</button>
+                            <button class="dmodal-btn-confirm" (click)="confirmDownload()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Yes, Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== Report Status Confirmation Modal ===== -->
+                <div class="download-modal-overlay" *ngIf="showReportModal" (click)="cancelReportStatus()">
+                    <div class="download-modal-card" (click)="$event.stopPropagation()">
+                        <div class="dmodal-header">
+                            <div class="dmodal-icon"
+                                [style.background]="targetReportStatus === 'REPORTED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'"
+                                [style.color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="dmodal-title">Confirm Report Status</h3>
+                                <p class="dmodal-subtitle">Review the action below before confirming</p>
+                            </div>
+                        </div>
+
+                        <div class="dmodal-body">
+                            <div
+                                style="font-size: 14px; line-height: 1.6; color: #475569; text-align: center; margin: 10px 0;">
+                                {{ reportModalMessage }}
+                            </div>
+                        </div>
+
+                        <div class="dmodal-actions">
+                            <button class="dmodal-btn-cancel" (click)="cancelReportStatus()">Cancel</button>
+                            <button class="dmodal-btn-confirm"
+                                [style.background]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
+                                [style.border-color]="targetReportStatus === 'REPORTED' ? '#10B981' : '#EF4444'"
+                                (click)="confirmReportStatus()">
+                                Yes, Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>

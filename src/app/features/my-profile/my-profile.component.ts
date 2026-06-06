@@ -404,14 +404,7 @@ export class MyProfileComponent implements OnInit, OnDestroy {
 
   logoutAllDevices(): void {
     this.showLogoutAllModal = false;
-    this.userService.logoutAllDevicesApi().subscribe({
-      next: () => {
-        this.authService.logout();
-      },
-      error: (err: any) => {
-        this.state.error = err?.error?.message || 'Global logout failed. Please try again.';
-      }
-    });
+    this.authService.logoutAllDevices();
   }
 
   formatDate(date: string | null, fallback: string): string {

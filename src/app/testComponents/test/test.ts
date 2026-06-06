@@ -10,8 +10,6 @@ import { AuthService } from '../../core/services/auth.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
-import { AdmissionFormModalComponent } from './components/admission-form-modal/admission-form-modal.component';
-import { FeePaymentModalComponent } from './components/fee-payment-modal/fee-payment-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 import { LocationService } from '../../core/services/location.service';
 import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
@@ -19,9 +17,11 @@ import { LeadSourceService } from '../../core/services/lead-source.service';
 import { ConsultancyService } from '../../core/services/consultancy.service';
 import { UserService } from '../../core/services/user.service';
 import { CourseService } from '../../core/services/course.service';
-import { CancellationModalComponent } from './components/cancellation-modal/cancellation-modal.component';
 import { CalendarModalComponent } from '../../shared/components/calendar-modal/calendar-modal.component';
 import { SearchableSelectorModalComponent } from '../../shared/components/searchable-selector-modal/searchable-selector-modal.component';
+import { AdmissionFormModalComponent } from '../../features/admission-management/components/admission-form-modal/admission-form-modal.component';
+import { CancellationModalComponent } from '../../features/admission-management/components/cancellation-modal/cancellation-modal.component';
+import { FeePaymentModalComponent } from '../../features/admission-management/components/fee-payment-modal/fee-payment-modal.component';
 
 
 /**
@@ -61,10 +61,8 @@ export interface ActiveFilters {
   admStartDate: string;
   admEndDate: string;
 }
-
 @Component({
-  selector: 'app-admission-management',
-  standalone: true,
+  selector: 'app-test',
   imports: [
     CommonModule,
     FormsModule,
@@ -78,15 +76,23 @@ export interface ActiveFilters {
     CancellationModalComponent,
     CalendarModalComponent,
     SearchableSelectorModalComponent
-  ],
-  templateUrl: './admission-management.component.html',
-  styleUrl: './admission-management.component.scss'
+  ], templateUrl: './test.html',
+  styleUrl: './test.scss',
 })
-export class AdmissionManagementComponent implements OnInit, OnDestroy {
+export class Test {
 
   pageData: AdmissionPageData | null = null;
   searchTerm: string = '';
   loading: boolean = true;
+
+  selectedRange: 'LAST_30_DAYS' | 'ALL_TIME' = 'ALL_TIME';
+  displayStats = {
+    appConfirmed: 0,
+    appCancelled: 0,
+    appCancelledAdmissions: 0,
+    appRemaining: 0
+  };
+  allAdmissionsForStats: AdmissionItem[] = [];
 
   private sub: Subscription | null = null;
   private routeSub: Subscription | null = null;
@@ -416,6 +422,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         this.pageData = data;
         this.totalPages = Math.ceil(data.totalCount / this.pageSize) || 1;
         this.loading = false;
+        this.updateDisplayStats();
+        this.fetchStatsDataset();
       },
       error: (err: any) => {
         console.error('Error fetching admissions', err);
@@ -675,6 +683,125 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       'border-color': `hsl(${hue}, 85%, 85%)`
     };
   }
+
+  getLeadSourceClass(name: string | undefined): string {
+    if (!name) return 'source-unmapped';
+    const normalized = name.toLowerCase().trim();
+    if (normalized.includes('consultant')) return 'source-consultant';
+    if (normalized.includes('digital')) return 'source-digital';
+    if (normalized.includes('direct')) return 'source-direct';
+    if (normalized.includes('reference')) return 'source-reference';
+    if (normalized.includes('raw')) return 'source-raw-data';
+    if (normalized.includes('orai')) return 'source-orai';
+    return 'source-unmapped';
+  }
+
+  get totalRangeApplications(): number {
+    return this.displayStats.appConfirmed +
+      this.displayStats.appCancelled +
+      this.displayStats.appCancelledAdmissions +
+      this.displayStats.appRemaining;
+  }
+
+  changeRange(range: 'LAST_30_DAYS' | 'ALL_TIME'): void {
+    this.selectedRange = range;
+    this.updateDisplayStats();
+  }
+
+  updateDisplayStats(): void {
+    if (!this.pageData) return;
+
+    if (this.selectedRange === 'ALL_TIME') {
+      this.displayStats.appConfirmed = this.pageData.stats.appConfirmed;
+      this.displayStats.appCancelled = this.pageData.stats.appCancelled;
+      this.displayStats.appCancelledAdmissions = this.pageData.stats.appCancelledAdmissions;
+      this.displayStats.appRemaining = this.pageData.stats.appRemaining;
+    } else {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+      const recentRecords = this.allAdmissionsForStats.filter(item => {
+        if (!item.createdAt) return false;
+        const date = new Date(item.createdAt);
+        return date >= thirtyDaysAgo;
+      });
+
+      let confirmed = 0;
+      let cancelled = 0;
+      let cancelledAdmissions = 0;
+      let remaining = 0;
+
+      recentRecords.forEach(item => {
+        const isReported = item.reportStatus === 'REPORTED';
+        if (item.isCancelled) {
+          if (isReported) {
+            cancelledAdmissions++;
+          } else {
+            cancelled++;
+          }
+        } else {
+          if (isReported) {
+            confirmed++;
+          } else {
+            remaining++;
+          }
+        }
+      });
+
+      this.displayStats.appConfirmed = confirmed;
+      this.displayStats.appCancelled = cancelled;
+      this.displayStats.appCancelledAdmissions = cancelledAdmissions;
+      this.displayStats.appRemaining = remaining;
+    }
+  }
+
+  fetchStatsDataset(): void {
+    const finalStartDate = this.isApplicationTab ? this.filters.appStartDate : this.filters.admStartDate;
+    const finalEndDate = this.isApplicationTab ? this.filters.appEndDate : this.filters.admEndDate;
+
+    this.admissionService.getAdmissionsData(
+      1,
+      100000,
+      this.searchTerm,
+      this.filters.statFilter,
+      this.filters.courseId ?? undefined,
+      this.sortColumn,
+      this.sortDirection,
+      this.filters.tab,
+      this.filters.statusFilter,
+      this.filters.source,
+      this.filters.isScholar,
+      this.filters.state,
+      this.filters.city,
+      this.filters.session,
+      this.filters.commissionStatus,
+      this.filters.fiftyPercentFeesPaid ?? undefined,
+      finalStartDate || this.filters.startDate,
+      finalEndDate || this.filters.endDate,
+      this.filters.leadSourceId,
+      this.filters.appStartDate,
+      this.filters.appEndDate,
+      this.filters.admStartDate,
+      this.filters.admEndDate,
+      this.filters.isDiscounted ?? undefined,
+      this.filters.consultancyId ?? undefined,
+      this.filters.userId ?? undefined,
+      this.filters.showOnlyPaid ?? undefined,
+      this.filters.showOnlyFoc ?? undefined,
+      this.filters.showOnlySbs ?? undefined
+    ).subscribe({
+      next: data => {
+        this.allAdmissionsForStats = data.admissions || [];
+        this.updateDisplayStats();
+      },
+      error: err => {
+        console.error('Error fetching stats dataset', err);
+      }
+    });
+  }
+
+
 
   onCalendarApply(event: { startDate: string; endDate: string }): void {
     if (this.calendarTarget === 'application') {
@@ -1269,4 +1396,5 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     const ls = this.activeLeadSources.find(x => x.id === this.filters.leadSourceId);
     return ls ? ls.name : `Source ID: ${this.filters.leadSourceId}`;
   }
+
 }
