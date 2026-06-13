@@ -520,80 +520,42 @@
                                         <h3>SESSION CUMULATIVE STATS</h3>
                                     </div>
 
-                                    <div class="primary-stats-grid">
-                                        <div class="session-stat-card color-blue">
-                                            <span class="card-icon">📥</span>
-                                            <span class="card-title">Total Forms</span>
-                                            <span class="card-count">{{dailySummaryData.totalFormsTillDate |
-                                                number}}</span>
-                                            <span class="card-subtitle">Total applications received till date</span>
+                                    <div class="financial-kpi-stack">
+                                        <div class="kpi-mini-card gross">
+                                            <span class="label">Total Forms</span>
+                                            <span class="val">{{dailySummaryData.totalFormsTillDate | number}}</span>
                                         </div>
-
-                                        <div class="session-stat-card color-green">
-                                            <span class="card-icon">🎓</span>
-                                            <span class="card-title">Total Admissions</span>
-                                            <span class="card-count">{{dailySummaryData.totalAdmissions |
-                                                number}}</span>
-                                            <span class="card-subtitle">Students moved to final roll</span>
+                                        <div class="kpi-mini-card gross">
+                                            <span class="label">Total Admissions</span>
+                                            <span class="val">{{dailySummaryData.totalAdmissions | number}}</span>
                                         </div>
-                                    </div>
-
-                                    <div class="secondary-stats-grid">
-                                        <div class="session-stat-card color-neutral">
-                                            <span class="card-icon">🏅</span>
-                                            <span class="card-title">Scholar Admissions</span>
-                                            <span class="card-count">{{dailySummaryData.scholarshipAdmissions |
-                                                number}}</span>
-                                            <span class="card-subtitle">Admissions on scholarship</span>
+                                        <div class="kpi-mini-card net">
+                                            <span class="label">Scholar Admissions</span>
+                                            <span class="val">{{dailySummaryData.scholarshipAdmissions | number}}</span>
                                         </div>
-
-                                        <div class="session-stat-card color-purple">
-                                            <span class="card-icon">🆓</span>
-                                            <span class="card-title">FOC Students</span>
-                                            <span class="card-count">{{dailySummaryData.focAdmissions | number}}</span>
-                                            <span class="card-subtitle">Free of cost students</span>
+                                        <div class="kpi-mini-card net">
+                                            <span class="label">FOC Students</span>
+                                            <span class="val">{{dailySummaryData.focAdmissions | number}}</span>
                                         </div>
-
-                                        <div class="session-stat-card color-purple">
-                                            <span class="card-icon">🏛️</span>
-                                            <span class="card-title">SBS Students</span>
-                                            <span class="card-count">{{dailySummaryData.sbsAdmissions | number}}</span>
-                                            <span class="card-subtitle">Special Benefit Scheme</span>
+                                        <div class="kpi-mini-card net">
+                                            <span class="label">SBS Students</span>
+                                            <span class="val">{{dailySummaryData.sbsAdmissions | number}}</span>
                                         </div>
-
-                                        <div class="session-stat-card color-green">
-                                            <span class="card-icon">✅</span>
-                                            <span class="card-title">Actual Admissions</span>
-                                            <span
-                                                class="card-count">{{dailySummaryData.actualAdmissionsWithoutScholarship
-                                                | number}}</span>
-                                            <span class="card-subtitle">Excluding cancelled & scholarship</span>
+                                        <div class="kpi-mini-card gross">
+                                            <span class="label">Actual Admissions</span>
+                                            <span class="val">{{dailySummaryData.actualAdmissionsWithoutScholarship | number}}</span>
                                         </div>
-                                    </div>
-
-                                    <div class="danger-stats-grid">
-                                        <div class="session-stat-card color-red">
-                                            <span class="card-icon">🚫</span>
-                                            <span class="card-title">Applications Cancelled</span>
-                                            <span class="card-count">{{dailySummaryData.applicationCancelledCount |
-                                                number}}</span>
-                                            <span class="card-subtitle">Total applications cancelled</span>
+                                        <div class="kpi-mini-card refund">
+                                            <span class="label">Applications Cancelled</span>
+                                            <span class="val">{{dailySummaryData.applicationCancelledCount | number}}</span>
                                         </div>
-
-                                        <div class="session-stat-card color-red">
-                                            <span class="card-icon">❌</span>
-                                            <span class="card-title">Admissions Cancelled</span>
-                                            <span class="card-count">{{dailySummaryData.admissionCancelledCount |
-                                                number}}</span>
-                                            <span class="card-subtitle">Confirmed admissions cancelled</span>
+                                        <div class="kpi-mini-card refund">
+                                            <span class="label">Admissions Cancelled</span>
+                                            <span class="val">{{dailySummaryData.admissionCancelledCount | number}}</span>
                                         </div>
-
-                                        <div class="session-stat-card color-yellow">
-                                            <span class="card-icon">⏳</span>
-                                            <span class="card-title">Remaining Forms</span>
-                                            <span class="card-count">{{dailySummaryData.totalFormsRemainingTillDate |
-                                                number}}</span>
-                                            <span class="card-subtitle">Pending verification / processing</span>
+                                        <div class="kpi-mini-card net">
+                                            <span class="label">Remaining Forms</span>
+                                            <span class="val">{{dailySummaryData.totalFormsRemainingTillDate | number}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -601,13 +563,12 @@
 
                             <!-- Course-wise First Fees Paid Analytics -->
                             <div class="op-section first-fees-analytics-section"
-                                style="margin-top: 2rem; border-top: 1px solid var(--slate-200); padding-top: 2rem; width: 100%;">
-                                <div class="section-header"
-                                    style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-                                    <span class="material-symbols-outlined"
-                                        style="color: var(--primary); font-size: 24px;">leaderboard</span>
-                                    <h3
-                                        style="margin: 0; font-size: 16px; font-weight: 800; color: var(--slate-800); text-transform: uppercase; letter-spacing: 0.5px;">
+                                style="margin-top: 2rem; border-top: 1px solid var(--slate-200); padding-top: 1.75rem; width: 100%;">
+                                <div class="section-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+                                    <span style="width: 40px; height: 40px; background: #eef2ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-symbols-outlined" style="color: var(--primary); font-size: 22px;">leaderboard</span>
+                                    </span>
+                                    <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--slate-800); text-transform: uppercase; letter-spacing: 0.5px;">
                                         Course-wise First Fees Paid Analytics</h3>
                                 </div>
 
@@ -622,22 +583,16 @@
                                 </div>
 
                                 <!-- Table / Grid Content -->
-                                <div class="first-fees-content" *ngIf="!loading">
+                                <div class="first-fees-content" *ngIf="!loading" style="padding: 0 26px;">
                                     <div
                                         *ngIf="dailySummaryData.courseWiseFirstFeesPaid && dailySummaryData.courseWiseFirstFeesPaid.length > 0">
                                         <!-- Course Wise Breakdown Heading -->
 
 
-
-
                                         <!-- Course Type Breakdown Heading -->
-                                        <div class="breakdown-subheader"
-                                            style="margin: 2.5rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                                            <span class="material-symbols-outlined"
-                                                style="color: var(--primary); font-size: 20px;">school</span>
-                                            <h4
-                                                style="margin: 0; font-size: 14px; font-weight: 700; color: var(--slate-800);">
-                                                🎓 Course Type Breakdown</h4>
+                                        <div class="breakdown-subheader">
+                                            <span class="material-symbols-outlined">school</span>
+                                            <h4>🎓 Course Type Breakdown</h4>
                                         </div>
 
                                         <!-- Hierarchical Breakdown Wrapper -->

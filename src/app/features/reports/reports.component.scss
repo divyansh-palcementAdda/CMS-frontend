@@ -2965,7 +2965,8 @@
                 box-sizing: border-box;
 
                 .session-stat-card {
-                    height: 140px;
+                    height: auto;
+                    min-height: 140px;
                 }
             }
 
@@ -2978,7 +2979,8 @@
                 box-sizing: border-box;
 
                 .session-stat-card {
-                    height: 170px;
+                    height: auto;
+                    min-height: 160px;
                 }
             }
 
@@ -2991,7 +2993,8 @@
                 box-sizing: border-box;
 
                 .session-stat-card {
-                    height: 170px;
+                    height: auto;
+                    min-height: 160px;
                 }
             }
 
@@ -3006,7 +3009,7 @@
 
                     .session-stat-card {
                         height: auto;
-                        min-height: 170px;
+                        min-height: 160px;
                     }
                 }
                 .danger-stats-grid {
@@ -3015,7 +3018,7 @@
 
                     .session-stat-card {
                         height: auto;
-                        min-height: 170px;
+                        min-height: 160px;
                     }
                 }
             }
@@ -3029,7 +3032,7 @@
 
                     .session-stat-card {
                         height: auto;
-                        min-height: 140px;
+                        min-height: 120px;
                     }
                 }
             }
@@ -3043,8 +3046,9 @@
                 flex-direction: column;
                 gap: 8px;
                 transition: var(--transition);
-                overflow: hidden;
-                height: 100%;
+                overflow: visible;
+                height: auto;
+                min-height: 140px;
                 box-sizing: border-box;
                 width: 100%;
 
@@ -3071,28 +3075,27 @@
                     text-transform: uppercase;
                     letter-spacing: .05em;
                     color: var(--slate-500);
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
+                    line-height: 1.4;
+                    white-space: normal;
+                    word-break: normal;
                 }
 
                 .card-count {
-                    font-size: 38px;
+                    font-size: clamp(24px, 3vw, 38px);
                     font-weight: 850;
                     font-family: 'JetBrains Mono', monospace;
-                    line-height: 1;
-                    word-break: break-word;
+                    line-height: 1.1;
+                    white-space: nowrap;
+                    word-break: keep-all;
+                    overflow: visible;
                 }
 
                 .card-subtitle {
-                    font-size: 13px;
+                    font-size: 12px;
                     line-height: 1.5;
                     color: var(--slate-500);
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
+                    white-space: normal;
+                    word-break: normal;
                 }
 
                 /* Variant left borders and backgrounds */
@@ -3923,6 +3926,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 2px 8px rgba(67, 95, 255, 0.25);
+            white-space: nowrap;
         }
     }
     
@@ -3964,6 +3968,7 @@
             padding: 2px 8px;
             border-radius: 6px;
             border: 1px solid var(--slate-200);
+            white-space: nowrap;
         }
     }
 
@@ -3972,8 +3977,8 @@
         justify-content: space-between;
         align-items: center;
         padding: 1.25rem 1.5rem;
-        background: var(--slate-50);
-        border: 2px solid var(--slate-200);
+        background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
+        border: 2px solid var(--primary-light);
         border-radius: 16px;
         font-weight: 800;
         color: var(--slate-800);
@@ -3982,12 +3987,41 @@
         
         .aggregate-label {
             font-weight: 800;
+            color: var(--slate-700);
         }
         
         .aggregate-value {
             font-size: 14px;
             font-weight: 800;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+    }
+}
+
+/* --- First Fees Analytics Section --- */
+.first-fees-analytics-section {
+    .breakdown-subheader {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1rem 0;
+        padding: 0.75rem 0;
+
+        .material-symbols-outlined {
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
             color: var(--slate-800);
         }
     }
-}
+}
+
+.course-type-breakdown-wrapper {
+    margin-top: 0.5rem;
+}
