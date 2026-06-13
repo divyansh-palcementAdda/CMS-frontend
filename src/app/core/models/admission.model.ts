@@ -142,6 +142,12 @@ export interface AdmissionItem {
   // FOC / SBS fields
   focType?: string; // 'FOC' | 'SBS' | 'NONE'
   focRemarks?: string;
+
+  recentEducation?: string;
+  eduStatus?: string;
+  board?: string;
+  schoolOrCollegeName?: string;
+  casteCategory?: string;
 }
 
 export interface StudentFee {

@@ -201,6 +201,36 @@
             </div>
           </section>
 
+          <!-- Education & Category Information -->
+          <section class="info-card">
+            <div class="card-header">
+              <i class="fas fa-graduation-cap"></i>
+              <h2>Education & Category Information</h2>
+            </div>
+            <div class="card-body grid-2">
+              <div class="info-group">
+                <label>Recent Education</label>
+                <p>{{ detail.recentEducation || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Education Status</label>
+                <p>{{ detail.eduStatus || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Board</label>
+                <p>{{ detail.board || 'N/A' }}</p>
+              </div>
+              <div class="info-group">
+                <label>School / College</label>
+                <p>{{ detail.schoolOrCollegeName || 'N/A' }}</p>
+              </div>
+              <div class="info-group" style="grid-column: span 2;">
+                <label>Caste Category</label>
+                <p>{{ detail.casteCategory || 'N/A' }}</p>
+              </div>
+            </div>
+          </section>
+
           <!-- Admission Information -->
           <section class="info-card">
             <div class="card-header">

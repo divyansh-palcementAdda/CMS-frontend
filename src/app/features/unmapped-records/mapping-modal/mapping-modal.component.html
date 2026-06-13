@@ -8,7 +8,15 @@
       </div>
       <div class="mm-header__text">
         <h2>{{ config.title }}</h2>
+        @if (isStudents) {
+        <p class="mm-student-name">{{ recordName }}</p>
+        <div class="mm-counselor-info">
+          <span class="material-symbols-outlined">person</span>
+          <span>Counseled By : {{ record.counselorName || 'Not Assigned' }}</span>
+        </div>
+        } @else {
         <p>{{ recordName }}</p>
+        }
       </div>
     </div>
 
@@ -226,39 +234,39 @@
           </div>
         </div>
         <div class="mm-list-panel">
-        <div class="mm-list-box">
-          @if (conSearchLoading() && consultancies.length === 0) {
-          <div class="mm-list__loading">
-            <div class="mm-spinner"></div>
-            <span>Searching consultancies…</span>
-          </div>
-          }
-          @else if (filteredConsultancies.length === 0) {
-          <div class="mm-list__empty">
-            <span class="material-symbols-outlined">{{ conSearch() ? 'search_off' : 'link_off' }}</span>
-            <p>{{ conSearchEmptyMessage }}</p>
-          </div>
-          }
-          @else {
-          <div class="mm-list">
-            @for (c of filteredConsultancies; track c.id) {
-            <div class="mm-list__item" [class.is-active]="mappingForm.get('consultancyId')?.value === c.id"
-              (click)="selectConsultancyForStudent(c.id)" [style.--item-color]="config.color">
-              <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
-                <span class="material-symbols-outlined">apartment</span>
+          <div class="mm-list-box">
+            @if (conSearchLoading() && consultancies.length === 0) {
+            <div class="mm-list__loading">
+              <div class="mm-spinner"></div>
+              <span>Searching consultancies…</span>
+            </div>
+            }
+            @else if (filteredConsultancies.length === 0) {
+            <div class="mm-list__empty">
+              <span class="material-symbols-outlined">{{ conSearch() ? 'search_off' : 'link_off' }}</span>
+              <p>{{ conSearchEmptyMessage }}</p>
+            </div>
+            }
+            @else {
+            <div class="mm-list">
+              @for (c of filteredConsultancies; track c.id) {
+              <div class="mm-list__item" [class.is-active]="mappingForm.get('consultancyId')?.value === c.id"
+                (click)="selectConsultancyForStudent(c.id)" [style.--item-color]="config.color">
+                <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
+                  <span class="material-symbols-outlined">apartment</span>
+                </div>
+                <div class="mm-list__info">
+                  <span class="mm-list__name">{{ c.name }}</span>
+                  <span class="mm-list__meta">{{ c.firmName }}</span>
+                </div>
+                @if (mappingForm.get('consultancyId')?.value === c.id) {
+                <span class="mm-check material-symbols-outlined" [style.color]="config.color">verified</span>
+                }
               </div>
-              <div class="mm-list__info">
-                <span class="mm-list__name">{{ c.name }}</span>
-                <span class="mm-list__meta">{{ c.firmName }}</span>
-              </div>
-              @if (mappingForm.get('consultancyId')?.value === c.id) {
-              <span class="mm-check material-symbols-outlined" [style.color]="config.color">verified</span>
               }
             </div>
             }
           </div>
-          }
-        </div>
         </div>
         @if (mappingForm.get('consultancyId')?.touched && !mappingForm.get('consultancyId')?.value) {
         <p class="mm-field-error">
@@ -462,40 +470,40 @@
       }
 
       <div class="mm-list-panel">
-      <div class="mm-list-box">
-        @if (conSearchLoading() && consultancies.length === 0) {
-        <div class="mm-list__loading">
-          <div class="mm-spinner"></div>
-          <span>Searching consultancies…</span>
-        </div>
-        } @else {
-        <div class="mm-list">
-          @for (c of filteredConsultancies; track c.id) {
-          <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)" (click)="toggleConsultancy(c.id)"
-            [style.--item-color]="config.color">
-            <div class="mm-checkbox" [class.is-checked]="isConSelected(c.id)" [style.--chk]="config.color">
-              @if (isConSelected(c.id)) {
-              <span class="material-symbols-outlined">check</span>
-              }
+        <div class="mm-list-box">
+          @if (conSearchLoading() && consultancies.length === 0) {
+          <div class="mm-list__loading">
+            <div class="mm-spinner"></div>
+            <span>Searching consultancies…</span>
+          </div>
+          } @else {
+          <div class="mm-list">
+            @for (c of filteredConsultancies; track c.id) {
+            <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)"
+              (click)="toggleConsultancy(c.id)" [style.--item-color]="config.color">
+              <div class="mm-checkbox" [class.is-checked]="isConSelected(c.id)" [style.--chk]="config.color">
+                @if (isConSelected(c.id)) {
+                <span class="material-symbols-outlined">check</span>
+                }
+              </div>
+              <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
+                <span class="material-symbols-outlined">apartment</span>
+              </div>
+              <div class="mm-list__info">
+                <span class="mm-list__name">{{ c.name }}</span>
+                <span class="mm-list__meta">{{ c.firmName || c.city || 'Partner Agency' }}</span>
+              </div>
             </div>
-            <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
-              <span class="material-symbols-outlined">apartment</span>
+            }
+            @if (filteredConsultancies.length === 0) {
+            <div class="mm-list__empty">
+              <span class="material-symbols-outlined">search_off</span>
+              <p>{{ conSearchEmptyMessage }}</p>
             </div>
-            <div class="mm-list__info">
-              <span class="mm-list__name">{{ c.name }}</span>
-              <span class="mm-list__meta">{{ c.firmName || c.city || 'Partner Agency' }}</span>
-            </div>
+            }
           </div>
           }
-          @if (filteredConsultancies.length === 0) {
-          <div class="mm-list__empty">
-            <span class="material-symbols-outlined">search_off</span>
-            <p>{{ conSearchEmptyMessage }}</p>
-          </div>
-          }
         </div>
-        }
-      </div>
       </div>
       @if (selectedConsultancyIds.size === 0) {
       <p class="mm-hint-error">
@@ -521,8 +529,9 @@
         <div class="mm-generic__actions">
           <div class="mm-search" [class.is-loading]="conSearchLoading()">
             <span class="material-symbols-outlined">search</span>
-            <input type="search" placeholder="Search consultancy or firm name…" [ngModel]="conSearch()" (ngModelChange)="onConSearchInput($event)"
-              [ngModelOptions]="{standalone: true}" aria-label="Search consultancy firm name" autocomplete="off">
+            <input type="search" placeholder="Search consultancy or firm name…" [ngModel]="conSearch()"
+              (ngModelChange)="onConSearchInput($event)" [ngModelOptions]="{standalone: true}"
+              aria-label="Search consultancy firm name" autocomplete="off">
             @if (conSearchLoading()) {
             <span class="mm-search__loader" aria-hidden="true"></span>
             }
@@ -543,38 +552,38 @@
       </div>
       }
       <div class="mm-list-panel">
-      <div class="mm-list-box">
-        @if (conSearchLoading() && consultancies.length === 0) {
-        <div class="mm-list__loading">
-          <div class="mm-spinner"></div>
-          <span>Searching consultancies…</span>
-        </div>
-        } @else {
-        <div class="mm-list">
-          @for (c of filteredConsultancies; track c.id) {
-          <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)" (click)="toggleConsultancy(c.id)"
-            [style.--item-color]="config.color">
-            <div class="mm-checkbox" [class.is-checked]="isConSelected(c.id)" [style.--chk]="config.color">
-              @if (isConSelected(c.id)) { <span class="material-symbols-outlined">check</span> }
+        <div class="mm-list-box">
+          @if (conSearchLoading() && consultancies.length === 0) {
+          <div class="mm-list__loading">
+            <div class="mm-spinner"></div>
+            <span>Searching consultancies…</span>
+          </div>
+          } @else {
+          <div class="mm-list">
+            @for (c of filteredConsultancies; track c.id) {
+            <div class="mm-list__item checkbox" [class.is-active]="isConSelected(c.id)"
+              (click)="toggleConsultancy(c.id)" [style.--item-color]="config.color">
+              <div class="mm-checkbox" [class.is-checked]="isConSelected(c.id)" [style.--chk]="config.color">
+                @if (isConSelected(c.id)) { <span class="material-symbols-outlined">check</span> }
+              </div>
+              <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
+                <span class="material-symbols-outlined">apartment</span>
+              </div>
+              <div class="mm-list__info">
+                <span class="mm-list__name">{{ c.name }}</span>
+                <span class="mm-list__meta">{{ c.firmName || c.city || 'Partner Agency' }}</span>
+              </div>
             </div>
-            <div class="mm-icon-box" [style.background]="config.color + '15'" [style.color]="config.color">
-              <span class="material-symbols-outlined">apartment</span>
+            }
+            @if (filteredConsultancies.length === 0) {
+            <div class="mm-list__empty">
+              <span class="material-symbols-outlined">search_off</span>
+              <p>{{ conSearchEmptyMessage }}</p>
             </div>
-            <div class="mm-list__info">
-              <span class="mm-list__name">{{ c.name }}</span>
-              <span class="mm-list__meta">{{ c.firmName || c.city || 'Partner Agency' }}</span>
-            </div>
+            }
           </div>
           }
-          @if (filteredConsultancies.length === 0) {
-          <div class="mm-list__empty">
-            <span class="material-symbols-outlined">search_off</span>
-            <p>{{ conSearchEmptyMessage }}</p>
-          </div>
-          }
         </div>
-        }
-      </div>
       </div>
     </div>
     }

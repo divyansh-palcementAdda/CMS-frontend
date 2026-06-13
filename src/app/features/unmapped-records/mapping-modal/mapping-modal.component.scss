@@ -100,6 +100,39 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .mm-student-name {
+      font-weight: 700;
+      color: var(--mm-text);
+      font-size: 0.95rem;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    .mm-student-id {
+      font-size: 0.8rem;
+      color: var(--mm-muted);
+      margin-top: 0;
+    }
+
+    .mm-counselor-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--mm-muted);
+      margin-top: 6px;
+      padding: 3px 8px;
+      background: var(--mm-bg);
+      border-radius: var(--mm-radius-sm);
+      border: 1px solid var(--mm-border);
+      font-weight: 500;
+
+      .material-symbols-outlined {
+        font-size: 14px;
+        color: var(--accent);
+      }
+    }
   }
 }
 

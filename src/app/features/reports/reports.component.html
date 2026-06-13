@@ -95,7 +95,8 @@
                     </header>
 
                     <!-- Analytics Section -->
-                    <section class="analytics-layer" *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY' && activeReport !== 'SESSION_COMPARISON'">
+                    <section class="analytics-layer"
+                        *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY' && activeReport !== 'SESSION_COMPARISON'">
                         <!-- Modern KPI Grid for Standard Reports -->
                         <div class="kpi-grid-premium" *ngIf="activeReport !== 'COURSE_REVENUE'">
                             <div class="kpi-card-v2 total" [class.is-loading]="loading">
@@ -496,16 +497,17 @@
                                     <div class="section-divider"></div>
                                     <div class="section-header mini">
                                         <span class="material-symbols-outlined">analytics</span>
-                                        <h3>COURSE-WISE REVENUE</h3>
+                                        <h3>COURSE-WISE FIRST FEES PAID ANALYTICS</h3>
                                     </div>
                                     <div class="course-distribution-list">
-                                        <div class="dist-item" *ngFor="let cw of dailySummaryData.courseWiseFees">
+                                        <div class="dist-item"
+                                            *ngFor="let cw of dailySummaryData.courseWiseFirstFeesPaid">
                                             <span class="course-name">{{cw.courseName}}</span>
                                             <span class="dots"></span>
-                                            <span class="course-count">₹{{cw.count | number:'1.0-0'}}</span>
+                                            <span class="course-count">{{cw.studentCount | number:'2.0-0'}}</span>
                                         </div>
                                         <div class="dist-item empty"
-                                            *ngIf="dailySummaryData.courseWiseFees.length === 0">
+                                            *ngIf="!dailySummaryData.courseWiseFirstFeesPaid || dailySummaryData.courseWiseFirstFeesPaid.length === 0">
                                             <span class="course-name">No fee collections recorded today</span>
                                         </div>
                                     </div>
@@ -518,91 +520,80 @@
                                         <h3>SESSION CUMULATIVE STATS</h3>
                                     </div>
 
-                                    <div class="metrics-stack">
-                                        <div class="metric-row">
-                                            <div class="metric-info">
-                                                <span class="material-symbols-outlined icon-main">description</span>
-                                                <div class="labels">
-                                                    <span class="main">Total Forms</span>
-                                                    <span class="sub">Total applications received till date</span>
-                                                </div>
-                                            </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.totalForms ??
-                                                0}}</span>
+                                    <div class="primary-stats-grid">
+                                        <div class="session-stat-card color-blue">
+                                            <span class="card-icon">📥</span>
+                                            <span class="card-title">Total Forms</span>
+                                            <span class="card-count">{{dailySummaryData.totalFormsTillDate |
+                                                number}}</span>
+                                            <span class="card-subtitle">Total applications received till date</span>
                                         </div>
 
-                                        <div class="metric-row highlight-success">
-                                            <div class="metric-info">
-                                                <span class="material-symbols-outlined icon-main">check_circle</span>
-                                                <div class="labels">
-                                                    <span class="main">Total Admissions</span>
-                                                    <span class="sub">Students moved to final roll</span>
-                                                </div>
-                                            </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.totalAdmissions ??
-                                                0}}</span>
+                                        <div class="session-stat-card color-green">
+                                            <span class="card-icon">🎓</span>
+                                            <span class="card-title">Total Admissions</span>
+                                            <span class="card-count">{{dailySummaryData.totalAdmissions |
+                                                number}}</span>
+                                            <span class="card-subtitle">Students moved to final roll</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="secondary-stats-grid">
+                                        <div class="session-stat-card color-neutral">
+                                            <span class="card-icon">🏅</span>
+                                            <span class="card-title">Scholar Admissions</span>
+                                            <span class="card-count">{{dailySummaryData.scholarshipAdmissions |
+                                                number}}</span>
+                                            <span class="card-subtitle">Admissions on scholarship</span>
                                         </div>
 
-                                        <div class="metrics-sub-group">
-                                            <div class="sub-metric">
-                                                <span class="label">Scholarship</span>
-                                                <span class="val">{{sessionCumulativeStats?.scholarshipAdmissions ??
-                                                    0}}</span>
-                                            </div>
-                                            <div class="sub-metric">
-                                                <span class="label">FOC Students</span>
-                                                <span class="val">{{sessionCumulativeStats?.focAdmissions ??
-                                                    0}}</span>
-                                            </div>
-                                            <div class="sub-metric">
-                                                <span class="label">SBS Students</span>
-                                                <span class="val">{{sessionCumulativeStats?.sbsAdmissions ??
-                                                    0}}</span>
-                                            </div>
-                                            <div class="sub-metric highlight-actual">
-                                                <span class="label">Actual Active Admissions (Excluding Cancelled &
-                                                    Scholarship)</span> <span
-                                                    class="val">{{sessionCumulativeStats?.actualAdmissions ??
-                                                    0}}</span>
-                                            </div>
+                                        <div class="session-stat-card color-purple">
+                                            <span class="card-icon">🆓</span>
+                                            <span class="card-title">FOC Students</span>
+                                            <span class="card-count">{{dailySummaryData.focAdmissions | number}}</span>
+                                            <span class="card-subtitle">Free of cost students</span>
                                         </div>
 
-                                        <div class="metric-row highlight-danger">
-                                            <div class="metric-info">
-                                                <span class="material-symbols-outlined icon-main">cancel</span>
-                                                <div class="labels">
-                                                    <span class="main">Application Cancelled</span>
-                                                    <span class="sub">Forms cancelled without fees</span>
-                                                </div>
-                                            </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.applicationCancelled
-                                                ??
-                                                0}}</span>
+                                        <div class="session-stat-card color-purple">
+                                            <span class="card-icon">🏛️</span>
+                                            <span class="card-title">SBS Students</span>
+                                            <span class="card-count">{{dailySummaryData.sbsAdmissions | number}}</span>
+                                            <span class="card-subtitle">Special Benefit Scheme</span>
                                         </div>
 
-                                        <div class="metric-row highlight-danger">
-                                            <div class="metric-info">
-                                                <span class="material-symbols-outlined icon-main">person_off</span>
-                                                <div class="labels">
-                                                    <span class="main">Admission Cancelled</span>
-                                                    <span class="sub">Confirmed admissions cancelled</span>
-                                                </div>
-                                            </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.admissionCancelled
-                                                ??
-                                                0}}</span>
+                                        <div class="session-stat-card color-green">
+                                            <span class="card-icon">✅</span>
+                                            <span class="card-title">Actual Admissions</span>
+                                            <span
+                                                class="card-count">{{dailySummaryData.actualAdmissionsWithoutScholarship
+                                                | number}}</span>
+                                            <span class="card-subtitle">Excluding cancelled & scholarship</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="danger-stats-grid">
+                                        <div class="session-stat-card color-red">
+                                            <span class="card-icon">🚫</span>
+                                            <span class="card-title">Applications Cancelled</span>
+                                            <span class="card-count">{{dailySummaryData.applicationCancelledCount |
+                                                number}}</span>
+                                            <span class="card-subtitle">Total applications cancelled</span>
                                         </div>
 
-                                        <div class="metric-row highlight-warning">
-                                            <div class="metric-info">
-                                                <span class="material-symbols-outlined icon-main">pending_actions</span>
-                                                <div class="labels">
-                                                    <span class="main">Remaining Forms</span>
-                                                    <span class="sub">Forms pending processing/closure</span>
-                                                </div>
-                                            </div>
-                                            <span class="metric-value">{{sessionCumulativeStats?.remainingForms ??
-                                                0}}</span>
+                                        <div class="session-stat-card color-red">
+                                            <span class="card-icon">❌</span>
+                                            <span class="card-title">Admissions Cancelled</span>
+                                            <span class="card-count">{{dailySummaryData.admissionCancelledCount |
+                                                number}}</span>
+                                            <span class="card-subtitle">Confirmed admissions cancelled</span>
+                                        </div>
+
+                                        <div class="session-stat-card color-yellow">
+                                            <span class="card-icon">⏳</span>
+                                            <span class="card-title">Remaining Forms</span>
+                                            <span class="card-count">{{dailySummaryData.totalFormsRemainingTillDate |
+                                                number}}</span>
+                                            <span class="card-subtitle">Pending verification / processing</span>
                                         </div>
                                     </div>
                                 </div>
@@ -632,45 +623,56 @@
 
                                 <!-- Table / Grid Content -->
                                 <div class="first-fees-content" *ngIf="!loading">
-                                    <div class="table-container-v2"
-                                        style="border: 1px solid var(--slate-200); border-radius: 16px; overflow: hidden; background: #ffffff; box-shadow: var(--shadow-sm);"
+                                    <div
                                         *ngIf="dailySummaryData.courseWiseFirstFeesPaid && dailySummaryData.courseWiseFirstFeesPaid.length > 0">
-                                        <table
-                                            style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
-                                            <thead>
-                                                <tr
-                                                    style="background: var(--slate-50); border-bottom: 1px solid var(--slate-200); color: var(--slate-600); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
-                                                    <th style="padding: 1rem 1.5rem;">Course Name</th>
-                                                    <th style="padding: 1rem 1.5rem; text-align: right;">Students Count
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr *ngFor="let item of dailySummaryData.courseWiseFirstFeesPaid"
-                                                    style="border-bottom: 1px solid var(--slate-100); transition: background-color 0.2s;"
-                                                    onmouseover="this.style.backgroundColor='#f8fafc'"
-                                                    onmouseout="this.style.backgroundColor='transparent'">
-                                                    <td
-                                                        style="padding: 1rem 1.5rem; font-weight: 700; color: var(--slate-800);">
-                                                        {{item.courseName}}</td>
-                                                    <td
-                                                        style="padding: 1rem 1.5rem; text-align: right; font-weight: 700; color: var(--slate-600);">
-                                                        {{item.studentCount}} {{item.studentCount === 1 ? 'Student' :
-                                                        'Students'}}</td>
-                                                </tr>
-                                            </tbody>
-                                            <tfoot>
-                                                <tr
-                                                    style="background: var(--slate-50); border-top: 2px solid var(--slate-200); font-weight: 800; color: var(--slate-800); font-size: 13px;">
-                                                    <td style="padding: 1.25rem 1.5rem;">Total Aggregate</td>
-                                                    <td
-                                                        style="padding: 1.25rem 1.5rem; text-align: right; font-size: 14px;">
-                                                        {{courseWiseFirstFeesTotalStudents}}
-                                                        {{courseWiseFirstFeesTotalStudents === 1 ? 'Student' :
-                                                        'Students'}}</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
+                                        <!-- Course Wise Breakdown Heading -->
+
+
+
+
+                                        <!-- Course Type Breakdown Heading -->
+                                        <div class="breakdown-subheader"
+                                            style="margin: 2.5rem 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                                            <span class="material-symbols-outlined"
+                                                style="color: var(--primary); font-size: 20px;">school</span>
+                                            <h4
+                                                style="margin: 0; font-size: 14px; font-weight: 700; color: var(--slate-800);">
+                                                🎓 Course Type Breakdown</h4>
+                                        </div>
+
+                                        <!-- Hierarchical Breakdown Wrapper -->
+                                        <div class="course-type-breakdown-wrapper">
+                                            <div *ngFor="let group of dailySummaryData.courseTypeBreakdown"
+                                                class="course-type-block">
+                                                <!-- Course Type Header Row -->
+                                                <div class="course-type-header">
+                                                    <span class="course-type-name">{{group.courseType}} Total</span>
+                                                    <span class="course-type-badge">{{group.totalFeesPaid |
+                                                        number:'2.0-0'}} {{group.totalFeesPaid === 1 ? 'Fee Paid' :
+                                                        'Fees Paid'}}</span>
+                                                </div>
+
+                                                <!-- Child Courses List -->
+                                                <div class="course-children-list">
+                                                    <div *ngFor="let course of group.courses" class="course-child-row">
+                                                        <span
+                                                            class="course-child-name">&bull;&nbsp;&nbsp;{{course.courseName}}</span>
+                                                        <span class="course-child-value">{{course.feesPaid |
+                                                            number:'2.0-0'}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Total Aggregate Footer -->
+                                            <div class="breakdown-total-aggregate">
+                                                <span class="aggregate-label">Total Aggregate</span>
+                                                <span class="aggregate-value">
+                                                    {{courseWiseFirstFeesTotalStudents | number:'2.0-0'}}
+                                                    {{courseWiseFirstFeesTotalStudents === 1 ? 'Student' :
+                                                    'Students'}}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Empty state when no data exists -->
@@ -707,7 +709,8 @@
                     </section>
 
                     <!-- Data Management Layer -->
-                    <section class="data-surface-v2" *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY' && activeReport !== 'SESSION_COMPARISON'">
+                    <section class="data-surface-v2"
+                        *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY' && activeReport !== 'SESSION_COMPARISON'">
                         <div class="surface-top">
                             <div class="info">
                                 <div class="header-with-actions">
@@ -1182,7 +1185,7 @@
                                 </button>
                             </div>
                         </div>
-                     </section>
+                    </section>
 
                     <!-- Session Comparison View -->
                     <section class="session-comparison-view" *ngIf="activeReport === 'SESSION_COMPARISON'">
@@ -1190,10 +1193,13 @@
                         <div class="session-filters-panel" style="margin-bottom: 1.5rem;">
                             <div class="filter-toolbar"
                                 style="display: flex; align-items: center; justify-content: flex-start; gap: 1.5rem; flex-wrap: wrap; padding: 1rem 1.5rem; background: #ffffff; border-radius: 16px; border: 1px solid var(--slate-200); box-shadow: var(--shadow-sm);">
-                                
+
                                 <!-- Previous Session Selection -->
-                                <div class="control-item" style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
-                                    <label style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Compare From (Previous Session)</label>
+                                <div class="control-item"
+                                    style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
+                                    <label
+                                        style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Compare
+                                        From (Previous Session)</label>
                                     <select [(ngModel)]="comparisonPrevSession" (change)="loadComparisonReport()"
                                         style="height: 52px; padding: 0 40px 0 16px; border-radius: 12px; border: 1px solid var(--slate-200); background: rgba(248, 250, 252, 0.5); font-size: 14px; font-weight: 700; color: var(--slate-800); outline: none; transition: var(--transition);">
                                         <ng-container *ngFor="let s of sessions">
@@ -1203,8 +1209,11 @@
                                 </div>
 
                                 <!-- Current Session Selection -->
-                                <div class="control-item" style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
-                                    <label style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Compare With (Current Session)</label>
+                                <div class="control-item"
+                                    style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
+                                    <label
+                                        style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Compare
+                                        With (Current Session)</label>
                                     <select [(ngModel)]="comparisonCurrSession" (change)="loadComparisonReport()"
                                         style="height: 52px; padding: 0 40px 0 16px; border-radius: 12px; border: 1px solid var(--slate-200); background: rgba(248, 250, 252, 0.5); font-size: 14px; font-weight: 700; color: var(--slate-800); outline: none; transition: var(--transition);">
                                         <ng-container *ngFor="let s of sessions">
@@ -1214,8 +1223,11 @@
                                 </div>
 
                                 <!-- Comparison Date Selection -->
-                                <div class="control-item" style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
-                                    <label style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Comparison Date (Till Date)</label>
+                                <div class="control-item"
+                                    style="min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
+                                    <label
+                                        style="font-size: 9px; font-weight: 800; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.1em; padding-left: 2px;">Comparison
+                                        Date (Till Date)</label>
                                     <input type="date" [(ngModel)]="comparisonDate" (change)="loadComparisonReport()"
                                         style="height: 52px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--slate-200); background: rgba(248, 250, 252, 0.5); font-size: 14px; font-weight: 700; color: var(--slate-800); outline: none; transition: var(--transition);">
                                 </div>
@@ -1230,29 +1242,48 @@
                         </div>
 
                         <!-- Comparison Period Info Alert Banner -->
-                        <div class="comparison-period-info" *ngIf="comparisonDate" 
+                        <div class="comparison-period-info" *ngIf="comparisonDate"
                             style="background: rgba(67, 95, 255, 0.05); border: 1px solid rgba(67, 95, 255, 0.15); border-radius: 16px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; font-size: 14px; color: var(--primary); font-weight: 700; box-shadow: var(--shadow-sm);">
-                            <span class="material-symbols-outlined" style="font-size: 24px; color: var(--primary);">info</span>
-                            <span>Comparing cumulative progress: Session {{comparisonPrevSession}} (Start to {{formatCustomDate(comparisonPrevCutoffDate)}}) vs Session {{comparisonCurrSession}} (Start to {{formatCustomDate(comparisonDate)}})</span>
+                            <span class="material-symbols-outlined"
+                                style="font-size: 24px; color: var(--primary);">info</span>
+                            <span>Comparing cumulative progress: Session {{comparisonPrevSession}} (Start to
+                                {{formatCustomDate(comparisonPrevCutoffDate)}}) vs Session {{comparisonCurrSession}}
+                                (Start to {{formatCustomDate(comparisonDate)}})</span>
                         </div>
 
 
                         <!-- KPI Growth Cards Grid -->
-                        <div class="kpi-grid-premium" style="margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                        <div class="kpi-grid-premium"
+                            style="margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
                             <!-- Forms Comparison Card -->
-                            <div class="kpi-card-v2" [class.is-loading]="loading" style="border-left: 4px solid var(--primary);">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: var(--primary);">compare_arrows</span></div>
-                                <div class="kpi-label" title="Comparing total forms received from session start till the selected cutoff dates">Forms Volume Till Date (Previous vs Current)</div>
-                                <div class="value-group" style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="border-left: 4px solid var(--primary);">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: var(--primary);">compare_arrows</span></div>
+                                <div class="kpi-label"
+                                    title="Comparing total forms received from session start till the selected cutoff dates">
+                                    Forms Volume Till Date (Previous vs Current)</div>
+                                <div class="value-group"
+                                    style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
                                     <div style="display: flex; align-items: baseline; gap: 8px;">
-                                        <span class="kpi-value" style="font-size: 26px;">{{comparisonSummary.prevTotalForms | number}}</span>
-                                        <span style="font-size: 14px; color: var(--slate-400); font-weight: 600;">to</span>
-                                        <span class="kpi-value" style="font-size: 26px; color: var(--primary);">{{comparisonSummary.currTotalForms | number}}</span>
+                                        <span class="kpi-value"
+                                            style="font-size: 26px;">{{comparisonSummary.prevTotalForms |
+                                            number}}</span>
+                                        <span
+                                            style="font-size: 14px; color: var(--slate-400); font-weight: 600;">to</span>
+                                        <span class="kpi-value"
+                                            style="font-size: 26px; color: var(--primary);">{{comparisonSummary.currTotalForms
+                                            | number}}</span>
                                     </div>
                                     <div class="trend-indicator" style="display: flex; align-items: center; gap: 8px;">
-                                        <span class="percentage" [class.success]="comparisonSummary.formsGrowth >= 0" [class.danger]="comparisonSummary.formsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
-                                            <span class="badge-icon">{{comparisonSummary.formsGrowth >= 0 ? '↗' : '↘'}}</span> 
-                                            {{comparisonSummary.formsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.formsGrowth | number}} ({{comparisonSummary.formsGrowthPct | number:'1.1-1'}}%)
+                                        <span class="percentage" [class.success]="comparisonSummary.formsGrowth >= 0"
+                                            [class.danger]="comparisonSummary.formsGrowth < 0"
+                                            style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
+                                            <span class="badge-icon">{{comparisonSummary.formsGrowth >= 0 ? '↗' :
+                                                '↘'}}</span>
+                                            {{comparisonSummary.formsGrowth >= 0 ? '+' :
+                                            ''}}{{comparisonSummary.formsGrowth | number}}
+                                            ({{comparisonSummary.formsGrowthPct | number:'1.1-1'}}%)
                                         </span>
                                         <span class="trend-label">Growth Margin</span>
                                     </div>
@@ -1260,19 +1291,35 @@
                             </div>
 
                             <!-- Confirmed Admissions Comparison Card -->
-                            <div class="kpi-card-v2" [class.is-loading]="loading" style="border-left: 4px solid #10b981;">
-                                <div class="card-bg-icon"><span class="material-symbols-outlined" style="color: #10b981;">how_to_reg</span></div>
-                                <div class="kpi-label" title="Comparing total confirmed admissions from session start till the selected cutoff dates">Confirmed Admissions Till Date (Previous vs Current)</div>
-                                <div class="value-group" style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="border-left: 4px solid #10b981;">
+                                <div class="card-bg-icon"><span class="material-symbols-outlined"
+                                        style="color: #10b981;">how_to_reg</span></div>
+                                <div class="kpi-label"
+                                    title="Comparing total confirmed admissions from session start till the selected cutoff dates">
+                                    Confirmed Admissions Till Date (Previous vs Current)</div>
+                                <div class="value-group"
+                                    style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
                                     <div style="display: flex; align-items: baseline; gap: 8px;">
-                                        <span class="kpi-value" style="font-size: 26px;">{{comparisonSummary.prevTotalAdmissions | number}}</span>
-                                        <span style="font-size: 14px; color: var(--slate-400); font-weight: 600;">to</span>
-                                        <span class="kpi-value" style="font-size: 26px; color: #10b981;">{{comparisonSummary.currTotalAdmissions | number}}</span>
+                                        <span class="kpi-value"
+                                            style="font-size: 26px;">{{comparisonSummary.prevTotalAdmissions |
+                                            number}}</span>
+                                        <span
+                                            style="font-size: 14px; color: var(--slate-400); font-weight: 600;">to</span>
+                                        <span class="kpi-value"
+                                            style="font-size: 26px; color: #10b981;">{{comparisonSummary.currTotalAdmissions
+                                            | number}}</span>
                                     </div>
                                     <div class="trend-indicator" style="display: flex; align-items: center; gap: 8px;">
-                                        <span class="percentage" [class.success]="comparisonSummary.admissionsGrowth >= 0" [class.danger]="comparisonSummary.admissionsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
-                                            <span class="badge-icon">{{comparisonSummary.admissionsGrowth >= 0 ? '&#x2197;' : '&#x2198;'}}</span> 
-                                            {{comparisonSummary.admissionsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.admissionsGrowth | number}} ({{comparisonSummary.admissionsGrowthPct | number:'1.1-1'}}%)
+                                        <span class="percentage"
+                                            [class.success]="comparisonSummary.admissionsGrowth >= 0"
+                                            [class.danger]="comparisonSummary.admissionsGrowth < 0"
+                                            style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 12px;">
+                                            <span class="badge-icon">{{comparisonSummary.admissionsGrowth >= 0 ?
+                                                '&#x2197;' : '&#x2198;'}}</span>
+                                            {{comparisonSummary.admissionsGrowth >= 0 ? '+' :
+                                            ''}}{{comparisonSummary.admissionsGrowth | number}}
+                                            ({{comparisonSummary.admissionsGrowthPct | number:'1.1-1'}}%)
                                         </span>
                                         <span class="trend-label">Admissions Growth</span>
                                     </div>
@@ -1281,12 +1328,14 @@
                         </div>
 
                         <!-- Graphical Insights Panel -->
-                        <div class="analytics-visualization-grid" *ngIf="!loading && comparisonData.length > 0" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="analytics-visualization-grid" *ngIf="!loading && comparisonData.length > 0"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
                             <!-- Forms Comparison Chart -->
                             <div class="analytics-chart-card main-insight" *ngIf="comparisonFormsChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
-                                        <span class="material-symbols-outlined icon" style="color: var(--primary);">bar_chart</span>
+                                        <span class="material-symbols-outlined icon"
+                                            style="color: var(--primary);">bar_chart</span>
                                         <h3>Program Form Comparison (Top 10)</h3>
                                     </div>
                                 </div>
@@ -1311,7 +1360,8 @@
                             <div class="analytics-chart-card side-distribution" *ngIf="comparisonFeesChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
-                                        <span class="material-symbols-outlined icon" style="color: #10b981;">how_to_reg</span>
+                                        <span class="material-symbols-outlined icon"
+                                            style="color: #10b981;">how_to_reg</span>
                                         <h3>Program Admissions Comparison (Top 10)</h3>
                                     </div>
                                 </div>
@@ -1339,96 +1389,149 @@
                                 <span class="material-symbols-outlined">data_alert</span>
                             </div>
                             <h3>No Comparison Data Found</h3>
-                            <p>There are no historical snapshots or active live data available for the selected sessions.</p>
+                            <p>There are no historical snapshots or active live data available for the selected
+                                sessions.</p>
                         </div>
 
                         <!-- Comparison Detailed Data Table Card -->
-                        <div class="data-surface-v2" *ngIf="!loading && comparisonData.length > 0" style="margin-top: 1.5rem; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.5); padding: 1.5rem;">
+                        <div class="data-surface-v2" *ngIf="!loading && comparisonData.length > 0"
+                            style="margin-top: 1.5rem; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.5); padding: 1.5rem;">
                             <div class="surface-top" style="margin-bottom: 1.25rem;">
                                 <div class="info">
-                                    <div class="header-with-actions" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                                        <h3 style="font-size: 18px; font-weight: 800; color: var(--slate-800); margin: 0;">Course Performance Comparison Metrics</h3>
-                                        <span class="badge premium" style="font-weight: 700; background: linear-gradient(135deg, #435fff 0%, #00d2ff 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px;">Previous (Manual) vs Current (Live)</span>
+                                    <div class="header-with-actions"
+                                        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                                        <h3
+                                            style="font-size: 18px; font-weight: 800; color: var(--slate-800); margin: 0;">
+                                            Course Performance Comparison Metrics</h3>
+                                        <span class="badge premium"
+                                            style="font-weight: 700; background: linear-gradient(135deg, #435fff 0%, #00d2ff 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px;">Previous
+                                            (Manual) vs Current (Live)</span>
                                     </div>
-                                    <p class="subtitle" style="font-size: 13px; color: var(--slate-500); margin: 4px 0 0 0;">Comprehensive breakdown of cumulative applications and confirmed admissions variance course-wise till the selected date.</p>
+                                    <p class="subtitle"
+                                        style="font-size: 13px; color: var(--slate-500); margin: 4px 0 0 0;">
+                                        Comprehensive breakdown of cumulative applications and confirmed admissions
+                                        variance course-wise till the selected date.</p>
                                 </div>
                             </div>
 
-                            <div class="table-scroll-container" style="border: 1px solid var(--slate-200); border-radius: 12px; overflow: hidden; background: #ffffff;">
+                            <div class="table-scroll-container"
+                                style="border: 1px solid var(--slate-200); border-radius: 12px; overflow: hidden; background: #ffffff;">
                                 <table class="enterprise-table" style="width: 100%; border-collapse: collapse;">
                                     <thead>
-                                        <tr style="background: var(--slate-50); border-bottom: 2px solid var(--slate-200);">
-                                            <th style="min-width: 250px; text-align: left; padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Course Program</th>
-                                            <th class="text-center" style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonPrevSession}} Forms Till Date</th>
-                                            <th class="text-center" style="background: rgba(67, 95, 255, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonCurrSession}} Forms Till Date</th>
-                                            <th class="text-center" style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Forms Growth</th>
-                                            <th class="text-center" style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonPrevSession}} Confirmed Adm. Till Date</th>
-                                            <th class="text-center" style="background: rgba(16, 185, 129, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Session {{comparisonCurrSession}} Confirmed Adm. Till Date</th>
-                                            <th class="text-center" style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Admissions Growth</th>
+                                        <tr
+                                            style="background: var(--slate-50); border-bottom: 2px solid var(--slate-200);">
+                                            <th
+                                                style="min-width: 250px; text-align: left; padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Course Program</th>
+                                            <th class="text-center"
+                                                style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Session {{comparisonPrevSession}} Forms Till Date</th>
+                                            <th class="text-center"
+                                                style="background: rgba(67, 95, 255, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Session {{comparisonCurrSession}} Forms Till Date</th>
+                                            <th class="text-center"
+                                                style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Forms Growth</th>
+                                            <th class="text-center"
+                                                style="background: rgba(148, 163, 184, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Session {{comparisonPrevSession}} Confirmed Adm. Till Date</th>
+                                            <th class="text-center"
+                                                style="background: rgba(16, 185, 129, 0.05); padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Session {{comparisonCurrSession}} Confirmed Adm. Till Date</th>
+                                            <th class="text-center"
+                                                style="padding: 14px 18px; font-weight: 800; color: var(--slate-700); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                                Admissions Growth</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let item of comparisonData" class="table-row" style="border-bottom: 1px solid var(--slate-100); transition: background 0.2s;">
+                                        <tr *ngFor="let item of comparisonData" class="table-row"
+                                            style="border-bottom: 1px solid var(--slate-100); transition: background 0.2s;">
                                             <td style="font-weight: 700; color: var(--slate-800); padding: 14px 18px;">
                                                 {{item.courseName}}
                                             </td>
-                                            
+
                                             <!-- Forms Column -->
-                                            <td class="text-center font-monospace" style="background: rgba(148, 163, 184, 0.02); font-weight: 600; color: var(--slate-600); padding: 14px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="background: rgba(148, 163, 184, 0.02); font-weight: 600; color: var(--slate-600); padding: 14px 18px; text-align: center;">
                                                 {{item.prevSessionForms || 0}}
                                             </td>
-                                            <td class="text-center font-monospace" style="background: rgba(67, 95, 255, 0.02); font-weight: 700; color: var(--primary); padding: 14px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="background: rgba(67, 95, 255, 0.02); font-weight: 700; color: var(--primary); padding: 14px 18px; text-align: center;">
                                                 {{item.currentSessionForms || 0}}
                                             </td>
                                             <td class="text-center" style="padding: 14px 18px; text-align: center;">
-                                                <span class="badge" [class.success]="item.formsGrowth >= 0" [class.danger]="item.formsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 12px;">
-                                                    <span style="font-size: 10px;">{{item.formsGrowth >= 0 ? '▲' : '▼'}}</span>
-                                                    {{item.formsGrowth >= 0 ? '+' : ''}}{{item.formsGrowth}} 
+                                                <span class="badge" [class.success]="item.formsGrowth >= 0"
+                                                    [class.danger]="item.formsGrowth < 0"
+                                                    style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 12px;">
+                                                    <span style="font-size: 10px;">{{item.formsGrowth >= 0 ? '▲' :
+                                                        '▼'}}</span>
+                                                    {{item.formsGrowth >= 0 ? '+' : ''}}{{item.formsGrowth}}
                                                     ({{item.formsGrowthPercent || 0 | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
 
                                             <!-- Confirmed Admissions Column -->
-                                            <td class="text-center font-monospace" style="background: rgba(148, 163, 184, 0.02); font-weight: 600; color: var(--slate-600); padding: 14px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="background: rgba(148, 163, 184, 0.02); font-weight: 600; color: var(--slate-600); padding: 14px 18px; text-align: center;">
                                                 {{item.prevSessionConfirmedAdmissions || 0}}
                                             </td>
-                                            <td class="text-center font-monospace" style="background: rgba(16, 185, 129, 0.02); font-weight: 700; color: #10b981; padding: 14px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="background: rgba(16, 185, 129, 0.02); font-weight: 700; color: #10b981; padding: 14px 18px; text-align: center;">
                                                 {{item.currentSessionConfirmedAdmissions || 0}}
                                             </td>
                                             <td class="text-center" style="padding: 14px 18px; text-align: center;">
-                                                <span class="badge" [class.success]="item.admissionsGrowth >= 0" [class.danger]="item.admissionsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 12px;">
-                                                    <span style="font-size: 10px;">{{item.admissionsGrowth >= 0 ? '&#9650;' : '&#9660;'}}</span>
-                                                    {{item.admissionsGrowth >= 0 ? '+' : ''}}{{item.admissionsGrowth || 0}} 
+                                                <span class="badge" [class.success]="item.admissionsGrowth >= 0"
+                                                    [class.danger]="item.admissionsGrowth < 0"
+                                                    style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 12px;">
+                                                    <span style="font-size: 10px;">{{item.admissionsGrowth >= 0 ?
+                                                        '&#9650;' : '&#9660;'}}</span>
+                                                    {{item.admissionsGrowth >= 0 ? '+' : ''}}{{item.admissionsGrowth ||
+                                                    0}}
                                                     ({{item.admissionsGrowthPercent || 0 | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
                                         </tr>
                                         <!-- Totals Row -->
-                                        <tr class="totals-row" style="background: var(--slate-50); border-top: 2px solid var(--slate-300); font-weight: 800;">
-                                            <td style="font-weight: 800; color: var(--slate-900); padding: 16px 18px;">Total Aggregated Summary</td>
-                                            <td class="text-center font-monospace" style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: center;">
+                                        <tr class="totals-row"
+                                            style="background: var(--slate-50); border-top: 2px solid var(--slate-300); font-weight: 800;">
+                                            <td style="font-weight: 800; color: var(--slate-900); padding: 16px 18px;">
+                                                Total Aggregated Summary</td>
+                                            <td class="text-center font-monospace"
+                                                style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: center;">
                                                 {{comparisonSummary.prevTotalForms | number}}
                                             </td>
-                                            <td class="text-center font-monospace" style="font-weight: 800; color: var(--primary); padding: 16px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="font-weight: 800; color: var(--primary); padding: 16px 18px; text-align: center;">
                                                 {{comparisonSummary.currTotalForms | number}}
                                             </td>
                                             <td class="text-center" style="padding: 16px 18px; text-align: center;">
-                                                <span class="badge" [class.success]="comparisonSummary.formsGrowth >= 0" [class.danger]="comparisonSummary.formsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
-                                                    <span>{{comparisonSummary.formsGrowth >= 0 ? '&#9650;' : '&#9660;'}}</span>
-                                                    {{comparisonSummary.formsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.formsGrowth}} 
+                                                <span class="badge" [class.success]="comparisonSummary.formsGrowth >= 0"
+                                                    [class.danger]="comparisonSummary.formsGrowth < 0"
+                                                    style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
+                                                    <span>{{comparisonSummary.formsGrowth >= 0 ? '&#9650;' :
+                                                        '&#9660;'}}</span>
+                                                    {{comparisonSummary.formsGrowth >= 0 ? '+' :
+                                                    ''}}{{comparisonSummary.formsGrowth}}
                                                     ({{comparisonSummary.formsGrowthPct | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
-                                            <td class="text-center font-monospace" style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="font-weight: 800; color: var(--slate-700); padding: 16px 18px; text-align: center;">
                                                 {{comparisonSummary.prevTotalAdmissions | number}}
                                             </td>
-                                            <td class="text-center font-monospace" style="font-weight: 800; color: #10b981; padding: 16px 18px; text-align: center;">
+                                            <td class="text-center font-monospace"
+                                                style="font-weight: 800; color: #10b981; padding: 16px 18px; text-align: center;">
                                                 {{comparisonSummary.currTotalAdmissions | number}}
                                             </td>
                                             <td class="text-center" style="padding: 16px 18px; text-align: center;">
-                                                <span class="badge" [class.success]="comparisonSummary.admissionsGrowth >= 0" [class.danger]="comparisonSummary.admissionsGrowth < 0" style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
-                                                    <span>{{comparisonSummary.admissionsGrowth >= 0 ? '&#9650;' : '&#9660;'}}</span>
-                                                    {{comparisonSummary.admissionsGrowth >= 0 ? '+' : ''}}{{comparisonSummary.admissionsGrowth}} 
+                                                <span class="badge"
+                                                    [class.success]="comparisonSummary.admissionsGrowth >= 0"
+                                                    [class.danger]="comparisonSummary.admissionsGrowth < 0"
+                                                    style="display: inline-flex; align-items: center; gap: 4px; font-weight: 800; padding: 6px 12px; border-radius: 8px; font-size: 12px;">
+                                                    <span>{{comparisonSummary.admissionsGrowth >= 0 ? '&#9650;' :
+                                                        '&#9660;'}}</span>
+                                                    {{comparisonSummary.admissionsGrowth >= 0 ? '+' :
+                                                    ''}}{{comparisonSummary.admissionsGrowth}}
                                                     ({{comparisonSummary.admissionsGrowthPct | number:'1.1-1'}}%)
                                                 </span>
                                             </td>
@@ -1545,12 +1648,14 @@
         </div>
     </div>
     <!-- Modern WhatsApp Preview Modal Overlay -->
-    <div class="modal-overlay whatsapp-preview-modal-overlay" *ngIf="showWhatsAppPreview" (click)="showWhatsAppPreview = false">
+    <div class="modal-overlay whatsapp-preview-modal-overlay" *ngIf="showWhatsAppPreview"
+        (click)="showWhatsAppPreview = false">
         <div class="whatsapp-preview-panel" (click)="$event.stopPropagation()">
             <div class="panel-header">
                 <div class="panel-title">
                     <svg class="whatsapp-logo" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.658 1.43 5.711 1.431h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.658 1.43 5.711 1.431h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                     </svg>
                     <div class="panel-header-text">
                         <h4>WhatsApp Summary Preview</h4>
@@ -1570,8 +1675,10 @@
                             <span class="chat-time">Just now</span>
                             <span class="chat-status-ticks">
                                 <svg viewBox="0 0 16 11" class="ticks-icon">
-                                    <path fill="#53bdeb" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.047L8.625 9.8 5.322 6.79a.366.366 0 0 0-.509.006l-.427.42a.307.307 0 0 0 .005.448l3.993 3.634a.366.366 0 0 0 .524-.012l6.15-8.46a.307.307 0 0 0-.048-.41z" />
-                                    <path fill="#53bdeb" d="M11.166 3.316l-.478-.372a.365.365 0 0 0-.51.047L4.78 9.8 1.478 6.79a.366.366 0 0 0-.51.006l-.427.42a.307.307 0 0 0 .006.448l3.993 3.634a.366.366 0 0 0 .523-.012l6.15-8.46a.307.307 0 0 0-.048-.41z" />
+                                    <path fill="#53bdeb"
+                                        d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.047L8.625 9.8 5.322 6.79a.366.366 0 0 0-.509.006l-.427.42a.307.307 0 0 0 .005.448l3.993 3.634a.366.366 0 0 0 .524-.012l6.15-8.46a.307.307 0 0 0-.048-.41z" />
+                                    <path fill="#53bdeb"
+                                        d="M11.166 3.316l-.478-.372a.365.365 0 0 0-.51.047L4.78 9.8 1.478 6.79a.366.366 0 0 0-.51.006l-.427.42a.307.307 0 0 0 .006.448l3.993 3.634a.366.366 0 0 0 .523-.012l6.15-8.46a.307.307 0 0 0-.048-.41z" />
                                 </svg>
                             </span>
                         </div>
@@ -1584,13 +1691,16 @@
                     Dismiss
                 </button>
                 <div class="footer-actions-group">
-                    <button class="btn-panel-action secondary copy-btn" [class.copied]="whatsappCopiedText" (click)="copyWhatsAppToClipboard()">
-                        <span class="material-symbols-outlined icon">{{ whatsappCopiedText ? 'check' : 'content_copy' }}</span>
+                    <button class="btn-panel-action secondary copy-btn" [class.copied]="whatsappCopiedText"
+                        (click)="copyWhatsAppToClipboard()">
+                        <span class="material-symbols-outlined icon">{{ whatsappCopiedText ? 'check' : 'content_copy'
+                            }}</span>
                         <span>{{ whatsappCopiedText ? 'Copied!' : 'Copy Text' }}</span>
                     </button>
                     <button class="btn-panel-action primary whatsapp-btn" (click)="shareOnWhatsApp()">
                         <svg class="btn-logo" viewBox="0 0 24 24">
-                            <path fill="#ffffff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.658 1.43 5.711 1.431h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                            <path fill="#ffffff"
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.658 1.43 5.711 1.431h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                         </svg>
                         <span>Share on WhatsApp</span>
                     </button>

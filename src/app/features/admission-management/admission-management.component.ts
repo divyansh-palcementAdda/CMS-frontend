@@ -962,11 +962,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.selectedAdmissionForPayment = item;
     this.showPaymentModal = true;
   }
-
   onPaymentSaved(): void {
     this.fetchData();
   }
-
   // ── Fee Status Toggle ─────────────────────────────────────────────────
 
   toggleFeeStatus(item: AdmissionItem, newStatus: string): void {

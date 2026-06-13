@@ -131,6 +131,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     conversionRate: 0
   };
   dailySummaryData: any = null;
+  meta: any = null;
   sessionCumulativeStats: any = null;
 
   // Session Comparison State
@@ -721,8 +722,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
             this.reportData = [];
             this.totalElements = 0;
             this.serverPages = 0;
+            this.meta = null;
             return;
           }
+
+          this.meta = apiData.meta || null;
 
           if (this.activeReport === 'DAILY_SESSION_SUMMARY') {
             this.reportData = apiData.content || [];

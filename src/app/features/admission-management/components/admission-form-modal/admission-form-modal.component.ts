@@ -258,6 +258,15 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
       state: ['', Validators.required],
       address: ['', [Validators.required, Validators.minLength(5)]],
 
+      // Education & Category Details
+      recentEducation: [''],
+      eduStatus: [''],
+      board: [''],
+      customBoard: [''],
+      schoolOrCollegeName: [''],
+      casteCategory: [''],
+      customCasteCategory: [''],
+
       // Step 2: Admission
       enrollmentId: ['', [Validators.required]],
       admissionSource: ['USER', Validators.required],
@@ -323,7 +332,27 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
   private loadStudentData(id: number): void {
     this.admissionService.getAdmissionById(id).subscribe({
       next: (data) => {
-        this.admissionForm.patchValue(data);
+        let boardVal = data.board;
+        let customBoardVal = '';
+        if (boardVal && !['CBSE', 'ICSE', 'MP Board', 'State Board'].includes(boardVal)) {
+          boardVal = 'Other';
+          customBoardVal = data.board;
+        }
+
+        let casteVal = data.casteCategory;
+        let customCasteVal = '';
+        if (casteVal && !['General', 'OBC', 'SC', 'ST', 'EWS'].includes(casteVal)) {
+          casteVal = 'Other';
+          customCasteVal = data.casteCategory;
+        }
+
+        this.admissionForm.patchValue({
+          ...data,
+          board: boardVal || '',
+          customBoard: customBoardVal,
+          casteCategory: casteVal || '',
+          customCasteCategory: customCasteVal
+        });
         if (data.institutionId) {
           this.onInstitutionChange();
           // Ensure courseId is set AFTER filteredCourses are loaded
@@ -435,6 +464,15 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     if (data.discountType === '') data.discountType = null;
     if (data.admittedByUserId === '') data.admittedByUserId = null;
     if (data.consultancyId === '') data.consultancyId = null;
+
+    if (data.board === 'Other') {
+      data.board = data.customBoard;
+    }
+    if (data.casteCategory === 'Other') {
+      data.casteCategory = data.customCasteCategory;
+    }
+    delete data.customBoard;
+    delete data.customCasteCategory;
 
     const request = this.isEditMode
       ? this.admissionService.updateAdmission(this.studentId!, data)

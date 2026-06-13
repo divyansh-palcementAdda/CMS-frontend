@@ -181,6 +181,20 @@
   }
 }
 
+.form-section-header {
+  grid-column: 1 / -1;
+  margin-top: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #e2e8f0;
+  
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+}
+
 .input-group {
   label {
     display: block;

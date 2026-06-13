@@ -178,6 +178,99 @@
               </div>
               <div class="error-msg" [class.show]="backendErrors['address']">{{ backendErrors['address'] }}</div>
             </div>
+
+            <!-- Education Details Section -->
+            <div class="form-section-header full-width">
+              <h3>Education Details</h3>
+            </div>
+
+            <div class="input-group">
+              <label>Recent Education</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['recentEducation']">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <input type="text" formControlName="recentEducation" placeholder="e.g. 12th Science / BCA">
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['recentEducation']">{{ backendErrors['recentEducation'] }}</div>
+            </div>
+
+            <div class="input-group">
+              <label>Education Status</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['eduStatus']">
+                <i class="fa-solid fa-circle-info"></i>
+                <select formControlName="eduStatus">
+                  <option value="">Select Education Status</option>
+                  <option value="Pursuing">Pursuing</option>
+                  <option value="Passed">Passed</option>
+                  <option value="Appearing">Appearing</option>
+                </select>
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['eduStatus']">{{ backendErrors['eduStatus'] }}</div>
+            </div>
+
+            <div class="input-group">
+              <label>Board</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['board']">
+                <i class="fa-solid fa-chalkboard"></i>
+                <select formControlName="board">
+                  <option value="">Select Board</option>
+                  <option value="CBSE">CBSE</option>
+                  <option value="ICSE">ICSE</option>
+                  <option value="MP Board">MP Board</option>
+                  <option value="State Board">State Board</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['board']">{{ backendErrors['board'] }}</div>
+            </div>
+
+            <div class="input-group" *ngIf="admissionForm.get('board')?.value === 'Other'">
+              <label>Specify Board</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['board']">
+                <i class="fa-solid fa-pen"></i>
+                <input type="text" formControlName="customBoard" placeholder="Enter board name">
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['board']">{{ backendErrors['board'] }}</div>
+            </div>
+
+            <div class="input-group">
+              <label>School / College Name</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['schoolOrCollegeName']">
+                <i class="fa-solid fa-school"></i>
+                <input type="text" formControlName="schoolOrCollegeName" placeholder="Enter school or college name">
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['schoolOrCollegeName']">{{ backendErrors['schoolOrCollegeName'] }}</div>
+            </div>
+
+            <!-- Category Details Section -->
+            <div class="form-section-header full-width">
+              <h3>Category Details</h3>
+            </div>
+
+            <div class="input-group">
+              <label>Caste Category</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['casteCategory']">
+                <i class="fa-solid fa-people-group"></i>
+                <select formControlName="casteCategory">
+                  <option value="">Select Category</option>
+                  <option value="General">General</option>
+                  <option value="OBC">OBC</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="EWS">EWS</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['casteCategory']">{{ backendErrors['casteCategory'] }}</div>
+            </div>
+
+            <div class="input-group" *ngIf="admissionForm.get('casteCategory')?.value === 'Other'">
+              <label>Specify Category</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['casteCategory']">
+                <i class="fa-solid fa-pen"></i>
+                <input type="text" formControlName="customCasteCategory" placeholder="Enter category">
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['casteCategory']">{{ backendErrors['casteCategory'] }}</div>
+            </div>
           </div>
         </div>
 

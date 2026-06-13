@@ -14,8 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
-      </div>
-      
+      </div>   
       <div class="login-card">
         <div class="login-header">
           <div class="logo-box">
@@ -24,12 +23,10 @@ import { AuthService } from '../../core/services/auth.service';
           <h1 class="welcome-text">Welcome Back</h1>
           <p class="subtitle">Please enter your details to sign in</p>
         </div>
-
         <div *ngIf="error()" class="error-alert">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <span>{{ error() }}</span>
         </div>
-
         <form (ngSubmit)="onSubmit()" #f="ngForm" class="login-form">
           <div class="form-group">
             <label for="identity">Username or Email</label>
@@ -39,17 +36,17 @@ import { AuthService } from '../../core/services/auth.service';
                 placeholder="john@example.com" required autocomplete="username" />
             </div>
           </div>
-
           <div class="form-group">
+            <label for="password">Password</label>
             <div class="input-wrapper">
               <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="password" [(ngModel)]="password" name="password"
+              <input [type]="showPassword ? 'text' : 'password'" id="password" [(ngModel)]="password" name="password"
                 placeholder="••••••••" required autocomplete="current-password" />
+              <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword ? 'Hide Password' : 'Show Password'">
+                <i class="pi" [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+              </button>
             </div>
           </div>
-
-        
-
           <button type="submit" class="submit-btn" [disabled]="loading()">
             <span *ngIf="!loading()">Sign In</span>
             <div *ngIf="loading()" class="loader"></div>
@@ -240,7 +237,7 @@ import { AuthService } from '../../core/services/auth.service';
     input[type="text"],
     input[type="password"] {
       width: 100%;
-      padding: 12px 16px 12px 48px;
+      padding: 12px 48px 12px 48px;
       background: #f1f5f9;
       border: 2px solid transparent;
       border-radius: 12px;
@@ -258,6 +255,29 @@ import { AuthService } from '../../core/services/auth.service';
         
         & + .input-icon { color: #7c3aed; }
       }
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: color 0.2s;
+      z-index: 5;
+    }
+
+    .password-toggle-btn:hover {
+      color: #7c3aed;
+    }
+
+    .password-toggle-btn i {
+      font-size: 18px;
     }
 
     .remember-me {
@@ -359,6 +379,11 @@ export class LoginComponent {
   password = '';
   loading = signal(false);
   error = signal<string | null>(null);
+  showPassword = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(
     private auth: AuthService,
