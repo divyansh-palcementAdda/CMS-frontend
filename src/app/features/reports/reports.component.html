@@ -596,37 +596,36 @@
                                         </div>
 
                                         <!-- Hierarchical Breakdown Wrapper -->
-                                        <div class="course-type-breakdown-wrapper">
-                                            <div *ngFor="let group of dailySummaryData.courseTypeBreakdown"
-                                                class="course-type-block">
-                                                <!-- Course Type Header Row -->
-                                                <div class="course-type-header">
-                                                    <span class="course-type-name">{{group.courseType}} Total</span>
-                                                    <span class="course-type-badge">{{group.totalFeesPaid |
-                                                        number:'2.0-0'}} {{group.totalFeesPaid === 1 ? 'Fee Paid' :
-                                                        'Fees Paid'}}</span>
+                                        <div class="course-type-grid-layout" *ngIf="dailySummaryData.transformedCourseTypeBreakdown">
+                                            <div *ngFor="let group of dailySummaryData.transformedCourseTypeBreakdown" class="course-type-card">
+                                                <!-- Header & Total -->
+                                                <div class="course-type-card-header">
+                                                    <span class="category-title">🎓 {{group.courseType}}</span>
+                                                    <span class="category-total">{{group.totalFeesPaid | number:'2.0-0'}} Students</span>
                                                 </div>
 
-                                                <!-- Child Courses List -->
-                                                <div class="course-children-list">
-                                                    <div *ngFor="let course of group.courses" class="course-child-row">
-                                                        <span
-                                                            class="course-child-name">&bull;&nbsp;&nbsp;{{course.courseName}}</span>
-                                                        <span class="course-child-value">{{course.feesPaid |
-                                                            number:'2.0-0'}}</span>
+                                                <!-- Divider & Course List only if totalFeesPaid > 0 -->
+                                                <ng-container *ngIf="group.totalFeesPaid > 0">
+                                                    <hr class="card-divider">
+                                                    <div class="course-list">
+                                                        <div *ngFor="let course of group.courses" class="course-row">
+                                                            <span class="course-name">{{course.courseName}}</span>
+                                                            <span class="dots"></span>
+                                                            <span class="course-val">{{course.feesPaid | number:'2.0-0'}}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </ng-container>
                                             </div>
+                                        </div>
 
-                                            <!-- Total Aggregate Footer -->
-                                            <div class="breakdown-total-aggregate">
-                                                <span class="aggregate-label">Total Aggregate</span>
-                                                <span class="aggregate-value">
-                                                    {{courseWiseFirstFeesTotalStudents | number:'2.0-0'}}
-                                                    {{courseWiseFirstFeesTotalStudents === 1 ? 'Student' :
-                                                    'Students'}}
-                                                </span>
-                                            </div>
+                                        <!-- Total Aggregate Footer -->
+                                        <div class="breakdown-total-aggregate" style="margin-top: 1.5rem;">
+                                            <span class="aggregate-label">Total Aggregate</span>
+                                            <span class="aggregate-value">
+                                                {{courseWiseFirstFeesTotalStudents | number:'2.0-0'}}
+                                                {{courseWiseFirstFeesTotalStudents === 1 ? 'Student' :
+                                                'Students'}}
+                                            </span>
                                         </div>
                                     </div>
 

@@ -731,12 +731,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
           if (this.activeReport === 'DAILY_SESSION_SUMMARY') {
             this.reportData = apiData.content || [];
             this.dailySummaryData = this.reportData.length > 0 ? this.reportData[0] : null;
-            if (this.dailySummaryData && this.dailySummaryData.courseWiseFirstFeesPaid) {
-              this.courseWiseFirstFeesTotalStudents = this.dailySummaryData.courseWiseFirstFeesPaid.reduce((acc: number, item: any) => acc + (item.studentCount || 0), 0);
-              this.courseWiseFirstFeesTotalAmount = this.dailySummaryData.courseWiseFirstFeesPaid.reduce((acc: number, item: any) => acc + (item.totalCollectedAmount || 0), 0);
-            } else {
-              this.courseWiseFirstFeesTotalStudents = 0;
-              this.courseWiseFirstFeesTotalAmount = 0;
+            if (this.dailySummaryData) {
+              if (this.dailySummaryData.courseWiseFirstFeesPaid) {
+                this.courseWiseFirstFeesTotalStudents = this.dailySummaryData.courseWiseFirstFeesPaid.reduce((acc: number, item: any) => acc + (item.studentCount || 0), 0);
+                this.courseWiseFirstFeesTotalAmount = this.dailySummaryData.courseWiseFirstFeesPaid.reduce((acc: number, item: any) => acc + (item.totalCollectedAmount || 0), 0);
+              } else {
+                this.courseWiseFirstFeesTotalStudents = 0;
+                this.courseWiseFirstFeesTotalAmount = 0;
+              }
+              if (this.dailySummaryData.courseTypeBreakdown) {
+                this.dailySummaryData.transformedCourseTypeBreakdown = this.transformCourseTypeBreakdown(this.dailySummaryData.courseTypeBreakdown);
+              }
             }
           } else {
             this.dailySummaryData = null;
@@ -798,6 +803,61 @@ export class ReportsComponent implements OnInit, OnDestroy {
       return 'DAILY_SESSION_SUMMARY';
     }
     return type;
+  }
+
+  transformCourseTypeBreakdown(breakdown: any[]): any[] {
+    if (!breakdown) return [];
+    const groups: { [key: string]: { courseType: string, coursesMap: Map<string, number> } } = {
+      'UNDERGRADUATE': { courseType: 'UNDERGRADUATE', coursesMap: new Map<string, number>() },
+      'POST GRADUATE': { courseType: 'POST GRADUATE', coursesMap: new Map<string, number>() },
+      'DOCTORAL PROGRAMS': { courseType: 'DOCTORAL PROGRAMS', coursesMap: new Map<string, number>() },
+      'DIPLOMA & CERTIFICATION': { courseType: 'DIPLOMA & CERTIFICATION', coursesMap: new Map<string, number>() }
+    };
+    breakdown.forEach(item => {
+      const type = (item.courseType || '').toUpperCase().trim();
+      let targetKey = '';
+      if (type === 'UG' || type === 'INTEGRATED' || type === 'UNDERGRADUATE') {
+        targetKey = 'UNDERGRADUATE';
+      } else if (type === 'PG' || type === 'POST GRADUATE' || type === 'POSTGRADUATE') {
+        targetKey = 'POST GRADUATE';
+      } else if (type === 'PHD' || type === 'DOCTORAL' || type === 'DOCTORAL PROGRAMS') {
+        targetKey = 'DOCTORAL PROGRAMS';
+      } else if (type === 'DIPLOMA' || type === 'CERTIFICATION' || type === 'DIPLOMA & CERTIFICATION') {
+        targetKey = 'DIPLOMA & CERTIFICATION';
+      }
+
+      if (targetKey && groups[targetKey]) {
+        if (item.courses) {
+          item.courses.forEach((c: any) => {
+            const courseName = c.courseName;
+            const feesPaid = c.feesPaid || 0;
+            const current = groups[targetKey].coursesMap.get(courseName) || 0;
+            groups[targetKey].coursesMap.set(courseName, current + feesPaid);
+          });
+        }
+      }
+    });
+
+    return [
+      'UNDERGRADUATE',
+      'POST GRADUATE',
+      'DOCTORAL PROGRAMS',
+      'DIPLOMA & CERTIFICATION'
+    ].map(key => {
+      const group = groups[key];
+      const coursesList = Array.from(group.coursesMap.entries()).map(([courseName, feesPaid]) => ({
+        courseName,
+        feesPaid
+      })).sort((a: any, b: any) => a.courseName.localeCompare(b.courseName));
+
+      const totalFeesPaid = coursesList.reduce((acc, c) => acc + c.feesPaid, 0);
+
+      return {
+        courseType: key,
+        totalFeesPaid,
+        courses: coursesList
+      };
+    });
   }
 
   private initCharts() {
