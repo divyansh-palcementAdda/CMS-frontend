@@ -622,6 +622,60 @@
                                         <button class="chip-close" (click)="clearFilter(key)">&times;</button>
                                     </ng-container>
                                 </div>
+                                <ng-container *ngIf="filters.states && filters.states.length > 0">
+                                    <div class="filter-chip" *ngFor="let s of filters.states">
+                                        <span class="chip-text">State: {{ s }}</span>
+                                        <button class="chip-close" (click)="toggleStateSelection(s); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.cities && filters.cities.length > 0">
+                                    <div class="filter-chip" *ngFor="let c of filters.cities">
+                                        <span class="chip-text">City: {{ c }}</span>
+                                        <button class="chip-close" (click)="toggleCitySelection(c); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.courseTypes && filters.courseTypes.length > 0">
+                                    <div class="filter-chip" *ngFor="let ct of filters.courseTypes">
+                                        <span class="chip-text">Course Type: {{ ct }}</span>
+                                        <button class="chip-close" (click)="toggleCourseTypeSelection(ct); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.sessions && filters.sessions.length > 0">
+                                    <div class="filter-chip" *ngFor="let s of filters.sessions">
+                                        <span class="chip-text">Session: {{ s }}</span>
+                                        <button class="chip-close" (click)="toggleSessionSelection(s); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.admissionTypes && filters.admissionTypes.length > 0">
+                                    <div class="filter-chip" *ngFor="let t of filters.admissionTypes">
+                                        <span class="chip-text">Type: {{ t }}</span>
+                                        <button class="chip-close" (click)="toggleAdmissionTypeSelection(t); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.leadSources && filters.leadSources.length > 0">
+                                    <div class="filter-chip" *ngFor="let id of filters.leadSources">
+                                        <span class="chip-text">Source: {{ getLeadSourceNameById(id) }}</span>
+                                        <button class="chip-close" (click)="toggleLeadSourceSelection(id); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.userIds && filters.userIds.length > 0">
+                                    <div class="filter-chip" *ngFor="let id of filters.userIds">
+                                        <span class="chip-text">Counselor: {{ getUserNameById(id) }}</span>
+                                        <button class="chip-close" (click)="toggleUserSelection(id); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.consultancyIds && filters.consultancyIds.length > 0">
+                                    <div class="filter-chip" *ngFor="let id of filters.consultancyIds">
+                                        <span class="chip-text">Consultancy: {{ getConsultancyNameById(id) }}</span>
+                                        <button class="chip-close" (click)="toggleConsultancySelection(id); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="filters.courseIds && filters.courseIds.length > 0">
+                                    <div class="filter-chip" *ngFor="let id of filters.courseIds">
+                                        <span class="chip-text">Course: {{ getCourseNameById(id) }}</span>
+                                        <button class="chip-close" (click)="toggleCourseSelection(id); applyFilters()">&times;</button>
+                                    </div>
+                                </ng-container>
                                 <div class="filter-chip" *ngIf="filters.leadSourceId">
                                     <span class="chip-text">Source: {{ getSelectedLeadSourceName() }}</span>
                                     <button class="chip-close" (click)="clearFilter('leadSourceId')">&times;</button>
@@ -1009,10 +1063,32 @@
                             <h4 class="group-title">Primary Filters</h4>
                             <div class="filter-section">
                                 <label class="filter-label">Session</label>
-                                <select [(ngModel)]="filters.session" class="filter-input">
-                                    <option value="">All Sessions</option>
-                                    <option *ngFor="let s of sessions" [value]="s">{{ s }}</option>
-                                </select>
+                                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                                    <div class="multi-select-trigger" (click)="dropdowns.session = !dropdowns.session">
+                                        <div class="selected-text-container">
+                                            <span *ngIf="!filters.sessions || filters.sessions.length === 0" class="placeholder">Select Sessions</span>
+                                            <div *ngIf="filters.sessions && filters.sessions.length > 0" class="selected-chips">
+                                                <span *ngFor="let s of filters.sessions" class="multiselect-chip">
+                                                    {{ s }}
+                                                    <span class="chip-remove" (click)="$event.stopPropagation(); toggleSessionSelection(s)">&times;</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <svg class="chevron-icon" [class.open]="dropdowns.session" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="multi-select-dropdown" *ngIf="dropdowns.session">
+                                        <input type="text" class="dropdown-search-input" placeholder="Search session..." [(ngModel)]="searchTerms.session">
+                                        <div class="options-list">
+                                            <div *ngFor="let s of filteredSessions" class="option-item" (click)="toggleSessionSelection(s)" [class.selected]="filters.sessions.includes(s)">
+                                                <input type="checkbox" [checked]="filters.sessions.includes(s)" (click)="$event.stopPropagation(); toggleSessionSelection(s)">
+                                                <span>{{ s }}</span>
+                                            </div>
+                                            <div *ngIf="filteredSessions.length === 0" class="no-options">No sessions found</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="filter-section" *ngIf="!isApplicationTab">
                                 <label class="filter-label">Commission Status</label>
@@ -1023,12 +1099,32 @@
                             </div>
                             <div class="filter-section">
                                 <label class="filter-label">Admission Type</label>
-                                <select [(ngModel)]="filters.source" class="filter-input">
-                                    <option value="">All Types</option>
-                                    <option value="USER">Direct Admission</option>
-                                    <option value="CONSULTANCY">Via Consultancy</option>
-                                    <option value="UNMAPPED">Unmapped Admission</option>
-                                </select>
+                                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                                    <div class="multi-select-trigger" (click)="dropdowns.admissionType = !dropdowns.admissionType">
+                                        <div class="selected-text-container">
+                                            <span *ngIf="!filters.admissionTypes || filters.admissionTypes.length === 0" class="placeholder">Select Types</span>
+                                            <div *ngIf="filters.admissionTypes && filters.admissionTypes.length > 0" class="selected-chips">
+                                                <span *ngFor="let t of filters.admissionTypes" class="multiselect-chip">
+                                                    {{ t }}
+                                                    <span class="chip-remove" (click)="$event.stopPropagation(); toggleAdmissionTypeSelection(t)">&times;</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <svg class="chevron-icon" [class.open]="dropdowns.admissionType" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="multi-select-dropdown" *ngIf="dropdowns.admissionType">
+                                        <input type="text" class="dropdown-search-input" placeholder="Search type..." [(ngModel)]="searchTerms.admissionType">
+                                        <div class="options-list">
+                                            <div *ngFor="let t of filteredAdmissionTypes" class="option-item" (click)="toggleAdmissionTypeSelection(t.value)" [class.selected]="filters.admissionTypes.includes(t.value)">
+                                                <input type="checkbox" [checked]="filters.admissionTypes.includes(t.value)" (click)="$event.stopPropagation(); toggleAdmissionTypeSelection(t.value)">
+                                                <span>{{ t.name }}</span>
+                                            </div>
+                                            <div *ngIf="filteredAdmissionTypes.length === 0" class="no-options">No types found</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="filter-section">
                                 <label class="filter-label">Scholarship</label>
@@ -1084,26 +1180,125 @@
                         </div>
 
                         <div class="filter-group">
-                            <h4 class="group-title">Source & Location</h4>
+                            <h4 class="group-title">Source, Location & Course Type</h4>
                             <div class="filter-section">
                                 <label class="filter-label">Lead Source</label>
-                                <select [(ngModel)]="filters.leadSourceId" class="filter-input">
-                                    <option value="">All Lead Sources</option>
-                                    <option *ngFor="let s of activeLeadSources" [value]="s.id">{{ s.name }}</option>
-                                </select>
+                                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                                    <div class="multi-select-trigger" (click)="dropdowns.leadSource = !dropdowns.leadSource">
+                                        <div class="selected-text-container">
+                                            <span *ngIf="!filters.leadSources || filters.leadSources.length === 0" class="placeholder">Select Lead Sources</span>
+                                            <div *ngIf="filters.leadSources && filters.leadSources.length > 0" class="selected-chips">
+                                                <span *ngFor="let id of filters.leadSources" class="multiselect-chip">
+                                                    {{ getLeadSourceNameById(id) }}
+                                                    <span class="chip-remove" (click)="$event.stopPropagation(); toggleLeadSourceSelection(id)">&times;</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <svg class="chevron-icon" [class.open]="dropdowns.leadSource" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="multi-select-dropdown" *ngIf="dropdowns.leadSource">
+                                        <input type="text" class="dropdown-search-input" placeholder="Search lead source..." [(ngModel)]="searchTerms.leadSource">
+                                        <div class="options-list">
+                                            <div *ngFor="let s of filteredLeadSources" class="option-item" (click)="toggleLeadSourceSelection(s.id)" [class.selected]="filters.leadSources.includes(s.id)">
+                                                <input type="checkbox" [checked]="filters.leadSources.includes(s.id)" (click)="$event.stopPropagation(); toggleLeadSourceSelection(s.id)">
+                                                <span>{{ s.name }}</span>
+                                            </div>
+                                            <div *ngIf="filteredLeadSources.length === 0" class="no-options">No lead sources found</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="filter-section">
-                                <label class="filter-label">Location</label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <select [(ngModel)]="filters.state" (change)="onStateChange()" class="filter-input">
-                                        <option value="">State</option>
-                                        <option *ngFor="let s of states" [value]="s">{{ s }}</option>
-                                    </select>
-                                    <select [(ngModel)]="filters.city" (change)="onCityChange()"
-                                        [disabled]="!filters.state" class="filter-input">
-                                        <option value="">City</option>
-                                        <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
-                                    </select>
+                                <label class="filter-label">States</label>
+                                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                                    <div class="multi-select-trigger" (click)="dropdowns.state = !dropdowns.state">
+                                        <div class="selected-text-container">
+                                            <span *ngIf="!filters.states || filters.states.length === 0" class="placeholder">Select States</span>
+                                            <div *ngIf="filters.states && filters.states.length > 0" class="selected-chips">
+                                                <span *ngFor="let state of filters.states" class="multiselect-chip">
+                                                    {{ state }}
+                                                    <span class="chip-remove" (click)="$event.stopPropagation(); toggleStateSelection(state)">&times;</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <svg class="chevron-icon" [class.open]="dropdowns.state" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="multi-select-dropdown" *ngIf="dropdowns.state">
+                                        <input type="text" class="dropdown-search-input" placeholder="Search state..." [(ngModel)]="searchTerms.state">
+                                        <div class="options-list">
+                                            <div *ngFor="let s of filteredStates" class="option-item" (click)="toggleStateSelection(s)" [class.selected]="filters.states.includes(s)">
+                                                <input type="checkbox" [checked]="filters.states.includes(s)" (click)="$event.stopPropagation(); toggleStateSelection(s)">
+                                                <span>{{ s }}</span>
+                                            </div>
+                                            <div *ngIf="filteredStates.length === 0" class="no-options">No states found</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <label class="filter-label">Cities</label>
+                                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                                    <div class="multi-select-trigger" (click)="filters.states && filters.states.length > 0 && (dropdowns.city = !dropdowns.city)" [class.disabled]="!filters.states || filters.states.length === 0">
+                                        <div class="selected-text-container">
+                                            <span *ngIf="!filters.cities || filters.cities.length === 0" class="placeholder">
+                                                {{ (!filters.states || filters.states.length === 0) ? 'Select State First' : 'Select Cities' }}
+                                            </span>
+                                            <div *ngIf="filters.cities && filters.cities.length > 0" class="selected-chips">
+                                                <span *ngFor="let city of filters.cities" class="multiselect-chip">
+                                                    {{ city }}
+                                                    <span class="chip-remove" (click)="$event.stopPropagation(); toggleCitySelection(city)">&times;</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <svg class="chevron-icon" [class.open]="dropdowns.city" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="multi-select-dropdown" *ngIf="dropdowns.city && filters.states && filters.states.length > 0">
+                                        <input type="text" class="dropdown-search-input" placeholder="Search city..." [(ngModel)]="searchTerms.city">
+                                        <div class="options-list">
+                                            <div *ngFor="let c of filteredCities" class="option-item" (click)="toggleCitySelection(c)" [class.selected]="filters.cities.includes(c)">
+                                                <input type="checkbox" [checked]="filters.cities.includes(c)" (click)="$event.stopPropagation(); toggleCitySelection(c)">
+                                                <span>{{ c }}</span>
+                                            </div>
+                                            <div *ngIf="filteredCities.length === 0" class="no-options">No cities found</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <label class="filter-label">Course Types</label>
+                                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                                    <div class="multi-select-trigger" (click)="dropdowns.courseType = !dropdowns.courseType">
+                                        <div class="selected-text-container">
+                                            <span *ngIf="!filters.courseTypes || filters.courseTypes.length === 0" class="placeholder">Select Course Types</span>
+                                            <div *ngIf="filters.courseTypes && filters.courseTypes.length > 0" class="selected-chips">
+                                                <span *ngFor="let ct of filters.courseTypes" class="multiselect-chip">
+                                                    {{ ct }}
+                                                    <span class="chip-remove" (click)="$event.stopPropagation(); toggleCourseTypeSelection(ct)">&times;</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <svg class="chevron-icon" [class.open]="dropdowns.courseType" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="multi-select-dropdown" *ngIf="dropdowns.courseType">
+                                        <input type="text" class="dropdown-search-input" placeholder="Search course type..." [(ngModel)]="searchTerms.courseType">
+                                        <div class="options-list">
+                                            <div *ngFor="let ct of filteredCourseTypes" class="option-item" (click)="toggleCourseTypeSelection(ct.name)" [class.selected]="filters.courseTypes.includes(ct.name)">
+                                                <input type="checkbox" [checked]="filters.courseTypes.includes(ct.name)" (click)="$event.stopPropagation(); toggleCourseTypeSelection(ct.name)">
+                                                <span>{{ ct.name }}</span>
+                                            </div>
+                                            <div *ngIf="filteredCourseTypes.length === 0" class="no-options">No course types found</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1156,33 +1351,50 @@
                             <h4 class="group-title">Advanced Filters</h4>
                             <div class="filter-section">
                                 <label class="filter-label">Filter by User (Admitted By)</label>
-                                <div class="custom-select-trigger" (click)="openUserFilter()">
-                                    <span>{{ filters.userId ? getSelectedUserName() : 'Select Counselor' }}</span>
+                                <div class="custom-select-trigger" (click)="openUserFilter()" style="margin-bottom: 8px;">
+                                    <span>Select Counselor</span>
                                     <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
+                                </div>
+                                <div *ngIf="filters.userIds && filters.userIds.length > 0" class="selected-chips" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0;">
+                                    <span *ngFor="let id of filters.userIds" class="multiselect-chip">
+                                        {{ getUserNameById(id) }}
+                                        <span class="chip-remove" (click)="toggleUserSelection(id)">&times;</span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="filter-section">
                                 <label class="filter-label">Filter by Consultancy</label>
-                                <div class="custom-select-trigger" (click)="openConsultancyFilter()">
-                                    <span>{{ filters.consultancyId ? getSelectedConsultancyName() : 'Select Consultancy'
-                                        }}</span>
+                                <div class="custom-select-trigger" (click)="openConsultancyFilter()" style="margin-bottom: 8px;">
+                                    <span>Select Consultancy</span>
                                     <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
+                                <div *ngIf="filters.consultancyIds && filters.consultancyIds.length > 0" class="selected-chips" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0;">
+                                    <span *ngFor="let id of filters.consultancyIds" class="multiselect-chip">
+                                        {{ getConsultancyNameById(id) }}
+                                        <span class="chip-remove" (click)="toggleConsultancySelection(id)">&times;</span>
+                                    </span>
+                                </div>
                             </div>
                             <div class="filter-section">
                                 <label class="filter-label">Filter by Course</label>
-                                <div class="custom-select-trigger" (click)="openCourseFilter()">
-                                    <span>{{ filters.courseId ? getSelectedCourseName() : 'Select Course' }}</span>
+                                <div class="custom-select-trigger" (click)="openCourseFilter()" style="margin-bottom: 8px;">
+                                    <span>Select Course</span>
                                     <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
+                                </div>
+                                <div *ngIf="filters.courseIds && filters.courseIds.length > 0" class="selected-chips" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0;">
+                                    <span *ngFor="let id of filters.courseIds" class="multiselect-chip">
+                                        {{ getCourseNameById(id) }}
+                                        <span class="chip-remove" (click)="toggleCourseSelection(id)">&times;</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1201,28 +1413,28 @@
                 </app-cancellation-modal>
 
                 <!-- Searchable Selection Modals -->
-                <app-searchable-selector-modal *ngIf="activeModal === 'user'" [title]="'Select Counselor / User'"
+                <app-multi-select-modal *ngIf="activeModal === 'user'" [title]="'Select Counselor / User'"
                     [placeholder]="'Search counselor by name, email, or phone...'" [items]="modalItems"
                     [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
-                    [totalPages]="modalTotalPages" [selectedId]="filters.userId" [displayField]="'fullName'"
+                    [totalPages]="modalTotalPages" [selectedItems]="getSelectedUsers()" [displayField]="'fullName'"
                     [subtitleField]="'email'" [tagField]="'mobile'" (search)="onModalSearch($event)"
-                    (pageChange)="onModalPageChange($event)" (select)="onModalSelect($event)"
-                    (close)="onModalClose()"></app-searchable-selector-modal>
+                    (pageChange)="onModalPageChange($event)" (apply)="onModalSelect($event)"
+                    (close)="onModalClose()"></app-multi-select-modal>
 
-                <app-searchable-selector-modal *ngIf="activeModal === 'consultancy'" [title]="'Select Consultancy'"
+                <app-multi-select-modal *ngIf="activeModal === 'consultancy'" [title]="'Select Consultancy'"
                     [placeholder]="'Search consultancy by name or firm name...'" [items]="modalItems"
                     [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
-                    [totalPages]="modalTotalPages" [selectedId]="filters.consultancyId" [displayField]="'name'"
+                    [totalPages]="modalTotalPages" [selectedItems]="getSelectedConsultancies()" [displayField]="'name'"
                     [subtitleField]="'firmName'" [tagField]="'city'" (search)="onModalSearch($event)"
-                    (pageChange)="onModalPageChange($event)" (select)="onModalSelect($event)"
-                    (close)="onModalClose()"></app-searchable-selector-modal>
+                    (pageChange)="onModalPageChange($event)" (apply)="onModalSelect($event)"
+                    (close)="onModalClose()"></app-multi-select-modal>
 
-                <app-searchable-selector-modal *ngIf="activeModal === 'course'" [title]="'Select Course'"
+                <app-multi-select-modal *ngIf="activeModal === 'course'" [title]="'Select Course'"
                     [placeholder]="'Search course by name or code...'" [items]="modalItems" [loading]="modalLoading"
                     [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage" [totalPages]="modalTotalPages"
-                    [selectedId]="filters.courseId" [displayField]="'name'" [subtitleField]="'duration'"
+                    [selectedItems]="getSelectedCourses()" [displayField]="'name'" [subtitleField]="'duration'"
                     [tagField]="'courseType'" (search)="onModalSearch($event)" (pageChange)="onModalPageChange($event)"
-                    (select)="onModalSelect($event)" (close)="onModalClose()"></app-searchable-selector-modal>
+                    (apply)="onModalSelect($event)" (close)="onModalClose()"></app-multi-select-modal>
 
                 <!-- ===== Download Confirmation Modal ===== -->
                 <div class="download-modal-overlay" *ngIf="showDownloadModal" (click)="showDownloadModal = false">

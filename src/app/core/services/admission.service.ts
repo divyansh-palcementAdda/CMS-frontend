@@ -52,7 +52,16 @@ export class AdmissionService {
     userId?: number,
     showOnlyPaid?: boolean,
     showOnlyFoc?: boolean,
-    showOnlySbs?: boolean
+    showOnlySbs?: boolean,
+    states?: string[],
+    cities?: string[],
+    courseTypes?: string[],
+    sessions?: string[],
+    admissionTypes?: string[],
+    leadSources?: string[],
+    userIds?: number[],
+    consultancyIds?: number[],
+    courseIds?: number[]
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -89,6 +98,22 @@ export class AdmissionService {
     if (showOnlyPaid !== undefined && showOnlyPaid !== null) params = params.set('showOnlyPaid', showOnlyPaid.toString());
     if (showOnlyFoc !== undefined && showOnlyFoc !== null) params = params.set('showOnlyFoc', showOnlyFoc.toString());
     if (showOnlySbs !== undefined && showOnlySbs !== null) params = params.set('showOnlySbs', showOnlySbs.toString());
+    if (states && states.length > 0) params = params.set('states', states.join(','));
+    if (cities && cities.length > 0) params = params.set('cities', cities.join(','));
+    if (courseTypes && courseTypes.length > 0) params = params.set('courseTypes', courseTypes.join(','));
+    if (sessions && sessions.length > 0) params = params.set('sessions', sessions.join(','));
+    if (admissionTypes && admissionTypes.length > 0) params = params.set('admissionTypes', admissionTypes.join(','));
+    if (leadSources && leadSources.length > 0) params = params.set('leadSources', leadSources.join(','));
+    if (userIds && userIds.length > 0) params = params.set('userIds', userIds.join(','));
+    if (consultancyIds && consultancyIds.length > 0) params = params.set('consultancyIds', consultancyIds.join(','));
+    if (courseIds && courseIds.length > 0) params = params.set('courseIds', courseIds.join(','));
+
+    console.log('Final Payload', {
+      userIds: userIds || null,
+      consultancyIds: consultancyIds || null,
+      courseIds: courseIds || null,
+      httpParams: params.toString()
+    });
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
@@ -209,7 +234,16 @@ export class AdmissionService {
     search?: string,
     isDiscounted?: boolean,
     consultancyId?: number,
-    userId?: number
+    userId?: number,
+    states?: string[],
+    cities?: string[],
+    courseTypes?: string[],
+    sessions?: string[],
+    admissionTypes?: string[],
+    leadSources?: string[],
+    userIds?: number[],
+    consultancyIds?: number[],
+    courseIds?: number[]
   ): Observable<Blob> {
     let params = new HttpParams();
     if (tab) params = params.set('tab', tab);
@@ -231,6 +265,15 @@ export class AdmissionService {
       params = params.set('isDiscounted', isDiscounted.toString());
     if (consultancyId) params = params.set('consultancyId', consultancyId.toString());
     if (userId) params = params.set('userId', userId.toString());
+    if (states && states.length > 0) params = params.set('states', states.join(','));
+    if (cities && cities.length > 0) params = params.set('cities', cities.join(','));
+    if (courseTypes && courseTypes.length > 0) params = params.set('courseTypes', courseTypes.join(','));
+    if (sessions && sessions.length > 0) params = params.set('sessions', sessions.join(','));
+    if (admissionTypes && admissionTypes.length > 0) params = params.set('admissionTypes', admissionTypes.join(','));
+    if (leadSources && leadSources.length > 0) params = params.set('leadSources', leadSources.join(','));
+    if (userIds && userIds.length > 0) params = params.set('userIds', userIds.join(','));
+    if (consultancyIds && consultancyIds.length > 0) params = params.set('consultancyIds', consultancyIds.join(','));
+    if (courseIds && courseIds.length > 0) params = params.set('courseIds', courseIds.join(','));
 
     return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
   }

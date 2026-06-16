@@ -1,0 +1,113 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title }}</h3>
+      <div class="header-actions">
+        <button class="select-all-btn" (click)="selectAllVisible()">Select All</button>
+        <button class="close-btn" (click)="close.emit()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-wrapper">
+      <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input 
+          type="text" 
+          [placeholder]="placeholder" 
+          [(ngModel)]="searchText" 
+          (input)="onSearchChange()"
+          class="search-input"
+          autofocus
+        />
+        <button class="clear-search-btn" *ngIf="searchText" (click)="searchText = ''; onSearchChange()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Items List -->
+    <div class="list-container">
+      <!-- Loading Overlay -->
+      <div class="loading-overlay" *ngIf="loading">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && items.length === 0">
+        <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+        </svg>
+        <p class="empty-title">No records found</p>
+        <p class="empty-sub">Try adjusting your search criteria</p>
+      </div>
+
+      <!-- Item Rows -->
+      <div class="items-list" *ngIf="!loading && items.length > 0">
+        <div 
+          *ngFor="let item of items" 
+          [class.active]="isItemSelected(item)"
+          (click)="toggleSelection(item)"
+          class="item-row"
+        >
+          <div class="item-checkbox-wrapper">
+            <input 
+              type="checkbox" 
+              [checked]="isItemSelected(item)" 
+              (click)="$event.stopPropagation(); toggleSelection(item)"
+              class="item-checkbox"
+            />
+            <div class="item-info">
+              <span class="item-name">{{ getDisplayText(item) }}</span>
+              <span class="item-sub" *ngIf="getSubtitleText(item)">{{ getSubtitleText(item) }}</span>
+            </div>
+          </div>
+          
+          <div class="item-meta">
+            <span class="item-tag" *ngIf="getTagText(item)">{{ getTagText(item) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Section inside Modal -->
+    <div class="modal-pagination-footer" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        Page <strong>{{ currentPage }}</strong> of {{ totalPages }}
+      </div>
+      <div class="pagination-actions">
+        <button class="nav-btn" [disabled]="currentPage <= 1" (click)="onPrevPage()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button class="nav-btn" [disabled]="currentPage >= totalPages" (click)="onNextPage()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <div class="modal-sticky-footer">
+      <div class="selected-count">
+        Selected: <strong>{{ tempSelectedIds.length }}</strong>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-clear-all" (click)="clearAll()">Clear All</button>
+        <button class="btn-cancel" (click)="close.emit()">Cancel</button>
+        <button class="btn-apply" (click)="applySelection()">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>

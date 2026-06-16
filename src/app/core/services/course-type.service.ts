@@ -115,4 +115,10 @@ export class CourseTypeService {
       responseType: 'blob'
     });
   }
+
+  getActiveCourseTypes(): Observable<any[]> {
+    return this.http.get<any>(`${this.apiUrl}/active`).pipe(
+      map(response => response?.data || response)
+    );
+  }
 }

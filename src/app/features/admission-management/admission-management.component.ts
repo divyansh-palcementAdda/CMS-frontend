@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, HostListener } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription, Subject, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
 import { AdmissionService } from '../../core/services/admission.service';
@@ -22,6 +22,8 @@ import { CourseService } from '../../core/services/course.service';
 import { CancellationModalComponent } from './components/cancellation-modal/cancellation-modal.component';
 import { CalendarModalComponent } from '../../shared/components/calendar-modal/calendar-modal.component';
 import { SearchableSelectorModalComponent } from '../../shared/components/searchable-selector-modal/searchable-selector-modal.component';
+import { CourseTypeService } from '../../core/services/course-type.service';
+import { MultiSelectModalComponent } from '../../shared/components/multi-select-modal/multi-select-modal.component';
 
 
 /**
@@ -37,6 +39,9 @@ export interface ActiveFilters {
   statFilter: string;    // '' | 'DIRECT' | 'INDIRECT' | 'SCHOLAR' | ...
   state: string;
   city: string;
+  states: string[];
+  cities: string[];
+  courseTypes: string[];
 
   // New Advanced Filters
   courseId: number | null;
@@ -60,6 +65,13 @@ export interface ActiveFilters {
   appEndDate: string;
   admStartDate: string;
   admEndDate: string;
+
+  sessions: string[];
+  admissionTypes: string[];
+  leadSources: string[];
+  userIds: number[];
+  consultancyIds: number[];
+  courseIds: number[];
 }
 
 @Component({
@@ -77,7 +89,7 @@ export interface ActiveFilters {
     FilterDrawerComponent,
     CancellationModalComponent,
     CalendarModalComponent,
-    SearchableSelectorModalComponent
+    MultiSelectModalComponent
   ],
   templateUrl: './admission-management.component.html',
   styleUrl: './admission-management.component.scss'
@@ -102,6 +114,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     statFilter: '',
     state: '',
     city: '',
+    states: [],
+    cities: [],
+    courseTypes: [],
     courseId: null,
     session: '',
     commissionStatus: '',
@@ -120,7 +135,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     appStartDate: '',
     appEndDate: '',
     admStartDate: '',
-    admEndDate: ''
+    admEndDate: '',
+    sessions: [],
+    admissionTypes: [],
+    leadSources: [],
+    userIds: [],
+    consultancyIds: [],
+    courseIds: []
   };
 
   // ── Excel Download Modal ──────────────────────────────────────────────
@@ -154,6 +175,55 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private courseService = inject(CourseService);
   public authService = inject(AuthService);
+  private courseTypeService = inject(CourseTypeService);
+
+  dropdowns: {
+    state: boolean,
+    city: boolean,
+    courseType: boolean,
+    session: boolean,
+    admissionType: boolean,
+    leadSource: boolean
+  } = {
+      state: false,
+      city: false,
+      courseType: false,
+      session: false,
+      admissionType: false,
+      leadSource: false
+    };
+
+  searchTerms: {
+    state: string,
+    city: string,
+    courseType: string,
+    session: string,
+    admissionType: string,
+    leadSource: string
+  } = {
+      state: '',
+      city: '',
+      courseType: '',
+      session: '',
+      admissionType: '',
+      leadSource: ''
+    };
+
+  admissionTypesList: { value: string, name: string }[] = [
+    { value: 'DIRECT', name: 'Direct' },
+    { value: 'INDIRECT', name: 'Indirect' },
+    { value: 'UNMAPPED', name: 'Unmapped' },
+    { value: 'CONFIRMED', name: 'Confirmed' },
+    { value: 'CANCELLED_APP', name: 'Cancelled Applications' },
+    { value: 'CANCELLED_ADM', name: 'Cancelled Admissions' },
+    { value: 'REMAINING_APP', name: 'Remaining Applications' },
+    { value: 'TOTAL_ADMISSIONS', name: 'Total Admissions' },
+    { value: 'ALL_APPLICATIONS', name: 'All Applications' },
+    { value: 'SCHOLAR', name: 'Scholar' },
+    { value: 'FOC', name: 'FOC' },
+    { value: 'SBS', name: 'SBS' }
+  ];
+  courseTypes: any[] = [];
 
   // Searchable Selector Modal State
   activeModal: 'user' | 'consultancy' | 'course' | null = null;
@@ -244,6 +314,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         statFilter: isFocOrSbs ? params['status'] : (params['statFilter'] || ''),
         state: params['state'] || '',
         city: params['city'] || '',
+        states: params['states'] ? params['states'].split(',') : [],
+        cities: params['cities'] ? params['cities'].split(',') : [],
+        courseTypes: params['courseTypes'] ? params['courseTypes'].split(',') : [],
         courseId: params['courseId'] ? +params['courseId'] : null,
         session: params['session'] || '',
         commissionStatus: params['commissionStatus'] || '',
@@ -262,13 +335,21 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         appStartDate: params['appStartDate'] || '',
         appEndDate: params['appEndDate'] || '',
         admStartDate: params['admStartDate'] || '',
-        admEndDate: params['admEndDate'] || ''
+        admEndDate: params['admEndDate'] || '',
+        sessions: params['sessions'] ? params['sessions'].split(',') : [],
+        admissionTypes: params['admissionTypes'] ? params['admissionTypes'].split(',') : [],
+        leadSources: params['leadSources'] ? params['leadSources'].split(',') : [],
+        userIds: params['userIds'] ? params['userIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : [],
+        consultancyIds: params['consultancyIds'] ? params['consultancyIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : [],
+        courseIds: params['courseIds'] ? params['courseIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : []
       };
       this.searchTerm = params['search'] || '';
       this.currentPage = params['page'] ? +params['page'] : 1;
       this.updateActiveFilterCount();
 
-      if (this.filters.state && this.states.length > 0) {
+      if (this.filters.states && this.filters.states.length > 0 && this.states.length > 0) {
+        this.loadCitiesForSelectedStates();
+      } else if (this.filters.state && this.states.length > 0) {
         this.loadCities(this.filters.state);
       }
 
@@ -298,6 +379,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.fetchActiveLeadSources();
     this.loadConsultancies();
     this.loadUsers();
+    this.loadActiveCourseTypes();
   }
 
   fetchActiveLeadSources() {
@@ -306,10 +388,43 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     });
   }
 
+  modalSelectionCache: Map<any, any> = new Map();
+
+  cacheSelectedItem(item: any) {
+    if (!item) return;
+    const id = this.getItemId(item);
+    if (id !== null && id !== undefined) {
+      this.modalSelectionCache.set(id, item);
+    }
+  }
+
+  getItemId(item: any): any {
+    if (!item) return null;
+    if (item.userId !== undefined && item.userId !== null) return item.userId;
+    if (item.courseId !== undefined && item.courseId !== null) return item.courseId;
+    return item.id;
+  }
+
+  getSelectedUsers(): any[] {
+    if (!this.filters.userIds) return [];
+    return this.filters.userIds.map(id => this.modalSelectionCache.get(id) || { id, userId: id, fullName: `User ID: ${id}` });
+  }
+
+  getSelectedConsultancies(): any[] {
+    if (!this.filters.consultancyIds) return [];
+    return this.filters.consultancyIds.map(id => this.modalSelectionCache.get(id) || { id, name: `Consultancy ID: ${id}` });
+  }
+
+  getSelectedCourses(): any[] {
+    if (!this.filters.courseIds) return [];
+    return this.filters.courseIds.map(id => this.modalSelectionCache.get(id) || { id, courseId: id, name: `Course ID: ${id}` });
+  }
+
   loadConsultancies(): void {
     this.consultancyService.getConsultanciesByStatusAndDeleted('ACTIVE', false).subscribe({
       next: (res: any) => {
         this.consultancies = res?.consultancies || [];
+        this.consultancies.forEach(c => this.cacheSelectedItem(c));
       },
       error: (err: any) => console.error('Error loading consultancies', err)
     });
@@ -319,6 +434,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.userService.getUsersData().subscribe({
       next: (res: any) => {
         this.users = res?.users || [];
+        this.users.forEach(u => this.cacheSelectedItem(u));
       },
       error: (err: any) => console.error('Error loading users', err)
     });
@@ -328,6 +444,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.admissionService.getActiveCourses().subscribe({
       next: (courses: any) => {
         this.courses = courses.data || courses;
+        this.courses.forEach(c => this.cacheSelectedItem(c));
       },
       error: (err: any) => console.error('Error loading courses', err)
     });
@@ -358,6 +475,17 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.appStartDate) count++;
     if (this.filters.admStartDate) count++;
 
+    if (this.filters.states && this.filters.states.length > 0) count++;
+    if (this.filters.cities && this.filters.cities.length > 0) count++;
+    if (this.filters.courseTypes && this.filters.courseTypes.length > 0) count++;
+
+    if (this.filters.sessions && this.filters.sessions.length > 0) count++;
+    if (this.filters.admissionTypes && this.filters.admissionTypes.length > 0) count++;
+    if (this.filters.leadSources && this.filters.leadSources.length > 0) count++;
+    if (this.filters.userIds && this.filters.userIds.length > 0) count++;
+    if (this.filters.consultancyIds && this.filters.consultancyIds.length > 0) count++;
+    if (this.filters.courseIds && this.filters.courseIds.length > 0) count++;
+
     this.activeFilterCount = count;
   }
 
@@ -380,6 +508,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     // Align with backend: map the primary date for each tab to 'startDate' and 'endDate'
     const finalStartDate = this.isApplicationTab ? this.filters.appStartDate : this.filters.admStartDate;
     const finalEndDate = this.isApplicationTab ? this.filters.appEndDate : this.filters.admEndDate;
+
+    console.log('Selected User IDs', this.filters.userIds);
+    console.log('Selected Consultancy IDs', this.filters.consultancyIds);
+    console.log('Selected Course IDs', this.filters.courseIds);
 
     this.sub = this.admissionService.getAdmissionsData(
       this.currentPage,
@@ -410,7 +542,16 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.userId ?? undefined,
       this.filters.showOnlyPaid ?? undefined,
       this.filters.showOnlyFoc ?? undefined,
-      this.filters.showOnlySbs ?? undefined
+      this.filters.showOnlySbs ?? undefined,
+      this.filters.states,
+      this.filters.cities,
+      this.filters.courseTypes,
+      this.filters.sessions,
+      this.filters.admissionTypes,
+      this.filters.leadSources,
+      this.filters.userIds,
+      this.filters.consultancyIds,
+      this.filters.courseIds
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -539,7 +680,11 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   applyFilters(): void {
     this.showFilterDrawer = false;
+    console.log('[ApplyFilters] userIds:', this.filters.userIds);
+    console.log('[ApplyFilters] consultancyIds:', this.filters.consultancyIds);
+    console.log('[ApplyFilters] courseIds:', this.filters.courseIds);
     const queryParams: any = {
+      page: 1,
       courseId: this.filters.courseId || null,
       session: this.filters.session || null,
       commissionStatus: this.filters.commissionStatus || null,
@@ -548,6 +693,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       endDate: this.filters.endDate || null,
       state: this.filters.state || null,
       city: this.filters.city || null,
+      states: (this.filters.states && this.filters.states.length > 0) ? this.filters.states.join(',') : null,
+      cities: (this.filters.cities && this.filters.cities.length > 0) ? this.filters.cities.join(',') : null,
+      courseTypes: (this.filters.courseTypes && this.filters.courseTypes.length > 0) ? this.filters.courseTypes.join(',') : null,
       source: this.filters.source || null,
       isScholar: this.filters.isScholar || null,
       leadSourceId: this.filters.leadSourceId || null,
@@ -562,7 +710,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       appStartDate: this.filters.appStartDate || null,
       appEndDate: this.filters.appEndDate || null,
       admStartDate: this.filters.admStartDate || null,
-      admEndDate: this.filters.admEndDate || null
+      admEndDate: this.filters.admEndDate || null,
+      sessions: (this.filters.sessions && this.filters.sessions.length > 0) ? this.filters.sessions.join(',') : null,
+      admissionTypes: (this.filters.admissionTypes && this.filters.admissionTypes.length > 0) ? this.filters.admissionTypes.join(',') : null,
+      leadSources: (this.filters.leadSources && this.filters.leadSources.length > 0) ? this.filters.leadSources.join(',') : null,
+      userIds: (this.filters.userIds && this.filters.userIds.length > 0) ? this.filters.userIds.join(',') : null,
+      consultancyIds: (this.filters.consultancyIds && this.filters.consultancyIds.length > 0) ? this.filters.consultancyIds.join(',') : null,
+      courseIds: (this.filters.courseIds && this.filters.courseIds.length > 0) ? this.filters.courseIds.join(',') : null
     };
 
     this.router.navigate([], {
@@ -580,6 +734,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       statusFilter: '',
       state: '',
       city: '',
+      states: [],
+      cities: [],
+      courseTypes: [],
       courseId: null,
       session: '',
       commissionStatus: '',
@@ -598,7 +755,13 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       appStartDate: '',
       appEndDate: '',
       admStartDate: '',
-      admEndDate: ''
+      admEndDate: '',
+      sessions: [],
+      admissionTypes: [],
+      leadSources: [],
+      userIds: [],
+      consultancyIds: [],
+      courseIds: []
     };
     this.searchTerm = '';
     this.applyFilters();
@@ -694,7 +857,9 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       next: states => {
         this.states = states;
         // If state already in filters (from URL), load its cities
-        if (this.filters.state) {
+        if (this.filters.states && this.filters.states.length > 0) {
+          this.loadCitiesForSelectedStates();
+        } else if (this.filters.state) {
           this.loadCities(this.filters.state);
         }
       },
@@ -714,6 +879,212 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         this.loadingCities = false;
       }
     });
+  }
+
+  loadCitiesForSelectedStates(): void {
+    if (!this.filters.states || this.filters.states.length === 0) {
+      this.cities = [];
+      this.filters.cities = [];
+      return;
+    }
+    this.loadingCities = true;
+    const obs = this.filters.states.map(state => this.locationService.getCitiesByState(state));
+    forkJoin(obs).subscribe({
+      next: (results: string[][]) => {
+        const allCities = results.reduce((acc, val) => acc.concat(val), []);
+        this.cities = Array.from(new Set(allCities)).sort();
+        // Remove any selected cities that are no longer valid for the selected states
+        this.filters.cities = this.filters.cities.filter(c => this.cities.includes(c));
+        this.loadingCities = false;
+      },
+      error: err => {
+        console.error('Error loading cities for selected states', err);
+        this.loadingCities = false;
+      }
+    });
+  }
+
+  loadActiveCourseTypes(): void {
+    this.courseTypeService.getActiveCourseTypes().subscribe({
+      next: (res: any[]) => {
+        this.courseTypes = res || [];
+      },
+      error: err => console.error('Error loading active course types', err)
+    });
+  }
+
+  toggleStateSelection(state: string): void {
+    if (!this.filters.states) {
+      this.filters.states = [];
+    }
+    const index = this.filters.states.indexOf(state);
+    if (index === -1) {
+      this.filters.states.push(state);
+    } else {
+      this.filters.states.splice(index, 1);
+    }
+    this.loadCitiesForSelectedStates();
+  }
+
+  toggleCitySelection(city: string): void {
+    if (!this.filters.cities) {
+      this.filters.cities = [];
+    }
+    const index = this.filters.cities.indexOf(city);
+    if (index === -1) {
+      this.filters.cities.push(city);
+    } else {
+      this.filters.cities.splice(index, 1);
+    }
+  }
+
+  toggleCourseTypeSelection(ct: string): void {
+    if (!this.filters.courseTypes) {
+      this.filters.courseTypes = [];
+    }
+    const index = this.filters.courseTypes.indexOf(ct);
+    if (index === -1) {
+      this.filters.courseTypes.push(ct);
+    } else {
+      this.filters.courseTypes.splice(index, 1);
+    }
+  }
+
+  toggleSessionSelection(session: string): void {
+    if (!this.filters.sessions) this.filters.sessions = [];
+    const index = this.filters.sessions.indexOf(session);
+    if (index === -1) {
+      this.filters.sessions.push(session);
+    } else {
+      this.filters.sessions.splice(index, 1);
+    }
+  }
+
+  get filteredSessions(): string[] {
+    const term = (this.searchTerms.session || '').toLowerCase().trim();
+    if (!term) return this.sessions;
+    return this.sessions.filter(s => s.toLowerCase().includes(term));
+  }
+
+  toggleAdmissionTypeSelection(val: string): void {
+    if (!this.filters.admissionTypes) this.filters.admissionTypes = [];
+    const index = this.filters.admissionTypes.indexOf(val);
+    if (index === -1) {
+      this.filters.admissionTypes.push(val);
+    } else {
+      this.filters.admissionTypes.splice(index, 1);
+    }
+  }
+
+  get filteredAdmissionTypes(): { value: string, name: string }[] {
+    const term = (this.searchTerms.admissionType || '').toLowerCase().trim();
+    if (!term) return this.admissionTypesList;
+    return this.admissionTypesList.filter(t => t.name.toLowerCase().includes(term));
+  }
+
+  toggleLeadSourceSelection(id: string): void {
+    if (!this.filters.leadSources) this.filters.leadSources = [];
+    const index = this.filters.leadSources.indexOf(id);
+    if (index === -1) {
+      this.filters.leadSources.push(id);
+    } else {
+      this.filters.leadSources.splice(index, 1);
+    }
+  }
+
+  get filteredLeadSources(): any[] {
+    const term = (this.searchTerms.leadSource || '').toLowerCase().trim();
+    const list = this.activeLeadSources || [];
+    if (!term) return list;
+    return list.filter(s => s.name && s.name.toLowerCase().includes(term));
+  }
+
+  toggleUserSelection(id: number): void {
+    if (!this.filters.userIds) this.filters.userIds = [];
+    const numId = Number(id);
+    const index = this.filters.userIds.findIndex(x => Number(x) === numId);
+    if (index === -1) {
+      this.filters.userIds.push(numId);
+    } else {
+      this.filters.userIds.splice(index, 1);
+    }
+  }
+
+  toggleConsultancySelection(id: number): void {
+    if (!this.filters.consultancyIds) this.filters.consultancyIds = [];
+    const numId = Number(id);
+    const index = this.filters.consultancyIds.findIndex(x => Number(x) === numId);
+    if (index === -1) {
+      this.filters.consultancyIds.push(numId);
+    } else {
+      this.filters.consultancyIds.splice(index, 1);
+    }
+  }
+
+  toggleCourseSelection(id: number): void {
+    if (!this.filters.courseIds) this.filters.courseIds = [];
+    const numId = Number(id);
+    const index = this.filters.courseIds.findIndex(x => Number(x) === numId);
+    if (index === -1) {
+      this.filters.courseIds.push(numId);
+    } else {
+      this.filters.courseIds.splice(index, 1);
+    }
+  }
+
+  getUserNameById(id: number): string {
+    const cached = this.modalSelectionCache.get(id);
+    if (cached) return cached.fullName || cached.name;
+    const u = this.users.find(x => (x.id || x.userId) == id);
+    return u ? (u.fullName || u.name) : `User ID: ${id}`;
+  }
+
+  getConsultancyNameById(id: number): string {
+    const cached = this.modalSelectionCache.get(id);
+    if (cached) return cached.name;
+    const c = this.consultancies.find(x => x.id == id);
+    return c ? c.name : `Consultancy ID: ${id}`;
+  }
+
+  getCourseNameById(id: number): string {
+    const cached = this.modalSelectionCache.get(id);
+    if (cached) return cached.name;
+    const c = this.courses.find(x => x.id == id);
+    return c ? c.name : `Course ID: ${id}`;
+  }
+
+  getLeadSourceNameById(id: string): string {
+    if (id === '00000000-0000-0000-0000-000000000000' || id === 'Unmapped') return 'Unmapped';
+    const ls = this.activeLeadSources.find(x => x.id === id);
+    return ls ? ls.name : id;
+  }
+
+  get filteredStates(): string[] {
+    const term = (this.searchTerms.state || '').toLowerCase().trim();
+    if (!term) return this.states;
+    return this.states.filter(s => s.toLowerCase().includes(term));
+  }
+
+  get filteredCities(): string[] {
+    const term = (this.searchTerms.city || '').toLowerCase().trim();
+    if (!term) return this.cities;
+    return this.cities.filter(c => c.toLowerCase().includes(term));
+  }
+
+  get filteredCourseTypes(): any[] {
+    const term = (this.searchTerms.courseType || '').toLowerCase().trim();
+    if (!term) return this.courseTypes;
+    return this.courseTypes.filter(ct => ct.name && ct.name.toLowerCase().includes(term));
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    this.dropdowns.state = false;
+    this.dropdowns.city = false;
+    this.dropdowns.courseType = false;
+    this.dropdowns.session = false;
+    this.dropdowns.admissionType = false;
+    this.dropdowns.leadSource = false;
   }
 
   onStateChange(): void {
@@ -743,7 +1114,15 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   }
 
   clearFilter(key: string): void {
-    (this.filters as any)[key] = '';
+    if (['states', 'cities', 'courseTypes', 'sessions', 'admissionTypes', 'leadSources', 'userIds', 'consultancyIds', 'courseIds'].includes(key)) {
+      (this.filters as any)[key] = [];
+      if (key === 'states') {
+        this.filters.cities = [];
+        this.cities = [];
+      }
+    } else {
+      (this.filters as any)[key] = '';
+    }
     this.applyFilters();
   }
 
@@ -795,7 +1174,26 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   }
 
   get hasActiveFilters(): boolean {
-    return !!(this.searchTerm || this.filters.source || this.filters.isScholar || this.filters.statusFilter || this.filters.courseId || this.filters.session || this.filters.state || this.filters.city || this.filters.startDate);
+    return !!(
+      this.searchTerm ||
+      this.filters.source ||
+      this.filters.isScholar ||
+      this.filters.statusFilter ||
+      this.filters.courseId ||
+      this.filters.session ||
+      this.filters.state ||
+      this.filters.city ||
+      this.filters.startDate ||
+      (this.filters.sessions && this.filters.sessions.length > 0) ||
+      (this.filters.admissionTypes && this.filters.admissionTypes.length > 0) ||
+      (this.filters.leadSources && this.filters.leadSources.length > 0) ||
+      (this.filters.userIds && this.filters.userIds.length > 0) ||
+      (this.filters.consultancyIds && this.filters.consultancyIds.length > 0) ||
+      (this.filters.courseIds && this.filters.courseIds.length > 0) ||
+      (this.filters.states && this.filters.states.length > 0) ||
+      (this.filters.cities && this.filters.cities.length > 0) ||
+      (this.filters.courseTypes && this.filters.courseTypes.length > 0)
+    );
   }
 
   // ── Navigation ────────────────────────────────────────────────────────
@@ -1084,7 +1482,16 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.searchTerm,
       this.filters.isDiscounted ?? undefined,
       this.filters.consultancyId ?? undefined,
-      this.filters.userId ?? undefined
+      this.filters.userId ?? undefined,
+      this.filters.states,
+      this.filters.cities,
+      this.filters.courseTypes,
+      this.filters.sessions,
+      this.filters.admissionTypes,
+      this.filters.leadSources,
+      this.filters.userIds,
+      this.filters.consultancyIds,
+      this.filters.courseIds
     ).subscribe({
       next: (blob: Blob) => {
         const tab = this.filters.tab || 'all';
@@ -1227,13 +1634,27 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     this.loadModalData();
   }
 
-  onModalSelect(item: any) {
+  onModalSelect(items: any[]) {
+    if (!items) {
+      this.activeModal = null;
+      return;
+    }
+    items.forEach(item => this.cacheSelectedItem(item));
+    // Safely extract numeric IDs — handles both object and primitive inputs
+    const ids: number[] = items.map(item => {
+      const raw = typeof item === 'object' && item !== null ? this.getItemId(item) : item;
+      return Number(raw);
+    }).filter(id => !isNaN(id) && id > 0);
+
     if (this.activeModal === 'user') {
-      this.filters.userId = item ? item.id : null;
+      this.filters.userIds = ids;
+      console.log('[Filter] userIds set to:', ids);
     } else if (this.activeModal === 'consultancy') {
-      this.filters.consultancyId = item ? item.id : null;
+      this.filters.consultancyIds = ids;
+      console.log('[Filter] consultancyIds set to:', ids);
     } else if (this.activeModal === 'course') {
-      this.filters.courseId = item ? item.id : null;
+      this.filters.courseIds = ids;
+      console.log('[Filter] courseIds set to:', ids);
     }
     this.activeModal = null;
     this.updateActiveFilterCount();
