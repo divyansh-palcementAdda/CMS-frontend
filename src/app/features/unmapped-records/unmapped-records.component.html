@@ -230,9 +230,6 @@
                   <!-- NAME COLUMN -->
                   <td>
                     <div class="user-cell">
-                      <div class="avatar-circle" [style.background-color]="getAvatarColor(item.fullName || item.name)">
-                        {{ (item.fullName || item.name || '?').charAt(0) }}
-                      </div>
                       <span class="user-name">{{ item.fullName || item.name }}</span>
                     </div>
                   </td>
@@ -253,7 +250,7 @@
                   <td>{{ item.counselorName || ' - ' }}</td>
                   <td>{{item.admissionDate}}</td>
                   }
-                    @case ('users') {
+                  @case ('users') {
                   <td>
                     <div class="roles-container" style="display: flex; gap: 4px; flex-wrap: wrap;">
                       @for (role of item.roles; track role.roleId) {
