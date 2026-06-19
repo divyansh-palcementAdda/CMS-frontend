@@ -1,8 +1,10 @@
 import { Component, signal, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { routes } from '../../../app.routes';
 
 export interface NavItem {
   label: string;
@@ -14,24 +16,24 @@ export interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
   template: `
+    <!-- Desktop & Tablet Sidebar Layout -->
     <aside class="sidebar" [class.collapsed]="collapsed()">
       <div class="sidebar-logo-area">
         <a routerLink="/admin/dashboard" class="logo-container">
           <img src="/assets/logo.png" alt="Logo" class="logo-img">
-          <!-- <span class="logo-text" *ngIf="!collapsed()">RU CMS</span> -->
         </a>
         <button class="sidebar-collapse-btn" (click)="toggleCollapse()">
           <svg width="100%" height="100%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 0C12.6522 0 15.1957 1.05357 17.0711 2.92893C18.9464 4.8043 20 7.34784 20 10C20 11.3132 19.7413 12.6136 19.2388 13.8268C18.7362 15.0401 17.9997 16.1425 17.0711 17.0711C15.1957 18.9464 12.6522 20 10 20C7.34784 20 4.8043 18.9464 2.92893 17.0711C1.05357 15.1957 0 12.6522 0 10C0 8.68678 0.258658 7.38642 0.761205 6.17317C1.26375 4.95991 2.00035 3.85752 2.92893 2.92893C3.85752 2.00035 4.95991 1.26375 6.17317 0.761204C7.38642 0.258657 8.68678 0 10 0ZM13.4 14.6L8.8 10L13.4 5.4L12 4L6 10L12 16L13.4 14.6Z" fill="currentColor" />
           </svg>
-          </button>
+        </button>
       </div>
 
       <nav class="sidebar-nav">
         <ul class="sidebar-menu">
-          <li *ngFor="let item of navItems" class="sidebar-menu-item">
+          <li *ngFor="let item of getFilteredNavItems()" class="sidebar-menu-item">
             <a [routerLink]="item.path" 
                [queryParams]="item.queryParams"
                routerLinkActive="active"
@@ -44,11 +46,114 @@ export interface NavItem {
         </ul>
       </nav>
     </aside>
+
+    <!-- Mobile Floating Bottom Navigation Dock -->
+    <div class="mobile-bottom-bar">
+      <div class="bottom-bar-container">
+        <a *ngFor="let item of bottomBarItems"
+           [routerLink]="item.path"
+           [queryParams]="item.queryParams"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
+           class="bottom-bar-item">
+          <span class="bottom-bar-icon" [innerHTML]="item.icon"></span>
+          <span class="bottom-bar-label">{{ item.label }}</span>
+        </a>
+
+        <!-- More Button -->
+        <button class="bottom-bar-item more-trigger" 
+                [class.active]="moreSheetOpen"
+                (click)="toggleMoreSheet()">
+          <span class="bottom-bar-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </span>
+          <span class="bottom-bar-label">More</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Backdrop Overlay for sliding sheet -->
+    <div class="sheet-overlay" *ngIf="moreSheetOpen" (click)="closeMoreSheet()"></div>
+
+    <!-- Sliding Bottom Sheet Drawer -->
+    <div class="bottom-sheet" [class.open]="moreSheetOpen">
+      <div class="sheet-drag-handle" (click)="closeMoreSheet()"></div>
+
+      <div class="sheet-header">
+        <h3 class="sheet-title">Explore Modules</h3>
+        <div class="sheet-search">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" 
+                 placeholder="Search feature..." 
+                 [(ngModel)]="searchQuery" 
+                 class="search-input" />
+        </div>
+      </div>
+
+      <div class="sheet-content">
+        <div class="modules-grid" *ngIf="filteredMoreItems.length > 0; else noResults">
+          <a *ngFor="let item of filteredMoreItems"
+             [routerLink]="item.path"
+             [queryParams]="item.queryParams"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{exact: item.path === '/admin/dashboard'}"
+             (click)="closeMoreSheet()"
+             class="module-card">
+            <div class="card-header">
+              <span class="card-icon" [innerHTML]="item.icon"></span>
+            </div>
+            <div class="card-body">
+              <span class="card-title">{{ item.label }}</span>
+              <span class="card-subtitle">{{ getSubtitle(item) }}</span>
+            </div>
+          </a>
+        </div>
+        <ng-template #noResults>
+          <div class="no-results">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <p>No modules match your search query</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="sheet-profile-section">
+        <div class="profile-user-info">
+          <div class="profile-avatar">{{ initials }}</div>
+          <div class="profile-text">
+            <span class="profile-name">{{ username }}</span>
+            <span class="profile-role">{{ userRole }}</span>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <a routerLink="/admin/profile" (click)="closeMoreSheet()" class="profile-btn secondary">
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            My Profile
+          </a>
+          <button (click)="logout()" class="profile-btn danger">
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
   `,
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
   collapsed = signal(false);
+  searchQuery = '';
+  moreSheetOpen = false;
   private sanitizer = inject(DomSanitizer);
 
   navItems: NavItem[] = [
@@ -69,6 +174,106 @@ export class SidebarComponent {
   ];
 
   constructor(private auth: AuthService) { }
-  toggleCollapse(): void { this.collapsed.update(v => !v); }
+
+  toggleCollapse(): void { 
+    this.collapsed.update(v => !v); 
+  }
+
+  getFilteredNavItems(): NavItem[] {
+    return this.navItems.filter(item => {
+      const cleanPath = item.path.startsWith('/') ? item.path.slice(1) : item.path;
+      const route = routes.find(r => r.path === cleanPath);
+      if (route && route.data && (route.data as any).role) {
+        return this.auth.hasRole((route.data as any).role);
+      }
+      return true;
+    });
+  }
+
+  get bottomBarItems(): NavItem[] {
+    const allowed = this.getFilteredNavItems();
+    const result: NavItem[] = [];
+
+    const dashboardItem = allowed.find(item => item.path === '/admin/dashboard');
+    if (dashboardItem) result.push(dashboardItem);
+
+    const admissionItem = allowed.find(item => item.path === '/admin/admission-management' && item.queryParams?.tab === 'Admission');
+    if (admissionItem) result.push(admissionItem);
+
+    const usersItem = allowed.find(item => item.path === '/users');
+    if (usersItem) result.push(usersItem);
+
+    const reportsItem = allowed.find(item => item.path === '/reports');
+    if (reportsItem) result.push(reportsItem);
+
+    return result;
+  }
+
+  get morePanelItems(): NavItem[] {
+    const allowed = this.getFilteredNavItems();
+    const bottomBar = this.bottomBarItems;
+    return allowed.filter(item => !bottomBar.includes(item));
+  }
+
+  get filteredMoreItems(): NavItem[] {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      return this.morePanelItems;
+    }
+    return this.morePanelItems.filter(item => 
+      item.label.toLowerCase().includes(query)
+    );
+  }
+
+  getSubtitle(item: NavItem): string {
+    switch (item.label) {
+      case 'Institution': return 'University partners';
+      case 'Roles': return 'Permissions & roles';
+      case 'Courses': return 'Academic programs';
+      case 'Course Type': return 'Program categories';
+      case 'Consultancy': return 'Consultant partners';
+      case 'Applications': return 'Student applications';
+      case 'Fee Payment History': return 'Fee records';
+      case 'UnMapped Records': return 'Resolve records';
+      case 'Reports & Analytics': return 'Analytics & graphs';
+      case 'Master Data': return 'Global settings';
+      case 'My Profile': return 'Account settings';
+      default: return 'Management module';
+    }
+  }
+
+  get username(): string {
+    return this.auth.user()?.username || 'User';
+  }
+
+  get userRole(): string {
+    const roles = this.auth.user()?.roles || [];
+    if (roles.includes('ROLE_ADMIN') || roles.includes('ADMIN')) return 'Admin';
+    if (roles.length > 0) {
+      return roles[0].replace('ROLE_', '').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+    }
+    return 'User';
+  }
+
+  get initials(): string {
+    const name = this.username;
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  toggleMoreSheet(): void {
+    this.moreSheetOpen = !this.moreSheetOpen;
+    if (this.moreSheetOpen) {
+      this.searchQuery = '';
+    }
+  }
+
+  closeMoreSheet(): void {
+    this.moreSheetOpen = false;
+  }
+
+  logout(): void {
+    this.closeMoreSheet();
+    this.auth.logout();
+  }
 }
 

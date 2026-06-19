@@ -99,7 +99,7 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
     </div>
   `,
   styles: [`
-    .dashboard-layout { display: flex; min-height: 100vh; background: #f8fafc; }
+    .dashboard-layout { display: flex; min-height: 100vh; background: #ffffff; }
     .dashboard-body { flex: 1; display: flex; flex-direction: column; }
     .main-content { padding: 32px; flex: 1; }
     .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }

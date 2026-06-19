@@ -1,7 +1,7 @@
 @use "sass:color";
 
 $primary: #6366F1;
-$bg-page: #F8FAFC;
+$bg-page: #ffffff;
 $card-border: #E2E8F0;
 $text-dark: #1E293B;
 $text-light: #64748B;
@@ -268,7 +268,7 @@ $text-light: #64748B;
     display: flex;
     padding: 0 24px;
     border-bottom: 1px solid #e2e8f0;
-    background: #f8fafc;
+    background: #ffffff;
 
     .tab-item {
       padding: 14px 24px;

@@ -1,7 +1,7 @@
 @use "sass:color";
 
 $primary: #435FFF;
-$bg-page: #F8FAFC;
+$bg-page: #ffffff;
 $card-border: #E2E8F0;
 $text-dark: #0F172A;
 $text-light: #64748B;
@@ -1351,7 +1351,7 @@ $text-light: #64748B;
 
     .pagination-section {
       padding: 20px 32px;
-      background: #F8FAFC;
+      background: #ffffff;
       display: flex;
       justify-content: space-between;
       align-items: center;
