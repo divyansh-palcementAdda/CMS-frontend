@@ -42,12 +42,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
   margin-bottom: 32px;
 
   .header-left {
     display: flex;
     align-items: center;
     gap: 16px;
+    flex: 1 1 280px;
+    min-width: 0;
 
     .back-btn {
       width: 40px;
@@ -90,6 +94,8 @@
     gap: 16px !important;
     align-items: center !important;
     flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
 
     button {
       padding: 10px 24px !important;
@@ -160,13 +166,16 @@
 }
 
 /* Cards */
-.info-card, .table-card, .chart-card, .quick-stats-card {
+.info-card, .table-card, .chart-card, .quick-stats-card, .enroll-card, .stat-card, .stat-premium-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   margin-bottom: 24px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
 }
 
 .enroll-card {
@@ -213,10 +222,12 @@
     .stat-row {
       display: flex;
       justify-content: space-between;
+      gap: 8px;
       padding: 12px 0;
       border-bottom: 1px solid #f1f5f9;
       font-size: 14px;
       color: #64748b;
+      flex-wrap: wrap;
 
       &:last-child { border-bottom: none; }
 
@@ -476,6 +487,299 @@
   .detail-grid {
     grid-template-columns: 1fr;
   }
+
+  .stats-grid-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .categorized-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-container {
+    padding: 16px;
+  }
+
+  .detail-grid,
+  .stats-grid-container,
+  .categorized-stats,
+  .card-grid {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
+  }
+
+  .detail-grid > .left-col,
+  .detail-grid > .right-col,
+  .stats-grid-container > .stat-card,
+  .categorized-stats > .stat-premium-card,
+  .card-grid > .info-item {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .header-left {
+      width: 100%;
+    }
+
+    .header-actions {
+      width: 100%;
+      justify-content: stretch;
+
+      button {
+        flex: 1 1 140px;
+        justify-content: center;
+      }
+    }
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid-container,
+  .categorized-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 18px 20px;
+  }
+
+  .table-tools {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-box {
+      width: 100%;
+
+      input {
+        width: 100%;
+      }
+    }
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+
+    table {
+      min-width: 900px;
+    }
+  }
+
+  .table-header-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .header-badges {
+    flex-wrap: wrap;
+    width: 100%;
+
+    .stat-badge {
+      flex: 1 1 140px;
+      min-width: 120px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-container {
+    padding: 12px;
+  }
+
+  .detail-grid,
+  .stats-grid-container,
+  .categorized-stats,
+  .card-grid {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
+  }
+
+  .detail-header .header-left {
+    gap: 10px;
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    .title-info h1 {
+      font-size: 20px;
+    }
+
+    .title-info p {
+      font-size: 12px;
+    }
+  }
+
+  .detail-header .header-actions button {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .enroll-card,
+  .quick-stats-card,
+  .info-card,
+  .stat-card,
+  .stat-premium-card {
+    padding: 16px;
+    border-radius: 10px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .enroll-card .enroll-number {
+    font-size: 32px;
+  }
+
+  .stats-grid-container,
+  .categorized-stats {
+    gap: 12px;
+  }
+
+  .stat-card,
+  .stat-premium-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+
+    .stat-info .value,
+    .info .value {
+      font-size: 22px;
+    }
+  }
+
+  .quick-stats-card .stats-list .stat-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .card-grid {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .table-wrapper table {
+    min-width: 820px;
+  }
+
+  .table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 320px) {
+  .detail-container {
+    padding: 10px;
+  }
+
+  .detail-grid,
+  .stats-grid-container,
+  .categorized-stats,
+  .card-grid {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
+  }
+
+  .detail-header .header-left .title-info h1 {
+    font-size: 18px;
+  }
+
+  .detail-grid,
+  .stats-grid-container,
+  .categorized-stats,
+  .card-grid {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .enroll-card,
+  .quick-stats-card,
+  .info-card,
+  .stat-card,
+  .stat-premium-card {
+    padding: 12px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+  }
+
+  .stat-card,
+  .stat-premium-card {
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stat-card .icon-box,
+  .stat-premium-card .icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .stat-card .stat-info .label,
+  .stat-premium-card .info .label {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .stat-card .stat-info .value,
+  .stat-premium-card .info .value {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .quick-stats-card .stats-list .stat-row {
+    padding: 8px 0;
+  }
+
+  .card-grid {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .card-grid .info-item p {
+    font-size: 14px;
+  }
+
+  .enroll-card .enroll-number {
+    font-size: 28px;
+  }
+
+  .table-header-row {
+    padding: 14px 16px;
+  }
+
+  .table-header-box {
+    padding: 16px;
+  }
 }
 
 /* Inserted from User Detail for new tables */
@@ -733,12 +1037,17 @@
   }
 
   .stat-info {
+    width: 100%;
+    min-width: 0;
+
     .label {
       font-size: 13px;
       font-weight: 500;
       color: #64748B;
       margin-bottom: 8px;
       display: block;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .value {
@@ -820,12 +1129,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   .info {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
+    width: 100%;
 
     .label {
       font-size: 13px;
@@ -833,12 +1146,16 @@
       color: #64748B;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .value {
       font-size: 28px;
       font-weight: 800;
       color: #1E293B;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
   }
 
@@ -861,6 +1178,40 @@
   &.orange {
     &::before { background: #F59E0B; }
     &:hover { border-color: #F59E0B; }
+  }
+}
+
+@media (max-width: 1200px) {
+  .stats-grid-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .categorized-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-grid,
+  .stats-grid-container,
+  .categorized-stats,
+  .card-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: unset !important;
+  }
+
+  .detail-grid > .left-col,
+  .detail-grid > .right-col,
+  .stats-grid-container > .stat-card,
+  .categorized-stats > .stat-premium-card,
+  .card-grid > .info-item,
+  .info-card,
+  .enroll-card,
+  .quick-stats-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
   }
 }
 
