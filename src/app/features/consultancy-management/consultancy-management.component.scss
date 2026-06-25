@@ -6,8 +6,13 @@ $card-border: #E2E8F0;
 $text-dark: #1E293B;
 $text-light: #64748B;
 
-.consultancy-page-wrapper {
+.consultancy-main-content {
   padding: 24px;
+  background: transparent;
+}
+
+.consultancy-page-wrapper {
+  padding: 0;
   background-color: $bg-page;
   min-height: calc(100vh - 64px);
   font-family: 'Inter', sans-serif;
@@ -518,20 +523,49 @@ $text-light: #64748B;
 
 @media (max-width: 1200px) {
   .consultancy-page-wrapper {
+    .header-section {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+    }
+
     .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
   }
 }
 
 @media (max-width: 768px) {
-  .consultancy-page-wrapper {
+  .consultancy-main-content {
     padding: 12px;
+  }
+
+  .consultancy-page-wrapper {
 
     .header-section {
       margin-bottom: 16px;
-      .page-title { font-size: 20px; }
+
+      .page-title {
+        font-size: 20px;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+
+        .btn-secondary,
+        .btn-primary {
+          width: 100%;
+          justify-content: center;
+        }
+      }
     }
 
     .stats-grid {
@@ -540,22 +574,68 @@ $text-light: #64748B;
 
     .table-card.table-only {
       border-radius: 12px;
-      
+
       .table-header {
         padding: 16px;
-        flex-direction: column;
+        flex-direction: column !important;
         gap: 16px;
-        
+        align-items: stretch !important;
+
         .header-filters {
           width: 100%;
-          .search-box { width: 100%; }
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+
+          .search-box {
+            width: 100%;
+            max-width: none;
+          }
         }
       }
 
+      .pagination-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
       table {
-        td.mobile-cell, th:nth-child(3) {
-          display: none; // Hide contact on very small screens
+        td.mobile-cell,
+        th:nth-child(3) {
+          display: none;
         }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .consultancy-page-wrapper {
+    padding: 10px;
+
+    .header-section {
+      .title-container {
+        gap: 12px;
+      }
+
+      .header-actions {
+        gap: 10px;
+      }
+    }
+
+    .table-card.table-only {
+      .table-header {
+        padding: 14px;
+      }
+
+      .pagination-section {
+        padding: 12px 14px;
+      }
+
+      .pagination-controls {
+        width: 100%;
+        overflow-x: auto;
       }
     }
   }

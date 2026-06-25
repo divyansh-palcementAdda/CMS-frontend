@@ -8,10 +8,25 @@ $green-success: #10B981;
 $red-danger: #EF4444;
 
 .main-content {
-  padding: 32px;
+  padding: 24px 32px;
   background: $teaser-bg;
   min-height: calc(100vh - 64px);
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.page-header,
+.page-header .header-left,
+.page-header .header-actions,
+.content-grid,
+.info-column,
+.stats-column,
+.info-card .info-grid,
+.info-item,
+.table-card .table-header-row,
+.table-card .table-footer,
+.table-card .table-wrapper {
+  min-width: 0;
 }
 
 .loading-overlay {
@@ -58,11 +73,15 @@ $red-danger: #EF4444;
   justify-content: space-between !important;
   align-items: center !important;
   margin-bottom: 32px !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
 
   .header-left {
     display: flex !important;
     align-items: center !important;
     gap: 20px !important;
+    min-width: 0 !important;
+    flex: 1 1 280px !important;
 
     .back-btn {
       background: none !important;
@@ -74,19 +93,29 @@ $red-danger: #EF4444;
       cursor: pointer !important;
       transition: transform 0.2s !important;
       box-shadow: none !important;
+      flex-shrink: 0 !important;
 
       &:hover {
         transform: scale(1.1) !important;
       }
+
+      svg {
+        width: 24px !important;
+        height: 24px !important;
+      }
     }
 
     .name-id {
+      min-width: 0 !important;
+
       h1 {
         font-size: 26px !important;
         font-weight: 700 !important;
         color: #111827 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
       }
       .consultancy-id {
         font-size: 15px !important;
@@ -101,6 +130,9 @@ $red-danger: #EF4444;
     display: flex !important;
     gap: 16px !important;
     align-items: center !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    min-width: 0 !important;
 
     .action-btn {
       height: 44px !important;
@@ -194,6 +226,8 @@ $red-danger: #EF4444;
       font-size: 16px !important;
       color: #111827 !important;
       font-weight: 600 !important;
+      overflow-wrap: anywhere !important;
+      word-break: break-word !important;
 
       &.link { color: #2563EB !important; text-decoration: none !important; cursor: pointer !important; }
       &.highlight { color: #059669 !important; }
@@ -329,9 +363,14 @@ $red-danger: #EF4444;
     .table-tools {
       display: flex !important;
       gap: 16px !important;
+      flex-wrap: wrap !important;
+      justify-content: flex-end !important;
+      min-width: 0 !important;
       
       .search-box {
         position: relative !important;
+        flex: 1 1 240px !important;
+        min-width: 0 !important;
         input {
           height: 40px !important;
           padding: 0 40px 0 16px !important;
@@ -405,6 +444,8 @@ $red-danger: #EF4444;
         cursor: pointer !important;
         color: $text-muted !important;
         transition: all 0.2s ease !important;
+        display: flex !important;
+        align-items: center !important;
         &:hover:not(.disabled) { color: $blue-primary !important; }
         &.disabled {
           opacity: 0.3 !important;
@@ -445,8 +486,11 @@ $red-danger: #EF4444;
     cursor: pointer !important;
     color: #9CA3AF !important;
     transition: color 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
     &:hover { color: $blue-primary !important; }
     svg { width: 20px !important; height: 20px !important; }
+    .material-symbols-outlined { font-size: 20px !important; }
   }
 }
 
@@ -590,6 +634,7 @@ $red-danger: #EF4444;
   .icon {
     width: 44px !important;
     height: 44px !important;
+    flex-shrink: 0 !important;
   }
 }
 
@@ -601,6 +646,12 @@ thead.orange-header { background: #F59E0B !important; }
 
 .table-wrapper {
   overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.table-card table {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .empty-state {
@@ -629,6 +680,7 @@ thead.orange-header { background: #F59E0B !important; }
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.2s ease-in-out !important;
+  white-space: nowrap !important;
 
   &:hover:not(:disabled) {
     background: #DBEAFE !important;
@@ -665,3 +717,1103 @@ thead.orange-header { background: #F59E0B !important; }
 @keyframes spin-anim {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 1400px) {
+  .main-content {
+    padding: 24px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+  }
+
+  .categorized-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+  }
+
+  .categorized-stats {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-column {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+
+  .page-header {
+    .header-actions {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+  }
+
+  .quick-stats-card {
+    padding: 20px;
+
+    .stat-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 12px 0;
+
+      .value {
+        width: 100%;
+        overflow-wrap: anywhere;
+      }
+    }
+  }
+
+  .financial-summary-section {
+    padding: 20px;
+
+    .fin-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+  }
+
+  .table-card {
+    .table-header-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .table-tools {
+        width: 100%;
+        flex-wrap: wrap;
+
+        .search-box {
+          width: 100%;
+
+          input {
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .table-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .stats-column {
+    grid-template-columns: 1fr !important;
+  }
+
+  .categorized-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+
+    .header-actions {
+      justify-content: stretch;
+    }
+  }
+
+  .commission-card-premium {
+    padding: 28px;
+
+    .amount {
+      font-size: 40px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 14px;
+  }
+
+  .breadcrumbs {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+
+    .header-left {
+      gap: 12px;
+      flex-wrap: nowrap;
+
+      .name-id h1 {
+        font-size: 22px;
+      }
+    }
+
+    .header-actions {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 10px;
+
+      .action-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        white-space: normal !important;
+        height: auto !important;
+        min-height: 44px !important;
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+        gap: 8px !important;
+      }
+    }
+  }
+
+  .info-card {
+    padding: 20px;
+    border-radius: 14px;
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .info-item.full-width {
+      grid-column: span 1;
+    }
+  }
+
+  .commission-card-premium {
+    padding: 24px;
+
+    .amount {
+      font-size: 36px;
+    }
+  }
+
+  .categorized-stats {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-premium-card {
+    padding: 18px;
+  }
+
+  .quick-stats-card {
+    padding: 18px;
+  }
+
+  .financial-summary-section {
+    padding: 18px;
+
+    .fin-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .fm-card {
+    padding: 14px;
+  }
+
+  .chart-section {
+    padding: 24px;
+  }
+
+  .table-card {
+    .table-header-row {
+      padding: 16px 18px;
+      align-items: flex-start;
+    }
+
+    .table-tools {
+      width: 100%;
+      gap: 10px;
+
+      .btn-export {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    table {
+      min-width: 700px;
+    }
+
+    .table-footer {
+      padding: 16px 18px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .breadcrumbs {
+    font-size: 11px;
+    gap: 4px;
+    margin-bottom: 16px;
+
+    .crumb {
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+    gap: 12px;
+
+    .header-left {
+      gap: 10px;
+
+      .back-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .name-id h1 {
+        font-size: 18px;
+      }
+
+      .consultancy-id {
+        font-size: 12px;
+        margin-top: 4px;
+      }
+    }
+
+    .header-actions {
+      gap: 8px;
+
+      .action-btn {
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+        min-height: 40px !important;
+        gap: 6px !important;
+
+        svg {
+          width: 16px !important;
+          height: 16px !important;
+        }
+      }
+    }
+  }
+
+  .info-card {
+    padding: 18px;
+
+    .card-title {
+      h3 {
+        font-size: 17px;
+      }
+    }
+  }
+
+  .commission-card-premium {
+    padding: 20px;
+
+    .label {
+      font-size: 14px;
+    }
+    .amount {
+      font-size: 32px;
+    }
+    .description {
+      font-size: 13px;
+    }
+  }
+
+  .quick-stats-card {
+    padding: 16px;
+
+    h3 {
+      font-size: 16px;
+    }
+
+    .stat-row {
+      padding: 10px 0;
+
+      .label { font-size: 13px; }
+      .value { font-size: 13px; }
+    }
+  }
+
+  .financial-summary-section {
+    padding: 16px;
+
+    h3 {
+      font-size: 16px;
+    }
+  }
+
+  .categorized-stats {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-premium-card {
+    padding: 16px;
+
+    .info .label {
+      font-size: 13px;
+    }
+
+    .info .value {
+      font-size: 26px;
+    }
+
+    .icon {
+      width: 38px;
+      height: 38px;
+
+      .material-symbols-outlined {
+        font-size: 28px !important;
+      }
+    }
+  }
+
+  .chart-section {
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .table-card {
+    margin-bottom: 24px;
+
+    .table-header-row {
+      padding: 14px 16px;
+
+      h3 {
+        font-size: 17px;
+      }
+    }
+
+    table {
+      min-width: 640px;
+
+      thead tr th,
+      tbody tr td {
+        padding: 14px 16px !important;
+        font-size: 13px !important;
+      }
+    }
+
+    .table-footer {
+      padding: 14px 16px;
+    }
+  }
+
+  .empty-state {
+    padding: 32px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 10px;
+  }
+
+  .page-header {
+    margin-bottom: 18px;
+
+    .header-left {
+      .back-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .name-id h1 {
+        font-size: 16px;
+      }
+
+      .consultancy-id {
+        font-size: 11px;
+      }
+    }
+
+    .header-actions {
+      .action-btn {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        min-height: 36px !important;
+        gap: 4px !important;
+
+        svg {
+          width: 14px !important;
+          height: 14px !important;
+          flex-shrink: 0 !important;
+        }
+      }
+    }
+  }
+
+  .info-card {
+    padding: 14px;
+    border-radius: 12px;
+
+    .card-title {
+      gap: 8px;
+      margin-bottom: 16px;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      h3 {
+        font-size: 16px;
+      }
+    }
+
+    .info-grid {
+      gap: 16px;
+    }
+
+    .info-item {
+      gap: 4px;
+
+      label {
+        font-size: 12px;
+      }
+      .value {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .commission-card-premium {
+    padding: 18px;
+
+    .amount {
+      font-size: 28px;
+    }
+  }
+
+  .quick-stats-card {
+    padding: 14px;
+
+    h3 {
+      font-size: 15px;
+    }
+  }
+
+  .financial-summary-section {
+    padding: 14px;
+
+    h3 {
+      font-size: 15px;
+    }
+
+    .fin-grid {
+      gap: 8px;
+    }
+  }
+
+  .categorized-stats {
+    gap: 10px;
+  }
+
+  .stat-premium-card {
+    padding: 14px;
+
+    .info .label {
+      font-size: 12px;
+    }
+    .info .value {
+      font-size: 22px;
+    }
+    .icon {
+      width: 32px;
+      height: 32px;
+      .material-symbols-outlined {
+        font-size: 24px !important;
+      }
+    }
+  }
+
+  .chart-section {
+    padding: 16px;
+
+    .chart-title {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  }
+
+  .table-card {
+    .table-header-row {
+      padding: 12px 14px;
+
+      h3 {
+        font-size: 15px;
+      }
+    }
+
+    table {
+      min-width: 580px;
+
+      thead tr th,
+      tbody tr td {
+        padding: 12px 14px !important;
+        font-size: 12px !important;
+      }
+    }
+
+    .table-footer {
+      padding: 12px 14px;
+
+      .record-count {
+        font-size: 12px;
+      }
+    }
+  }
+
+  .course-dropdown-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .count-badge {
+    padding: 4px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .main-content {
+    padding: 8px;
+  }
+
+  .page-header {
+    .header-left {
+      gap: 8px;
+
+      .name-id h1 {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .table-card {
+    table {
+      min-width: 520px;
+    }
+  }
+}
+
+/* ===== Small Screen Fixes (320px+) ===== */
+@media (max-width: 360px) {
+  .main-content {
+    padding: 6px !important;
+  }
+
+  .breadcrumbs {
+    font-size: 10px !important;
+    gap: 2px !important;
+    margin-bottom: 12px !important;
+    
+    .crumb {
+      max-width: 70px !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+  }
+
+  .page-header {
+    margin-bottom: 14px !important;
+    gap: 10px !important;
+
+    .header-left {
+      flex: 1 1 auto !important;
+      width: 100% !important;
+      gap: 8px !important;
+
+      .back-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+
+      .name-id {
+        h1 {
+          font-size: 13px !important;
+        }
+        .consultancy-id {
+          font-size: 10px !important;
+          margin-top: 2px !important;
+        }
+      }
+    }
+
+    .header-actions {
+      width: 100% !important;
+      gap: 6px !important;
+
+      .action-btn {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        gap: 4px !important;
+        min-height: 34px !important;
+
+        svg {
+          width: 12px !important;
+          height: 12px !important;
+          flex-shrink: 0 !important;
+        }
+      }
+    }
+  }
+
+  .commission-card-premium {
+    padding: 14px !important;
+
+    .label { font-size: 12px !important; }
+    .amount { font-size: 22px !important; }
+    .description { font-size: 10px !important; }
+  }
+
+  .quick-stats-card {
+    padding: 10px !important;
+    h3 { font-size: 13px !important; }
+    .stat-row {
+      padding: 6px 0 !important;
+      .label { font-size: 11px !important; }
+      .value { font-size: 12px !important; }
+    }
+  }
+
+  .financial-summary-section {
+    padding: 10px !important;
+    h3 { font-size: 13px !important; }
+    .fin-grid { gap: 6px !important; }
+  }
+
+  .fm-card {
+    padding: 8px !important;
+    gap: 4px !important;
+
+    .fm-header {
+      gap: 4px !important;
+      .fm-icon {
+        width: 16px !important;
+        height: 16px !important;
+        .material-symbols-outlined { font-size: 12px !important; }
+      }
+      span { font-size: 9px !important; }
+    }
+    .fm-value { font-size: 12px !important; }
+  }
+
+  .info-card {
+    padding: 10px !important;
+    border-radius: 10px !important;
+
+    .card-title {
+      gap: 6px !important;
+      margin-bottom: 12px !important;
+      svg { width: 16px !important; height: 16px !important; }
+      h3 { font-size: 13px !important; }
+    }
+    .info-grid { gap: 12px !important; }
+    .info-item {
+      gap: 4px !important;
+      label { font-size: 10px !important; }
+      .value { font-size: 12px !important; }
+    }
+  }
+
+  .categorized-stats { gap: 8px !important; margin-bottom: 14px !important; }
+
+  .stat-premium-card {
+    padding: 10px !important;
+    border-radius: 12px !important;
+
+    .info {
+      gap: 2px !important;
+      .label { font-size: 10px !important; }
+      .value { font-size: 18px !important; }
+    }
+    .icon {
+      width: 28px !important;
+      height: 28px !important;
+      .material-symbols-outlined { font-size: 20px !important; }
+    }
+  }
+
+  .chart-section {
+    padding: 10px !important;
+    margin-bottom: 14px !important;
+    .chart-title { font-size: 13px !important; margin-bottom: 12px !important; }
+  }
+
+  .table-card {
+    margin-bottom: 14px !important;
+    border-radius: 10px !important;
+
+    .table-header-row {
+      padding: 8px 10px !important;
+      gap: 6px !important;
+      h3 { font-size: 13px !important; }
+
+      .table-tools {
+        gap: 6px !important;
+
+        .btn-export {
+          font-size: 10px !important;
+          padding: 5px 8px !important;
+          svg { width: 10px !important; height: 10px !important; }
+        }
+
+        .search-box {
+          input {
+            font-size: 11px !important;
+            height: 30px !important;
+            padding: 0 28px 0 8px !important;
+          }
+          svg { right: 6px !important; top: 8px !important; width: 12px !important; height: 12px !important; }
+        }
+      }
+    }
+
+    table { min-width: 480px !important; }
+
+    .table-footer {
+      padding: 8px 10px !important;
+      gap: 6px !important;
+      .record-count { font-size: 10px !important; }
+      .pagination {
+        .page-link { width: 24px !important; height: 24px !important; font-size: 10px !important; }
+        .nav-btn svg { width: 12px !important; height: 12px !important; }
+      }
+    }
+  }
+}
+
+/* ===== Small Screen Fixes (320px+) ===== */
+@media (max-width: 360px) {
+  .main-content {
+    padding: 6px !important;
+  }
+
+  /* Breadcrumbs - compress and ellipsis */
+  .breadcrumbs {
+    font-size: 10px !important;
+    gap: 2px !important;
+    margin-bottom: 12px !important;
+    
+    .crumb {
+      max-width: 80px !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+  }
+
+  /* Page header */
+  .page-header {
+    margin-bottom: 14px !important;
+    gap: 10px !important;
+
+    .header-left {
+      flex: 1 1 auto !important;
+      width: 100% !important;
+      gap: 8px !important;
+
+      .back-btn {
+        svg {
+          width: 20px !important;
+          height: 20px !important;
+        }
+      }
+
+      .name-id {
+        h1 {
+          font-size: 14px !important;
+        }
+        .consultancy-id {
+          font-size: 11px !important;
+          margin-top: 2px !important;
+        }
+      }
+    }
+
+    .header-actions {
+      width: 100% !important;
+      gap: 8px !important;
+
+      .action-btn {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        gap: 4px !important;
+        min-height: 36px !important;
+        height: auto !important;
+
+        svg {
+          width: 14px !important;
+          height: 14px !important;
+          flex-shrink: 0 !important;
+        }
+      }
+    }
+  }
+
+  /* Commission card */
+  .commission-card-premium {
+    padding: 16px !important;
+
+    .label {
+      font-size: 13px !important;
+      margin-bottom: 6px !important;
+    }
+
+    .amount {
+      font-size: 24px !important;
+    }
+
+    .description {
+      font-size: 11px !important;
+      margin-top: 6px !important;
+    }
+  }
+
+  /* Quick stats */
+  .quick-stats-card {
+    padding: 12px !important;
+
+    h3 {
+      font-size: 14px !important;
+      margin-bottom: 12px !important;
+    }
+
+    .stat-row {
+      padding: 8px 0 !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 2px !important;
+
+      .label {
+        font-size: 12px !important;
+      }
+      .value {
+        font-size: 13px !important;
+      }
+    }
+  }
+
+  /* Financial summary */
+  .financial-summary-section {
+    padding: 12px !important;
+
+    h3 {
+      font-size: 14px !important;
+      margin-bottom: 12px !important;
+    }
+
+    .fin-grid {
+      gap: 6px !important;
+    }
+  }
+
+  .fm-card {
+    padding: 10px !important;
+    gap: 6px !important;
+
+    .fm-header {
+      gap: 4px !important;
+      .fm-icon {
+        width: 18px !important;
+        height: 18px !important;
+        .material-symbols-outlined {
+          font-size: 14px !important;
+        }
+      }
+      span {
+        font-size: 10px !important;
+      }
+    }
+    .fm-value {
+      font-size: 13px !important;
+    }
+  }
+
+  /* Info cards */
+  .info-card {
+    padding: 12px !important;
+    border-radius: 12px !important;
+
+    .card-title {
+      gap: 6px !important;
+      margin-bottom: 14px !important;
+
+      svg {
+        width: 18px !important;
+        height: 18px !important;
+      }
+
+      h3 {
+        font-size: 14px !important;
+      }
+    }
+
+    .info-grid {
+      gap: 14px !important;
+    }
+
+    .info-item {
+      gap: 4px !important;
+
+      label {
+        font-size: 11px !important;
+      }
+      .value {
+        font-size: 13px !important;
+      }
+    }
+  }
+
+  /* Categorized stats */
+  .categorized-stats {
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .stat-premium-card {
+    padding: 12px !important;
+    border-radius: 14px !important;
+
+    .info {
+      gap: 4px !important;
+      .label {
+        font-size: 11px !important;
+      }
+      .value {
+        font-size: 20px !important;
+      }
+    }
+
+    .icon {
+      width: 32px !important;
+      height: 32px !important;
+      .material-symbols-outlined {
+        font-size: 24px !important;
+      }
+    }
+  }
+
+  /* Chart section */
+  .chart-section {
+    padding: 12px !important;
+    margin-bottom: 16px !important;
+
+    .chart-title {
+      font-size: 14px !important;
+      margin-bottom: 16px !important;
+    }
+  }
+
+  /* Table cards */
+  .table-card {
+    margin-bottom: 16px !important;
+    border-radius: 12px !important;
+
+    .table-header-row {
+      padding: 10px !important;
+      gap: 8px !important;
+
+      h3 {
+        font-size: 14px !important;
+      }
+
+      .table-tools {
+        gap: 8px !important;
+
+        .btn-export {
+          font-size: 11px !important;
+          padding: 6px 10px !important;
+          white-space: normal !important;
+          width: 100% !important;
+          justify-content: center !important;
+
+          svg {
+            width: 12px !important;
+            height: 12px !important;
+            flex-shrink: 0 !important;
+          }
+        }
+
+        .search-box {
+          flex: 1 1 100% !important;
+          width: 100% !important;
+
+          input {
+            width: 100% !important;
+            font-size: 12px !important;
+            height: 34px !important;
+            padding: 0 32px 0 10px !important;
+          }
+          svg {
+            right: 8px !important;
+            top: 9px !important;
+            width: 14px !important;
+            height: 14px !important;
+          }
+        }
+      }
+    }
+
+    table {
+      min-width: 640px !important;
+    }
+
+    .table-footer {
+      padding: 10px !important;
+      gap: 8px !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+
+      .record-count {
+        font-size: 11px !important;
+      }
+
+      .pagination {
+        gap: 4px !important;
+
+        .page-link {
+          width: 26px !important;
+          height: 26px !important;
+          font-size: 11px !important;
+        }
+        .nav-btn {
+          display: flex !important;
+          align-items: center !important;
+
+          svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+        }
+      }
+    }
+  }
+}
+@import 'consultancy-detail.responsive.scss';

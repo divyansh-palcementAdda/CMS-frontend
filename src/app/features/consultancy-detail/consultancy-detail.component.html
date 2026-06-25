@@ -707,21 +707,22 @@
               </div>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Course Name</th>
-                <th>Course Type</th>
-                <th>Duration</th>
-                <th>Students</th>
-                <th>Status</th>
-                <th>Institution</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let course of paginatedCourses">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Course Name</th>
+                  <th>Course Type</th>
+                  <th>Duration</th>
+                  <th>Students</th>
+                  <th>Status</th>
+                  <th>Institution</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let course of paginatedCourses">
                 <td>{{ course.sNo }}</td>
                 <td class="bold-text">{{ course.name }}</td>
                 <td><span class="tag-badge">{{ course.type }}</span></td>
@@ -744,7 +745,8 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+            </table>
+          </div>
           <div class="table-footer">
             <span class="record-count">Showing {{ paginatedCourses.length }} of {{ filteredCourses.length }}
               records</span>
@@ -783,19 +785,20 @@
               </div>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let rep of paginatedUsers">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let rep of paginatedUsers">
                 <td>{{ rep.sNo }}</td>
                 <td class="bold-text">{{ rep.name }}</td>
                 <td>{{ rep.email }}</td>
@@ -816,7 +819,8 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+            </table>
+          </div>
           <div class="table-footer">
             <span class="record-count">Showing {{ paginatedUsers.length }} of {{ filteredUsers.length }} records</span>
             <div class="pagination">
@@ -851,19 +855,20 @@
               </div>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Institution</th>
-                <th>Course Name</th>
-                <th>Course Type</th>
-                <th>Admission</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of paginatedInstitutions">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Institution</th>
+                  <th>Course Name</th>
+                  <th>Course Type</th>
+                  <th>Admission</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of paginatedInstitutions">
                 <td>{{ item.sNo }}</td>
                 <td class="bold-text">{{ item.institutionName }}</td>
                 <td>{{ item.courseName }}</td>
@@ -884,7 +889,8 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+            </table>
+          </div>
           <div class="table-footer">
             <span class="record-count">Showing {{ paginatedInstitutions.length }} of {{ filteredInstitutions.length }}
               records</span>
