@@ -26,12 +26,12 @@
 .projected-card {
   background: linear-gradient(135deg, #ff2c47 0%, #ff7a0b 100%);
   border-radius: 16px;
-  padding: 14px 16px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 8px 18px rgba(255, 102, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: 0.3s ease;
@@ -63,6 +63,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  gap: 10px;
 }
 
 /* Heading */
@@ -70,34 +71,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
   color: #fff;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 700;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 /* Rupee Circle */
 .rupee-icon {
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: bold;
+  flex-shrink: 0;
 }
 
 /* Total Amount */
 .projected-amount {
-  margin-top: 4px;
   color: #fff;
-  font-size: clamp(22px, 3.5vw, 36px);
+  font-size: clamp(18px, 2.5vw, 28px);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
   text-align: center;
   word-break: break-word;
   overflow-wrap: anywhere;
@@ -105,18 +107,18 @@
 
 /* Progress Row */
 .progress-row {
-  margin-top: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
+  margin-top: 2px;
 }
 
 /* Progress Bar */
 .progress-bar-wrap {
-  width: 180px;
-  height: 6px;
+  width: 140px;
+  height: 5px;
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.3);
   overflow: hidden;
@@ -131,20 +133,20 @@
 
 .progress-label {
   color: #fff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
 }
 
 /* Pending Badge */
 .pending-badge {
-  margin-top: 2px;
   display: inline-block;
   padding: 4px 10px;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
+  margin-top: 4px;
 }
 
 /* Bottom Cards */
@@ -153,23 +155,24 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-top: 6px;
 }
 
 /* Individual Card */
 .amount-chip {
   background: rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 12px 14px;
-  min-width: 180px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 140px;
   flex: 1;
-  max-width: 220px;
+  max-width: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   transition: 0.3s ease;
   min-width: 0;
   box-sizing: border-box;
@@ -182,14 +185,14 @@
 
 /* Icon */
 .chip-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -205,16 +208,16 @@
 /* Label */
 .chip-label {
   color: rgba(255, 255, 255, 0.85);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   overflow-wrap: anywhere;
 }
 
 /* Value */
 .chip-value {
   color: #fff;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -224,8 +227,8 @@
   .projected-card {
     flex-direction: row;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 16px;
+    padding: 14px 18px;
   }
 
   .projected-left {
@@ -233,6 +236,7 @@
     justify-content: center;
     text-align: center;
     padding: 4px 0;
+    gap: 6px;
   }
 
   .projected-chips {
@@ -241,12 +245,13 @@
     flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    margin-top: 0;
   }
 
   .amount-chip {
     flex: 1 1 0;
-    min-width: 140px;
+    min-width: 120px;
     max-width: 100%;
     justify-content: center;
     padding: 10px 12px;
@@ -254,90 +259,96 @@
   }
 
   .chip-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
 
   .chip-label {
-    font-size: 11px;
+    font-size: 10px;
     margin-bottom: 2px;
   }
 
   .chip-value {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .projected-label {
-    font-size: 16px;
+    font-size: 14px;
     gap: 6px;
   }
 
   .rupee-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
   }
 
   .projected-amount {
-    font-size: 24px;
+    font-size: 22px;
     margin-top: 2px;
   }
 
   .progress-row {
     margin-top: 2px;
-    gap: 6px;
+    gap: 8px;
   }
 
   .progress-bar-wrap {
-    width: 140px;
+    width: 120px;
     height: 5px;
   }
 
   .progress-label {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .pending-badge {
-    padding: 3px 8px;
+    padding: 4px 10px;
     font-size: 10px;
-    margin-top: 1px;
+    margin-top: 4px;
   }
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .projected-card {
-    padding: 14px 10px;
-    gap: 12px;
+    padding: 14px 12px;
+    gap: 8px;
     min-width: 0;
   }
 
-  .projected-label {
-    font-size: 16px;
+  .projected-left {
     gap: 6px;
   }
 
+  .projected-label {
+    font-size: 13px;
+    gap: 4px;
+  }
+
   .projected-amount {
-    font-size: 22px;
-    margin-top: 6px;
+    font-size: 18px;
+    margin-top: 2px;
   }
 
   .progress-row {
     flex-direction: column;
     gap: 4px;
     width: 100%;
+    align-items: center;
   }
 
   .progress-bar-wrap {
     width: 100%;
-    max-width: 200px;
+    max-width: 140px;
   }
 
   .projected-chips {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 6px;
+    margin-top: 6px;
   }
 
   .amount-chip {
@@ -346,6 +357,10 @@
     min-width: 0;
     padding: 10px 12px;
     justify-content: flex-start;
+  }
+
+  .pending-badge {
+    margin-top: 4px;
   }
 }
 
