@@ -798,17 +798,16 @@
                                         </th>
 
                                         <th style="min-width:130px; white-space:nowrap;">Disc. Amount</th>
-
-                                        <th class="text-center" style="min-width:150px; white-space:nowrap;">Reported
-                                            Status</th>
-
-                                        <th class="text-center" style="min-width:180px; white-space:nowrap;">Actions
-                                        </th>
+                                        <th class="text-center" style="min-width:150px; white-space:nowrap;">Reported Status</th>
+                                        <th class="text-center" style="min-width:120px; white-space:nowrap;">Duplicate</th>
+                                        <th class="text-center" style="min-width:180px; white-space:nowrap;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let item of paginatedAdmissions; let i = index"
-                                        [class.cancelled-row]="item.isCancelled" (click)="onView(item.id!)"
+                                        [class.cancelled-row]="item.isCancelled"
+                                        [class.duplicate-row]="item.isDuplicateForm"
+                                        (click)="onView(item.id!)"
                                         style="cursor: pointer;">
                                         <td class="text-center sticky-col" style="font-weight: 700; color: #64748B;">{{
                                             item.sNo }}</td>
@@ -823,7 +822,7 @@
                                                 <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge"
                                                     title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
                                                 <span *ngIf="item.isDuplicateForm" class="foc-badge duplicate-badge"
-                                                    [title]="item.duplicateRemarks || 'Duplicate student application form'">DUPLICATE</span>
+                                                    [title]="item.duplicateRemarks || 'Duplicate student application form'">📑 DUPLICATE</span>
                                             </div>
                                         </td>
 
@@ -958,6 +957,22 @@
                                             </div>
                                         </td>
 
+                                        <!-- Duplicate Toggle -->
+                                        <td class="text-center" (click)="$event.stopPropagation()">
+                                            <div class="duplicate-toggle-container" style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                                <label class="toggle-switch" [class.disabled]="!canEditDuplicate()">
+                                                    <input type="checkbox" 
+                                                            [checked]="item.isDuplicateForm" 
+                                                            [disabled]="!canEditDuplicate()"
+                                                            (change)="onDuplicateToggleClick(item, $event)">
+                                                    <span class="slider round"></span>
+                                                </label>
+                                                <span style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748B;">
+                                                    {{ item.isDuplicateForm ? 'Duplicate' : 'Normal' }}
+                                                </span>
+                                            </div>
+                                        </td>
+
                                         <td class="text-center" (click)="$event.stopPropagation()">
                                             <div class="action-icons">
                                                 <button class="icon-btn view" title="View Details"
@@ -1065,6 +1080,43 @@
                     [message]="'Are you sure you want to delete admission of \'' + selectedAdmission?.fullName + '\'?'"
                     (confirm)="confirmDelete()" (cancel)="cancelDelete()">
                 </app-confirmation-modal>
+
+                <!-- Duplicate Confirmation Modal -->
+                <div class="modal-overlay-duplicate" *ngIf="showDuplicateConfirmModal" (click)="cancelDuplicateToggle()">
+                    <div class="modal-container-duplicate" (click)="$event.stopPropagation()">
+                        <div class="modal-header-duplicate">
+                            <div class="icon-badge-duplicate">
+                                <span class="material-symbols-outlined">file_copy</span>
+                            </div>
+                            <div class="header-text-duplicate">
+                                <h3>{{ duplicateConfirmTitle }}</h3>
+                                <p class="subtitle-duplicate">Administrative Action</p>
+                            </div>
+                        </div>
+                        <div class="modal-body-duplicate">
+                            <p class="body-text-duplicate">{{ duplicateConfirmMessage }}</p>
+                            
+                            <!-- Optional Remarks Textarea -->
+                            <div class="remarks-container-duplicate" *ngIf="duplicateConfirmMode === 'mark'">
+                                <label class="remarks-label-duplicate">Duplicate Remarks (Optional)</label>
+                                <div class="input-focus-wrapper-duplicate">
+                                    <textarea class="remarks-textarea-duplicate" 
+                                              [(ngModel)]="duplicateRemarksInput" 
+                                              maxlength="500" 
+                                              placeholder="Reason for marking this application as duplicate..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer-duplicate">
+                            <button class="btn-cancel-duplicate" (click)="cancelDuplicateToggle()">Cancel</button>
+                            <button class="btn-confirm-duplicate" 
+                                    [class.remove-mode]="duplicateConfirmMode === 'unmark'"
+                                    (click)="confirmDuplicateToggle()">
+                                {{ duplicateConfirmConfirmText }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Fee Payment Modal -->
                 <app-fee-payment-modal *ngIf="showPaymentModal" [isVisible]="showPaymentModal"
