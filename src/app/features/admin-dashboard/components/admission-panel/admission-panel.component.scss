@@ -7,7 +7,7 @@
 
 .admission-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -24,6 +24,9 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 
   &:hover {
     transform: translateY(-2px);
@@ -34,6 +37,7 @@
 
 .admission-info {
   flex: 1;
+  min-width: 0;
 }
 
 .admission-name {
@@ -41,6 +45,7 @@
   font-weight: 600;
   color: #111827;
   margin-bottom: 4px;
+  overflow-wrap: anywhere;
 }
 
 .admission-sub {
@@ -48,6 +53,7 @@
   color: #9ca3af;
   margin-bottom: 14px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .admission-count {
@@ -81,12 +87,38 @@
 
 @media (max-width: 900px) {
   .admission-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 480px) {
   .admission-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .admission-card {
+    padding: 12px;
+  }
+  .admission-name {
+    font-size: 14px;
+  }
+  .admission-sub {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+  .admission-count {
+    font-size: 22px;
+  }
+  .admission-icon-box {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    margin-left: 8px;
   }
 }

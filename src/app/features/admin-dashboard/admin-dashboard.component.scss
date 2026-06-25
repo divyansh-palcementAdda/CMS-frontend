@@ -1,7 +1,10 @@
 .dashboard-layout {
   display: flex;
+  height: 100vh;
   min-height: 100vh;
+  max-height: 100vh;
   background: #ffffff;
+  overflow: hidden;
 }
 
 .dashboard-body {
@@ -9,13 +12,17 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100vh;
+  max-height: 100vh;
   overflow: hidden;
 }
 
 .main-content {
   flex: 1;
+  min-height: 0;
   padding: 20px 24px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .welcome-heading {
@@ -45,12 +52,13 @@
   gap: 24px;
   max-width: 1440px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* TOP SECTION: Stats left, Activity right */
 .top-section-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 20px;
   align-items: stretch;
 }
@@ -67,6 +75,7 @@
   flex-direction: column;
   min-height: 0;
   height: 100%;
+  min-width: 0;
 }
 
 .activity-fit-height {
@@ -80,6 +89,7 @@
   flex-direction: column;
   gap: 24px;
   width: 100%;
+  min-width: 0;
 }
 
 .error-state {
@@ -119,7 +129,7 @@
 
 .skeleton-grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 20px;
 }
 
@@ -170,7 +180,7 @@
 @media (max-width: 1200px) {
   .top-section-grid,
   .skeleton-grid {
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: minmax(0, 1fr) 280px;
   }
 }
 
@@ -183,7 +193,7 @@
   }
   .top-section-grid,
   .skeleton-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
   .skeleton-sidebar {
@@ -200,5 +210,34 @@
   }
   .top-section-grid {
     gap: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .main-content {
+    padding: 10px 10px 20px;
+  }
+  .welcome-heading {
+    padding: 14px 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .welcome-heading .welcome-title {
+    font-size: 18px;
+  }
+  .welcome-heading .welcome-sub {
+    font-size: 12px;
+  }
+  .content-wrapper {
+    gap: 14px;
+  }
+  .top-section-grid {
+    gap: 12px;
+  }
+  .top-left-panels {
+    gap: 12px;
+  }
+  .bottom-full-width-section {
+    gap: 14px;
   }
 }
