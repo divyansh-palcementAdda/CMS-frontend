@@ -43,6 +43,7 @@ export interface AdmissionStats {
   appSbs: number;
   admFoc: number;
   admSbs: number;
+  duplicateForms: number;
 }
 
 export interface AdmissionItem {
@@ -148,6 +149,9 @@ export interface AdmissionItem {
   board?: string;
   schoolOrCollegeName?: string;
   casteCategory?: string;
+
+  isDuplicateForm?: boolean;
+  duplicateRemarks?: string;
 }
 
 export interface StudentFee {

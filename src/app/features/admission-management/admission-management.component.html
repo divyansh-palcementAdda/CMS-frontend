@@ -334,6 +334,21 @@
                                                 <span class="mini-label">Remaining Applications</span>
                                             </div>
                                         </div>
+                                        <div class="stat-mini-card status-duplicate"
+                                            [class.active]="filters.statFilter === 'DUPLICATE'"
+                                            (click)="onStatFilter('DUPLICATE')">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ pageData.stats.duplicateForms }}</span>
+                                                <span class="mini-label">Duplicate Forms</span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Admissions Tab Status Breakdown -->
@@ -807,6 +822,8 @@
                                                     title="{{ item.focRemarks || 'Sarva Brahmin Samaj sponsored' }}">SBS</span>
                                                 <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge"
                                                     title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
+                                                <span *ngIf="item.isDuplicateForm" class="foc-badge duplicate-badge"
+                                                    [title]="item.duplicateRemarks || 'Duplicate student application form'">DUPLICATE</span>
                                             </div>
                                         </td>
 
@@ -934,6 +951,9 @@
                                                     [class.reported]="item.reportStatus === 'REPORTED'"
                                                     [class.not-reported]="item.reportStatus !== 'REPORTED'">
                                                     {{ item.reportStatus === 'REPORTED' ? 'Reported' : 'Not Reported' }}
+                                                </span>
+                                                <span *ngIf="item.isDuplicateForm" class="report-badge status-duplicate-chip">
+                                                    Duplicate
                                                 </span>
                                             </div>
                                         </td>
@@ -1139,6 +1159,14 @@
                                 <select [(ngModel)]="filters.statusFilter" class="filter-input">
                                     <option value="">Active Admissions</option>
                                     <option value="CANCELLED">Cancelled Admissions</option>
+                                </select>
+                            </div>
+                            <div class="filter-section">
+                                <label class="filter-label">Duplicate Forms</label>
+                                <select [ngModel]="getDuplicateFilterValue()" (ngModelChange)="setDuplicateFilterValue($event)" class="filter-input">
+                                    <option value="exclude">Exclude Duplicate (Default)</option>
+                                    <option value="only">Only Duplicate</option>
+                                    <option value="all">Include Duplicate</option>
                                 </select>
                             </div>
                         </div>

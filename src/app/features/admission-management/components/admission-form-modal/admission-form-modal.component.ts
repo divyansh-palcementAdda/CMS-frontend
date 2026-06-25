@@ -111,6 +111,7 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
     this.loadDropdownData();
     this.loadStates();
     this.setupScholarDiscountLogic();
+    this.setupDuplicateFormLogic();
     this.setupRelationshipFiltering();
     this.setupLocationListeners();
     this.adjustValidators();
@@ -184,6 +185,16 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
         this.admissionForm.patchValue({
           discountType: null,
           discountValue: 0
+        }, { emitEvent: false });
+      }
+    });
+  }
+
+  private setupDuplicateFormLogic(): void {
+    this.admissionForm.get('isDuplicateForm')?.valueChanges.subscribe(isDuplicate => {
+      if (!isDuplicate) {
+        this.admissionForm.patchValue({
+          duplicateRemarks: ''
         }, { emitEvent: false });
       }
     });
@@ -281,7 +292,9 @@ export class AdmissionFormModalComponent implements OnInit, OnChanges {
       discountValue: [0],
       isScholar: [false],
       scholarshipDetails: [''],
-      counselorName: ['']
+      counselorName: [''],
+      isDuplicateForm: [false],
+      duplicateRemarks: ['']
     });
   }
 

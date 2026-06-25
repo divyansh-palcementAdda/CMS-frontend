@@ -436,6 +436,25 @@
               <div class="error-msg" [class.show]="backendErrors['scholarshipDetails']">{{
                 backendErrors['scholarshipDetails'] }}</div>
             </div>
+
+            <div class="input-group">
+              <label>Duplicate Form?</label>
+              <div class="checkbox-group">
+                <input type="checkbox" formControlName="isDuplicateForm">
+                <span>Yes, this is a duplicate form</span>
+              </div>
+            </div>
+
+            <div class="input-group full-width" *ngIf="admissionForm.get('isDuplicateForm')?.value">
+              <label>Duplicate Remarks</label>
+              <div class="input-wrapper" [class.error-border]="backendErrors['duplicateRemarks']">
+                <i class="fa-solid fa-info-circle"></i>
+                <textarea formControlName="duplicateRemarks"
+                  placeholder="Enter reason or remarks for marking this as a duplicate form"></textarea>
+              </div>
+              <div class="error-msg" [class.show]="backendErrors['duplicateRemarks']">{{
+                backendErrors['duplicateRemarks'] }}</div>
+            </div>
           </div>
         </div>
       </form>

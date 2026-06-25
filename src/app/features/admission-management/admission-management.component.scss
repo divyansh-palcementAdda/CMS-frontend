@@ -665,6 +665,28 @@ $text-light: #64748B;
       }
     }
 
+    &.status-duplicate {
+      .mini-icon {
+        background: #FEF3C7;
+        color: #D97706;
+      }
+
+      &.active {
+        border-color: #D97706;
+        background: #FFFBEB;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+
+        .mini-icon {
+          background: #D97706;
+          color: white;
+        }
+
+        .mini-val {
+          color: #D97706;
+        }
+      }
+    }
+
     &.source-sbs {
       .mini-icon {
         background: #FFF7ED;
@@ -1162,6 +1184,12 @@ $text-light: #64748B;
                   background: #FAF5FF;
                   color: #6D28D9;
                   border: 1px solid #DDD6FE;
+                }
+
+                &.duplicate-badge {
+                  background: #FEF3C7;
+                  color: #D97706;
+                  border: 1px solid #FCD34D;
                 }
               }
             }
@@ -2144,6 +2172,13 @@ $text-light: #64748B;
     background: rgba(100, 116, 139, 0.1);
     color: #475569;
     border: 1px solid rgba(100, 116, 139, 0.2);
+  }
+
+  &.status-duplicate-chip {
+    background: rgba(217, 119, 6, 0.12);
+    color: #D97706;
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    margin-left: 6px;
   }
 }
 

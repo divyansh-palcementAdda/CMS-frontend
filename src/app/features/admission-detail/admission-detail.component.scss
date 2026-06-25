@@ -527,3 +527,40 @@ input:checked + .slider:before { transform: translateX(14px); }
   width: 100%;
   color: #1e293b;
 }
+
+.duplicate-warning-banner {
+  background: #FFFBEB;
+  border: 1.5px solid #FCD34D;
+  border-radius: 16px;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.05);
+
+  .warning-banner-icon {
+    color: #D97706;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .warning-banner-text {
+    .warning-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #92400E;
+      display: block;
+    }
+
+    .warning-remarks {
+      font-size: 13px;
+      font-weight: 500;
+      color: #B45309;
+      margin: 6px 0 0 0;
+      line-height: 1.4;
+    }
+  }
+}

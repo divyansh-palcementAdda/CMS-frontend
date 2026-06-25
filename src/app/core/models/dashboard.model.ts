@@ -42,6 +42,7 @@ export interface DashboardStats {
   actualAdmissions: number;
   focStudentsCount: number;
   sbsStudentsCount: number;
+  duplicateFormsCount: number;
 }
 
 export interface ConsultancyItem {

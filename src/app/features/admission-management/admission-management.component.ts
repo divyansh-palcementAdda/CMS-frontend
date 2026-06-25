@@ -72,6 +72,9 @@ export interface ActiveFilters {
   userIds: number[];
   consultancyIds: number[];
   courseIds: number[];
+  duplicateOnly: boolean | null;
+  excludeDuplicate: boolean | null;
+  includeDuplicate: boolean | null;
 }
 
 @Component({
@@ -141,7 +144,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     leadSources: [],
     userIds: [],
     consultancyIds: [],
-    courseIds: []
+    courseIds: [],
+    duplicateOnly: null,
+    excludeDuplicate: true,
+    includeDuplicate: null
   };
 
   // ── Excel Download Modal ──────────────────────────────────────────────
@@ -341,7 +347,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         leadSources: params['leadSources'] ? params['leadSources'].split(',') : [],
         userIds: params['userIds'] ? params['userIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : [],
         consultancyIds: params['consultancyIds'] ? params['consultancyIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : [],
-        courseIds: params['courseIds'] ? params['courseIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : []
+        courseIds: params['courseIds'] ? params['courseIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : [],
+        duplicateOnly: params['duplicateOnly'] === 'true' ? true : (params['duplicateOnly'] === 'false' ? false : null),
+        excludeDuplicate: params['excludeDuplicate'] === 'true' ? true : (params['excludeDuplicate'] === 'false' ? false : (params['duplicateOnly'] === 'true' || params['includeDuplicate'] === 'true' ? false : true)),
+        includeDuplicate: params['includeDuplicate'] === 'true' ? true : (params['includeDuplicate'] === 'false' ? false : null)
       };
       this.searchTerm = params['search'] || '';
       this.currentPage = params['page'] ? +params['page'] : 1;
@@ -485,7 +494,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.userIds && this.filters.userIds.length > 0) count++;
     if (this.filters.consultancyIds && this.filters.consultancyIds.length > 0) count++;
     if (this.filters.courseIds && this.filters.courseIds.length > 0) count++;
-
+    if (this.filters.duplicateOnly !== null) count++;
+    if (this.filters.includeDuplicate !== null) count++;
     this.activeFilterCount = count;
   }
 
@@ -551,7 +561,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.leadSources,
       this.filters.userIds,
       this.filters.consultancyIds,
-      this.filters.courseIds
+      this.filters.courseIds,
+      this.filters.duplicateOnly ?? undefined,
+      this.filters.excludeDuplicate ?? undefined,
+      this.filters.includeDuplicate ?? undefined
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -607,7 +620,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       city: null,
       leadSourceId: null,
       consultancyId: null,
-      userId: null
+      userId: null,
+      duplicateOnly: null,
+      excludeDuplicate: true,
+      includeDuplicate: null
     };
 
     // 3. If we have saved state for the target tab, restore it
@@ -629,7 +645,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         city: savedState.filters.city || null,
         leadSourceId: savedState.filters.leadSourceId || null,
         consultancyId: savedState.filters.consultancyId || null,
-        userId: savedState.filters.userId || null
+        userId: savedState.filters.userId || null,
+        duplicateOnly: savedState.filters.duplicateOnly !== null ? savedState.filters.duplicateOnly.toString() : null,
+        excludeDuplicate: savedState.filters.excludeDuplicate !== null ? savedState.filters.excludeDuplicate.toString() : null,
+        includeDuplicate: savedState.filters.includeDuplicate !== null ? savedState.filters.includeDuplicate.toString() : null
       });
       this.searchTerm = savedState.searchTerm || '';
       this.currentPage = savedState.currentPage || 1;
@@ -716,7 +735,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       leadSources: (this.filters.leadSources && this.filters.leadSources.length > 0) ? this.filters.leadSources.join(',') : null,
       userIds: (this.filters.userIds && this.filters.userIds.length > 0) ? this.filters.userIds.join(',') : null,
       consultancyIds: (this.filters.consultancyIds && this.filters.consultancyIds.length > 0) ? this.filters.consultancyIds.join(',') : null,
-      courseIds: (this.filters.courseIds && this.filters.courseIds.length > 0) ? this.filters.courseIds.join(',') : null
+      courseIds: (this.filters.courseIds && this.filters.courseIds.length > 0) ? this.filters.courseIds.join(',') : null,
+      duplicateOnly: this.filters.duplicateOnly !== null ? this.filters.duplicateOnly.toString() : null,
+      excludeDuplicate: this.filters.excludeDuplicate !== null ? this.filters.excludeDuplicate.toString() : null,
+      includeDuplicate: this.filters.includeDuplicate !== null ? this.filters.includeDuplicate.toString() : null
     };
 
     this.router.navigate([], {
@@ -761,7 +783,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       leadSources: [],
       userIds: [],
       consultancyIds: [],
-      courseIds: []
+      courseIds: [],
+      duplicateOnly: null,
+      excludeDuplicate: true,
+      includeDuplicate: null
     };
     this.searchTerm = '';
     this.applyFilters();
@@ -1491,7 +1516,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.leadSources,
       this.filters.userIds,
       this.filters.consultancyIds,
-      this.filters.courseIds
+      this.filters.courseIds,
+      this.filters.duplicateOnly ?? undefined,
+      this.filters.excludeDuplicate ?? undefined,
+      this.filters.includeDuplicate ?? undefined
     ).subscribe({
       next: (blob: Blob) => {
         const tab = this.filters.tab || 'all';
@@ -1687,5 +1715,32 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.leadSourceId === '00000000-0000-0000-0000-000000000000') return 'Unmapped';
     const ls = this.activeLeadSources.find(x => x.id === this.filters.leadSourceId);
     return ls ? ls.name : `Source ID: ${this.filters.leadSourceId}`;
+  }
+
+  getDuplicateFilterValue(): string {
+    if (this.filters.duplicateOnly) {
+      return 'only';
+    }
+    if (this.filters.includeDuplicate) {
+      return 'all';
+    }
+    return 'exclude';
+  }
+
+  setDuplicateFilterValue(value: string): void {
+    if (value === 'only') {
+      this.filters.duplicateOnly = true;
+      this.filters.excludeDuplicate = null;
+      this.filters.includeDuplicate = null;
+    } else if (value === 'all') {
+      this.filters.duplicateOnly = null;
+      this.filters.excludeDuplicate = null;
+      this.filters.includeDuplicate = true;
+    } else {
+      // Default / 'exclude'
+      this.filters.duplicateOnly = null;
+      this.filters.excludeDuplicate = true;
+      this.filters.includeDuplicate = null;
+    }
   }
 }

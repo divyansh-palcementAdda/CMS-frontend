@@ -61,7 +61,10 @@ export class AdmissionService {
     leadSources?: string[],
     userIds?: number[],
     consultancyIds?: number[],
-    courseIds?: number[]
+    courseIds?: number[],
+    duplicateOnly?: boolean,
+    excludeDuplicate?: boolean,
+    includeDuplicate?: boolean
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -107,6 +110,9 @@ export class AdmissionService {
     if (userIds && userIds.length > 0) params = params.set('userIds', userIds.join(','));
     if (consultancyIds && consultancyIds.length > 0) params = params.set('consultancyIds', consultancyIds.join(','));
     if (courseIds && courseIds.length > 0) params = params.set('courseIds', courseIds.join(','));
+    if (duplicateOnly !== undefined && duplicateOnly !== null) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (excludeDuplicate !== undefined && excludeDuplicate !== null) params = params.set('excludeDuplicate', excludeDuplicate.toString());
+    if (includeDuplicate !== undefined && includeDuplicate !== null) params = params.set('includeDuplicate', includeDuplicate.toString());
 
     console.log('Final Payload', {
       userIds: userIds || null,
@@ -243,7 +249,10 @@ export class AdmissionService {
     leadSources?: string[],
     userIds?: number[],
     consultancyIds?: number[],
-    courseIds?: number[]
+    courseIds?: number[],
+    duplicateOnly?: boolean,
+    excludeDuplicate?: boolean,
+    includeDuplicate?: boolean
   ): Observable<Blob> {
     let params = new HttpParams();
     if (tab) params = params.set('tab', tab);
@@ -274,6 +283,9 @@ export class AdmissionService {
     if (userIds && userIds.length > 0) params = params.set('userIds', userIds.join(','));
     if (consultancyIds && consultancyIds.length > 0) params = params.set('consultancyIds', consultancyIds.join(','));
     if (courseIds && courseIds.length > 0) params = params.set('courseIds', courseIds.join(','));
+    if (duplicateOnly !== undefined && duplicateOnly !== null) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (excludeDuplicate !== undefined && excludeDuplicate !== null) params = params.set('excludeDuplicate', excludeDuplicate.toString());
+    if (includeDuplicate !== undefined && includeDuplicate !== null) params = params.set('includeDuplicate', includeDuplicate.toString());
 
     return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
   }
