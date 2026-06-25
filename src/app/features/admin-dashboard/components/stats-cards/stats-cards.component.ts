@@ -188,7 +188,7 @@ export class StatsCardsComponent {
         label: 'Duplicate Forms',
         value: s.duplicateFormsCount,
         gradient: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
-        route: '/admin/admission-management', queryParams: { tab: 'applications', statFilter: 'DUPLICATE' }, trend: '1%', trendUp: false,
+        route: '/admin/admission-management', queryParams: { tab: 'applications', statFilter: 'DUPLICATE', duplicateOnly: 'true', excludeDuplicate: 'false' }, trend: '1%', trendUp: false,
         icon: this.svg(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M16 2H8C6.9 2 6 2.9 6 4v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m0 14H8V4h8zm4 4H4V6H2v14c0 1.1.9 2 2 2h16z"/></svg>`)
       },
       {

@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AdmissionPageData, AdmissionItem } from '../../core/models/admission.model';
 import { AdmissionService } from '../../core/services/admission.service';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -182,6 +183,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   private courseService = inject(CourseService);
   public authService = inject(AuthService);
   private courseTypeService = inject(CourseTypeService);
+  private notificationService = inject(NotificationService);
 
   dropdowns: {
     state: boolean,
@@ -287,6 +289,15 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   selectedStudentNameForPayment: string = '';
   admissionIdToDelete?: number;
   admissionIdToCancel?: number;
+
+  // ── Duplicate Application Toggle Modal State ─────────────────────────
+  showDuplicateConfirmModal: boolean = false;
+  duplicateConfirmTitle: string = '';
+  duplicateConfirmMessage: string = '';
+  duplicateConfirmConfirmText: string = '';
+  duplicateConfirmMode: 'mark' | 'unmark' = 'mark';
+  duplicateRemarksInput: string = '';
+  selectedStudentForDuplicateToggle: AdmissionItem | null = null;
 
   enrollmentUpdateService = {
     bulkUpload: (file: File) => this.admissionService.bulkUpdateEnrollment(file),
@@ -678,6 +689,20 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   /** Legacy stat card filter (DIRECT / INDIRECT / SCHOLAR / etc.) */
   onStatFilter(filter: string): void {
+    if (filter === 'DUPLICATE') {
+      const isCurrentlyOnly = this.filters.duplicateOnly === true;
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {
+          statFilter: isCurrentlyOnly ? null : 'DUPLICATE',
+          duplicateOnly: isCurrentlyOnly ? null : 'true',
+          excludeDuplicate: isCurrentlyOnly ? 'true' : 'false',
+          includeDuplicate: null
+        },
+        queryParamsHandling: 'merge'
+      });
+      return;
+    }
     const newFilter = this.filters.statFilter === filter ? '' : filter;
     this.router.navigate([], {
       relativeTo: this.route,
@@ -1742,5 +1767,73 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.excludeDuplicate = true;
       this.filters.includeDuplicate = null;
     }
+  }
+
+  canEditDuplicate(): boolean {
+    return !this.authService.hasRole('ROLE_READ_ONLY') && !this.authService.hasRole('ROLE_VIEWER');
+  }
+
+  onDuplicateToggleClick(item: AdmissionItem, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.selectedStudentForDuplicateToggle = item;
+
+    if (!item.isDuplicateForm) {
+      this.duplicateConfirmMode = 'mark';
+      this.duplicateConfirmTitle = 'Mark as Duplicate Application';
+      this.duplicateConfirmMessage = 'You are about to mark this application as a duplicate. Duplicate applications continue to behave as normal applications. This action only helps identify duplicate submissions. You can reverse this action later.';
+      this.duplicateConfirmConfirmText = 'Mark as Duplicate';
+      this.duplicateRemarksInput = '';
+    } else {
+      this.duplicateConfirmMode = 'unmark';
+      this.duplicateConfirmTitle = 'Remove Duplicate Flag?';
+      this.duplicateConfirmMessage = 'This application will no longer be marked as duplicate. This action does not affect admissions, fees or reports.';
+      this.duplicateConfirmConfirmText = 'Remove';
+    }
+
+    this.showDuplicateConfirmModal = true;
+  }
+
+  cancelDuplicateToggle(): void {
+    this.showDuplicateConfirmModal = false;
+    this.selectedStudentForDuplicateToggle = null;
+  }
+
+  confirmDuplicateToggle(): void {
+    if (!this.selectedStudentForDuplicateToggle) return;
+
+    const item = this.selectedStudentForDuplicateToggle;
+    const isDuplicate = this.duplicateConfirmMode === 'mark';
+    const remarks = isDuplicate ? this.duplicateRemarksInput : null;
+
+    this.showDuplicateConfirmModal = false;
+    this.selectedStudentForDuplicateToggle = null;
+
+    this.admissionService.updateAdmission(
+      item.id!,
+      undefined as any,
+      undefined as any,
+      undefined as any,
+      undefined as any,
+      undefined as any,
+      isDuplicate,
+      remarks || undefined,
+      undefined as any,
+      undefined as any,
+      undefined as any,
+      undefined as any,
+      undefined as any
+    ).subscribe({
+      next: () => {
+        item.isDuplicateForm = isDuplicate;
+        item.duplicateRemarks = remarks || '';
+        this.notificationService.success('Success', `Successfully updated duplicate status.`);
+      },
+      error: (err) => {
+        console.error('Failed to update duplicate status', err);
+        this.notificationService.error('Error', err.error?.message || 'Failed to update Duplicate status.');
+      }
+    });
   }
 }

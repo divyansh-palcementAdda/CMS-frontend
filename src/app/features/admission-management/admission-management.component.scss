@@ -2366,3 +2366,189 @@ $text-light: #64748B;
     transform: scale(0.9);
   }
 }
+
+/* Duplicate Application Table Row and Toggle Highlight Styles */
+tr.duplicate-row {
+  border-left: 4px solid #f59e0b !important; /* amber left border */
+  background-color: #fefaf0 !important; /* soft amber background */
+  
+  &:hover {
+    background-color: #fef6e5 !important;
+  }
+}
+
+/* Duplicate Confirmation Modal Styles */
+.modal-overlay-duplicate {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-container-duplicate {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header-duplicate {
+  padding: 24px 24px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #f1f5f9;
+
+  .icon-badge-duplicate {
+    width: 40px;
+    height: 40px;
+    background: #fef3c7; /* soft amber background */
+    color: #d97706; /* amber color */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    span {
+      font-size: 20px;
+    }
+  }
+
+  .header-text-duplicate {
+    h3 {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .subtitle-duplicate {
+      margin: 2px 0 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+}
+
+.modal-body-duplicate {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .body-text-duplicate {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .remarks-container-duplicate {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .remarks-label-duplicate {
+      font-size: 0.813rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .input-focus-wrapper-duplicate {
+      .remarks-textarea-duplicate {
+        width: 100%;
+        min-height: 100px;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.875rem;
+        color: #1e293b;
+        resize: vertical;
+        transition: all 0.2s ease;
+
+        &::placeholder {
+          color: #cbd5e1;
+        }
+
+        &:focus {
+          background: #ffffff;
+          border-color: #d97706; /* amber focus */
+          box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+          outline: none;
+        }
+      }
+    }
+  }
+}
+
+.modal-footer-duplicate {
+  padding: 16px 24px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #f1f5f9;
+
+  button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cancel-duplicate {
+    border: 1.5px solid #e2e8f0;
+    background: #ffffff;
+    color: #64748b;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #1e293b;
+    }
+  }
+
+  .btn-confirm-duplicate {
+    border: none;
+    background: #d97706; /* amber primary button */
+    color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.2);
+
+    &:hover {
+      background: #b45309;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 12px -3px rgba(217, 119, 6, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &.remove-mode {
+      background: #ef4444; /* red button for removing duplicate flag */
+      box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+
+      &:hover {
+        background: #dc2626;
+        box-shadow: 0 8px 12px -3px rgba(239, 68, 68, 0.3);
+      }
+    }
+  }
+}
