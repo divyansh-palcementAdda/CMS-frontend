@@ -1773,66 +1773,28 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     return !this.authService.hasRole('ROLE_READ_ONLY') && !this.authService.hasRole('ROLE_VIEWER');
   }
 
-  onDuplicateToggleClick(item: AdmissionItem, event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+  onDuplicateToggleClick(item: AdmissionItem): void {
+    const isDuplicate = !item.isDuplicateForm;
+    const remarks = isDuplicate ? '' : null;
 
-    this.selectedStudentForDuplicateToggle = item;
-
-    if (!item.isDuplicateForm) {
-      this.duplicateConfirmMode = 'mark';
-      this.duplicateConfirmTitle = 'Mark as Duplicate Application';
-      this.duplicateConfirmMessage = 'You are about to mark this application as a duplicate. Duplicate applications continue to behave as normal applications. This action only helps identify duplicate submissions. You can reverse this action later.';
-      this.duplicateConfirmConfirmText = 'Mark as Duplicate';
-      this.duplicateRemarksInput = '';
-    } else {
-      this.duplicateConfirmMode = 'unmark';
-      this.duplicateConfirmTitle = 'Remove Duplicate Flag?';
-      this.duplicateConfirmMessage = 'This application will no longer be marked as duplicate. This action does not affect admissions, fees or reports.';
-      this.duplicateConfirmConfirmText = 'Remove';
-    }
-
-    this.showDuplicateConfirmModal = true;
-  }
-
-  cancelDuplicateToggle(): void {
-    this.showDuplicateConfirmModal = false;
-    this.selectedStudentForDuplicateToggle = null;
-  }
-
-  confirmDuplicateToggle(): void {
-    if (!this.selectedStudentForDuplicateToggle) return;
-
-    const item = this.selectedStudentForDuplicateToggle;
-    const isDuplicate = this.duplicateConfirmMode === 'mark';
-    const remarks = isDuplicate ? this.duplicateRemarksInput : null;
-
-    this.showDuplicateConfirmModal = false;
-    this.selectedStudentForDuplicateToggle = null;
-
+    // Directly call updateAdmission API
     this.admissionService.updateAdmission(
       item.id!,
-      undefined as any,
-      undefined as any,
-      undefined as any,
-      undefined as any,
-      undefined as any,
-      isDuplicate,
-      remarks || undefined,
-      undefined as any,
-      undefined as any,
-      undefined as any,
-      undefined as any,
-      undefined as any
+      {
+        isDuplicateForm: isDuplicate,
+        duplicateRemarks: remarks || undefined
+      }
     ).subscribe({
       next: () => {
         item.isDuplicateForm = isDuplicate;
         item.duplicateRemarks = remarks || '';
-        this.notificationService.success('Success', `Successfully updated duplicate status.`);
+        this.notificationService.success('Success', `Successfully ${isDuplicate ? 'marked' : 'removed'} duplicate status.`);
       },
       error: (err) => {
         console.error('Failed to update duplicate status', err);
         this.notificationService.error('Error', err.error?.message || 'Failed to update Duplicate status.');
+        // Revert the UI change on error
+        item.isDuplicateForm = !isDuplicate;
       }
     });
   }
