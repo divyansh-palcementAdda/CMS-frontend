@@ -17,6 +17,8 @@ $text-light: #64748B;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
 
     .title-container {
       display: flex;
@@ -35,6 +37,31 @@ $text-light: #64748B;
         font-weight: 600;
         margin: 0;
         color: $text-dark;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+
+      .header-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .bulk-import-btn {
+        border: none;
       }
     }
   }
@@ -111,10 +138,11 @@ $text-light: #64748B;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 
     .table-header {
-      padding: 24px;
+      padding: 16px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
 
       .table-title {
         font-size: 18px;
@@ -122,10 +150,63 @@ $text-light: #64748B;
         margin: 0;
         color: $text-dark;
       }
+
+      .table-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .entries-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #64748B;
+      }
+
+      .search-box {
+        position: relative;
+        width: 240px;
+        min-width: 220px;
+        height: 38px;
+        box-sizing: border-box;
+
+        svg {
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 16px;
+          height: 16px;
+          color: #64748B;
+          pointer-events: none;
+          display: block;
+        }
+
+        input {
+          width: 100%;
+          height: 100%;
+          border: 1.5px solid #E2E8F0;
+          border-radius: 8px;
+          outline: none;
+          font-size: 14px;
+          background: white;
+          line-height: 1;
+          padding: 0 12px 0 36px;
+          box-sizing: border-box;
+          display: block;
+
+          &::placeholder {
+            color: #64748B;
+          }
+        }
+      }
     }
 
     .table-wrapper {
-      padding: 0 24px 8px;
+      padding: 0 16px 8px;
 
       table {
         width: 100%;
@@ -184,32 +265,19 @@ $text-light: #64748B;
               }
 
               &:nth-child(3) {
-                // Total Admissions
                 color: #10B981;
-                // background-color: #9effa3;
-
-
               }
 
               &:nth-child(4) {
-                // Total Applications
                 color: #3B82F6;
-                // background-color: #435FFF;
-
               }
 
               &:nth-child(5) {
-                // Cancelled Admissions
                 color: #F97316;
-                // background-color: #435FFF;
-
               }
 
               &:nth-child(6) {
-                // Cancelled Applications
                 color: #EF4444;
-                // background-color: #435FFF;
-
               }
 
               .status-pill {
@@ -266,6 +334,21 @@ $text-light: #64748B;
   .user-page-wrapper {
     padding: 16px;
 
+    .header-section {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .header-actions {
+        width: 100%;
+        justify-content: stretch;
+
+        .header-action-btn {
+          flex: 1 1 100%;
+          width: 100%;
+        }
+      }
+    }
+
     .stats-grid {
       grid-template-columns: 1fr;
     }
@@ -273,8 +356,29 @@ $text-light: #64748B;
     .table-card {
       .table-header {
         flex-direction: column;
-        gap: 16px;
+        gap: 12px;
         align-items: stretch;
+        padding: 14px 14px 16px;
+
+        .table-controls {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+        }
+
+        .entries-selector {
+          justify-content: space-between;
+        }
+
+        .search-box {
+          min-width: unset;
+          width: 100%;
+          max-width: none;
+        }
+      }
+
+      .table-wrapper {
+        padding: 0 14px 8px;
       }
     }
   }

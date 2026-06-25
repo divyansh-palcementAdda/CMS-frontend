@@ -18,6 +18,7 @@ $text-light: #64748B;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
     margin-bottom: 24px;
 
     .title-container {
@@ -36,6 +37,51 @@ $text-light: #64748B;
         font-size: 24px;
         font-weight: 600;
         margin: 0;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+
+      .btn-secondary,
+      .btn-primary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .btn-secondary {
+        border: 1.5px solid #E2E8F0;
+        background: white;
+        color: #475569;
+
+        &:hover {
+          border-color: #CBD5E1;
+          background: #F8FAFC;
+        }
+      }
+
+      .btn-primary {
+        border: none;
+        background: linear-gradient(135deg, #6366F1, #4F46E5);
+        color: white;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.18);
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 24px rgba(99, 102, 241, 0.24);
+        }
       }
     }
   }
@@ -252,11 +298,72 @@ $text-light: #64748B;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
 
       .table-title {
         font-size: 18px;
         font-weight: 600;
         margin: 0;
+      }
+
+      .table-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        flex: 1;
+        min-width: 0;
+
+        .entries-selector {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          color: #64748B;
+          flex-wrap: wrap;
+
+          select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #E2E8F0;
+            background: white;
+            font-weight: 600;
+            color: #1E293B;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+          }
+        }
+
+        .search-box {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 0 14px;
+          border: 1.5px solid #E2E8F0;
+          border-radius: 12px;
+          background: #F8FAFC;
+          min-width: min(280px, 100%);
+          flex: 1;
+          max-width: 320px;
+          height: 44px;
+
+          svg {
+            flex-shrink: 0;
+            color: #64748B;
+          }
+
+          input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            color: #1E293B;
+            min-width: 0;
+          }
+        }
       }
     }
 
@@ -412,8 +519,16 @@ $text-light: #64748B;
 }
 
 @media (max-width: 1024px) {
-  .course-page-wrapper .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .course-page-wrapper {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fee-filter-bar {
+      .filter-row {
+        gap: 16px;
+      }
+    }
   }
 }
 
@@ -421,14 +536,75 @@ $text-light: #64748B;
   .course-page-wrapper {
     padding: 16px;
 
+    .header-section {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .header-actions {
+        width: 100%;
+        justify-content: stretch;
+
+        .btn-secondary,
+        .btn-primary {
+          flex: 1;
+        }
+      }
+    }
+
     .stats-grid {
       grid-template-columns: 1fr;
     }
 
-    .table-card .table-header {
-      flex-direction: column;
-      gap: 16px;
-      align-items: stretch;
+    .fee-filter-bar {
+      padding: 18px;
+
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+
+        .filter-group {
+          min-width: 100%;
+          flex: 1 1 auto;
+        }
+
+        .reset-btn {
+          margin-left: 0;
+          justify-content: center;
+          width: 100%;
+        }
+      }
+    }
+
+    .table-card {
+      .table-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        padding: 18px;
+
+        .table-toolbar {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+
+          .entries-selector {
+            justify-content: space-between;
+          }
+
+          .search-box {
+            max-width: none;
+            width: 100%;
+          }
+        }
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 980px;
+      }
     }
   }
 }

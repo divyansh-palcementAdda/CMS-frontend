@@ -70,6 +70,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+  gap: 16px;
 }
 
 .user-title-row {
@@ -107,6 +108,7 @@
     font-weight: 700;
     color: #1E293B;
     margin: 0;
+    line-height: 1.2;
   }
 
   .user-id {
@@ -118,19 +120,22 @@
 
 .header-actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
 
   .btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 10px 24px;
+    padding: 8px 14px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
+    white-space: nowrap;
 
     &.edit-btn {
       background: white;
@@ -572,6 +577,25 @@
   .stats-grid-container {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .categorized-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 20px 20px 28px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
 }
 
 /* Categorized Premium Stats */
@@ -821,18 +845,122 @@
 
 
 @media (max-width: 768px) {
+  .main-content {
+    padding: 16px 16px 24px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  .user-title-row {
+    gap: 12px;
+  }
+
+  .user-name-meta h1 {
+    font-size: 22px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
   .info-fields-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .stats-grid-container {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
   }
 
-  .page-header {
+  .stat-card {
+    padding: 18px;
+  }
+
+  .categorized-stats {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-premium-card {
+    padding: 18px;
+  }
+
+  .table-card .table-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .table-tools {
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .table-tools .search-box {
+    width: 100%;
+  }
+
+  .table-tools .search-box input {
+    width: 100%;
+  }
+
+  .table-footer {
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+
+  .btn-export,
+  .header-actions .btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    padding: 12px 12px 20px;
+  }
+
+  .back-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-actions {
+    gap: 8px;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table-card .table-header-row {
+    padding: 16px;
+  }
+
+  .table-wrapper table thead tr th,
+  .table-wrapper table tbody tr td,
+  .custom-table thead tr th,
+  .custom-table tbody tr td {
+    padding: 12px 14px;
   }
 }
 

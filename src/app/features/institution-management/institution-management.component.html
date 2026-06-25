@@ -27,9 +27,8 @@
                             </div>
                             <h2 class="page-title">Institution Management</h2>
                         </div>
-                        <div class="header-actions" style="display: flex; gap: 12px;">
-                            <button class="btn-secondary" (click)="showBulkUploadModal = true"
-                                style="display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1.5px solid #E2E8F0; background: white; color: #475569; cursor: pointer; transition: all 0.2s;">
+                        <div class="header-actions">
+                            <button class="btn-secondary header-action-btn" (click)="showBulkUploadModal = true">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -39,7 +38,7 @@
                                 <span>Bulk Import</span>
                             </button>
 
-                            <button class="btn-primary" (click)="openAddModal()">
+                            <button class="btn-primary header-action-btn" (click)="openAddModal()">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" />
