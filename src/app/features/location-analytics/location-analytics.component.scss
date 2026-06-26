@@ -14,6 +14,18 @@ $text-light: #64748B;
   font-family: 'Inter', sans-serif;
   color: $text-dark;
 
+  @media (max-width: 480px) {
+    padding: 16px 12px;
+  }
+
+  @media (max-width: 375px) {
+    padding: 12px 10px;
+  }
+
+  @media (max-width: 320px) {
+    padding: 10px 8px;
+  }
+
   .header-section {
     display: flex;
     justify-content: space-between;
@@ -26,12 +38,15 @@ $text-light: #64748B;
       display: flex;
       align-items: center;
       gap: 16px;
+      flex: 1;
+      min-width: 200px;
 
       .back-btn {
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
       }
 
       .page-title {
@@ -65,6 +80,9 @@ $text-light: #64748B;
         height: 42px;
         width: 240px;
         transition: all 0.2s;
+        flex: 1;
+        max-width: 300px;
+        min-width: 180px;
 
         &:focus-within {
           border-color: $primary;
@@ -102,6 +120,7 @@ $text-light: #64748B;
         transition: all 0.2s ease;
         white-space: nowrap;
         height: 42px;
+        flex-shrink: 0;
       }
 
       .btn-secondary {
@@ -154,6 +173,48 @@ $text-light: #64748B;
         }
       }
     }
+
+    @media (max-width: 1024px) {
+      flex-direction: column;
+      align-items: stretch;
+
+      .title-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .header-actions {
+        justify-content: flex-start;
+        width: 100%;
+
+        .search-box {
+          max-width: 100%;
+          flex: 1 1 100%;
+        }
+
+        .btn-secondary,
+        .btn-primary {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header-actions {
+        flex-direction: column;
+
+        .search-box {
+          width: 100%;
+        }
+
+        .btn-secondary,
+        .btn-primary {
+          width: 100%;
+        }
+      }
+    }
   }
 
   .stats-grid {
@@ -166,8 +227,20 @@ $text-light: #64748B;
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 375px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 320px) {
       grid-template-columns: 1fr;
+      gap: 8px;
     }
   }
 
@@ -178,6 +251,19 @@ $text-light: #64748B;
     padding: 20px 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    @media (max-width: 640px) {
+      padding: 14px 14px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 375px) {
+      padding: 12px 10px;
+    }
+
+    @media (max-width: 320px) {
+      padding: 12px;
+    }
 
     &:hover {
       transform: translateY(-2px);
@@ -194,6 +280,10 @@ $text-light: #64748B;
         font-size: 13px;
         color: $text-light;
         font-weight: 500;
+
+        @media (max-width: 375px) {
+          font-size: 11px;
+        }
       }
 
       .stat-icon-wrapper {
@@ -203,6 +293,17 @@ $text-light: #64748B;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
+
+        @media (max-width: 375px) {
+          width: 26px;
+          height: 26px;
+
+          svg {
+            width: 14px;
+            height: 14px;
+          }
+        }
 
         &.purple {
           background: #EEF2FF;
@@ -217,11 +318,23 @@ $text-light: #64748B;
       line-height: 1.2;
       color: $text-dark;
       margin-bottom: 4px;
+
+      @media (max-width: 640px) {
+        font-size: 16px;
+      }
+
+      @media (max-width: 375px) {
+        font-size: 14px;
+      }
     }
 
     .stat-subtext {
       font-size: 12px;
       color: $text-light;
+
+      @media (max-width: 375px) {
+        font-size: 10px;
+      }
     }
   }
 
@@ -233,6 +346,14 @@ $text-light: #64748B;
     @media (max-width: 1024px) {
       grid-template-columns: 1fr;
     }
+
+    @media (max-width: 480px) {
+      gap: 14px;
+    }
+
+    @media (max-width: 375px) {
+      gap: 12px;
+    }
   }
 
   .table-card {
@@ -241,6 +362,21 @@ $text-light: #64748B;
     border: 1px solid $card-border;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: visible;
+
+    @media (max-width: 480px) {
+      padding: 14px 12px;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 375px) {
+      padding: 12px 8px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 320px) {
+      padding: 10px 6px;
+    }
 
     .table-header {
       display: flex;
@@ -249,12 +385,30 @@ $text-light: #64748B;
       margin-bottom: 18px;
       border-bottom: 1px solid #F1F5F9;
       padding-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        gap: 4px;
+      }
 
       .table-title {
         font-size: 15px;
         font-weight: 700;
         color: $text-dark;
         margin: 0;
+
+        @media (max-width: 480px) {
+          font-size: 13px;
+        }
+
+        @media (max-width: 375px) {
+          font-size: 12px;
+        }
       }
 
       .view-all-link {
@@ -263,6 +417,10 @@ $text-light: #64748B;
         color: $primary;
         text-decoration: none;
         transition: color 0.15s;
+
+        @media (max-width: 480px) {
+          font-size: 11px;
+        }
 
         &:hover {
           color: #4F46E5;
@@ -273,24 +431,90 @@ $text-light: #64748B;
 
     .table-wrapper {
       overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      position: relative;
+      z-index: 1;
+
+      @media (max-width: 480px) {
+        margin: 0;
+        padding-bottom: 8px;
+      }
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #F1F5F9;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 4px;
+
+        &:hover {
+          background: #94A3B8;
+        }
+      }
 
       table {
         width: 100%;
-        border-collapse: separate;
+        border-collapse: collapse;
         border-spacing: 0;
+        // Remove fixed min-width so table can shrink naturally with scroll
+        min-width: 420px;
+
+        @media (max-width: 480px) {
+          min-width: 360px;
+        }
+
+        @media (max-width: 375px) {
+          min-width: 320px;
+          font-size: 12px;
+        }
+
+        @media (max-width: 320px) {
+          min-width: 290px;
+          font-size: 11px;
+        }
 
         thead {
           tr {
-            background: #EEF2FF;
+            background: $primary;
+            position: sticky;
+            top: 0;
+            z-index: 5;
           }
 
           th {
-            color: #435FFF;
-            padding: 12px 14px;
+            color: white;
+            padding: 10px 10px;
             font-size: 12px;
             font-weight: 600;
             text-align: left;
             border: none;
+            white-space: nowrap;
+            background: $primary;
+
+            @media (max-width: 480px) {
+              padding: 9px 7px;
+              font-size: 11px;
+            }
+
+            @media (max-width: 375px) {
+              padding: 8px 5px;
+              font-size: 10px;
+            }
+
+            @media (max-width: 320px) {
+              padding: 7px 4px;
+              font-size: 10px;
+            }
 
             &:first-child {
               border-top-left-radius: 8px;
@@ -317,11 +541,27 @@ $text-light: #64748B;
             }
 
             td {
-              padding: 12px 14px;
+              padding: 10px 10px;
               font-size: 13px;
               color: $text-dark;
               border-bottom: 1px solid #F1F5F9;
               vertical-align: middle;
+              white-space: nowrap;
+
+              @media (max-width: 480px) {
+                padding: 9px 7px;
+                font-size: 12px;
+              }
+
+              @media (max-width: 375px) {
+                padding: 8px 5px;
+                font-size: 11px;
+              }
+
+              @media (max-width: 320px) {
+                padding: 7px 4px;
+                font-size: 11px;
+              }
 
               &.text-center {
                 text-align: center;
@@ -346,6 +586,13 @@ $text-light: #64748B;
           }
         }
       }
+    }
+  }
+
+  // ── Responsive Utilities ──────────────────────────────────────────
+  .hide-xs {
+    @media (max-width: 480px) {
+      display: none !important;
     }
   }
 

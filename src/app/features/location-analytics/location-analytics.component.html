@@ -151,17 +151,17 @@
                 <table>
                   <thead>
                     <tr>
-                      <th class="text-center" style="width: 60px;">S.NO</th>
-                      <th>City</th>
-                      <th>State</th>
-                      <th class="text-center">Applications</th>
-                      <th class="text-center">Admissions</th>
-                      <th class="text-center">Remaining</th>
+                      <th class="text-center hide-xs" style="width: 44px;">#</th>
+                      <th style="min-width: 80px;">City</th>
+                      <th style="min-width: 80px;">State</th>
+                      <th class="text-center" style="min-width: 68px;">Apps</th>
+                      <th class="text-center" style="min-width: 68px;">Adms</th>
+                      <th class="text-center" style="min-width: 68px;">Left</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of topCitiesByApps; let i = index">
-                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
                       <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
                       <td class="text-light">{{ item.state }}</td>
                       <td class="text-center text-bold">{{ item.totalApplications }}</td>
@@ -186,17 +186,17 @@
                 <table>
                   <thead>
                     <tr>
-                      <th class="text-center" style="width: 60px;">S.NO</th>
-                      <th>City</th>
-                      <th>State</th>
-                      <th class="text-center">Applications</th>
-                      <th class="text-center">Admissions</th>
-                      <th class="text-center">Remaining</th>
+                      <th class="text-center hide-xs" style="width: 44px;">#</th>
+                      <th style="min-width: 80px;">City</th>
+                      <th style="min-width: 80px;">State</th>
+                      <th class="text-center" style="min-width: 68px;">Apps</th>
+                      <th class="text-center" style="min-width: 68px;">Adms</th>
+                      <th class="text-center" style="min-width: 68px;">Left</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of topCitiesByAdms; let i = index">
-                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
                       <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
                       <td class="text-light">{{ item.state }}</td>
                       <td class="text-center">{{ item.totalApplications }}</td>
@@ -221,16 +221,16 @@
                 <table>
                   <thead>
                     <tr>
-                      <th class="text-center" style="width: 60px;">S.NO</th>
-                      <th>State</th>
-                      <th class="text-center">Applications</th>
-                      <th class="text-center">Admissions</th>
-                      <th class="text-center">Remaining</th>
+                      <th class="text-center hide-xs" style="width: 44px;">#</th>
+                      <th style="min-width: 100px;">State</th>
+                      <th class="text-center" style="min-width: 68px;">Apps</th>
+                      <th class="text-center" style="min-width: 68px;">Adms</th>
+                      <th class="text-center" style="min-width: 68px;">Left</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of topStatesByApps; let i = index">
-                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
                       <td class="font-medium text-dark">{{ item.state }}</td>
                       <td class="text-center text-bold">{{ item.totalApplications }}</td>
                       <td class="text-center">{{ item.totalAdmissions }}</td>
@@ -254,16 +254,16 @@
                 <table>
                   <thead>
                     <tr>
-                      <th class="text-center" style="width: 60px;">S.NO</th>
-                      <th>State</th>
-                      <th class="text-center">Applications</th>
-                      <th class="text-center">Admissions</th>
-                      <th class="text-center">Remaining</th>
+                      <th class="text-center hide-xs" style="width: 44px;">#</th>
+                      <th style="min-width: 100px;">State</th>
+                      <th class="text-center" style="min-width: 68px;">Apps</th>
+                      <th class="text-center" style="min-width: 68px;">Adms</th>
+                      <th class="text-center" style="min-width: 68px;">Left</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of topStatesByAdms; let i = index">
-                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
                       <td class="font-medium text-dark">{{ item.state }}</td>
                       <td class="text-center">{{ item.totalApplications }}</td>
                       <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
