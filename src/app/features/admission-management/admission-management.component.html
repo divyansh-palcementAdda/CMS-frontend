@@ -437,7 +437,7 @@
                                         <span class="pulse-indicator foc-pulse"></span>
                                         <h4>4th Breakdown (FOC / SBS Wise)</h4>
                                     </div>
-                                    <div class="breakdown-grid source-grid">
+                                    <div class="breakdown-grid source-grid foc-sbs-grid">
                                         <!-- SBS -->
                                         <div class="stat-mini-card source-sbs"
                                             [class.active]="filters.statFilter === 'SBS'" (click)="onStatFilter('SBS')">
@@ -485,35 +485,35 @@
                         </div>
 
                         <!-- Secondary Finance Counters (Only for Admission/All tab, preserved) -->
-                        <div class="stats-grid sub-stats" *ngIf="filters.tab !== 'applications'">
-                            <div class="stat-card finance-card" [class.active]="filters.statFilter === 'PARTIAL_PAID'"
-                                (click)="onStatFilter('PARTIAL_PAID')" [class.paid]="true">
-                                <div class="stat-icon-wrapper">
+                        <div class="breakdown-grid sub-stats-mini" *ngIf="filters.tab !== 'applications'">
+                            <div class="stat-mini-card status-confirmed"
+                                [class.active]="filters.statFilter === 'PARTIAL_PAID'"
+                                (click)="onStatFilter('PARTIAL_PAID')">
+                                <div class="mini-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                     </svg>
                                 </div>
-                                <div class="stat-content">
-                                    <div class="stat-label">50% Fee Paid</div>
-                                    <div class="stat-value">{{ pageData.stats.partialFeesPaid }}</div>
-                                    <div class="stat-desc">Students with early payments</div>
+                                <div class="mini-data">
+                                    <span class="mini-val">{{ pageData.stats.partialFeesPaid }}</span>
+                                    <span class="mini-label">50% Fee Paid</span>
                                 </div>
                             </div>
 
-                            <div class="stat-card finance-card" [class.active]="filters.statFilter === 'UNPAID'"
-                                (click)="onStatFilter('UNPAID')" [class.unpaid]="true">
-                                <div class="stat-icon-wrapper">
+                            <div class="stat-mini-card status-cancelled-app"
+                                [class.active]="filters.statFilter === 'UNPAID'"
+                                (click)="onStatFilter('UNPAID')">
+                                <div class="mini-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <line x1="12" y1="8" x2="12" y2="12"></line>
                                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                     </svg>
                                 </div>
-                                <div class="stat-content">
-                                    <div class="stat-label">50% Fee Unpaid</div>
-                                    <div class="stat-value">{{ pageData.stats.partialfessUnpaid }}</div>
-                                    <div class="stat-desc">Pending initial fees</div>
+                                <div class="mini-data">
+                                    <span class="mini-val">{{ pageData.stats.partialfessUnpaid }}</span>
+                                    <span class="mini-label">50% Fee Unpaid</span>
                                 </div>
                             </div>
                         </div>

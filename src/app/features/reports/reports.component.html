@@ -47,7 +47,7 @@
                         </button>
                         <div class="nav-divider"></div>
 
-                        <div class="report-tabs-scroll-container">
+                        <div class="report-tabs-scroll-container" #tabsScrollContainer>
                             <div class="report-tabs">
                                 <button *ngFor="let type of reportTypes" [class.active]="activeReport === type.id"
                                     (click)="setReport(type.id)" class="tab-btn">
@@ -151,8 +151,8 @@
 
                         <!-- Revenue Summary KPI Grid for COURSE_REVENUE -->
                         <div class="kpi-grid-premium revenue-kpi-grid" *ngIf="activeReport === 'COURSE_REVENUE'">
-                            <div class="kpi-card-v2 total" [class.is-loading]="loading"
-                                style="border-left: 4px solid #10b981;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="--before-bg: #10b981;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #10b981;">payments</span></div>
                                 <div class="kpi-label">Total Collected Till Date (A)</div>
@@ -164,8 +164,8 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 confirmed" [class.is-loading]="loading"
-                                style="border-left: 4px solid #ef4444;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="--before-bg: #ef4444;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #ef4444;">keyboard_return</span></div>
                                 <div class="kpi-label">Total Refunded Till Date</div>
@@ -178,8 +178,8 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 revenue" [class.is-loading]="loading"
-                                style="border-left: 4px solid #4f46e5;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="--before-bg: #4f46e5;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #4f46e5;">account_balance</span></div>
                                 <div class="kpi-label">Net Collected Revenue</div>
@@ -192,8 +192,8 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 pending" [class.is-loading]="loading"
-                                style="border-left: 4px solid #f59e0b;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="--before-bg: #f59e0b;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #f59e0b;">account_balance_wallet</span></div>
                                 <div class="kpi-label">Total Remaining To Collect (B)</div>
@@ -205,8 +205,8 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2 total" [class.is-loading]="loading"
-                                style="border-left: 4px solid #8b5cf6;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading"
+                                style="--before-bg: #8b5cf6;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #8b5cf6;">analytics</span></div>
                                 <div class="kpi-label">Overall Revenue By All Courses</div>
