@@ -2,7 +2,6 @@
 
 <div class="main-content">
   <app-topbar></app-topbar>
-
   <div class="page-content">
     <div class="container-fluid" *ngIf="detail; else loadingTpl">
       <!-- Breadcrumbs -->
@@ -10,7 +9,6 @@
         <span>Dashboard</span> / <span>Admission</span> / <span>All Admission</span> / <span
           class="active">Details</span>
       </nav>
-
       <!-- Title Section -->
       <header class="page-header">
         <div class="title-left">
@@ -48,7 +46,6 @@
             </svg>
             Edit
           </button>
-
           <button *ngIf="!detail.isCancelled" class="btn-outline-edit" (click)="handleCancellationClick()"
             style="border-color: #ef4444; color: #ef4444; background: white;">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -60,9 +57,10 @@
             </svg>
             Cancel Admission
           </button>
-
           <!-- Refund Fees Button -->
-          <button *ngIf="detail.isCancelled && detail.totalFeesPaid! > 0 && detail.totalRefundedAmount! < detail.totalFeesPaid!" class="btn-primary-fees" (click)="openRefundModal()"
+          <button
+            *ngIf="detail.isCancelled && detail.totalFeesPaid! > 0 && detail.totalRefundedAmount! < detail.totalFeesPaid!"
+            class="btn-primary-fees" (click)="openRefundModal()"
             style="background: #f59e0b; border-color: #f59e0b; margin-right: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -82,7 +80,6 @@
             </svg>
             Restore Admission
           </button>
-
           <button class="btn-danger-delete" (click)="onDelete()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -95,7 +92,6 @@
           </button>
         </div>
       </header>
-
       <!-- Duplicate Form Warning Banner -->
       <div *ngIf="detail.isDuplicateForm" class="duplicate-warning-banner">
         <div class="warning-banner-icon">
@@ -107,8 +103,10 @@
         <div class="warning-banner-text">
           <span class="warning-title">📑 Duplicate Application</span>
           <div *ngIf="detail.duplicateRemarks" class="warning-remarks" style="margin-top: 8px;">
-            <strong style="display: block; font-size: 12px; color: #B45309; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Reason:</strong>
-            <span style="font-size: 13px; color: #78350F; line-height: 1.5; font-weight: 500;">{{ detail.duplicateRemarks }}</span>
+            <strong
+              style="display: block; font-size: 12px; color: #B45309; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Reason:</strong>
+            <span style="font-size: 13px; color: #78350F; line-height: 1.5; font-weight: 500;">{{
+              detail.duplicateRemarks }}</span>
           </div>
         </div>
       </div>
@@ -389,7 +387,8 @@
                           [class.fee-status-unpaid]="!detail.fiftyPercentFeesPaid && (detail.totalFeesPaid || 0) <= 0"
                           [class.fee-status-provisional]="(detail.totalFeesPaid || 0) > 0 && !detail.fiftyPercentFeesPaid"
                           [class.fee-status-fifty]="detail.fiftyPercentFeesPaid">
-                          {{ detail.fiftyPercentFeesPaid ? '50% FEES PAID' : ((detail.totalFeesPaid || 0) > 0 ? 'PROVISIONAL PAID' : 'UNPAID') }}
+                          {{ detail.fiftyPercentFeesPaid ? '50% FEES PAID' : ((detail.totalFeesPaid || 0) > 0 ?
+                          'PROVISIONAL PAID' : 'UNPAID') }}
                         </span>
                       </div>
                     </div>
@@ -488,11 +487,13 @@
               </div>
               <div class="sum-card-basic orange-border" *ngIf="detail.totalRefundedAmount! > 0">
                 <label>Total Refunded</label>
-                <div class="sum-val-lg orange-text" style="color: #f59e0b;">₹{{ detail.totalRefundedAmount | number: '1.0-0' }}</div>
+                <div class="sum-val-lg orange-text" style="color: #f59e0b;">₹{{ detail.totalRefundedAmount | number:
+                  '1.0-0' }}</div>
               </div>
               <div class="sum-card-basic green-border" *ngIf="detail.isCancelled && detail.totalFeesPaid! > 0">
                 <label>Refundable Balance</label>
-                <div class="sum-val-lg green-text" style="color: #10b981;">₹{{ (detail.totalFeesPaid! - detail.totalRefundedAmount!) | number: '1.0-0' }}</div>
+                <div class="sum-val-lg green-text" style="color: #10b981;">₹{{ (detail.totalFeesPaid! -
+                  detail.totalRefundedAmount!) | number: '1.0-0' }}</div>
               </div>
               <div class="sum-card-basic teal-border">
                 <label>Registration Fees</label>
@@ -588,9 +589,11 @@
       </section>
 
       <!-- Refund History (Only for Cancelled Admissions) -->
-      <section class="fee-history-section" *ngIf="detail.isCancelled && refundHistory && refundHistory.length > 0" style="margin-top: 32px; border-top: 2px dashed #f1f5f9; padding-top: 32px;">
+      <section class="fee-history-section" *ngIf="detail.isCancelled && refundHistory && refundHistory.length > 0"
+        style="margin-top: 32px; border-top: 2px dashed #f1f5f9; padding-top: 32px;">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-          <div style="background: #fef3c7; color: #d97706; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="background: #fef3c7; color: #d97706; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <span class="material-symbols-outlined">history_edu</span>
           </div>
           <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: #1e293b;">Refund History</h3>
@@ -613,9 +616,12 @@
                 <td>{{ i + 1 }}</td>
                 <td class="bold" style="color: #d97706;">₹ {{ refund.amount | number: '1.0-0' }}</td>
                 <td>{{ refund.refundDate | date: 'MMM d, yyyy' }}</td>
-                <td><span class="status-badge" style="background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 4px; font-size: 11px;">{{ refund.refundMode }}</span></td>
+                <td><span class="status-badge"
+                    style="background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 4px; font-size: 11px;">{{
+                    refund.refundMode }}</span></td>
                 <td>{{ refund.referenceNo || 'N/A' }}</td>
-                <td><span class="remarks-pill" style="background: #fffbeb; color: #b45309;">{{ refund.reason }}</span></td>
+                <td><span class="remarks-pill" style="background: #fffbeb; color: #b45309;">{{ refund.reason }}</span>
+                </td>
                 <td>{{ refund.refundedBy }}</td>
               </tr>
             </tbody>
@@ -645,12 +651,9 @@
       (confirm)="confirmCancellationAction($event)" (cancel)="showCancellationModal = false">
     </app-cancellation-modal>
 
-    <app-refund-modal *ngIf="showRefundModal" 
-      [studentName]="detail?.fullName || ''" 
-      [totalPaid]="detail?.totalFeesPaid || 0"
-      [alreadyRefunded]="detail?.totalRefundedAmount || 0"
-      (confirm)="onRefundConfirmed($event)" 
-      (cancel)="showRefundModal = false">
+    <app-refund-modal *ngIf="showRefundModal" [studentName]="detail?.fullName || ''"
+      [totalPaid]="detail?.totalFeesPaid || 0" [alreadyRefunded]="detail?.totalRefundedAmount || 0"
+      (confirm)="onRefundConfirmed($event)" (cancel)="showRefundModal = false">
     </app-refund-modal>
   </div>
 </div>
