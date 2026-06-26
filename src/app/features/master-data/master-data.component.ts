@@ -102,7 +102,7 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
     .dashboard-layout { display: flex; min-height: 100vh; background: #ffffff; }
     .dashboard-body { flex: 1; display: flex; flex-direction: column; }
     .main-content { padding: 32px; flex: 1; }
-    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; gap: 16px; }
     .page-title { font-size: 24px; font-weight: 700; color: #1e293b; }
     
     .master-data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
@@ -152,6 +152,59 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
       transition: all 0.2s;
     }
     .btn-primary:hover { background: #4f46e5; }
+    
+    /* Tablet and below */
+    @media (max-width: 768px) {
+      .main-content { padding: 20px; }
+      .content-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        margin-bottom: 24px;
+        gap: 12px;
+      }
+      .page-title { font-size: 20px; }
+      .btn-primary { 
+        width: 100%; 
+        justify-content: center;
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+      .btn-primary svg { 
+        width: 18px; 
+        height: 18px; 
+      }
+      .master-data-grid { 
+        grid-template-columns: 1fr; 
+        gap: 16px;
+      }
+    }
+    
+    /* Mobile */
+    @media (max-width: 480px) {
+      .main-content { padding: 16px; }
+      .content-header { margin-bottom: 20px; }
+      .page-title { font-size: 18px; }
+      .btn-primary { 
+        padding: 10px 14px;
+        font-size: 13px;
+        gap: 6px;
+      }
+      .btn-primary svg { 
+        width: 16px; 
+        height: 16px; 
+      }
+      .master-card { padding: 20px; }
+      .card-icon { 
+        width: 48px; 
+        height: 48px; 
+      }
+      .card-icon svg { 
+        width: 24px; 
+        height: 24px; 
+      }
+      .card-info h3 { font-size: 16px; }
+      .card-info p { font-size: 13px; }
+    }
   `]
 })
 export class MasterDataComponent {

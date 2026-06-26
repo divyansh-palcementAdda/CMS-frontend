@@ -725,3 +725,610 @@
     transform: rotate(360deg);
   }
 }
+
+/* Responsive Styles */
+
+/* Tablet Devices (768px - 1024px) */
+@media (max-width: 1024px) {
+  .unmapped-page {
+    padding: 20px 24px;
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+
+      .stat-card {
+        padding: 20px;
+
+        .card-inner {
+          gap: 16px;
+        }
+
+        .stat-icon-wrapper {
+          width: 44px;
+          height: 44px;
+          font-size: 20px;
+        }
+
+        .stat-content {
+          .stat-value {
+            font-size: 24px;
+          }
+
+          .stat-label {
+            font-size: 12px;
+          }
+
+          .stat-desc {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+
+    .table-card {
+      .table-card-header {
+        padding: 20px 24px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+
+        .left-header {
+          .table-title {
+            font-size: 18px;
+          }
+
+          .header-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+        }
+
+        .search-box {
+          width: 100%;
+        }
+      }
+
+      .figma-table {
+        thead tr th {
+          padding: 14px 16px;
+          font-size: 11px;
+
+          &:first-child {
+            padding-left: 24px;
+          }
+
+          &:last-child {
+            padding-right: 24px;
+          }
+        }
+
+        tbody tr td {
+          padding: 12px 16px;
+          font-size: 13px;
+
+          &:last-child {
+            padding-right: 20px;
+          }
+
+          &.serial-no {
+            width: 50px;
+          }
+        }
+      }
+
+      .table-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+
+        .showing-text {
+          font-size: 11px;
+        }
+
+        .pagination {
+          button {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .tab-pill-container {
+      .tab-pill-btn {
+        padding: 6px 20px;
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+/* Mobile Devices (< 768px) */
+@media (max-width: 768px) {
+  .unmapped-page {
+    padding: 16px;
+
+    .breadcrumb {
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+
+      .stat-card {
+        padding: 16px;
+
+        .card-inner {
+          gap: 12px;
+        }
+
+        .stat-icon-wrapper {
+          width: 40px;
+          height: 40px;
+          font-size: 18px;
+          border-radius: 10px;
+        }
+
+        .stat-content {
+          .stat-value {
+            font-size: 22px;
+          }
+
+          .stat-label {
+            font-size: 12px;
+          }
+
+          .stat-desc {
+            font-size: 10px;
+            margin-top: 2px;
+          }
+        }
+      }
+    }
+
+    .tab-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 20px;
+
+      .tab-pill-btn {
+        padding: 6px 16px;
+        font-size: 12px;
+        gap: 6px;
+
+        .tab-count {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .table-card {
+      border-radius: 12px;
+      overflow-x: auto;
+
+      .table-card-header {
+        padding: 16px;
+        gap: 12px;
+
+        .left-header {
+          .table-title {
+            font-size: 16px;
+          }
+
+          .header-meta {
+            .record-count {
+              font-size: 12px;
+            }
+
+            .entries-selector {
+              font-size: 12px;
+
+              select {
+                padding: 3px 8px;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+
+        .search-box {
+          width: 100%;
+
+          .search-icon {
+            left: 12px;
+            font-size: 18px;
+          }
+
+          input {
+            padding: 10px 12px 10px 38px;
+            font-size: 13px;
+            border-radius: 10px;
+          }
+        }
+      }
+
+      .table-wrapper {
+        min-height: 300px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .figma-table {
+        min-width: 800px;
+
+        thead tr th {
+          padding: 12px 14px;
+          font-size: 10px;
+          letter-spacing: 0.03em;
+
+          &:first-child {
+            padding-left: 20px;
+          }
+
+          &:last-child {
+            padding-right: 20px;
+          }
+        }
+
+        tbody tr td {
+          padding: 10px 14px;
+          font-size: 12px;
+
+          &:last-child {
+            padding-right: 18px;
+          }
+
+          &.serial-no {
+            width: 45px;
+            font-size: 11px;
+          }
+
+          .user-cell {
+            gap: 8px;
+
+            .avatar-circle {
+              width: 30px;
+              height: 30px;
+              font-size: 11px;
+            }
+
+            .user-name {
+              font-size: 12px;
+            }
+          }
+
+          .contact-info {
+            .primary {
+              font-size: 12px;
+            }
+
+            .secondary {
+              font-size: 11px;
+            }
+          }
+
+          .course-badge {
+            padding: 4px 10px;
+            font-size: 11px;
+            border-radius: 8px;
+            max-width: 180px;
+          }
+
+          .role-badge {
+            padding: 3px 6px;
+            font-size: 11px;
+          }
+
+          .status-badge {
+            padding: 4px 12px;
+            font-size: 11px;
+          }
+
+          .count-badge {
+            min-width: 24px;
+            height: 24px;
+            padding: 0 6px;
+            font-size: 11px;
+          }
+
+          .action-buttons {
+            gap: 8px;
+            min-width: 90px;
+
+            .action-btn {
+              width: 28px;
+              height: 28px;
+              font-size: 12px;
+              border-radius: 6px;
+            }
+          }
+        }
+      }
+
+      .table-footer {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+
+        .showing-text {
+          font-size: 11px;
+          text-align: center;
+        }
+
+        .pagination {
+          justify-content: center;
+
+          button {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+          }
+
+          .pagination-dots {
+            font-size: 12px;
+            padding: 0 4px;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Small Mobile Devices (< 480px) */
+@media (max-width: 480px) {
+  .unmapped-page {
+    padding: 12px;
+
+    .breadcrumb {
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .stats-grid {
+      gap: 10px;
+      margin-bottom: 16px;
+
+      .stat-card {
+        padding: 14px;
+
+        .card-inner {
+          gap: 10px;
+        }
+
+        .stat-icon-wrapper {
+          width: 36px;
+          height: 36px;
+          font-size: 16px;
+          border-radius: 8px;
+        }
+
+        .stat-content {
+          .stat-value {
+            font-size: 20px;
+          }
+
+          .stat-label {
+            font-size: 11px;
+          }
+
+          .stat-desc {
+            font-size: 9px;
+          }
+        }
+      }
+    }
+
+    .tab-pill-container {
+      .tab-pill-btn {
+        padding: 5px 12px;
+        font-size: 11px;
+        gap: 4px;
+
+        .tab-count {
+          font-size: 10px;
+        }
+      }
+    }
+
+    .table-card {
+      border-radius: 10px;
+
+      .table-card-header {
+        padding: 12px;
+
+        .left-header {
+          .table-title {
+            font-size: 15px;
+          }
+
+          .header-meta {
+            .record-count {
+              font-size: 11px;
+            }
+
+            .entries-selector {
+              font-size: 11px;
+              gap: 6px;
+
+              select {
+                padding: 2px 6px;
+                font-size: 11px;
+              }
+            }
+          }
+        }
+
+        .search-box {
+          .search-icon {
+            left: 10px;
+            font-size: 16px;
+          }
+
+          input {
+            padding: 8px 10px 8px 34px;
+            font-size: 12px;
+            border-radius: 8px;
+          }
+        }
+      }
+
+      .figma-table {
+        min-width: 700px;
+
+        thead tr th {
+          padding: 10px 12px;
+          font-size: 9px;
+
+          &:first-child {
+            padding-left: 16px;
+          }
+
+          &:last-child {
+            padding-right: 16px;
+          }
+        }
+
+        tbody tr td {
+          padding: 8px 12px;
+          font-size: 11px;
+
+          &:last-child {
+            padding-right: 14px;
+          }
+
+          &.serial-no {
+            width: 40px;
+            font-size: 10px;
+          }
+
+          .user-cell {
+            .avatar-circle {
+              width: 26px;
+              height: 26px;
+              font-size: 10px;
+            }
+
+            .user-name {
+              font-size: 11px;
+            }
+          }
+
+          .contact-info {
+            .primary {
+              font-size: 11px;
+            }
+
+            .secondary {
+              font-size: 10px;
+            }
+          }
+
+          .course-badge {
+            padding: 3px 8px;
+            font-size: 10px;
+            border-radius: 6px;
+            max-width: 150px;
+          }
+
+          .role-badge {
+            padding: 2px 5px;
+            font-size: 10px;
+          }
+
+          .status-badge {
+            padding: 3px 10px;
+            font-size: 10px;
+          }
+
+          .count-badge {
+            min-width: 22px;
+            height: 22px;
+            padding: 0 5px;
+            font-size: 10px;
+          }
+
+          .action-buttons {
+            gap: 6px;
+            min-width: 80px;
+
+            .action-btn {
+              width: 26px;
+              height: 26px;
+              font-size: 11px;
+              border-radius: 5px;
+            }
+          }
+        }
+      }
+
+      .table-footer {
+        padding: 12px;
+
+        .showing-text {
+          font-size: 10px;
+        }
+
+        .pagination {
+          button {
+            width: 26px;
+            height: 26px;
+            font-size: 11px;
+          }
+
+          .pagination-dots {
+            font-size: 11px;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Landscape Mobile Devices */
+@media (max-width: 768px) and (orientation: landscape) {
+  .unmapped-page {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+
+      .stat-card {
+        padding: 14px;
+
+        .stat-icon-wrapper {
+          width: 38px;
+          height: 38px;
+          font-size: 17px;
+        }
+
+        .stat-content {
+          .stat-value {
+            font-size: 20px;
+          }
+
+          .stat-label {
+            font-size: 11px;
+          }
+
+          .stat-desc {
+            font-size: 9px;
+          }
+        }
+      }
+    }
+
+    .table-card {
+      .table-wrapper {
+        min-height: 250px;
+      }
+    }
+  }
+}

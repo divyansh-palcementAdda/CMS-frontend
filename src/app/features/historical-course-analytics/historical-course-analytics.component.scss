@@ -835,3 +835,501 @@ $danger-color: hsl(350, 70%, 45%);
   color: $text-muted;
   font-variant-numeric: tabular-nums;
 }
+
+// ─── Responsive Design ───────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 24px;
+    gap: 24px;
+  }
+
+  .content-header {
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .summary-cards {
+    gap: 16px;
+  }
+
+  .summary-card {
+    padding: 16px;
+    
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .card-info {
+      .card-value {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .filter-panel {
+    padding: 16px;
+  }
+
+  .filter-group {
+    min-width: 140px;
+    
+    &.search-group {
+      min-width: 200px;
+    }
+  }
+
+  .table-container {
+    padding: 6px;
+  }
+
+  .data-table {
+    th, td {
+      padding: 14px 16px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .content-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    
+    .page-title {
+      font-size: 22px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+    }
+
+    .header-actions {
+      flex-direction: column;
+      width: 100%;
+      
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 14px;
+    gap: 12px;
+    
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .card-info {
+      .card-label {
+        font-size: 11px;
+      }
+      
+      .card-value {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .filter-panel {
+    padding: 14px;
+    border-radius: 16px;
+    
+    .filter-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .filter-group {
+      width: 100%;
+      min-width: 0;
+      
+      &.search-group {
+        min-width: 0;
+      }
+    }
+  }
+
+  .table-container {
+    padding: 4px;
+    border-radius: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  }
+
+  .data-table {
+    min-width: 900px;
+    
+    thead {
+      th {
+        padding: 12px 14px;
+        font-size: 12px;
+      }
+    }
+
+    tbody {
+      .table-row {
+        td {
+          padding: 12px 14px;
+          font-size: 13px;
+          
+          &.actions-cell {
+            gap: 6px;
+          }
+        }
+      }
+    }
+  }
+
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .pagination-footer {
+    padding: 16px 14px 12px;
+    gap: 12px;
+  }
+
+  .pagination-meta {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .entries-info {
+    font-size: 12px;
+  }
+
+  .page-size-group {
+    .page-size-select {
+      font-size: 12px;
+      padding: 4px 24px 4px 8px;
+    }
+  }
+
+  .paginator {
+    .btn-page {
+      padding: 6px 10px;
+      font-size: 12px;
+      
+      span {
+        display: none;
+      }
+      
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .btn-page-num {
+      min-width: 30px;
+      height: 30px;
+      font-size: 12px;
+    }
+
+    .page-ellipsis {
+      min-width: 24px;
+      height: 30px;
+      font-size: 12px;
+    }
+  }
+
+  .modal-card {
+    width: 95%;
+    max-width: 95%;
+    padding: 20px;
+    border-radius: 20px;
+    gap: 16px;
+    
+    .modal-header {
+      padding-bottom: 12px;
+      
+      .modal-title {
+        font-size: 18px;
+      }
+    }
+
+    .modal-footer {
+      flex-direction: column;
+      gap: 8px;
+      
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    
+    .full-width {
+      grid-column: span 1;
+    }
+  }
+
+  .upload-config-row {
+    grid-template-columns: 1fr;
+  }
+
+  .drag-drop-container {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 12px;
+    gap: 16px;
+  }
+
+  .content-header {
+    .page-title {
+      font-size: 20px;
+    }
+
+    .page-subtitle {
+      font-size: 12px;
+    }
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 12px;
+    
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .card-info {
+      .card-label {
+        font-size: 10px;
+      }
+      
+      .card-value {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .filter-panel {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .filter-group {
+    .filter-label {
+      font-size: 11px;
+    }
+
+    .filter-select,
+    .filter-input {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  }
+
+  .data-table {
+    min-width: 800px;
+    
+    thead {
+      th {
+        padding: 10px 12px;
+        font-size: 11px;
+      }
+    }
+
+    tbody {
+      .table-row {
+        td {
+          padding: 10px 12px;
+          font-size: 12px;
+          
+          &.actions-cell {
+            gap: 4px;
+          }
+        }
+      }
+    }
+  }
+
+  .btn-icon {
+    width: 26px;
+    height: 26px;
+    
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .pagination-footer {
+    padding: 12px 10px 10px;
+  }
+
+  .entries-info {
+    font-size: 11px;
+  }
+
+  .modal-card {
+    padding: 16px;
+    border-radius: 16px;
+    
+    .modal-header {
+      .modal-title {
+        font-size: 16px;
+      }
+      
+      .btn-close {
+        font-size: 20px;
+      }
+    }
+
+    .modal-body {
+      gap: 12px;
+    }
+
+    .modal-footer {
+      padding-top: 12px;
+    }
+  }
+
+  .form-group {
+    .form-label {
+      font-size: 11px;
+    }
+
+    .form-input {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  }
+
+  .alert {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .drag-drop-container {
+    padding: 20px 12px;
+    
+    .upload-cloud {
+      width: 36px;
+      height: 36px;
+    }
+
+    .drag-text {
+      font-size: 13px;
+    }
+  }
+
+  .upload-result {
+    .result-summary {
+      padding: 12px 14px;
+      font-size: 12px;
+      
+      .result-details {
+        h4 {
+          font-size: 13px;
+        }
+        
+        p {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .error-download-card {
+      padding: 12px;
+      
+      p {
+        font-size: 12px;
+      }
+      
+      .btn-danger-outline {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .empty-state-cell {
+    padding: 40px 0;
+    
+    .empty-state {
+      svg {
+        width: 40px;
+        height: 40px;
+      }
+      
+      h4 {
+        font-size: 14px;
+      }
+      
+      p {
+        font-size: 12px;
+      }
+    }
+  }
+}
