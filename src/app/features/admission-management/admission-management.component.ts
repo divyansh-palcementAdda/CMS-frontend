@@ -1762,7 +1762,6 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.excludeDuplicate = null;
       this.filters.includeDuplicate = true;
     } else {
-      // Default / 'exclude'
       this.filters.duplicateOnly = null;
       this.filters.excludeDuplicate = true;
       this.filters.includeDuplicate = null;
@@ -1775,9 +1774,30 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
 
   onDuplicateToggleClick(item: AdmissionItem): void {
     const isDuplicate = !item.isDuplicateForm;
-    const remarks = isDuplicate ? '' : null;
+    this.selectedStudentForDuplicateToggle = item;
+    this.duplicateConfirmMode = isDuplicate ? 'mark' : 'unmark';
+    this.duplicateRemarksInput = '';
+    this.duplicateConfirmTitle = isDuplicate ? 'Mark as Duplicate' : 'Remove Duplicate Status';
+    this.duplicateConfirmMessage = isDuplicate
+      ? `Are you sure you want to mark ${item.fullName}'s application as duplicate?`
+      : `Are you sure you want to remove the duplicate status from ${item.fullName}'s application?`;
+    this.duplicateConfirmConfirmText = isDuplicate ? 'Mark as Duplicate' : 'Remove Duplicate';
+    this.showDuplicateConfirmModal = true;
+  }
 
-    // Directly call updateAdmission API
+  cancelDuplicateToggle(): void {
+    this.showDuplicateConfirmModal = false;
+    this.selectedStudentForDuplicateToggle = null;
+    this.duplicateRemarksInput = '';
+  }
+
+  confirmDuplicateToggle(): void {
+    const item = this.selectedStudentForDuplicateToggle;
+    if (!item) return;
+
+    const isDuplicate = this.duplicateConfirmMode === 'mark';
+    const remarks = isDuplicate ? this.duplicateRemarksInput : null;
+
     this.admissionService.updateAdmission(
       item.id!,
       {
@@ -1789,12 +1809,12 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         item.isDuplicateForm = isDuplicate;
         item.duplicateRemarks = remarks || '';
         this.notificationService.success('Success', `Successfully ${isDuplicate ? 'marked' : 'removed'} duplicate status.`);
+        this.cancelDuplicateToggle();
       },
       error: (err) => {
         console.error('Failed to update duplicate status', err);
         this.notificationService.error('Error', err.error?.message || 'Failed to update Duplicate status.');
-        // Revert the UI change on error
-        item.isDuplicateForm = !isDuplicate;
+        this.cancelDuplicateToggle();
       }
     });
   }
