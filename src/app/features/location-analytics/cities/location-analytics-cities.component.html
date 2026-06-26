@@ -96,56 +96,57 @@
             <table>
               <thead>
                 <tr>
-                  <th class="text-center" style="width: 70px;">S.NO</th>
-                  <th class="sortable" (click)="toggleSort('city')" style="cursor: pointer;">
+                  <th class="text-center" style="width: 50px;">#</th>
+                  <th class="sortable" (click)="toggleSort('city')" style="cursor: pointer; min-width: 100px;">
                     City
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'city'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'city'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="sortable" (click)="toggleSort('state')" style="cursor: pointer;">
+                  <th class="sortable" (click)="toggleSort('state')" style="cursor: pointer; min-width: 100px;">
                     State
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'state'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'state'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="sortable text-center" (click)="toggleSort('totalApplications')" style="cursor: pointer;">
-                    Total Applications
+                  <th class="sortable text-center" (click)="toggleSort('totalApplications')" style="cursor: pointer; min-width: 80px;">
+                    Total Apps
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'totalApplications'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'totalApplications'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="sortable text-center" (click)="toggleSort('totalAdmissions')" style="cursor: pointer;">
-                    Total Admissions
+                  <th class="sortable text-center" (click)="toggleSort('totalAdmissions')" style="cursor: pointer; min-width: 80px;">
+                    Total Adms
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'totalAdmissions'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'totalAdmissions'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="sortable text-center" (click)="toggleSort('remainingApplications')" style="cursor: pointer;">
-                    Remaining Applications
+                  <th class="sortable text-center" (click)="toggleSort('remainingApplications')" style="cursor: pointer; min-width: 80px;">
+                    Remaining
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'remainingApplications'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'remainingApplications'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="sortable text-center" (click)="toggleSort('cancelledApplications')" style="cursor: pointer;">
-                    Cancelled Applications
+                  <th class="sortable text-center" (click)="toggleSort('cancelledApplications')" style="cursor: pointer; min-width: 80px;">
+                    Cancelled Apps
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'cancelledApplications'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'cancelledApplications'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="sortable text-center" (click)="toggleSort('cancelledAdmissions')" style="cursor: pointer;">
-                    Cancelled Admissions
+                  <th class="sortable text-center" (click)="toggleSort('cancelledAdmissions')" style="cursor: pointer; min-width: 80px;">
+                    Cancelled Adms
                     <span class="sort-icon" style="margin-left: 4px;">
                       <span *ngIf="sortBy === 'cancelledAdmissions'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                       <span *ngIf="sortBy !== 'cancelledAdmissions'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
+                  <th class="text-center" style="min-width: 100px;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,9 +159,18 @@
                   <td class="text-center text-bold" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
                   <td class="text-center text-bold">{{ item.cancelledApplications }}</td>
                   <td class="text-center text-bold">{{ item.cancelledAdmissions }}</td>
+                  <td class="action-cell">
+                    <button class="btn-view" [routerLink]="['/location-analytics/cities', item.city]" title="View analytics for {{ item.city }}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      View
+                    </button>
+                  </td>
                 </tr>
                 <tr *ngIf="citiesData.length === 0">
-                  <td colspan="8" class="text-center py-4 text-gray-500">No city analytics records found.</td>
+                  <td colspan="9" class="text-center py-4 text-gray-500">No city analytics records found.</td>
                 </tr>
               </tbody>
             </table>

@@ -14,6 +14,14 @@ $text-light: #64748B;
   font-family: 'Inter', sans-serif;
   color: $text-dark;
 
+  @media (max-width: 480px) {
+    padding: 16px 12px;
+  }
+
+  @media (max-width: 375px) {
+    padding: 12px 10px;
+  }
+
   .header-section {
     display: flex;
     justify-content: space-between;
@@ -22,28 +30,44 @@ $text-light: #64748B;
     margin-bottom: 24px;
     flex-wrap: wrap;
 
+    @media (max-width: 1024px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
     .title-container {
       display: flex;
       align-items: center;
       gap: 16px;
+      flex: 1;
+      min-width: 200px;
 
       .back-btn {
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
       }
 
       .page-title {
         font-size: 24px;
         font-weight: 600;
         margin: 0;
+
+        @media (max-width: 480px) {
+          font-size: 20px;
+        }
       }
 
       .page-subtitle {
         font-size: 13px;
         margin-top: 4px;
         margin-bottom: 0;
+
+        @media (max-width: 480px) {
+          font-size: 12px;
+        }
       }
     }
 
@@ -53,6 +77,15 @@ $text-light: #64748B;
       gap: 12px;
       flex-wrap: wrap;
       justify-content: flex-end;
+
+      @media (max-width: 1024px) {
+        justify-content: flex-start;
+        width: 100%;
+      }
+
+      @media (max-width: 640px) {
+        gap: 8px;
+      }
 
       .search-box {
         display: flex;
@@ -65,6 +98,14 @@ $text-light: #64748B;
         height: 42px;
         width: 240px;
         transition: all 0.2s;
+        flex: 1;
+        max-width: 300px;
+        min-width: 160px;
+
+        @media (max-width: 640px) {
+          max-width: 100%;
+          flex: 1 1 100%;
+        }
 
         &:focus-within {
           border-color: $primary;
@@ -102,6 +143,14 @@ $text-light: #64748B;
         transition: all 0.2s ease;
         white-space: nowrap;
         height: 42px;
+        flex-shrink: 0;
+
+        @media (max-width: 640px) {
+          padding: 8px 14px;
+          font-size: 13px;
+          flex: 1;
+          min-width: 80px;
+        }
       }
 
       .btn-secondary {
@@ -164,6 +213,15 @@ $text-light: #64748B;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     margin-bottom: 24px;
 
+    @media (max-width: 480px) {
+      padding: 14px 12px;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 375px) {
+      padding: 12px 8px;
+    }
+
     .table-header {
       display: flex;
       justify-content: space-between;
@@ -171,12 +229,25 @@ $text-light: #64748B;
       margin-bottom: 18px;
       border-bottom: 1px solid #F1F5F9;
       padding-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
 
       .table-title {
         font-size: 16px;
         font-weight: 700;
         color: $text-dark;
         margin: 0;
+
+        @media (max-width: 480px) {
+          font-size: 14px;
+        }
       }
 
       .table-toolbar {
@@ -210,24 +281,56 @@ $text-light: #64748B;
 
     .table-wrapper {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #F1F5F9;
+        border-radius: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 4px;
+
+        &:hover {
+          background: #94A3B8;
+        }
+      }
 
       table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
+        min-width: 700px;
+
+        @media (max-width: 480px) {
+          min-width: 600px;
+        }
 
         thead {
           tr {
-            background: #435FFF;
+            // Fixed: use $primary to match project theme
+            background: $primary;
           }
 
           th {
             color: white;
-            padding: 14px 16px;
-            font-size: 13px;
+            padding: 12px 14px;
+            font-size: 12px;
             font-weight: 600;
             text-align: left;
             border: none;
+            white-space: nowrap;
+            background: $primary;
+
+            @media (max-width: 480px) {
+              padding: 10px 10px;
+              font-size: 11px;
+            }
 
             &:first-child {
               border-top-left-radius: 8px;
@@ -247,7 +350,7 @@ $text-light: #64748B;
               user-select: none;
 
               &:hover {
-                background-color: color.adjust(#435FFF, $lightness: -5%);
+                background-color: #4F46E5;
               }
             }
 
@@ -267,11 +370,17 @@ $text-light: #64748B;
             }
 
             td {
-              padding: 14px 16px;
-              font-size: 13.5px;
+              padding: 12px 14px;
+              font-size: 13px;
               color: $text-dark;
               border-bottom: 1px solid #F1F5F9;
               vertical-align: middle;
+              white-space: nowrap;
+
+              @media (max-width: 480px) {
+                padding: 10px 10px;
+                font-size: 12px;
+              }
 
               &.text-center {
                 text-align: center;
@@ -288,6 +397,12 @@ $text-light: #64748B;
               &.text-light {
                 color: $text-light;
               }
+
+              // View button cell
+              &.action-cell {
+                text-align: center;
+                padding: 8px 10px;
+              }
             }
 
             &:last-child td {
@@ -298,28 +413,70 @@ $text-light: #64748B;
       }
     }
 
+    // View Analytics button inside table rows
+    .btn-view {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      background: $primary-light;
+      color: $primary;
+      border: 1.5px solid rgba(99, 102, 241, 0.25);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+
+      svg {
+        flex-shrink: 0;
+      }
+
+      &:hover {
+        background: $primary;
+        color: white;
+        border-color: $primary;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+      }
+    }
+
     .pagination-section {
-      padding-top: 20px;
+      padding-top: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-top: 1px solid #F1F5F9;
-      margin-top: 20px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
 
       .showing-text {
-        font-size: 14px;
+        font-size: 13px;
         color: $text-light;
         font-weight: 500;
+
+        @media (max-width: 480px) {
+          font-size: 12px;
+        }
       }
 
       .pagination-controls {
         display: flex;
-        gap: 6px;
+        gap: 5px;
+        flex-wrap: wrap;
 
         .page-btn {
-          min-width: 34px;
-          height: 34px;
-          padding: 0 8px;
+          min-width: 32px;
+          height: 32px;
+          padding: 0 7px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -327,7 +484,7 @@ $text-light: #64748B;
           border: 1px solid #E2E8F0;
           background: white;
           color: $text-dark;
-          font-size: 13.5px;
+          font-size: 13px;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
