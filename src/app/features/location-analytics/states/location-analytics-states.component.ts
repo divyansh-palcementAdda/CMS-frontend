@@ -803,4 +803,10 @@ export class LocationAnalyticsStatesComponent implements OnInit, OnDestroy {
     const q = this.searchTerms.courseType.toLowerCase().trim();
     return this.courseTypes.filter(c => c.name.toLowerCase().includes(q));
   }
+
+  navigateToStateDetail(stateName: string | undefined): void {
+    if (!stateName) return;
+    this.router.navigate(['/location-analytics/states', encodeURIComponent(stateName)]);
+  }
 }
+

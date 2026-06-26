@@ -803,4 +803,9 @@ export class LocationAnalyticsCitiesComponent implements OnInit, OnDestroy {
     const q = this.searchTerms.courseType.toLowerCase().trim();
     return this.courseTypes.filter(c => c.name.toLowerCase().includes(q));
   }
+
+  navigateToCityDetail(cityId: number | undefined): void {
+    if (cityId == null) return;
+    this.router.navigate(['/location-analytics/cities', cityId]);
+  }
 }

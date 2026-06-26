@@ -160,7 +160,7 @@
                   <td class="text-center text-bold">{{ item.cancelledApplications }}</td>
                   <td class="text-center text-bold">{{ item.cancelledAdmissions }}</td>
                   <td class="action-cell">
-                    <button class="btn-view" [routerLink]="['/location-analytics/cities', item.city]" title="View analytics for {{ item.city }}">
+                    <button class="btn-view" (click)="navigateToCityDetail(item.cityId)" title="View analytics for {{ item.city }}">
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
@@ -168,6 +168,7 @@
                       View
                     </button>
                   </td>
+
                 </tr>
                 <tr *ngIf="citiesData.length === 0">
                   <td colspan="9" class="text-center py-4 text-gray-500">No city analytics records found.</td>

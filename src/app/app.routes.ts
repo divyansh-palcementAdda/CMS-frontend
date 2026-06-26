@@ -150,11 +150,24 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' }
   },
   {
+    path: 'location-analytics/cities/:cityId',
+    loadComponent: () => import('./features/location-analytics/city-detail/city-detail.component').then(m => m.CityDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
     path: 'location-analytics/states',
     loadComponent: () => import('./features/location-analytics/states/location-analytics-states.component').then(m => m.LocationAnalyticsStatesComponent),
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  {
+    path: 'location-analytics/states/:stateId',
+    loadComponent: () => import('./features/location-analytics/state-detail/state-detail.component').then(m => m.StateDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
   { path: '**', redirectTo: '/admin/dashboard' }
+
 ];
 

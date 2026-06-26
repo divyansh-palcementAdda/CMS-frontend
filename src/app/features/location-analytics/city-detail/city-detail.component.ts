@@ -1,0 +1,387 @@
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
+import { TopbarComponent } from '../../../shared/components/topbar/topbar.component';
+import { DownloadConfirmationModalComponent } from '../../../shared/components/download-confirmation-modal/download-confirmation-modal.component';
+import { StudentAnalyticsModalComponent } from '../../../shared/components/student-analytics-modal/student-analytics-modal.component';
+
+import { LocationAnalyticsService } from '../../../core/services/location-analytics.service';
+import {
+  CityDetailDTO,
+  UserBreakdown,
+  ConsultancyBreakdown,
+  InstitutionBreakdown,
+  CourseBreakdown,
+  CourseTypeBreakdown,
+  LeadSourceBreakdown
+} from '../../../core/models/location-analytics.model';
+
+@Component({
+  selector: 'app-city-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    SidebarComponent,
+    TopbarComponent,
+    DownloadConfirmationModalComponent,
+    StudentAnalyticsModalComponent
+  ],
+  templateUrl: './city-detail.component.html',
+  styleUrls: ['./city-detail.component.scss']
+})
+export class CityDetailComponent implements OnInit, OnDestroy {
+
+  cityId!: number;
+  cityDetail: CityDetailDTO | null = null;
+  loading = true;
+  private destroy$ = new Subject<void>();
+
+  // --- Student List ---
+  totalApplications = signal<any[]>([]);
+  cancelledApplications = signal<any[]>([]);
+  totalAdmissions = signal<any[]>([]);
+  cancelledAdmissions = signal<any[]>([]);
+
+  totalAppPage = 1; totalAppPageSize = 10; totalAppTotal = 0; totalAppSearch = ''; totalAppSortBy = 'date'; totalAppSortDir = 'desc';
+  cancelledAppPage = 1; cancelledAppPageSize = 10; cancelledAppTotal = 0; cancelledAppSearch = ''; cancelledAppSortBy = 'date'; cancelledAppSortDir = 'desc';
+  totalAdmPage = 1; totalAdmPageSize = 10; totalAdmTotal = 0; totalAdmSearch = ''; totalAdmSortBy = 'date'; totalAdmSortDir = 'desc';
+  cancelledAdmPage = 1; cancelledAdmPageSize = 10; cancelledAdmTotal = 0; cancelledAdmSearch = ''; cancelledAdmSortBy = 'date'; cancelledAdmSortDir = 'desc';
+  appFilterSource: string | null = null; appFilterScholar: boolean | null = null;
+  admFilterSource: string | null = null; admFilterScholar: boolean | null = null;
+
+  // --- User Breakdown ---
+  userBreakdownList = signal<UserBreakdown[]>([]);
+  userPage = 1; userPageSize = 10; userTotal = 0; userSortBy = 'userName'; userSortDir = 'asc';
+
+  // --- Consultancy Breakdown ---
+  consultancyList = signal<ConsultancyBreakdown[]>([]);
+  consPage = 1; consPageSize = 10; consTotal = 0; consSortBy = 'consultancyName'; consSortDir = 'asc';
+
+  // --- Institution Breakdown ---
+  institutionList = signal<InstitutionBreakdown[]>([]);
+  instPage = 1; instPageSize = 10; instTotal = 0; instSortBy = 'institutionName'; instSortDir = 'asc';
+
+  // --- Course Breakdown ---
+  courseList = signal<CourseBreakdown[]>([]);
+  coursePage = 1; coursePageSize = 10; courseTotal = 0; courseSortBy = 'courseName'; courseSortDir = 'asc';
+
+  // --- Course Type Breakdown ---
+  courseTypeList: CourseTypeBreakdown[] = [];
+
+  // --- Lead Source Breakdown ---
+  leadSourceList: LeadSourceBreakdown[] = [];
+
+  // --- Analytics Modal ---
+  showAnalyticsModal = false;
+  modalUserId = 0;
+  modalUserName = '';
+  modalInitialTab = 'ALL_APPLICATIONS';
+
+  // --- Export ---
+  exporting: { [key: string]: boolean } = {};
+  showDownloadModal: { [key: string]: boolean } = {};
+
+  constructor(
+    private route: ActivatedRoute,
+    public router: Router,
+    private locationAnalyticsService: LocationAnalyticsService
+  ) {}
+
+  ngOnInit(): void {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const id = params.get('cityId');
+      if (id) {
+        this.cityId = +id;
+        this.loadAll();
+      }
+    });
+
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      if (params['showAnalyticsModal'] === 'true') {
+        this.modalUserId = Number(params['modalUserId'] || 0);
+        this.modalUserName = params['modalUserName'] || '';
+        this.modalInitialTab = params['modalInitialTab'] || 'ALL_APPLICATIONS';
+        this.showAnalyticsModal = true;
+      } else {
+        this.showAnalyticsModal = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadAll(): void {
+    this.loading = true;
+    this.locationAnalyticsService.getCityDetail(this.cityId).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data) => {
+        this.cityDetail = data;
+        this.loading = false;
+        this.loadStudents('remaining_applications');
+        this.loadStudents('cancelled_applications');
+        this.loadStudents('confirmed_admissions');
+        this.loadStudents('cancelled_admissions');
+        this.loadUserBreakdown();
+        this.loadConsultancyBreakdown();
+        this.loadInstitutionBreakdown();
+        this.loadCourseBreakdown();
+        this.loadCourseTypeBreakdown();
+        this.loadLeadSourceBreakdown();
+      },
+      error: (err) => {
+        console.error('Error loading city detail:', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  // ---- Student List ----
+  loadStudents(tab: string): void {
+    let page: number, size: number, search: string, source: string | null, scholar: boolean | null, sortBy: string, sortDir: string;
+    switch (tab) {
+      case 'remaining_applications':
+        page = this.totalAppPage - 1; size = this.totalAppPageSize; search = this.totalAppSearch; source = this.appFilterSource; scholar = this.appFilterScholar; sortBy = this.totalAppSortBy; sortDir = this.totalAppSortDir; break;
+      case 'cancelled_applications':
+        page = this.cancelledAppPage - 1; size = this.cancelledAppPageSize; search = this.cancelledAppSearch; source = null; scholar = null; sortBy = this.cancelledAppSortBy; sortDir = this.cancelledAppSortDir; break;
+      case 'confirmed_admissions':
+        page = this.totalAdmPage - 1; size = this.totalAdmPageSize; search = this.totalAdmSearch; source = this.admFilterSource; scholar = this.admFilterScholar; sortBy = this.totalAdmSortBy; sortDir = this.totalAdmSortDir; break;
+      case 'cancelled_admissions':
+        page = this.cancelledAdmPage - 1; size = this.cancelledAdmPageSize; search = this.cancelledAdmSearch; source = null; scholar = null; sortBy = this.cancelledAdmSortBy; sortDir = this.cancelledAdmSortDir; break;
+      default: return;
+    }
+    this.locationAnalyticsService.getCityStudentsPaged(this.cityId, page, size, tab, search, source || '', scholar, sortBy, sortDir)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => {
+          const content = res.content || [];
+          const total = res.totalElements || 0;
+          switch (tab) {
+            case 'remaining_applications': this.totalApplications.set(content); this.totalAppTotal = total; break;
+            case 'cancelled_applications': this.cancelledApplications.set(content); this.cancelledAppTotal = total; break;
+            case 'confirmed_admissions': this.totalAdmissions.set(content); this.totalAdmTotal = total; break;
+            case 'cancelled_admissions': this.cancelledAdmissions.set(content); this.cancelledAdmTotal = total; break;
+          }
+        },
+        error: err => console.error(`Error loading city students (${tab}):`, err)
+      });
+  }
+
+  // ---- User Breakdown ----
+  loadUserBreakdown(): void {
+    this.locationAnalyticsService.getCityUserBreakdown(this.cityId, this.userPage - 1, this.userPageSize, this.userSortBy, this.userSortDir)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => { this.userBreakdownList.set(res.content || []); this.userTotal = res.totalElements || 0; },
+        error: err => console.error('Error loading city user breakdown:', err)
+      });
+  }
+
+  // ---- Consultancy Breakdown ----
+  loadConsultancyBreakdown(): void {
+    this.locationAnalyticsService.getCityConsultancyBreakdown(this.cityId, this.consPage - 1, this.consPageSize, this.consSortBy, this.consSortDir)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => { this.consultancyList.set(res.content || []); this.consTotal = res.totalElements || 0; },
+        error: err => console.error('Error loading city consultancy breakdown:', err)
+      });
+  }
+
+  // ---- Institution Breakdown ----
+  loadInstitutionBreakdown(): void {
+    this.locationAnalyticsService.getCityInstitutionBreakdown(this.cityId, this.instPage - 1, this.instPageSize, this.instSortBy, this.instSortDir)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => { this.institutionList.set(res.content || []); this.instTotal = res.totalElements || 0; },
+        error: err => console.error('Error loading city institution breakdown:', err)
+      });
+  }
+
+  // ---- Course Breakdown ----
+  loadCourseBreakdown(): void {
+    this.locationAnalyticsService.getCityCourseBreakdown(this.cityId, this.coursePage - 1, this.coursePageSize, this.courseSortBy, this.courseSortDir)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => { this.courseList.set(res.content || []); this.courseTotal = res.totalElements || 0; },
+        error: err => console.error('Error loading city course breakdown:', err)
+      });
+  }
+
+  // ---- Course Type Breakdown ----
+  loadCourseTypeBreakdown(): void {
+    this.locationAnalyticsService.getCityCourseTypeBreakdown(this.cityId)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => { this.courseTypeList = res || []; },
+        error: err => console.error('Error loading city course type breakdown:', err)
+      });
+  }
+
+  // ---- Lead Source Breakdown ----
+  loadLeadSourceBreakdown(): void {
+    this.locationAnalyticsService.getCityLeadSourceBreakdown(this.cityId)
+      .pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => { this.leadSourceList = res || []; },
+        error: err => console.error('Error loading city lead source breakdown:', err)
+      });
+  }
+
+  // ---- Sorting ----
+  sortStudents(tab: string, col: string): void {
+    switch (tab) {
+      case 'remaining_applications': this.totalAppSortDir = this.totalAppSortBy === col ? (this.totalAppSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.totalAppSortBy = col; this.totalAppPage = 1; break;
+      case 'cancelled_applications': this.cancelledAppSortDir = this.cancelledAppSortBy === col ? (this.cancelledAppSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.cancelledAppSortBy = col; this.cancelledAppPage = 1; break;
+      case 'confirmed_admissions': this.totalAdmSortDir = this.totalAdmSortBy === col ? (this.totalAdmSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.totalAdmSortBy = col; this.totalAdmPage = 1; break;
+      case 'cancelled_admissions': this.cancelledAdmSortDir = this.cancelledAdmSortBy === col ? (this.cancelledAdmSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.cancelledAdmSortBy = col; this.cancelledAdmPage = 1; break;
+    }
+    this.loadStudents(tab);
+  }
+
+  sortUsers(col: string): void { this.userSortDir = this.userSortBy === col ? (this.userSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.userSortBy = col; this.userPage = 1; this.loadUserBreakdown(); }
+  sortCons(col: string): void { this.consSortDir = this.consSortBy === col ? (this.consSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.consSortBy = col; this.consPage = 1; this.loadConsultancyBreakdown(); }
+  sortInst(col: string): void { this.instSortDir = this.instSortBy === col ? (this.instSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.instSortBy = col; this.instPage = 1; this.loadInstitutionBreakdown(); }
+  sortCourse(col: string): void { this.courseSortDir = this.courseSortBy === col ? (this.courseSortDir === 'asc' ? 'desc' : 'asc') : 'asc'; this.courseSortBy = col; this.coursePage = 1; this.loadCourseBreakdown(); }
+
+  getSortIcon(sortBy: string, col: string, sortDir: string): string {
+    return sortBy === col ? (sortDir === 'asc' ? 'bx-chevron-up' : 'bx-chevron-down') : 'bx-sort';
+  }
+
+  // ---- Pagination ----
+  getTotalPages(total: number, size: number): number { return Math.max(1, Math.ceil(total / size)); }
+
+  changeTotalAppPage(d: number): void { this.totalAppPage += d; this.loadStudents('remaining_applications'); }
+  changeCancelledAppPage(d: number): void { this.cancelledAppPage += d; this.loadStudents('cancelled_applications'); }
+  changeTotalAdmPage(d: number): void { this.totalAdmPage += d; this.loadStudents('confirmed_admissions'); }
+  changeCancelledAdmPage(d: number): void { this.cancelledAdmPage += d; this.loadStudents('cancelled_admissions'); }
+  changeUserPage(d: number): void { this.userPage += d; this.loadUserBreakdown(); }
+  changeConsPage(d: number): void { this.consPage += d; this.loadConsultancyBreakdown(); }
+  changeInstPage(d: number): void { this.instPage += d; this.loadInstitutionBreakdown(); }
+  changeCoursePage(d: number): void { this.coursePage += d; this.loadCourseBreakdown(); }
+
+  onTotalAppSizeChange(): void { this.totalAppPage = 1; this.loadStudents('remaining_applications'); }
+  onCancelledAppSizeChange(): void { this.cancelledAppPage = 1; this.loadStudents('cancelled_applications'); }
+  onTotalAdmSizeChange(): void { this.totalAdmPage = 1; this.loadStudents('confirmed_admissions'); }
+  onCancelledAdmSizeChange(): void { this.cancelledAdmPage = 1; this.loadStudents('cancelled_admissions'); }
+
+  onTotalAppSearchChange(): void { this.totalAppPage = 1; this.loadStudents('remaining_applications'); }
+  onCancelledAppSearchChange(): void { this.cancelledAppPage = 1; this.loadStudents('cancelled_applications'); }
+  onTotalAdmSearchChange(): void { this.totalAdmPage = 1; this.loadStudents('confirmed_admissions'); }
+  onCancelledAdmSearchChange(): void { this.cancelledAdmPage = 1; this.loadStudents('cancelled_admissions'); }
+
+  onUserSizeChange(): void { this.userPage = 1; this.loadUserBreakdown(); }
+  onConsSizeChange(): void { this.consPage = 1; this.loadConsultancyBreakdown(); }
+  onInstSizeChange(): void { this.instPage = 1; this.loadInstitutionBreakdown(); }
+  onCourseSizeChange(): void { this.coursePage = 1; this.loadCourseBreakdown(); }
+
+  // ---- Filters ----
+  clearAppFilter(): void { this.appFilterSource = null; this.appFilterScholar = null; this.totalAppPage = 1; this.loadStudents('remaining_applications'); }
+  clearAdmFilter(): void { this.admFilterSource = null; this.admFilterScholar = null; this.totalAdmPage = 1; this.loadStudents('confirmed_admissions'); }
+
+  // ---- Export ----
+  downloadBlob(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    window.URL.revokeObjectURL(url); document.body.removeChild(a);
+  }
+
+  exportStudents(tab: string): void {
+    const key = `students_${tab}`;
+    this.exporting[key] = true;
+    let search = '', source = '', scholar: boolean | null = null;
+    if (tab === 'remaining_applications') { search = this.totalAppSearch; source = this.appFilterSource || ''; scholar = this.appFilterScholar; }
+    else if (tab === 'confirmed_admissions') { search = this.totalAdmSearch; source = this.admFilterSource || ''; scholar = this.admFilterScholar; }
+    else if (tab === 'cancelled_applications') { search = this.cancelledAppSearch; }
+    else if (tab === 'cancelled_admissions') { search = this.cancelledAdmSearch; }
+    this.locationAnalyticsService.exportCityStudents(this.cityId, tab, search, source, scholar).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_${tab}.xlsx`); this.exporting[key] = false; },
+      error: (err) => { console.error(err); this.exporting[key] = false; }
+    });
+  }
+
+  exportUsers(): void {
+    this.exporting['users'] = true;
+    this.locationAnalyticsService.exportCityUsers(this.cityId, undefined, this.userSortBy, this.userSortDir).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_Users.xlsx`); this.exporting['users'] = false; },
+      error: (err) => { console.error(err); this.exporting['users'] = false; }
+    });
+  }
+
+  exportConsultancies(): void {
+    this.exporting['consultancies'] = true;
+    this.locationAnalyticsService.exportCityConsultancies(this.cityId, undefined, this.consSortBy, this.consSortDir).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_Consultancies.xlsx`); this.exporting['consultancies'] = false; },
+      error: (err) => { console.error(err); this.exporting['consultancies'] = false; }
+    });
+  }
+
+  exportInstitutions(): void {
+    this.exporting['institutions'] = true;
+    this.locationAnalyticsService.exportCityInstitutions(this.cityId, undefined, this.instSortBy, this.instSortDir).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_Institutions.xlsx`); this.exporting['institutions'] = false; },
+      error: (err) => { console.error(err); this.exporting['institutions'] = false; }
+    });
+  }
+
+  exportCourses(): void {
+    this.exporting['courses'] = true;
+    this.locationAnalyticsService.exportCityCourses(this.cityId, undefined, this.courseSortBy, this.courseSortDir).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_Courses.xlsx`); this.exporting['courses'] = false; },
+      error: (err) => { console.error(err); this.exporting['courses'] = false; }
+    });
+  }
+
+  exportCourseTypes(): void {
+    this.exporting['courseTypes'] = true;
+    this.locationAnalyticsService.exportCityCourseTypes(this.cityId).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_CourseTypes.xlsx`); this.exporting['courseTypes'] = false; },
+      error: (err) => { console.error(err); this.exporting['courseTypes'] = false; }
+    });
+  }
+
+  exportLeadSources(): void {
+    this.exporting['leadSources'] = true;
+    this.locationAnalyticsService.exportCityLeadSources(this.cityId).subscribe({
+      next: (blob) => { this.downloadBlob(blob, `City_${this.cityId}_LeadSources.xlsx`); this.exporting['leadSources'] = false; },
+      error: (err) => { console.error(err); this.exporting['leadSources'] = false; }
+    });
+  }
+
+  // ---- Analytics Modal ----
+  onViewDetails(userId: number, userName: string, initialTab: string): void {
+    this.modalUserId = userId; this.modalUserName = userName; this.modalInitialTab = initialTab;
+    this.showAnalyticsModal = true;
+    this.router.navigate([], { relativeTo: this.route, queryParams: { showAnalyticsModal: 'true', modalUserId: userId, modalUserName: userName, modalInitialTab: initialTab }, queryParamsHandling: 'merge' });
+  }
+
+  onCloseAnalyticsModal(): void {
+    this.showAnalyticsModal = false;
+    this.router.navigate([], { relativeTo: this.route, queryParams: { showAnalyticsModal: null, modalUserId: null, modalUserName: null, modalInitialTab: null }, queryParamsHandling: 'merge' });
+  }
+
+  // ---- Navigation ----
+  goBack(): void { this.router.navigate(['/location-analytics/cities']); }
+  onViewAdmission(id: number): void { this.router.navigate(['/admissions', id]); }
+  onViewUser(userId: number): void { this.router.navigate(['/users', userId]); }
+  onViewCourse(id: number): void { this.router.navigate(['/courses', id]); }
+  onViewConsultancy(id: number): void { this.router.navigate(['/consultancy', id]); }
+  onViewInstitution(id: number): void { this.router.navigate(['/institutions', id]); }
+
+  scrollTo(id: string): void {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Getters
+  get paginatedTotalApplications(): any[] { return this.totalApplications(); }
+  get paginatedCancelledApplications(): any[] { return this.cancelledApplications(); }
+  get paginatedTotalAdmissions(): any[] { return this.totalAdmissions(); }
+  get paginatedCancelledAdmissions(): any[] { return this.cancelledAdmissions(); }
+  get paginatedUsers(): UserBreakdown[] { return this.userBreakdownList(); }
+  get paginatedConsultancies(): ConsultancyBreakdown[] { return this.consultancyList(); }
+  get paginatedInstitutions(): InstitutionBreakdown[] { return this.institutionList(); }
+  get paginatedCourses(): CourseBreakdown[] { return this.courseList(); }
+}
