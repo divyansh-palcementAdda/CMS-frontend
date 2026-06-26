@@ -47,7 +47,7 @@
                         </button>
                         <div class="nav-divider"></div>
 
-                        <div class="report-tabs-scroll-container">
+                        <div class="report-tabs-scroll-container" #tabsScrollContainer>
                             <div class="report-tabs">
                                 <button *ngFor="let type of reportTypes" [class.active]="activeReport === type.id"
                                     (click)="setReport(type.id)" class="tab-btn">

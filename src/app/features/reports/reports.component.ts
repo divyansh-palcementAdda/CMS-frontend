@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportsService, ReportFilter } from '../../core/services/reports.service';
@@ -87,12 +87,16 @@ const COMMON_CHART_OPTIONS = {
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss'
 })
-export class ReportsComponent implements OnInit, OnDestroy {
+export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
   private reportsService = inject(ReportsService);
   private courseService = inject(CourseService);
   private leadSourceService = inject(LeadSourceService);
   private userService = inject(UserService);
   private consultancyService = inject(ConsultancyService);
+
+  @ViewChild('tabsScrollContainer') tabsScrollContainer!: ElementRef<HTMLElement>;
+
+  private tabsWheelListener?: (e: WheelEvent) => void;
 
   coursesList: any[] = [];
   leadSourcesList: any[] = [];
@@ -229,6 +233,22 @@ export class ReportsComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit() {
+    if (this.tabsScrollContainer?.nativeElement) {
+      this.tabsWheelListener = (e: WheelEvent) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          this.tabsScrollContainer.nativeElement.scrollLeft += e.deltaY;
+        }
+      };
+      this.tabsScrollContainer.nativeElement.addEventListener(
+        'wheel',
+        this.tabsWheelListener,
+        { passive: false }
+      );
+    }
+  }
+
   private generateSessions() {
     const currentYear = new Date().getFullYear();
     const years = ['OVERALL'];
@@ -277,6 +297,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.tabsScrollContainer?.nativeElement && this.tabsWheelListener) {
+      this.tabsScrollContainer.nativeElement.removeEventListener('wheel', this.tabsWheelListener);
+    }
   }
 
   nextPage() {
