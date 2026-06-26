@@ -92,6 +92,29 @@
 
                     <!-- Live Today Counters Grid -->
                     <div class="today-counters-grid" *ngIf="pageData">
+                        <!-- Total Admissions Hero Card -->
+                        <div class="today-stat-card total-today-card" [class.active]="filters.statFilter === ''"
+                            (click)="onStatFilter('')">
+                            <div class="today-card-glow"></div>
+                            <div class="today-card-content">
+                                <div class="today-icon-container">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <div class="today-card-details">
+                                    <span class="today-label">{{ labels.total }}</span>
+                                    <span class="today-value">
+                                        {{ isApplicationTab ? pageData.stats.totalApplication : (filters.tab === 'Admission' ? pageData.stats.admTotal : pageData.stats.totalApplication) }}
+                                    </span>
+                                    <span class="today-desc">{{ labels.totalDesc }}</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Today's Applications Card -->
                         <div class="today-stat-card app-today-card"
                             *ngIf="filters.tab === '' || filters.tab === 'applications'">
@@ -131,33 +154,8 @@
 
                     <!-- Unified Stats Section -->
                     <div class="stats-container" *ngIf="pageData">
-                        <!-- Hero Card & Sub Grids Layout -->
+                        <!-- Sub Grids Layout -->
                         <div class="stats-dashboard-grid">
-
-                            <!-- Left: Hero Card (Total Applications / Admissions) -->
-                            <div class="hero-stat-card card-glass-glow" [class.active]="filters.statFilter === ''"
-                                (click)="onStatFilter('')">
-                                <div class="hero-glow-effect"></div>
-                                <div class="hero-icon-container">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg>
-                                </div>
-                                <div class="hero-content">
-                                    <h4 class="hero-label">{{ labels.total }}</h4>
-                                    <div class="hero-value-wrapper">
-                                        <span class="hero-value">
-                                            {{ isApplicationTab ? pageData.stats.totalApplication : (filters.tab ===
-                                            'Admission' ? pageData.stats.admTotal : pageData.stats.totalApplication) }}
-                                        </span>
-                                        <span class="hero-badge">Active</span>
-                                    </div>
-                                    <p class="hero-description">{{ labels.totalDesc }}</p>
-                                </div>
-                            </div>
 
                             <!-- Right: Detailed Breakdowns -->
                             <div class="breakdowns-wrapper">

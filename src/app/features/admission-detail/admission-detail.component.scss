@@ -461,12 +461,26 @@ input:checked + .slider:before { transform: translateX(14px); }
 .history-table-container {
   background: white;
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f8fafc;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
 }
 
 .history-table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   text-align: left;
 
@@ -561,6 +575,94 @@ input:checked + .slider:before { transform: translateX(14px); }
       color: #B45309;
       margin: 6px 0 0 0;
       line-height: 1.4;
+    }
+  }
+}
+
+// ── Responsive: Header Buttons ────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .title-left {
+      .student-title h1 {
+        font-size: 22px;
+      }
+    }
+
+    .title-actions {
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      button {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 9px 14px;
+        font-size: 13px;
+        min-width: 0;
+
+        span { white-space: nowrap; }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    .title-left {
+      gap: 10px;
+
+      .student-title h1 {
+        font-size: 18px;
+      }
+
+      .student-title .enrollment-id {
+        font-size: 12px;
+      }
+    }
+
+    .title-actions {
+      gap: 6px;
+
+      button {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+
+        svg {
+          width: 15px;
+          height: 15px;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .page-header {
+    .title-left {
+      .student-title h1 {
+        font-size: 16px;
+      }
+    }
+
+    .title-actions {
+      button {
+        flex: 1 1 45%;
+        padding: 8px 8px;
+        font-size: 11px;
+        gap: 5px;
+
+        svg {
+          width: 14px;
+          height: 14px;
+        }
+      }
     }
   }
 }
