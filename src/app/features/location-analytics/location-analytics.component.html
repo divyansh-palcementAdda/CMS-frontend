@@ -1,0 +1,657 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+
+    <main class="main-content" style="padding: 0; background: transparent;">
+      <div class="location-analytics-wrapper">
+        
+        <!-- Header Section -->
+        <div class="header-section">
+          <div class="title-container">
+            <div class="back-btn" title="Back" routerLink="/admin/dashboard">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#6366F1" />
+                <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="page-title">Location Analytics</h2>
+              <p class="page-subtitle text-light">City-wise and State-wise student application and admission analytics</p>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <!-- Search Box -->
+            <div class="search-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" placeholder="Search city or state..." [ngModel]="searchTerm" (ngModelChange)="onSearchChange($event)">
+            </div>
+
+            <!-- Actions buttons -->
+            <button class="btn-secondary" (click)="resetFilters()" title="Reset all filters">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6"></path>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              <span>Reset</span>
+            </button>
+
+            <button class="btn-secondary filter-btn" (click)="showFilterDrawer = true" [class.active-filters]="activeFilterCount > 0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <span>Filters</span>
+              <span class="filter-badge" *ngIf="activeFilterCount > 0">{{ activeFilterCount }}</span>
+            </button>
+
+            <button class="btn-secondary" (click)="refreshData()" title="Refresh statistics">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+              </svg>
+              <span>Refresh</span>
+            </button>
+
+            <button class="btn-primary" (click)="placeholderDownload()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Export Excel</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loader State -->
+        <div *ngIf="loading" class="flex justify-center items-center h-full min-h-[400px]">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <ng-container *ngIf="!loading">
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <!-- Top City by Applications -->
+            <div class="stat-card">
+              <div class="stat-content">
+                <span class="stat-label">Top City (Applications)</span>
+                <div class="stat-icon-wrapper purple">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 20 10.2c0 7.3-8 11.8-8 11.8z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value text-truncate" [title]="topCityByAppsName">{{ topCityByAppsName }}</div>
+              <div class="stat-subtext">{{ topCityByAppsCount }} total applications</div>
+            </div>
+
+            <!-- Top City by Admissions -->
+            <div class="stat-card">
+              <div class="stat-content">
+                <span class="stat-label">Top City (Admissions)</span>
+                <div class="stat-icon-wrapper purple">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value text-truncate" [title]="topCityByAdmsName">{{ topCityByAdmsName }}</div>
+              <div class="stat-subtext">{{ topCityByAdmsCount }} total admissions</div>
+            </div>
+
+            <!-- Top State by Applications -->
+            <div class="stat-card">
+              <div class="stat-content">
+                <span class="stat-label">Top State (Applications)</span>
+                <div class="stat-icon-wrapper purple">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" y1="22" x2="4" y2="15"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value text-truncate" [title]="topStateByAppsName">{{ topStateByAppsName }}</div>
+              <div class="stat-subtext">{{ topStateByAppsCount }} total applications</div>
+            </div>
+
+            <!-- Top State by Admissions -->
+            <div class="stat-card">
+              <div class="stat-content">
+                <span class="stat-label">Top State (Admissions)</span>
+                <div class="stat-icon-wrapper purple">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value text-truncate" [title]="topStateByAdmsName">{{ topStateByAdmsName }}</div>
+              <div class="stat-subtext">{{ topStateByAdmsCount }} total admissions</div>
+            </div>
+          </div>
+
+          <!-- Top 5 Rankings Grid -->
+          <div class="rankings-grid">
+            
+            <!-- Table 1: Top 5 Cities by Applications -->
+            <div class="table-card stat-card table-only">
+              <div class="table-header">
+                <h3 class="table-title">Top 5 Cities by Applications</h3>
+                <a routerLink="/location-analytics/cities" class="view-all-link">View All Cities ({{ totalCitiesCount }}) &rarr;</a>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="text-center" style="width: 60px;">S.NO</th>
+                      <th>City</th>
+                      <th>State</th>
+                      <th class="text-center">Applications</th>
+                      <th class="text-center">Admissions</th>
+                      <th class="text-center">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of topCitiesByApps; let i = index">
+                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
+                      <td class="text-light">{{ item.state }}</td>
+                      <td class="text-center text-bold">{{ item.totalApplications }}</td>
+                      <td class="text-center">{{ item.totalAdmissions }}</td>
+                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    </tr>
+                    <tr *ngIf="topCitiesByApps.length === 0">
+                      <td colspan="6" class="text-center py-4 text-gray-500">No data found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Table 2: Top 5 Cities by Admissions -->
+            <div class="table-card stat-card table-only">
+              <div class="table-header">
+                <h3 class="table-title">Top 5 Cities by Admissions</h3>
+                <a routerLink="/location-analytics/cities" class="view-all-link">View All Cities ({{ totalCitiesCount }}) &rarr;</a>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="text-center" style="width: 60px;">S.NO</th>
+                      <th>City</th>
+                      <th>State</th>
+                      <th class="text-center">Applications</th>
+                      <th class="text-center">Admissions</th>
+                      <th class="text-center">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of topCitiesByAdms; let i = index">
+                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
+                      <td class="text-light">{{ item.state }}</td>
+                      <td class="text-center">{{ item.totalApplications }}</td>
+                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    </tr>
+                    <tr *ngIf="topCitiesByAdms.length === 0">
+                      <td colspan="6" class="text-center py-4 text-gray-500">No data found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Table 3: Top 5 States by Applications -->
+            <div class="table-card stat-card table-only">
+              <div class="table-header">
+                <h3 class="table-title">Top 5 States by Applications</h3>
+                <a routerLink="/location-analytics/states" class="view-all-link">View All States ({{ totalStatesCount }}) &rarr;</a>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="text-center" style="width: 60px;">S.NO</th>
+                      <th>State</th>
+                      <th class="text-center">Applications</th>
+                      <th class="text-center">Admissions</th>
+                      <th class="text-center">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of topStatesByApps; let i = index">
+                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="font-medium text-dark">{{ item.state }}</td>
+                      <td class="text-center text-bold">{{ item.totalApplications }}</td>
+                      <td class="text-center">{{ item.totalAdmissions }}</td>
+                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    </tr>
+                    <tr *ngIf="topStatesByApps.length === 0">
+                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Table 4: Top 5 States by Admissions -->
+            <div class="table-card stat-card table-only">
+              <div class="table-header">
+                <h3 class="table-title">Top 5 States by Admissions</h3>
+                <a routerLink="/location-analytics/states" class="view-all-link">View All States ({{ totalStatesCount }}) &rarr;</a>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="text-center" style="width: 60px;">S.NO</th>
+                      <th>State</th>
+                      <th class="text-center">Applications</th>
+                      <th class="text-center">Admissions</th>
+                      <th class="text-center">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of topStatesByAdms; let i = index">
+                      <td class="text-center text-bold">{{ i + 1 }}</td>
+                      <td class="font-medium text-dark">{{ item.state }}</td>
+                      <td class="text-center">{{ item.totalApplications }}</td>
+                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    </tr>
+                    <tr *ngIf="topStatesByAdms.length === 0">
+                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+
+        <!-- Advanced Filter Drawer -->
+        <app-filter-drawer [isOpen]="showFilterDrawer" (close)="showFilterDrawer = false" (apply)="applyFiltersAndReload()" (clear)="resetFilters()">
+          <div class="filter-drawer-content">
+            
+            <!-- Primary Filters -->
+            <div class="filter-group">
+              <h4 class="group-title">Primary Filters</h4>
+              
+              <!-- Sessions -->
+              <div class="filter-section">
+                <label class="filter-label">Session</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="dropdowns.session = !dropdowns.session">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.sessions || filters.sessions.length === 0" class="placeholder">Select Sessions</span>
+                      <div *ngIf="filters.sessions && filters.sessions.length > 0" class="selected-chips">
+                        <span *ngFor="let s of filters.sessions" class="multiselect-chip">
+                          {{ s }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleSessionSelection(s)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" [class.open]="dropdowns.session" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  <div class="multi-select-dropdown" *ngIf="dropdowns.session">
+                    <input type="text" class="dropdown-search-input" placeholder="Search session..." [(ngModel)]="searchTerms.session" (click)="$event.stopPropagation()">
+                    <div class="options-list">
+                      <div *ngFor="let s of filteredSessions" class="option-item" (click)="toggleSessionSelection(s)" [class.selected]="filters.sessions.includes(s)">
+                        <input type="checkbox" [checked]="filters.sessions.includes(s)" (click)="$event.stopPropagation(); toggleSessionSelection(s)">
+                        <span>{{ s }}</span>
+                      </div>
+                      <div *ngIf="filteredSessions.length === 0" class="no-options">No sessions found</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Scholarship -->
+              <div class="filter-section">
+                <label class="filter-label">Scholarship</label>
+                <select [(ngModel)]="filters.isScholar" class="filter-input">
+                  <option value="">All Students</option>
+                  <option value="true">Scholarship Students</option>
+                  <option value="false">Non-Scholarship</option>
+                </select>
+              </div>
+
+              <!-- Record Status -->
+              <div class="filter-section">
+                <label class="filter-label">Record Status</label>
+                <select [(ngModel)]="filters.statusFilter" class="filter-input">
+                  <option value="">Active Admissions</option>
+                  <option value="CANCELLED">Cancelled Admissions</option>
+                </select>
+              </div>
+
+              <!-- Duplicate Forms -->
+              <div class="filter-section">
+                <label class="filter-label">Duplicate Forms</label>
+                <select [ngModel]="getDuplicateFilterValue()" (ngModelChange)="setDuplicateFilterValue($event)" class="filter-input">
+                  <option value="exclude">Exclude Duplicate (Default)</option>
+                  <option value="only">Only Duplicate</option>
+                  <option value="all">Include Duplicate</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Date Filters -->
+            <div class="filter-group">
+              <h4 class="group-title">Date Filters</h4>
+              
+              <!-- Application Date Range -->
+              <div class="filter-section">
+                <label class="filter-label">Application Date Range</label>
+                <select [(ngModel)]="filters.appDateRangeType" (change)="onDateRangeTypeChange('application')" class="filter-input">
+                  <option value="">All Dates</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="custom">Custom Date</option>
+                </select>
+                <div class="date-range-inputs" *ngIf="filters.appDateRangeType === 'custom'" style="margin-top: 8px; display: flex; gap: 8px;">
+                  <input type="date" [(ngModel)]="filters.appStartDate" class="filter-input" placeholder="Start Date">
+                  <input type="date" [(ngModel)]="filters.appEndDate" class="filter-input" placeholder="End Date">
+                </div>
+                <div class="range-preview" *ngIf="filters.appStartDate && filters.appDateRangeType !== 'custom'" style="margin-top: 4px; font-size: 12px; color: #6366F1;">
+                  <span>{{ filters.appStartDate | date:'dd MMM' }} - {{ filters.appEndDate | date:'dd MMM, yyyy' }}</span>
+                </div>
+              </div>
+
+              <!-- Admission Date Range -->
+              <div class="filter-section">
+                <label class="filter-label">Admission Date Range</label>
+                <select [(ngModel)]="filters.admDateRangeType" (change)="onDateRangeTypeChange('admission')" class="filter-input">
+                  <option value="">All Dates</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="custom">Custom Date</option>
+                </select>
+                <div class="date-range-inputs" *ngIf="filters.admDateRangeType === 'custom'" style="margin-top: 8px; display: flex; gap: 8px;">
+                  <input type="date" [(ngModel)]="filters.admStartDate" class="filter-input" placeholder="Start Date">
+                  <input type="date" [(ngModel)]="filters.admEndDate" class="filter-input" placeholder="End Date">
+                </div>
+                <div class="range-preview" *ngIf="filters.admStartDate && filters.admDateRangeType !== 'custom'" style="margin-top: 4px; font-size: 12px; color: #6366F1;">
+                  <span>{{ filters.admStartDate | date:'dd MMM' }} - {{ filters.admEndDate | date:'dd MMM, yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- FOC / Financial Status -->
+            <div class="filter-group">
+              <h4 class="group-title">Financial Status (FOC)</h4>
+              
+              <div class="filter-section">
+                <label class="filter-label">FOC Type Filter</label>
+                <select [(ngModel)]="filters.focType" class="filter-input">
+                  <option value="">All Types</option>
+                  <option value="FOC">FOC Only</option>
+                  <option value="SBS">SBS Only</option>
+                  <option value="PAID">Paid Only</option>
+                </select>
+              </div>
+
+              <div class="filter-section">
+                <label class="filter-label">Quick Fees Selection</label>
+                <div class="radio-group" style="display: flex; flex-direction: column; gap: 8px;">
+                  <label class="radio-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" [value]="null" [(ngModel)]="filters.showOnlyPaid">
+                    <span>Show All Forms</span>
+                  </label>
+                  <label class="radio-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" [value]="true" [(ngModel)]="filters.showOnlyPaid">
+                    <span>Show Paid Forms Only</span>
+                  </label>
+                  <label class="radio-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" [value]="false" [(ngModel)]="filters.showOnlyPaid">
+                    <span>Show Unpaid Forms Only</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Source & Location -->
+            <div class="filter-group">
+              <h4 class="group-title">Location & Source</h4>
+              
+              <!-- States -->
+              <div class="filter-section">
+                <label class="filter-label">States</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="dropdowns.state = !dropdowns.state">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.states || filters.states.length === 0" class="placeholder">Select States</span>
+                      <div *ngIf="filters.states && filters.states.length > 0" class="selected-chips">
+                        <span *ngFor="let s of filters.states" class="multiselect-chip">
+                          {{ s }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleStateSelection(s)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" [class.open]="dropdowns.state" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  <div class="multi-select-dropdown" *ngIf="dropdowns.state">
+                    <input type="text" class="dropdown-search-input" placeholder="Search state..." [(ngModel)]="searchTerms.state" (click)="$event.stopPropagation()">
+                    <div class="options-list">
+                      <div *ngFor="let s of filteredStates" class="option-item" (click)="toggleStateSelection(s)" [class.selected]="filters.states.includes(s)">
+                        <input type="checkbox" [checked]="filters.states.includes(s)" (click)="$event.stopPropagation(); toggleStateSelection(s)">
+                        <span>{{ s }}</span>
+                      </div>
+                      <div *ngIf="filteredStates.length === 0" class="no-options">No states found</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cities -->
+              <div class="filter-section">
+                <label class="filter-label">Cities</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="filters.states && filters.states.length > 0 && (dropdowns.city = !dropdowns.city)" [class.disabled]="!filters.states || filters.states.length === 0">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.cities || filters.cities.length === 0" class="placeholder">
+                        {{ (!filters.states || filters.states.length === 0) ? 'Select State First' : 'Select Cities' }}
+                      </span>
+                      <div *ngIf="filters.cities && filters.cities.length > 0" class="selected-chips">
+                        <span *ngFor="let city of filters.cities" class="multiselect-chip">
+                          {{ city }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleCitySelection(city)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" [class.open]="dropdowns.city" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  <div class="multi-select-dropdown" *ngIf="dropdowns.city && filters.states && filters.states.length > 0">
+                    <input type="text" class="dropdown-search-input" placeholder="Search city..." [(ngModel)]="searchTerms.city" (click)="$event.stopPropagation()">
+                    <div class="options-list">
+                      <div *ngFor="let c of filteredCities" class="option-item" (click)="toggleCitySelection(c)" [class.selected]="filters.cities.includes(c)">
+                        <input type="checkbox" [checked]="filters.cities.includes(c)" (click)="$event.stopPropagation(); toggleCitySelection(c)">
+                        <span>{{ c }}</span>
+                      </div>
+                      <div *ngIf="filteredCities.length === 0" class="no-options">No cities found</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lead Source -->
+              <div class="filter-section">
+                <label class="filter-label">Lead Source</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="dropdowns.leadSource = !dropdowns.leadSource">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.leadSources || filters.leadSources.length === 0" class="placeholder">Select Sources</span>
+                      <div *ngIf="filters.leadSources && filters.leadSources.length > 0" class="selected-chips">
+                        <span *ngFor="let id of filters.leadSources" class="multiselect-chip">
+                          {{ getLeadSourceNameById(id) }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleLeadSourceSelection(id)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" [class.open]="dropdowns.leadSource" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  <div class="multi-select-dropdown" *ngIf="dropdowns.leadSource">
+                    <input type="text" class="dropdown-search-input" placeholder="Search lead source..." [(ngModel)]="searchTerms.leadSource" (click)="$event.stopPropagation()">
+                    <div class="options-list">
+                      <div *ngFor="let s of filteredLeadSources" class="option-item" (click)="toggleLeadSourceSelection(s.id)" [class.selected]="filters.leadSources.includes(s.id)">
+                        <input type="checkbox" [checked]="filters.leadSources.includes(s.id)" (click)="$event.stopPropagation(); toggleLeadSourceSelection(s.id)">
+                        <span>{{ s.name }}</span>
+                      </div>
+                      <div *ngIf="filteredLeadSources.length === 0" class="no-options">No lead sources found</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Advanced Academic & Counselor filters -->
+            <div class="filter-group">
+              <h4 class="group-title">Counselor, Course & Consultancy</h4>
+              
+              <!-- Course Type -->
+              <div class="filter-section">
+                <label class="filter-label">Course Types</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="dropdowns.courseType = !dropdowns.courseType">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.courseTypes || filters.courseTypes.length === 0" class="placeholder">Select Course Types</span>
+                      <div *ngIf="filters.courseTypes && filters.courseTypes.length > 0" class="selected-chips">
+                        <span *ngFor="let ct of filters.courseTypes" class="multiselect-chip">
+                          {{ ct }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleCourseTypeSelection(ct)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" [class.open]="dropdowns.courseType" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                  <div class="multi-select-dropdown" *ngIf="dropdowns.courseType">
+                    <input type="text" class="dropdown-search-input" placeholder="Search course type..." [(ngModel)]="searchTerms.courseType" (click)="$event.stopPropagation()">
+                    <div class="options-list">
+                      <div *ngFor="let ct of filteredCourseTypes" class="option-item" (click)="toggleCourseTypeSelection(ct.name)" [class.selected]="filters.courseTypes.includes(ct.name)">
+                        <input type="checkbox" [checked]="filters.courseTypes.includes(ct.name)" (click)="$event.stopPropagation(); toggleCourseTypeSelection(ct.name)">
+                        <span>{{ ct.name }}</span>
+                      </div>
+                      <div *ngIf="filteredCourseTypes.length === 0" class="no-options">No course types found</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course -->
+              <div class="filter-section">
+                <label class="filter-label">Course</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="openCourseFilter()">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.courseIds || filters.courseIds.length === 0" class="placeholder">Select Courses</span>
+                      <div *ngIf="filters.courseIds && filters.courseIds.length > 0" class="selected-chips">
+                        <span *ngFor="let cid of filters.courseIds" class="multiselect-chip">
+                          {{ getCourseNameById(cid) }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleCourseSelection(cid)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Counselor / User -->
+              <div class="filter-section">
+                <label class="filter-label">Counselor (Admitted By)</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="openUserFilter()">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.userIds || filters.userIds.length === 0" class="placeholder">Select Counselors</span>
+                      <div *ngIf="filters.userIds && filters.userIds.length > 0" class="selected-chips">
+                        <span *ngFor="let uid of filters.userIds" class="multiselect-chip">
+                          {{ getUserNameById(uid) }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleUserSelection(uid)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Consultancy -->
+              <div class="filter-section">
+                <label class="filter-label">Consultancy</label>
+                <div class="multi-select-container" (click)="$event.stopPropagation()">
+                  <div class="multi-select-trigger" (click)="openConsultancyFilter()">
+                    <div class="selected-text-container">
+                      <span *ngIf="!filters.consultancyIds || filters.consultancyIds.length === 0" class="placeholder">Select Consultancies</span>
+                      <div *ngIf="filters.consultancyIds && filters.consultancyIds.length > 0" class="selected-chips">
+                        <span *ngFor="let cond of filters.consultancyIds" class="multiselect-chip">
+                          {{ getConsultancyNameById(cond) }}
+                          <span class="chip-remove" (click)="$event.stopPropagation(); toggleConsultancySelection(cond)">&times;</span>
+                        </span>
+                      </div>
+                    </div>
+                    <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </app-filter-drawer>
+
+        <!-- Searchable Selection Modals -->
+        <app-multi-select-modal *ngIf="activeModal === 'user'" [title]="'Select Counselor / User'"
+            [placeholder]="'Search counselor by name, email, or phone...'" [items]="modalItems"
+            [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
+            [totalPages]="modalTotalPages" [selectedItems]="getSelectedUsers()" [displayField]="'fullName'"
+            [subtitleField]="'email'" [tagField]="'mobile'" (search)="onModalSearch($event)"
+            (pageChange)="onModalPageChange($event)" (apply)="onModalSelect($event)"
+            (close)="onModalClose()"></app-multi-select-modal>
+
+        <app-multi-select-modal *ngIf="activeModal === 'consultancy'" [title]="'Select Consultancy'"
+            [placeholder]="'Search consultancy by name or firm name...'" [items]="modalItems"
+            [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
+            [totalPages]="modalTotalPages" [selectedItems]="getSelectedConsultancies()" [displayField]="'name'"
+            [subtitleField]="'firmName'" [tagField]="'city'" (search)="onModalSearch($event)"
+            (pageChange)="onModalPageChange($event)" (apply)="onModalSelect($event)"
+            (close)="onModalClose()"></app-multi-select-modal>
+
+        <app-multi-select-modal *ngIf="activeModal === 'course'" [title]="'Select Course'"
+            [placeholder]="'Search course by name or code...'" [items]="modalItems" [loading]="modalLoading"
+            [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage" [totalPages]="modalTotalPages"
+            [selectedItems]="getSelectedCourses()" [displayField]="'name'" [subtitleField]="'duration'"
+            [tagField]="'courseType'" (search)="onModalSearch($event)" (pageChange)="onModalPageChange($event)"
+            (apply)="onModalSelect($event)" (close)="onModalClose()"></app-multi-select-modal>
+
+      </div>
+    </main>
+  </div>
+</div>
