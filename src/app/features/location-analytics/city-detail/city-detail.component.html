@@ -29,7 +29,9 @@
           <div class="detail-header">
             <div class="header-left">
               <button class="back-btn" (click)="goBack()" title="Go back">
-                <i class='bx bx-arrow-back'></i>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
               </button>
               <div class="header-icon">
                 <i class='bx bx-map-pin'></i>
@@ -112,17 +114,15 @@
                 <span class="count-badge">{{ totalAppTotal | number }}</span>
               </div>
               <div class="section-actions">
-                <div class="table-controls" style="padding:0;border:none;">
+                <div class="filter-selects">
                   <select [(ngModel)]="appFilterSource"
-                    (change)="totalAppPage=1; loadStudents('remaining_applications')"
-                    style="border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:13px;background:white;color:#334155;outline:none;cursor:pointer;">
+                    (change)="totalAppPage=1; loadStudents('remaining_applications')" class="filter-select">
                     <option [ngValue]="null">All Sources</option>
                     <option value="USER">Direct</option>
                     <option value="CONSULTANCY">Consultancy</option>
                   </select>
                   <select [(ngModel)]="appFilterScholar"
-                    (change)="totalAppPage=1; loadStudents('remaining_applications')"
-                    style="border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:13px;background:white;color:#334155;outline:none;cursor:pointer;">
+                    (change)="totalAppPage=1; loadStudents('remaining_applications')" class="filter-select">
                     <option [ngValue]="null">All Types</option>
                     <option [ngValue]="true">Scholar</option>
                     <option [ngValue]="false">Non-Scholar</option>
@@ -301,15 +301,15 @@
                 <span class="count-badge">{{ totalAdmTotal | number }}</span>
               </div>
               <div class="section-actions">
-                <div class="table-controls" style="padding:0;border:none;">
+                <div class="filter-selects">
                   <select [(ngModel)]="admFilterSource" (change)="totalAdmPage=1; loadStudents('confirmed_admissions')"
-                    style="border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:13px;background:white;color:#334155;outline:none;cursor:pointer;">
+                    class="filter-select">
                     <option [ngValue]="null">All Sources</option>
                     <option value="USER">Direct</option>
                     <option value="CONSULTANCY">Consultancy</option>
                   </select>
                   <select [(ngModel)]="admFilterScholar" (change)="totalAdmPage=1; loadStudents('confirmed_admissions')"
-                    style="border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:13px;background:white;color:#334155;outline:none;cursor:pointer;">
+                    class="filter-select">
                     <option [ngValue]="null">All Types</option>
                     <option [ngValue]="true">Scholar</option>
                     <option [ngValue]="false">Non-Scholar</option>
