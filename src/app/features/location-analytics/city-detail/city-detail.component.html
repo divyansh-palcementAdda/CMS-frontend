@@ -30,78 +30,163 @@
             <div class="header-left">
               <button class="back-btn" (click)="goBack()" title="Go back">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
               </button>
-              <div class="header-icon">
-                <i class='bx bx-map-pin'></i>
+              <div class="header-icon-container">
+                <span class="material-symbols-outlined header-icon">location_city</span>
               </div>
               <div class="title-info">
-                <h1>
-                  {{ cityDetail.basicInfo.name }}
-                  <span class="state-badge">{{ cityDetail.basicInfo.state }}</span>
-                </h1>
-                <p>{{ cityDetail.basicInfo.totalStudents | number }} total students &bull; City Analytics Dashboard</p>
+                <div class="title-row-1">
+                  <h1>{{ cityDetail.basicInfo.name }}</h1>
+                  <span class="state-badge" [class.inactive]="cityDetail.basicInfo.status === 'Inactive'">
+                    {{ cityDetail.basicInfo.state }}
+                  </span>
+                </div>
+                <div class="title-row-2">
+                  <span>{{ cityDetail.basicInfo.totalStudents | number }} Students</span>
+                  <span class="divider-dot">&bull;</span>
+                  <span>City Analytics Dashboard</span>
+                </div>
+                <div class="title-row-3">
+                  <span class="subtle-chip">Updated Today</span>
+                  <span class="subtle-chip">Status {{ cityDetail.basicInfo.status || 'Active' }}</span>
+                  <span class="subtle-chip">Location Analytics</span>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- KPI Stats Grid -->
           <div class="kpi-grid">
-            <div class="kpi-card primary" (click)="scrollTo('total-apps')">
-              <div class="kpi-label">Total Applications</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.totalApplications | number }}</div>
-              <div class="kpi-sub">All-time applications</div>
+            <!-- Row 1: 5 cards -->
+            <div class="kpi-row row-5">
+              <div class="kpi-card primary"
+                [class.active-kpi]="currentAppTab === 'total_applications' && !appFilterScholar && !appFilterDuplicate && !appFilterSource"
+                (click)="onStatClick('total_applications')">
+                <span class="material-symbols-outlined kpi-icon">assignment</span>
+                <div class="kpi-label">Total Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.totalApplications | number }}</div>
+                <div class="kpi-sub">Total student applications</div>
+              </div>
+              <div class="kpi-card primary"
+                [class.active-kpi]="currentAppTab === 'remaining_applications' && !appFilterScholar && !appFilterDuplicate && !appFilterSource"
+                (click)="onStatClick('remaining_applications')">
+                <span class="material-symbols-outlined kpi-icon">hourglass_empty</span>
+                <div class="kpi-label">Remaining Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.remainingApplications | number }}</div>
+                <div class="kpi-sub">Applications pending admission</div>
+              </div>
+              <div class="kpi-card danger" (click)="onStatClick('cancelled_applications')">
+                <span class="material-symbols-outlined kpi-icon">cancel</span>
+                <div class="kpi-label">Cancelled Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.cancelledApplications | number }}</div>
+                <div class="kpi-sub">Applications cancelled before admission</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && !admFilterScholar && !admFilterDuplicate && !admFilterSource && !admFilterFoc && !admFilterSbs"
+                (click)="onStatClick('total_admissions')">
+                <span class="material-symbols-outlined kpi-icon">school</span>
+                <div class="kpi-label">Total Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.totalAdmissions | number }}</div>
+                <div class="kpi-sub">Successfully confirmed admissions</div>
+              </div>
+              <div class="kpi-card danger" (click)="onStatClick('cancelled_admissions')">
+                <span class="material-symbols-outlined kpi-icon">block</span>
+                <div class="kpi-label">Cancelled Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.cancelledAdmissions | number }}</div>
+                <div class="kpi-sub">Confirmed admissions later cancelled</div>
+              </div>
             </div>
-            <div class="kpi-card success" (click)="scrollTo('total-adms')">
-              <div class="kpi-label">Total Admissions</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.totalAdmissions | number }}</div>
-              <div class="kpi-sub">Confirmed admissions</div>
+
+            <!-- Row 2: 4 cards -->
+            <div class="kpi-row row-4">
+              <div class="kpi-card purple"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterScholar"
+                (click)="onStatClick('scholar_applications')">
+                <span class="material-symbols-outlined kpi-icon">workspace_premium</span>
+                <div class="kpi-label">Scholar Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.scholarApplications | number }}</div>
+                <div class="kpi-sub">Scholarship applications</div>
+              </div>
+              <div class="kpi-card purple"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterScholar"
+                (click)="onStatClick('scholar_admissions')">
+                <span class="material-symbols-outlined kpi-icon">military_tech</span>
+                <div class="kpi-label">Scholar Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.scholarAdmissions | number }}</div>
+                <div class="kpi-sub">Scholarship admissions</div>
+              </div>
+              <div class="kpi-card purple" [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterFoc"
+                (click)="onStatClick('foc_admissions')">
+                <span class="material-symbols-outlined kpi-icon">volunteer_activism</span>
+                <div class="kpi-label">FOC Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.focAdmissions | number }}</div>
+                <div class="kpi-sub">Free of Cost admissions</div>
+              </div>
+              <div class="kpi-card purple" [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSbs"
+                (click)="onStatClick('sbs_admissions')">
+                <span class="material-symbols-outlined kpi-icon">account_balance</span>
+                <div class="kpi-label">SBS Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.sbsAdmissions | number }}</div>
+                <div class="kpi-sub">State Benefit Scheme admissions</div>
+              </div>
             </div>
-            <div class="kpi-card warning" (click)="scrollTo('total-apps')">
-              <div class="kpi-label">Remaining Apps</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.remainingApplications | number }}</div>
-              <div class="kpi-sub">Active applications</div>
+
+            <!-- Row 3: 4 cards -->
+            <div class="kpi-row row-4">
+              <div class="kpi-card info"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterSource === 'USER'"
+                (click)="onStatClick('direct_applications')">
+                <span class="material-symbols-outlined kpi-icon">person</span>
+                <div class="kpi-label">Direct Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.directApplications | number }}</div>
+                <div class="kpi-sub">Direct walk-in applications</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSource === 'USER'"
+                (click)="onStatClick('direct_admissions')">
+                <span class="material-symbols-outlined kpi-icon">person_check</span>
+                <div class="kpi-label">Direct Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.directAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions from direct applicants</div>
+              </div>
+              <div class="kpi-card info"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterSource === 'CONSULTANCY'"
+                (click)="onStatClick('consultancy_applications')">
+                <span class="material-symbols-outlined kpi-icon">groups</span>
+                <div class="kpi-label">Consultancy Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.consultancyApplications | number }}</div>
+                <div class="kpi-sub">Applications via consultancy</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSource === 'CONSULTANCY'"
+                (click)="onStatClick('consultancy_admissions')">
+                <span class="material-symbols-outlined kpi-icon">handshake</span>
+                <div class="kpi-label">Consultancy Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.consultancyAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions via consultancy</div>
+              </div>
             </div>
-            <div class="kpi-card danger" (click)="scrollTo('cancelled-apps')">
-              <div class="kpi-label">Cancelled Apps</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.cancelledApplications | number }}</div>
-              <div class="kpi-sub">Withdrawn applications</div>
-            </div>
-            <div class="kpi-card danger" (click)="scrollTo('cancelled-adms')">
-              <div class="kpi-label">Cancelled Adm.</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.cancelledAdmissions | number }}</div>
-              <div class="kpi-sub">Revoked admissions</div>
-            </div>
-            <div class="kpi-card purple" (click)="scrollTo('total-adms')">
-              <div class="kpi-label">Scholar Admissions</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.scholarAdmissions | number }}</div>
-              <div class="kpi-sub">of {{ cityDetail.kpiStats.scholarApplications | number }} apps</div>
-            </div>
-            <div class="kpi-card info" (click)="scrollTo('total-adms')">
-              <div class="kpi-label">Direct Admissions</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.directAdmissions | number }}</div>
-              <div class="kpi-sub">of {{ cityDetail.kpiStats.directApplications | number }} apps</div>
-            </div>
-            <div class="kpi-card teal" (click)="scrollTo('consultancy-section')">
-              <div class="kpi-label">Consultancy Adm.</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.consultancyAdmissions | number }}</div>
-              <div class="kpi-sub">of {{ cityDetail.kpiStats.consultancyApplications | number }} apps</div>
-            </div>
-            <div class="kpi-card orange">
-              <div class="kpi-label">FOC Admissions</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.focAdmissions | number }}</div>
-              <div class="kpi-sub">Free of charge</div>
-            </div>
-            <div class="kpi-card orange">
-              <div class="kpi-label">SBS Admissions</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.sbsAdmissions | number }}</div>
-              <div class="kpi-sub">Subsidized</div>
-            </div>
-            <div class="kpi-card warning">
-              <div class="kpi-label">Duplicate Apps</div>
-              <div class="kpi-value">{{ cityDetail.kpiStats.duplicateApplications | number }}</div>
-              <div class="kpi-sub">of {{ cityDetail.kpiStats.duplicateAdmissions | number }} adm.</div>
+
+            <!-- Row 4: 2 cards -->
+            <div class="kpi-row row-2">
+              <div class="kpi-card orange"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterDuplicate"
+                (click)="onStatClick('duplicate_applications')">
+                <span class="material-symbols-outlined kpi-icon">content_copy</span>
+                <div class="kpi-label">Duplicate Applications</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.duplicateApplications | number }}</div>
+                <div class="kpi-sub">Applications marked duplicate</div>
+              </div>
+              <div class="kpi-card orange"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterDuplicate"
+                (click)="onStatClick('duplicate_admissions')">
+                <span class="material-symbols-outlined kpi-icon">rule</span>
+                <div class="kpi-label">Duplicate Admissions</div>
+                <div class="kpi-value">{{ cityDetail.kpiStats.duplicateAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions marked duplicate</div>
+              </div>
             </div>
           </div>
 
@@ -109,11 +194,28 @@
           <div class="section" id="total-apps">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon"><i class='bx bx-file'></i></div>
-                <h2>Total Applications</h2>
-                <span class="count-badge">{{ totalAppTotal | number }}</span>
+                <div class="section-icon">
+                  <span class="material-symbols-outlined">assignment</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>
+                    {{ currentAppTab === 'total_applications' ? 'Total Applications' : 'Remaining Applications' }}
+                    <span class="count-badge">{{ totalAppTotal | number }}</span>
+                  </h2>
+                  <p class="section-subtitle">
+                    {{ currentAppTab === 'total_applications' ? 'All student applications for this city' : 'Students
+                    pending admission confirmation' }}
+                  </p>
+                </div>
               </div>
-              <div class="section-actions">
+            </div>
+            <div class="table-controls">
+              <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search student..." [(ngModel)]="totalAppSearch"
+                  (ngModelChange)="onTotalAppSearchChange()">
+              </div>
+              <div class="filter-actions-group">
                 <div class="filter-selects">
                   <select [(ngModel)]="appFilterSource"
                     (change)="totalAppPage=1; loadStudents('remaining_applications')" class="filter-select">
@@ -128,24 +230,19 @@
                     <option [ngValue]="false">Non-Scholar</option>
                   </select>
                 </div>
-                <button class="action-btn btn-export" (click)="exportStudents('remaining_applications')"
+                <button
+                  *ngIf="appFilterSource || appFilterScholar !== null || appFilterDuplicate || appFilterFoc || appFilterSbs || currentAppTab !== 'remaining_applications'"
+                  class="clear-filter-btn" (click)="clearAppFilter()">
+                  <span class="material-symbols-outlined">close</span> Clear Filter
+                </button>
+                <button class="btn-excel-export" (click)="exportStudents('remaining_applications')"
                   [disabled]="exporting['students_remaining_applications']">
-                  <i class='bx'
-                    [ngClass]="exporting['students_remaining_applications'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
+                  <span class="material-symbols-outlined"
+                    *ngIf="!exporting['students_remaining_applications']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_remaining_applications']"></i>
+                  Export Excel
                 </button>
               </div>
-            </div>
-            <div class="table-controls">
-              <div class="search-box">
-                <i class='bx bx-search'></i>
-                <input type="text" placeholder="Search student..." [(ngModel)]="totalAppSearch"
-                  (ngModelChange)="onTotalAppSearchChange()">
-              </div>
-              <button *ngIf="appFilterSource || appFilterScholar !== null" class="filter-pill"
-                (click)="clearAppFilter()">
-                <i class='bx bx-x'></i> Clear Filter
-              </button>
             </div>
             <div class="table-wrapper">
               <table>
@@ -153,8 +250,8 @@
                   <tr>
                     <th (click)="sortStudents('remaining_applications','fullName')">Student <i class='bx'
                         [ngClass]="getSortIcon(totalAppSortBy,'fullName',totalAppSortDir)"></i></th>
-                    <th (click)="sortStudents('remaining_applications','mobileNumber')">Mobile <i class='bx'
-                        [ngClass]="getSortIcon(totalAppSortBy,'mobileNumber',totalAppSortDir)"></i></th>
+                    <th (click)="sortStudents('remaining_applications','phoneNumber')">Mobile <i class='bx'
+                        [ngClass]="getSortIcon(totalAppSortBy,'phoneNumber',totalAppSortDir)"></i></th>
                     <th (click)="sortStudents('remaining_applications','courseName')">Course <i class='bx'
                         [ngClass]="getSortIcon(totalAppSortBy,'courseName',totalAppSortDir)"></i></th>
                     <th (click)="sortStudents('remaining_applications','date')">Date <i class='bx'
@@ -169,43 +266,82 @@
                 <tbody>
                   <tr *ngFor="let s of paginatedTotalApplications">
                     <td><strong>{{ s.fullName || s.studentName }}</strong></td>
-                    <td>{{ s.mobileNumber || '—' }}</td>
+                    <td>{{ s.phoneNumber|| '—' }}</td>
                     <td>{{ s.courseName || '—' }}</td>
-                    <td>{{ s.date | date:'dd MMM yyyy' }}</td>
-                    <td><span class="badge" [ngClass]="s.source === 'CONSULTANCY' ? 'badge-blue' : 'badge-purple'">{{
-                        s.source || 'Direct' }}</span></td>
+                    <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-blue': s.leadSource?.name?.toLowerCase()?.includes('consult'),
+                        'badge-purple': s.leadSource?.name?.toLowerCase()?.includes('direct') || !s.leadSource?.name,
+                        'badge-green': s.leadSource?.name?.toLowerCase()?.includes('digital'),
+                        'badge-teal': s.leadSource?.name?.toLowerCase()?.includes('orai'),
+                        'badge-orange': s.leadSource?.name?.toLowerCase()?.includes('raw')
+                      }">{{ s.leadSource?.name || 'Direct' }}</span>
+                    </td>
                     <td><span class="badge" [ngClass]="s.isScholar ? 'badge-green' : 'badge-orange'">{{ s.isScholar ?
                         'Scholar' : 'Regular' }}</span></td>
-                    <td><span class="badge badge-purple">{{ s.status || '—' }}</span></td>
-                    <td><button class="link-btn" (click)="onViewAdmission(s.id)">View</button></td>
+
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-green': s.status === 'Confirmed' || s.status === 'ADMITTED',
+                        'badge-red': s.status === 'Cancelled' || s.status === 'CANCELLED',
+                        'badge-orange': s.status === 'Duplicate',
+                        'badge-purple': s.status !== 'Confirmed' && s.status !== 'ADMITTED' && s.status !== 'Cancelled' && s.status !== 'CANCELLED' && s.status !== 'Duplicate'
+                      }">{{ s.status || '—' }}</span>
+                    </td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedTotalApplications.length === 0">
                     <td colspan="8">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No applications found</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Remaining Applications Found</h3>
+                        <p>There are currently no students in this category.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="totalAppPageSize" (change)="onTotalAppSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (totalAppPage - 1) * totalAppPageSize + 1 }}–{{ totalAppPage * totalAppPageSize >
+                totalAppTotal ? totalAppTotal : totalAppPage * totalAppPageSize }} of {{ totalAppTotal | number }}
+                students
               </div>
-              <div class="pagination-info">{{ totalAppTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeTotalAppPage(-1)" [disabled]="totalAppPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ totalAppPage }} / {{ getTotalPages(totalAppTotal, totalAppPageSize)
-                  }}</span>
-                <button (click)="changeTotalAppPage(1)"
-                  [disabled]="totalAppPage >= getTotalPages(totalAppTotal, totalAppPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="totalAppPageSize" (change)="onTotalAppSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="totalAppPage = 1; loadStudents('remaining_applications')"
+                    [disabled]="totalAppPage <= 1" title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeTotalAppPage(-1)" [disabled]="totalAppPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ totalAppPage }} / {{ getTotalPages(totalAppTotal, totalAppPageSize)
+                    }}</span>
+                  <button (click)="changeTotalAppPage(1)"
+                    [disabled]="totalAppPage >= getTotalPages(totalAppTotal, totalAppPageSize)" title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button
+                    (click)="totalAppPage = getTotalPages(totalAppTotal, totalAppPageSize); loadStudents('remaining_applications')"
+                    [disabled]="totalAppPage >= getTotalPages(totalAppTotal, totalAppPageSize)" title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -214,25 +350,30 @@
           <div class="section" id="cancelled-apps">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#fee2e2;"><i class='bx bx-x-circle'
-                    style="color:#ef4444;"></i></div>
-                <h2>Cancelled Applications</h2>
-                <span class="count-badge">{{ cancelledAppTotal | number }}</span>
-              </div>
-              <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportStudents('cancelled_applications')"
-                  [disabled]="exporting['students_cancelled_applications']">
-                  <i class='bx'
-                    [ngClass]="exporting['students_cancelled_applications'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
-                </button>
+                <div class="section-icon" style="background:#fee2e2; color:#ef4444;">
+                  <span class="material-symbols-outlined">cancel</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Cancelled Applications <span class="count-badge" style="background:#fee2e2; color:#ef4444;">{{
+                      cancelledAppTotal | number }}</span></h2>
+                  <p class="section-subtitle">Applications that were cancelled before admission confirmation</p>
+                </div>
               </div>
             </div>
             <div class="table-controls">
               <div class="search-box">
-                <i class='bx bx-search'></i>
+                <span class="material-symbols-outlined">search</span>
                 <input type="text" placeholder="Search student..." [(ngModel)]="cancelledAppSearch"
                   (ngModelChange)="onCancelledAppSearchChange()">
+              </div>
+              <div class="filter-actions-group">
+                <button class="btn-excel-export" (click)="exportStudents('cancelled_applications')"
+                  [disabled]="exporting['students_cancelled_applications']">
+                  <span class="material-symbols-outlined"
+                    *ngIf="!exporting['students_cancelled_applications']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_cancelled_applications']"></i>
+                  Export Excel
+                </button>
               </div>
             </div>
             <div class="table-wrapper">
@@ -253,40 +394,73 @@
                 <tbody>
                   <tr *ngFor="let s of paginatedCancelledApplications">
                     <td><strong>{{ s.fullName || s.studentName }}</strong></td>
-                    <td>{{ s.mobileNumber || '—' }}</td>
+                    <td>{{ s.phoneNumber || '—' }}</td>
                     <td>{{ s.courseName || '—' }}</td>
-                    <td>{{ s.date | date:'dd MMM yyyy' }}</td>
-                    <td><span class="badge" [ngClass]="s.source === 'CONSULTANCY' ? 'badge-blue' : 'badge-purple'">{{
-                        s.source || 'Direct' }}</span></td>
-                    <td><button class="link-btn" (click)="onViewAdmission(s.id)">View</button></td>
+                    <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-blue': s.leadSource?.name?.toLowerCase()?.includes('consult'),
+                        'badge-purple': s.leadSource?.name?.toLowerCase()?.includes('direct') || !s.leadSource?.name,
+                        'badge-green': s.leadSource?.name?.toLowerCase()?.includes('digital'),
+                        'badge-teal': s.leadSource?.name?.toLowerCase()?.includes('orai'),
+                        'badge-orange': s.leadSource?.name?.toLowerCase()?.includes('raw')
+                      }">{{ s.leadSource?.name || 'Direct' }}</span>
+                    </td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedCancelledApplications.length === 0">
                     <td colspan="6">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No cancelled applications</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Cancelled Applications Found</h3>
+                        <p>There are currently no students in this category.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="cancelledAppPageSize" (change)="onCancelledAppSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (cancelledAppPage - 1) * cancelledAppPageSize + 1 }}–{{ cancelledAppPage *
+                cancelledAppPageSize > cancelledAppTotal ? cancelledAppTotal : cancelledAppPage * cancelledAppPageSize
+                }} of {{ cancelledAppTotal | number }} students
               </div>
-              <div class="pagination-info">{{ cancelledAppTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeCancelledAppPage(-1)" [disabled]="cancelledAppPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ cancelledAppPage }} / {{ getTotalPages(cancelledAppTotal,
-                  cancelledAppPageSize) }}</span>
-                <button (click)="changeCancelledAppPage(1)"
-                  [disabled]="cancelledAppPage >= getTotalPages(cancelledAppTotal, cancelledAppPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="cancelledAppPageSize" (change)="onCancelledAppSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="cancelledAppPage = 1; loadStudents('cancelled_applications')"
+                    [disabled]="cancelledAppPage <= 1" title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeCancelledAppPage(-1)" [disabled]="cancelledAppPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ cancelledAppPage }} / {{ getTotalPages(cancelledAppTotal,
+                    cancelledAppPageSize) }}</span>
+                  <button (click)="changeCancelledAppPage(1)"
+                    [disabled]="cancelledAppPage >= getTotalPages(cancelledAppTotal, cancelledAppPageSize)"
+                    title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button
+                    (click)="cancelledAppPage = getTotalPages(cancelledAppTotal, cancelledAppPageSize); loadStudents('cancelled_applications')"
+                    [disabled]="cancelledAppPage >= getTotalPages(cancelledAppTotal, cancelledAppPageSize)"
+                    title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -295,12 +469,23 @@
           <div class="section" id="total-adms">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#dcfce7;"><i class='bx bx-check-circle'
-                    style="color:#16a34a;"></i></div>
-                <h2>Confirmed Admissions</h2>
-                <span class="count-badge">{{ totalAdmTotal | number }}</span>
+                <div class="section-icon" style="background:#dcfce7; color:#16a34a;">
+                  <span class="material-symbols-outlined">school</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Confirmed Admissions <span class="count-badge" style="background:#dcfce7; color:#16a34a;">{{
+                      totalAdmTotal | number }}</span></h2>
+                  <p class="section-subtitle">Successfully confirmed student admissions</p>
+                </div>
               </div>
-              <div class="section-actions">
+            </div>
+            <div class="table-controls">
+              <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Search student..." [(ngModel)]="totalAdmSearch"
+                  (ngModelChange)="onTotalAdmSearchChange()">
+              </div>
+              <div class="filter-actions-group">
                 <div class="filter-selects">
                   <select [(ngModel)]="admFilterSource" (change)="totalAdmPage=1; loadStudents('confirmed_admissions')"
                     class="filter-select">
@@ -315,24 +500,19 @@
                     <option [ngValue]="false">Non-Scholar</option>
                   </select>
                 </div>
-                <button class="action-btn btn-export" (click)="exportStudents('confirmed_admissions')"
+                <button
+                  *ngIf="admFilterSource || admFilterScholar !== null || admFilterDuplicate || admFilterFoc || admFilterSbs || currentAdmTab !== 'confirmed_admissions'"
+                  class="clear-filter-btn" (click)="clearAdmFilter()">
+                  <span class="material-symbols-outlined">close</span> Clear Filter
+                </button>
+                <button class="btn-excel-export" (click)="exportStudents('confirmed_admissions')"
                   [disabled]="exporting['students_confirmed_admissions']">
-                  <i class='bx'
-                    [ngClass]="exporting['students_confirmed_admissions'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
+                  <span class="material-symbols-outlined"
+                    *ngIf="!exporting['students_confirmed_admissions']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_confirmed_admissions']"></i>
+                  Export Excel
                 </button>
               </div>
-            </div>
-            <div class="table-controls">
-              <div class="search-box">
-                <i class='bx bx-search'></i>
-                <input type="text" placeholder="Search student..." [(ngModel)]="totalAdmSearch"
-                  (ngModelChange)="onTotalAdmSearchChange()">
-              </div>
-              <button *ngIf="admFilterSource || admFilterScholar !== null" class="filter-pill"
-                (click)="clearAdmFilter()">
-                <i class='bx bx-x'></i> Clear Filter
-              </button>
             </div>
             <div class="table-wrapper">
               <table>
@@ -353,42 +533,73 @@
                 <tbody>
                   <tr *ngFor="let s of paginatedTotalAdmissions">
                     <td><strong>{{ s.fullName || s.studentName }}</strong></td>
-                    <td>{{ s.mobileNumber || '—' }}</td>
+                    <td>{{ s.phoneNumber || '—' }}</td>
                     <td>{{ s.courseName || '—' }}</td>
-                    <td>{{ s.date | date:'dd MMM yyyy' }}</td>
-                    <td><span class="badge" [ngClass]="s.source === 'CONSULTANCY' ? 'badge-blue' : 'badge-purple'">{{
-                        s.source || 'Direct' }}</span></td>
+                    <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-blue': s.leadSource?.name?.toLowerCase()?.includes('consult'),
+                        'badge-purple': s.leadSource?.name?.toLowerCase()?.includes('direct') || !s.leadSource?.name,
+                        'badge-green': s.leadSource?.name?.toLowerCase()?.includes('digital'),
+                        'badge-teal': s.leadSource?.name?.toLowerCase()?.includes('orai'),
+                        'badge-orange': s.leadSource?.name?.toLowerCase()?.includes('raw')
+                      }">{{ s.leadSource?.name || 'Direct' }}</span>
+                    </td>
                     <td><span class="badge" [ngClass]="s.isScholar ? 'badge-green' : 'badge-orange'">{{ s.isScholar ?
                         'Scholar' : 'Regular' }}</span></td>
-                    <td><button class="link-btn" (click)="onViewAdmission(s.id)">View</button></td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedTotalAdmissions.length === 0">
                     <td colspan="7">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No admissions found</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Confirmed Admissions Found</h3>
+                        <p>There are currently no students in this category.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="totalAdmPageSize" (change)="onTotalAdmSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (totalAdmPage - 1) * totalAdmPageSize + 1 }}–{{ totalAdmPage * totalAdmPageSize >
+                totalAdmTotal ? totalAdmTotal : totalAdmPage * totalAdmPageSize }} of {{ totalAdmTotal | number }}
+                students
               </div>
-              <div class="pagination-info">{{ totalAdmTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeTotalAdmPage(-1)" [disabled]="totalAdmPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ totalAdmPage }} / {{ getTotalPages(totalAdmTotal, totalAdmPageSize)
-                  }}</span>
-                <button (click)="changeTotalAdmPage(1)"
-                  [disabled]="totalAdmPage >= getTotalPages(totalAdmTotal, totalAdmPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="totalAdmPageSize" (change)="onTotalAdmSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="totalAdmPage = 1; loadStudents('confirmed_admissions')"
+                    [disabled]="totalAdmPage <= 1" title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeTotalAdmPage(-1)" [disabled]="totalAdmPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ totalAdmPage }} / {{ getTotalPages(totalAdmTotal, totalAdmPageSize)
+                    }}</span>
+                  <button (click)="changeTotalAdmPage(1)"
+                    [disabled]="totalAdmPage >= getTotalPages(totalAdmTotal, totalAdmPageSize)" title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button
+                    (click)="totalAdmPage = getTotalPages(totalAdmTotal, totalAdmPageSize); loadStudents('confirmed_admissions')"
+                    [disabled]="totalAdmPage >= getTotalPages(totalAdmTotal, totalAdmPageSize)" title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -397,25 +608,30 @@
           <div class="section" id="cancelled-adms">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#fee2e2;"><i class='bx bx-x' style="color:#ef4444;"></i>
+                <div class="section-icon" style="background:#fee2e2; color:#ef4444;">
+                  <span class="material-symbols-outlined">block</span>
                 </div>
-                <h2>Cancelled Admissions</h2>
-                <span class="count-badge">{{ cancelledAdmTotal | number }}</span>
-              </div>
-              <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportStudents('cancelled_admissions')"
-                  [disabled]="exporting['students_cancelled_admissions']">
-                  <i class='bx'
-                    [ngClass]="exporting['students_cancelled_admissions'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
-                </button>
+                <div class="title-text-group">
+                  <h2>Cancelled Admissions <span class="count-badge" style="background:#fee2e2; color:#ef4444;">{{
+                      cancelledAdmTotal | number }}</span></h2>
+                  <p class="section-subtitle">Confirmed admissions that were later cancelled / revoked</p>
+                </div>
               </div>
             </div>
             <div class="table-controls">
               <div class="search-box">
-                <i class='bx bx-search'></i>
+                <span class="material-symbols-outlined">search</span>
                 <input type="text" placeholder="Search student..." [(ngModel)]="cancelledAdmSearch"
                   (ngModelChange)="onCancelledAdmSearchChange()">
+              </div>
+              <div class="filter-actions-group">
+                <button class="btn-excel-export" (click)="exportStudents('cancelled_admissions')"
+                  [disabled]="exporting['students_cancelled_admissions']">
+                  <span class="material-symbols-outlined"
+                    *ngIf="!exporting['students_cancelled_admissions']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_cancelled_admissions']"></i>
+                  Export Excel
+                </button>
               </div>
             </div>
             <div class="table-wrapper">
@@ -435,38 +651,64 @@
                 <tbody>
                   <tr *ngFor="let s of paginatedCancelledAdmissions">
                     <td><strong>{{ s.fullName || s.studentName }}</strong></td>
-                    <td>{{ s.mobileNumber || '—' }}</td>
+                    <td>{{ s.phoneNumber || '—' }}</td>
                     <td>{{ s.courseName || '—' }}</td>
-                    <td>{{ s.date | date:'dd MMM yyyy' }}</td>
-                    <td><button class="link-btn" (click)="onViewAdmission(s.id)">View</button></td>
+                    <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedCancelledAdmissions.length === 0">
                     <td colspan="5">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No cancelled admissions</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Cancelled Admissions Found</h3>
+                        <p>There are currently no students in this category.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="cancelledAdmPageSize" (change)="onCancelledAdmSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (cancelledAdmPage - 1) * cancelledAdmPageSize + 1 }}–{{ cancelledAdmPage *
+                cancelledAdmPageSize > cancelledAdmTotal ? cancelledAdmTotal : cancelledAdmPage * cancelledAdmPageSize
+                }} of {{ cancelledAdmTotal | number }} students
               </div>
-              <div class="pagination-info">{{ cancelledAdmTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeCancelledAdmPage(-1)" [disabled]="cancelledAdmPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ cancelledAdmPage }} / {{ getTotalPages(cancelledAdmTotal,
-                  cancelledAdmPageSize) }}</span>
-                <button (click)="changeCancelledAdmPage(1)"
-                  [disabled]="cancelledAdmPage >= getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="cancelledAdmPageSize" (change)="onCancelledAdmSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="cancelledAdmPage = 1; loadStudents('cancelled_admissions')"
+                    [disabled]="cancelledAdmPage <= 1" title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeCancelledAdmPage(-1)" [disabled]="cancelledAdmPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ cancelledAdmPage }} / {{ getTotalPages(cancelledAdmTotal,
+                    cancelledAdmPageSize) }}</span>
+                  <button (click)="changeCancelledAdmPage(1)"
+                    [disabled]="cancelledAdmPage >= getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)"
+                    title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button
+                    (click)="cancelledAdmPage = getTotalPages(cancelledAdmTotal, cancelledAdmPageSize); loadStudents('cancelled_admissions')"
+                    [disabled]="cancelledAdmPage >= getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)"
+                    title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -475,13 +717,18 @@
           <div class="section" id="user-section">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon"><i class='bx bx-user'></i></div>
-                <h2>User Breakdown</h2>
-                <span class="count-badge">{{ userTotal | number }}</span>
+                <div class="section-icon">
+                  <span class="material-symbols-outlined">group</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>User Breakdown <span class="count-badge">{{ userTotal | number }}</span></h2>
+                  <p class="section-subtitle">Performance stats and breakdowns per registration user/counselor</p>
+                </div>
               </div>
               <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportUsers()" [disabled]="exporting['users']">
-                  <i class='bx' [ngClass]="exporting['users'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i> Export
+                <button class="btn-excel-export" (click)="exportUsers()" [disabled]="exporting['users']">
+                  <span class="material-symbols-outlined" *ngIf="!exporting['users']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['users']"></i> Export Excel
                 </button>
               </div>
             </div>
@@ -521,37 +768,60 @@
                     <td class="num-col">{{ u.sbsStudents | number }}</td>
                     <td class="num-col">{{ u.duplicateApplications | number }}</td>
                     <td>
-                      <button class="link-btn"
-                        (click)="onViewDetails(u.userId, u.userName, 'ALL_APPLICATIONS')">Analytics</button>
-                      &nbsp;|&nbsp;
-                      <button class="link-btn" (click)="onViewUser(u.userId)">Profile</button>
+                      <div style="display:flex; gap:6px;">
+                        <button class="action-icon-btn"
+                          (click)="onViewDetails(u.userId, u.userName, 'ALL_APPLICATIONS')">
+                          <span class="material-symbols-outlined">analytics</span> Analytics
+                        </button>
+                        <button class="action-icon-btn" (click)="onViewUser(u.userId)">
+                          <span class="material-symbols-outlined">account_circle</span> Profile
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr *ngIf="paginatedUsers.length === 0">
                     <td colspan="11">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No user data available</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No User Data Available</h3>
+                        <p>There are currently no users registered in this category.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="userPageSize" (change)="onUserSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (userPage - 1) * userPageSize + 1 }}–{{ userPage * userPageSize > userTotal ? userTotal :
+                userPage * userPageSize }} of {{ userTotal | number }} users
               </div>
-              <div class="pagination-info">{{ userTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeUserPage(-1)" [disabled]="userPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ userPage }} / {{ getTotalPages(userTotal, userPageSize) }}</span>
-                <button (click)="changeUserPage(1)" [disabled]="userPage >= getTotalPages(userTotal, userPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="userPageSize" (change)="onUserSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="userPage = 1; loadUserBreakdown()" [disabled]="userPage <= 1" title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeUserPage(-1)" [disabled]="userPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ userPage }} / {{ getTotalPages(userTotal, userPageSize) }}</span>
+                  <button (click)="changeUserPage(1)" [disabled]="userPage >= getTotalPages(userTotal, userPageSize)"
+                    title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button (click)="userPage = getTotalPages(userTotal, userPageSize); loadUserBreakdown()"
+                    [disabled]="userPage >= getTotalPages(userTotal, userPageSize)" title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -560,16 +830,19 @@
           <div class="section" id="consultancy-section">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#dbeafe;"><i class='bx bx-buildings'
-                    style="color:#3b82f6;"></i></div>
-                <h2>Consultancy Breakdown</h2>
-                <span class="count-badge">{{ consTotal | number }}</span>
+                <div class="section-icon" style="background:#dbeafe; color:#3b82f6;">
+                  <span class="material-symbols-outlined">handshake</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Consultancy Breakdown <span class="count-badge">{{ consTotal | number }}</span></h2>
+                  <p class="section-subtitle">Performance breakdown by partner consultancies</p>
+                </div>
               </div>
               <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportConsultancies()"
+                <button class="btn-excel-export" (click)="exportConsultancies()"
                   [disabled]="exporting['consultancies']">
-                  <i class='bx' [ngClass]="exporting['consultancies'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
+                  <span class="material-symbols-outlined" *ngIf="!exporting['consultancies']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['consultancies']"></i> Export Excel
                 </button>
               </div>
             </div>
@@ -589,7 +862,6 @@
                     <th class="num-col">FOC</th>
                     <th class="num-col">SBS</th>
                     <th class="num-col">Duplicates</th>
-                    <th class="num-col">Commission</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -604,34 +876,56 @@
                     <td class="num-col">{{ c.focStudents | number }}</td>
                     <td class="num-col">{{ c.sbsStudents | number }}</td>
                     <td class="num-col">{{ c.duplicateApplications | number }}</td>
-                    <td class="num-col">₹{{ c.projectedCommission | number:'1.0-0' }}</td>
-                    <td><button class="link-btn" (click)="onViewConsultancy(c.consultancyId)">View</button></td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewConsultancy(c.consultancyId)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedConsultancies.length === 0">
                     <td colspan="11">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No consultancy data</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Consultancy Data Found</h3>
+                        <p>There is currently no consultancy data available.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="consPageSize" (change)="onConsSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (consPage - 1) * consPageSize + 1 }}–{{ consPage * consPageSize > consTotal ? consTotal :
+                consPage * consPageSize }} of {{ consTotal | number }} consultancies
               </div>
-              <div class="pagination-info">{{ consTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeConsPage(-1)" [disabled]="consPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ consPage }} / {{ getTotalPages(consTotal, consPageSize) }}</span>
-                <button (click)="changeConsPage(1)" [disabled]="consPage >= getTotalPages(consTotal, consPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="consPageSize" (change)="onConsSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="consPage = 1; loadConsultancyBreakdown()" [disabled]="consPage <= 1"
+                    title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeConsPage(-1)" [disabled]="consPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ consPage }} / {{ getTotalPages(consTotal, consPageSize) }}</span>
+                  <button (click)="changeConsPage(1)" [disabled]="consPage >= getTotalPages(consTotal, consPageSize)"
+                    title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button (click)="consPage = getTotalPages(consTotal, consPageSize); loadConsultancyBreakdown()"
+                    [disabled]="consPage >= getTotalPages(consTotal, consPageSize)" title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -640,16 +934,19 @@
           <div class="section" id="institution-section">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#fef3c7;"><i class='bx bxs-school'
-                    style="color:#d97706;"></i></div>
-                <h2>Institution Breakdown</h2>
-                <span class="count-badge">{{ instTotal | number }}</span>
+                <div class="section-icon" style="background:#fef3c7; color:#d97706;">
+                  <span class="material-symbols-outlined">corporate_fare</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Institution Breakdown <span class="count-badge" style="background:#fef3c7; color:#d97706;">{{
+                      instTotal | number }}</span></h2>
+                  <p class="section-subtitle">Performance breakdown by participating institutions</p>
+                </div>
               </div>
               <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportInstitutions()"
-                  [disabled]="exporting['institutions']">
-                  <i class='bx' [ngClass]="exporting['institutions'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
+                <button class="btn-excel-export" (click)="exportInstitutions()" [disabled]="exporting['institutions']">
+                  <span class="material-symbols-outlined" *ngIf="!exporting['institutions']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['institutions']"></i> Export Excel
                 </button>
               </div>
             </div>
@@ -681,33 +978,56 @@
                     <td class="num-col">{{ inst.cancelledApplications | number }}</td>
                     <td class="num-col">{{ inst.cancelledAdmissions | number }}</td>
                     <td class="num-col">{{ inst.duplicateApplications | number }}</td>
-                    <td><button class="link-btn" (click)="onViewInstitution(inst.institutionId)">View</button></td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewInstitution(inst.institutionId)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedInstitutions.length === 0">
                     <td colspan="9">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No institution data</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Institution Data Found</h3>
+                        <p>There is currently no institution data available.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="instPageSize" (change)="onInstSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (instPage - 1) * instPageSize + 1 }}–{{ instPage * instPageSize > instTotal ? instTotal :
+                instPage * instPageSize }} of {{ instTotal | number }} institutions
               </div>
-              <div class="pagination-info">{{ instTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeInstPage(-1)" [disabled]="instPage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ instPage }} / {{ getTotalPages(instTotal, instPageSize) }}</span>
-                <button (click)="changeInstPage(1)" [disabled]="instPage >= getTotalPages(instTotal, instPageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="instPageSize" (change)="onInstSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="instPage = 1; loadInstitutionBreakdown()" [disabled]="instPage <= 1"
+                    title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeInstPage(-1)" [disabled]="instPage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ instPage }} / {{ getTotalPages(instTotal, instPageSize) }}</span>
+                  <button (click)="changeInstPage(1)" [disabled]="instPage >= getTotalPages(instTotal, instPageSize)"
+                    title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button (click)="instPage = getTotalPages(instTotal, instPageSize); loadInstitutionBreakdown()"
+                    [disabled]="instPage >= getTotalPages(instTotal, instPageSize)" title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -716,14 +1036,19 @@
           <div class="section" id="course-section">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#f0fdf4;"><i class='bx bx-book-open'
-                    style="color:#16a34a;"></i></div>
-                <h2>Course Breakdown</h2>
-                <span class="count-badge">{{ courseTotal | number }}</span>
+                <div class="section-icon" style="background:#f0fdf4; color:#16a34a;">
+                  <span class="material-symbols-outlined">auto_stories</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Course Breakdown <span class="count-badge" style="background:#f0fdf4; color:#16a34a;">{{
+                      courseTotal | number }}</span></h2>
+                  <p class="section-subtitle">Performance breakdown by academic course</p>
+                </div>
               </div>
               <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportCourses()" [disabled]="exporting['courses']">
-                  <i class='bx' [ngClass]="exporting['courses'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i> Export
+                <button class="btn-excel-export" (click)="exportCourses()" [disabled]="exporting['courses']">
+                  <span class="material-symbols-outlined" *ngIf="!exporting['courses']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['courses']"></i> Export Excel
                 </button>
               </div>
             </div>
@@ -759,34 +1084,56 @@
                     <td class="num-col">{{ c.focStudents | number }}</td>
                     <td class="num-col">{{ c.sbsStudents | number }}</td>
                     <td class="num-col">{{ c.duplicateApplications | number }}</td>
-                    <td><button class="link-btn" (click)="onViewCourse(c.courseId)">View</button></td>
+                    <td>
+                      <button class="action-icon-btn" (click)="onViewCourse(c.courseId)">
+                        <span class="material-symbols-outlined">visibility</span> View
+                      </button>
+                    </td>
                   </tr>
                   <tr *ngIf="paginatedCourses.length === 0">
                     <td colspan="11">
-                      <div class="empty-state"><i class='bx bx-inbox'></i>
-                        <p>No course data</p>
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Course Data Found</h3>
+                        <p>There is currently no course breakdown data available.</p>
                       </div>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <div class="pagination-row">
-              <div class="page-size-selector">
-                Show <select [(ngModel)]="coursePageSize" (change)="onCourseSizeChange()">
-                  <option [ngValue]="10">10</option>
-                  <option [ngValue]="25">25</option>
-                  <option [ngValue]="50">50</option>
-                </select> per page
+            <div class="table-footer">
+              <div class="footer-left">
+                Showing {{ (coursePage - 1) * coursePageSize + 1 }}–{{ coursePage * coursePageSize > courseTotal ?
+                courseTotal : coursePage * coursePageSize }} of {{ courseTotal | number }} courses
               </div>
-              <div class="pagination-info">{{ courseTotal | number }} total</div>
-              <div class="pagination-controls">
-                <button (click)="changeCoursePage(-1)" [disabled]="coursePage <= 1"><i
-                    class='bx bx-chevron-left'></i></button>
-                <span class="page-num">Page {{ coursePage }} / {{ getTotalPages(courseTotal, coursePageSize) }}</span>
-                <button (click)="changeCoursePage(1)"
-                  [disabled]="coursePage >= getTotalPages(courseTotal, coursePageSize)"><i
-                    class='bx bx-chevron-right'></i></button>
+              <div class="footer-right">
+                <div class="page-size-selector">
+                  Rows per page
+                  <select [(ngModel)]="coursePageSize" (change)="onCourseSizeChange()">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                  </select>
+                </div>
+                <div class="pagination-controls">
+                  <button (click)="coursePage = 1; loadCourseBreakdown()" [disabled]="coursePage <= 1"
+                    title="First Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
+                  </button>
+                  <button (click)="changeCoursePage(-1)" [disabled]="coursePage <= 1" title="Previous Page">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <span class="page-num">{{ coursePage }} / {{ getTotalPages(courseTotal, coursePageSize) }}</span>
+                  <button (click)="changeCoursePage(1)"
+                    [disabled]="coursePage >= getTotalPages(courseTotal, coursePageSize)" title="Next Page">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                  <button (click)="coursePage = getTotalPages(courseTotal, coursePageSize); loadCourseBreakdown()"
+                    [disabled]="coursePage >= getTotalPages(courseTotal, coursePageSize)" title="Last Page">
+                    <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -795,53 +1142,60 @@
           <div class="section" id="course-type-section">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#fdf4ff;"><i class='bx bx-category'
-                    style="color:#a21caf;"></i></div>
-                <h2>Course Type Breakdown</h2>
-                <span class="count-badge">{{ courseTypeList.length }}</span>
+                <div class="section-icon" style="background:#fdf4ff; color:#a21caf;">
+                  <span class="material-symbols-outlined">category</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Course Type Breakdown <span class="count-badge" style="background:#fdf4ff; color:#a21caf;">{{
+                      courseTypeList.length }}</span></h2>
+                  <p class="section-subtitle">Performance breakdown by course type category</p>
+                </div>
               </div>
               <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportCourseTypes()"
-                  [disabled]="exporting['courseTypes']">
-                  <i class='bx' [ngClass]="exporting['courseTypes'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
+                <button class="btn-excel-export" (click)="exportCourseTypes()" [disabled]="exporting['courseTypes']">
+                  <span class="material-symbols-outlined" *ngIf="!exporting['courseTypes']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['courseTypes']"></i> Export Excel
                 </button>
               </div>
             </div>
-            <div class="cards-grid">
-              <div class="breakdown-card" *ngFor="let ct of courseTypeList">
-                <div class="card-title"><i class='bx bx-bookmark'></i>{{ ct.courseType }}</div>
-                <div class="card-stats">
-                  <div class="stat-item">
-                    <div class="stat-label">Total Apps</div>
-                    <div class="stat-val">{{ ct.totalApplications | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Total Adm.</div>
-                    <div class="stat-val">{{ ct.totalAdmissions | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Remaining</div>
-                    <div class="stat-val">{{ ct.remainingApplications | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Cancelled Apps</div>
-                    <div class="stat-val">{{ ct.cancelledApplications | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Scholar Adm.</div>
-                    <div class="stat-val">{{ ct.scholarAdmissions | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Duplicates</div>
-                    <div class="stat-val">{{ ct.duplicateApplications | number }}</div>
-                  </div>
-                </div>
-              </div>
-              <div *ngIf="courseTypeList.length === 0" class="empty-state" style="grid-column:1/-1;">
-                <i class='bx bx-inbox'></i>
-                <p>No course type data</p>
-              </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Course Type</th>
+                    <th class="num-col">Total Apps</th>
+                    <th class="num-col">Total Adm.</th>
+                    <th class="num-col">Remaining</th>
+                    <th class="num-col">Cancelled Apps</th>
+                    <th class="num-col">Scholar Adm.</th>
+                    <th class="num-col">FOC</th>
+                    <th class="num-col">SBS</th>
+                    <th class="num-col">Duplicates</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ct of courseTypeList">
+                    <td><strong>{{ ct.courseType }}</strong></td>
+                    <td class="num-col">{{ ct.totalApplications | number }}</td>
+                    <td class="num-col">{{ ct.totalAdmissions | number }}</td>
+                    <td class="num-col">{{ ct.remainingApplications | number }}</td>
+                    <td class="num-col">{{ ct.cancelledApplications | number }}</td>
+                    <td class="num-col">{{ ct.scholarAdmissions | number }}</td>
+                    <td class="num-col">{{ ct.focStudents | number }}</td>
+                    <td class="num-col">{{ ct.sbsStudents | number }}</td>
+                    <td class="num-col">{{ ct.duplicateApplications | number }}</td>
+                  </tr>
+                  <tr *ngIf="courseTypeList.length === 0">
+                    <td colspan="9">
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Course Type Data Found</h3>
+                        <p>There is currently no course type breakdown data available.</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -849,53 +1203,56 @@
           <div class="section" id="lead-source-section">
             <div class="section-header">
               <div class="section-title">
-                <div class="section-icon" style="background:#fff7ed;"><i class='bx bx-target-lock'
-                    style="color:#ea580c;"></i></div>
-                <h2>Lead Source Breakdown</h2>
-                <span class="count-badge">{{ leadSourceList.length }}</span>
+                <div class="section-icon" style="background:#fff7ed; color:#ea580c;">
+                  <span class="material-symbols-outlined">track_changes</span>
+                </div>
+                <div class="title-text-group">
+                  <h2>Lead Source Breakdown <span class="count-badge" style="background:#fff7ed; color:#ea580c;">{{
+                      leadSourceList.length }}</span></h2>
+                  <p class="section-subtitle">Performance breakdown by student lead acquisition sources</p>
+                </div>
               </div>
               <div class="section-actions">
-                <button class="action-btn btn-export" (click)="exportLeadSources()"
-                  [disabled]="exporting['leadSources']">
-                  <i class='bx' [ngClass]="exporting['leadSources'] ? 'bx-loader-alt bx-spin' : 'bx-download'"></i>
-                  Export
+                <button class="btn-excel-export" (click)="exportLeadSources()" [disabled]="exporting['leadSources']">
+                  <span class="material-symbols-outlined" *ngIf="!exporting['leadSources']">file_download</span>
+                  <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['leadSources']"></i> Export Excel
                 </button>
               </div>
             </div>
-            <div class="cards-grid">
-              <div class="breakdown-card" *ngFor="let ls of leadSourceList">
-                <div class="card-title"><i class='bx bx-radio-circle-marked'></i>{{ ls.leadSourceName }}</div>
-                <div class="card-stats">
-                  <div class="stat-item">
-                    <div class="stat-label">Total Apps</div>
-                    <div class="stat-val">{{ ls.totalApplications | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Total Adm.</div>
-                    <div class="stat-val">{{ ls.totalAdmissions | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Remaining</div>
-                    <div class="stat-val">{{ ls.remainingApplications | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Cancelled Apps</div>
-                    <div class="stat-val">{{ ls.cancelledApplications | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">FOC Adm.</div>
-                    <div class="stat-val">{{ ls.focAdmissions | number }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Duplicates</div>
-                    <div class="stat-val">{{ ls.duplicateApplications | number }}</div>
-                  </div>
-                </div>
-              </div>
-              <div *ngIf="leadSourceList.length === 0" class="empty-state" style="grid-column:1/-1;">
-                <i class='bx bx-inbox'></i>
-                <p>No lead source data</p>
-              </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Lead Source</th>
+                    <th class="num-col">Total Apps</th>
+                    <th class="num-col">Total Adm.</th>
+                    <th class="num-col">Remaining</th>
+                    <th class="num-col">Cancelled Apps</th>
+                    <th class="num-col">FOC Adm.</th>
+                    <th class="num-col">Duplicates</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let ls of leadSourceList">
+                    <td><strong>{{ ls.leadSourceName }}</strong></td>
+                    <td class="num-col">{{ ls.totalApplications | number }}</td>
+                    <td class="num-col">{{ ls.totalAdmissions | number }}</td>
+                    <td class="num-col">{{ ls.remainingApplications | number }}</td>
+                    <td class="num-col">{{ ls.cancelledApplications | number }}</td>
+                    <td class="num-col">{{ ls.focAdmissions | number }}</td>
+                    <td class="num-col">{{ ls.duplicateApplications | number }}</td>
+                  </tr>
+                  <tr *ngIf="leadSourceList.length === 0">
+                    <td colspan="7">
+                      <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-icon">inbox</span>
+                        <h3>No Lead Source Data Found</h3>
+                        <p>There is currently no lead source breakdown data available.</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

@@ -301,7 +301,20 @@ export class LocationAnalyticsService {
 
   // ===================== STUDENT LIST ENDPOINTS =====================
 
-  getCityStudentsPaged(cityId: number, page: number, size: number, tab: string, search: string, source: string, scholar: boolean | null, sortBy: string, sortDirection: string): Observable<any> {
+  getCityStudentsPaged(
+    cityId: number,
+    page: number,
+    size: number,
+    tab: string,
+    search: string,
+    source: string,
+    scholar: boolean | null,
+    sortBy: string,
+    sortDirection: string,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -311,12 +324,28 @@ export class LocationAnalyticsService {
     if (search) params = params.set('search', search);
     if (source) params = params.set('source', source);
     if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
     return this.http.get<any>(`${this.apiUrl}/cities/${cityId}/students`, { params }).pipe(
       map(res => res.data || { content: [], totalElements: 0 })
     );
   }
 
-  getStateStudentsPaged(stateName: string, page: number, size: number, tab: string, search: string, source: string, scholar: boolean | null, sortBy: string, sortDirection: string): Observable<any> {
+  getStateStudentsPaged(
+    stateName: string,
+    page: number,
+    size: number,
+    tab: string,
+    search: string,
+    source: string,
+    scholar: boolean | null,
+    sortBy: string,
+    sortDirection: string,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -326,6 +355,9 @@ export class LocationAnalyticsService {
     if (search) params = params.set('search', search);
     if (source) params = params.set('source', source);
     if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
     return this.http.get<any>(`${this.apiUrl}/states/${encodeURIComponent(stateName)}/students`, { params }).pipe(
       map(res => res.data || { content: [], totalElements: 0 })
     );
@@ -333,19 +365,43 @@ export class LocationAnalyticsService {
 
   // ===================== EXPORT ENDPOINTS =====================
 
-  exportCityStudents(cityId: number, tab: string, search?: string, source?: string, scholar?: boolean | null): Observable<Blob> {
+  exportCityStudents(
+    cityId: number,
+    tab: string,
+    search?: string,
+    source?: string,
+    scholar?: boolean | null,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<Blob> {
     let params = new HttpParams().set('tab', tab);
     if (search) params = params.set('search', search);
     if (source) params = params.set('source', source);
     if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
     return this.http.get(`${this.apiUrl}/cities/${cityId}/students/export`, { params, responseType: 'blob' });
   }
 
-  exportStateStudents(stateName: string, tab: string, search?: string, source?: string, scholar?: boolean | null): Observable<Blob> {
+  exportStateStudents(
+    stateName: string,
+    tab: string,
+    search?: string,
+    source?: string,
+    scholar?: boolean | null,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<Blob> {
     let params = new HttpParams().set('tab', tab);
     if (search) params = params.set('search', search);
     if (source) params = params.set('source', source);
     if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
     return this.http.get(`${this.apiUrl}/states/${encodeURIComponent(stateName)}/students/export`, { params, responseType: 'blob' });
   }
 

@@ -31,7 +31,6 @@ import {
     FormsModule,
     SidebarComponent,
     TopbarComponent,
-    DownloadConfirmationModalComponent,
     StudentAnalyticsModalComponent
   ],
   templateUrl: './state-detail.component.html',
@@ -96,7 +95,7 @@ export class StateDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     public router: Router,
     private locationAnalyticsService: LocationAnalyticsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {

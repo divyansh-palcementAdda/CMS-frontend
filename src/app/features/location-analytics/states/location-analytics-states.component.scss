@@ -288,12 +288,46 @@ $text-light: #64748B;
               &.text-light {
                 color: $text-light;
               }
+
+              &.action-cell {
+                text-align: center;
+                padding: 8px 10px;
+              }
             }
 
             &:last-child td {
               border-bottom: none;
             }
           }
+        }
+      }
+
+      // View Analytics button inside table rows
+      .btn-view {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        background: $primary-light;
+        color: $primary;
+        border: 1.5px solid rgba(99, 102, 241, 0.25);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+
+        svg {
+          flex-shrink: 0;
+        }
+
+        &:hover {
+          background: $primary;
+          color: white;
+          border-color: $primary;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
         }
       }
     }
