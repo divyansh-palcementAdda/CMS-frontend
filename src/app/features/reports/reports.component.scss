@@ -5245,6 +5245,61 @@
             }
         }
     }
+
+    // WhatsApp modal responsive for 375px
+    .whatsapp-preview-modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+
+        .whatsapp-preview-panel {
+            border-radius: 20px 20px 0 0;
+            max-height: 92vh;
+            overflow-y: auto;
+
+            .panel-header {
+                padding: 16px 18px;
+
+                .panel-title {
+                    gap: 10px;
+
+                    .whatsapp-logo {
+                        width: 26px;
+                        height: 26px;
+                        flex-shrink: 0;
+                    }
+                }
+            }
+
+            .preview-chat-bg {
+                max-height: 260px;
+                padding: 16px;
+
+                .whatsapp-chat-bubble {
+                    max-width: 100%;
+                }
+            }
+
+            .panel-footer {
+                padding: 14px 18px;
+                flex-direction: column;
+                gap: 10px;
+
+                .close-btn {
+                    width: 100%;
+                }
+
+                .footer-actions-group {
+                    width: 100%;
+                    flex-direction: column;
+                    gap: 8px;
+
+                    .btn-panel-action {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Extra Small Mobile Phones (320px)
@@ -5588,6 +5643,95 @@
             .btn-panel-action {
                 height: 40px;
                 font-size: 12px;
+            }
+        }
+    }
+
+    // WhatsApp modal specific fixes for 320px
+    .whatsapp-preview-modal-overlay {
+        padding: 0 !important;
+        align-items: flex-end !important;
+
+        .whatsapp-preview-panel {
+            border-radius: 16px 16px 0 0 !important;
+            max-height: 78vh !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+
+            .panel-header {
+                padding: 12px 14px !important;
+                flex-shrink: 0 !important;
+
+                .panel-title {
+                    gap: 8px;
+
+                    .whatsapp-logo {
+                        width: 22px;
+                        height: 22px;
+                        flex-shrink: 0;
+                    }
+
+                    .panel-header-text {
+                        h4 {
+                            font-size: 13px !important;
+                        }
+                        p {
+                            font-size: 10px !important;
+                        }
+                    }
+                }
+
+                .btn-close-panel {
+                    width: 28px !important;
+                    height: 28px !important;
+                    flex-shrink: 0;
+                }
+            }
+
+            .preview-chat-bg {
+                padding: 12px !important;
+                flex: 1 1 auto !important;
+                overflow-y: auto !important;
+                max-height: 180px !important;  // fixed small height so footer always visible
+
+                .whatsapp-chat-bubble {
+                    max-width: 100%;
+                    padding: 8px 10px 6px 10px !important;
+
+                    .bubble-text {
+                        font-size: 11.5px !important;
+                        line-height: 1.45 !important;
+                    }
+                }
+            }
+
+            .panel-footer {
+                padding: 10px 14px 14px !important;
+                flex-shrink: 0 !important;
+                flex-direction: column !important;
+                gap: 7px !important;
+                background: #ffffff;
+
+                .close-btn {
+                    width: 100% !important;
+                    height: 38px !important;
+                    font-size: 12px !important;
+                }
+
+                .footer-actions-group {
+                    width: 100% !important;
+                    flex-direction: column !important;
+                    gap: 7px !important;
+
+                    .btn-panel-action {
+                        width: 100% !important;
+                        height: 38px !important;
+                        font-size: 12px !important;
+                        padding: 0 12px !important;
+                    }
+                }
             }
         }
     }
