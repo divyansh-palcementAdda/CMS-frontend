@@ -79,6 +79,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   modalUserId = 0;
   modalUserName = '';
   modalInitialTab = 'ALL_APPLICATIONS';
+  modalCity = '';
+  modalState = '';
 
   // Outer Table Breakdown Pagination
   breakdownPage = 1;
@@ -738,10 +740,12 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     this.loadCourseUserBreakdown();
   }
 
-  onViewDetails(userId: number, userName: string, initialTab: string): void {
+  onViewDetails(userId: number, userName: string, initialTab: string, city?: string, state?: string): void {
     this.modalUserId = userId;
     this.modalUserName = userName;
     this.modalInitialTab = initialTab;
+    this.modalCity = city || '';
+    this.modalState = state || '';
     this.showAnalyticsModal = true;
 
     // Push state into query parameters
@@ -751,7 +755,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         showAnalyticsModal: 'true',
         modalUserId: userId,
         modalUserName: userName,
-        modalInitialTab: initialTab
+        modalInitialTab: initialTab,
+        modalCity: city || null,
+        modalState: state || null
       },
       queryParamsHandling: 'merge'
     });
@@ -766,6 +772,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         modalUserId: null,
         modalUserName: null,
         modalInitialTab: null,
+        modalCity: null,
+        modalState: null,
         modalTab: null,
         modalSearch: null,
         modalSession: null,

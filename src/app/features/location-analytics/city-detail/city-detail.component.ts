@@ -92,6 +92,8 @@ export class CityDetailComponent implements OnInit, OnDestroy {
   modalUserId = 0;
   modalUserName = '';
   modalInitialTab = 'ALL_APPLICATIONS';
+  modalCity = '';
+  modalState = '';
 
   // --- Export ---
   exporting: { [key: string]: boolean } = {};
@@ -543,15 +545,38 @@ export class CityDetailComponent implements OnInit, OnDestroy {
   }
 
   // ---- Analytics Modal ----
-  onViewDetails(userId: number, userName: string, initialTab: string): void {
+  onViewDetails(userId: number, userName: string, initialTab: string, city?: string, state?: string): void {
     this.modalUserId = userId; this.modalUserName = userName; this.modalInitialTab = initialTab;
+    this.modalCity = city || '';
+    this.modalState = state || this.modalState || '';
     this.showAnalyticsModal = true;
-    this.router.navigate([], { relativeTo: this.route, queryParams: { showAnalyticsModal: 'true', modalUserId: userId, modalUserName: userName, modalInitialTab: initialTab }, queryParamsHandling: 'merge' });
+    this.router.navigate([], { 
+      relativeTo: this.route, 
+      queryParams: { 
+        showAnalyticsModal: 'true', 
+        modalUserId: userId, 
+        modalUserName: userName, 
+        modalInitialTab: initialTab,
+        modalCity: city || null,
+        modalState: state || null
+      }, 
+      queryParamsHandling: 'merge' 
+    });
   }
 
   onCloseAnalyticsModal(): void {
     this.showAnalyticsModal = false;
-    this.router.navigate([], { relativeTo: this.route, queryParams: { showAnalyticsModal: null, modalUserId: null, modalUserName: null, modalInitialTab: null }, queryParamsHandling: 'merge' });
+    this.router.navigate([], { 
+      queryParams: { 
+        showAnalyticsModal: null, 
+        modalUserId: null, 
+        modalUserName: null, 
+        modalInitialTab: null,
+        modalCity: null,
+        modalState: null
+      }, 
+      queryParamsHandling: 'merge' 
+    });
   }
 
   // ---- Navigation ----

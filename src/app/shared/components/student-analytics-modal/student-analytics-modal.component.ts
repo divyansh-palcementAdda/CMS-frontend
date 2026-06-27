@@ -23,6 +23,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
   @Input() counselorName!: string;
   @Input() courseName!: string;
   @Input() initialTab: string = 'ALL_APPLICATIONS';
+  @Input() city: string = '';
+  @Input() state: string = '';
 
   @Output() close = new EventEmitter<void>();
 
@@ -267,8 +269,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       statusFilterParam,
       this.sourceType || undefined,
       undefined, // isScholar
-      undefined, // state
-      undefined, // city
+      this.state || undefined, // state
+      this.city || undefined, // city
       this.session || undefined,
       undefined, // commissionStatus
       fiftyPercentFeesPaid,

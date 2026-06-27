@@ -778,7 +778,7 @@
                     <td>
                       <div style="display:flex; gap:6px;">
                         <button class="action-icon-btn"
-                          (click)="onViewDetails(u.userId, u.userName, 'ALL_APPLICATIONS')">
+                          (click)="onViewDetails(u.userId, u.userName, 'ALL_APPLICATIONS', '', stateName)">
                           <span class="material-symbols-outlined">analytics</span> Analytics
                         </button>
                         <button class="action-icon-btn" (click)="onViewUser(u.userId)">
@@ -1262,5 +1262,5 @@
 
 <!-- Analytics Modal -->
 <app-student-analytics-modal *ngIf="showAnalyticsModal" [userId]="modalUserId" [counselorName]="modalUserName"
-  [initialTab]="modalInitialTab" (close)="onCloseAnalyticsModal()">
+  [initialTab]="modalInitialTab" [city]="modalCity" [state]="modalState" (close)="onCloseAnalyticsModal()">
 </app-student-analytics-modal>

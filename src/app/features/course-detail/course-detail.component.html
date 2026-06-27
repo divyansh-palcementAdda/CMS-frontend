@@ -1144,7 +1144,7 @@
       <!-- Reusable Student Analytics Modal -->
       <app-student-analytics-modal *ngIf="showAnalyticsModal" [courseId]="courseId" [userId]="modalUserId"
         [courseName]="courseDetail?.basicInfo?.name || ''" [counselorName]="modalUserName"
-        [initialTab]="modalInitialTab" (close)="onCloseAnalyticsModal()">
+        [initialTab]="modalInitialTab" [city]="modalCity" [state]="modalState" (close)="onCloseAnalyticsModal()">
       </app-student-analytics-modal>
 
       <!-- User Wise Breakdown Download Confirmation Modal -->
