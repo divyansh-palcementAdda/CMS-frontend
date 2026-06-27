@@ -671,6 +671,10 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.currentPage = 1;
     }
 
+    // Reset the debounce subject with the new search term
+    // This ensures the debounce timer is reset when switching tabs
+    this.searchSubject.next(this.searchTerm);
+
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
