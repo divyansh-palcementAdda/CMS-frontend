@@ -56,6 +56,16 @@ export class StateDetailComponent implements OnInit, OnDestroy {
   appFilterSource: string | null = null; appFilterScholar: boolean | null = null;
   admFilterSource: string | null = null; admFilterScholar: boolean | null = null;
 
+  // --- Additional Filters ---
+  appFilterDuplicate: boolean | null = null;
+  appFilterFoc: boolean | null = null;
+  appFilterSbs: boolean | null = null;
+  admFilterDuplicate: boolean | null = null;
+  admFilterFoc: boolean | null = null;
+  admFilterSbs: boolean | null = null;
+  currentAppTab: string = 'remaining_applications';
+  currentAdmTab: string = 'confirmed_admissions';
+
   // --- User Breakdown ---
   userBreakdownList = signal<UserBreakdown[]>([]);
   userPage = 1; userPageSize = 10; userTotal = 0; userSortBy = 'userName'; userSortDir = 'asc';
@@ -150,34 +160,66 @@ export class StateDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ---- Student List ----
   loadStudents(tab: string): void {
     let page: number, size: number, search: string, source: string | null, scholar: boolean | null, sortBy: string, sortDir: string;
-    switch (tab) {
-      case 'remaining_applications':
-        page = this.totalAppPage - 1; size = this.totalAppPageSize; search = this.totalAppSearch; source = this.appFilterSource; scholar = this.appFilterScholar; sortBy = this.totalAppSortBy; sortDir = this.totalAppSortDir; break;
-      case 'cancelled_applications':
-        page = this.cancelledAppPage - 1; size = this.cancelledAppPageSize; search = this.cancelledAppSearch; source = null; scholar = null; sortBy = this.cancelledAppSortBy; sortDir = this.cancelledAppSortDir; break;
-      case 'confirmed_admissions':
-        page = this.totalAdmPage - 1; size = this.totalAdmPageSize; search = this.totalAdmSearch; source = this.admFilterSource; scholar = this.admFilterScholar; sortBy = this.totalAdmSortBy; sortDir = this.totalAdmSortDir; break;
-      case 'cancelled_admissions':
-        page = this.cancelledAdmPage - 1; size = this.cancelledAdmPageSize; search = this.cancelledAdmSearch; source = null; scholar = null; sortBy = this.cancelledAdmSortBy; sortDir = this.cancelledAdmSortDir; break;
-      default: return;
+    let duplicateOnly: boolean | null = null;
+    let showOnlyFoc: boolean | null = null;
+    let showOnlySbs: boolean | null = null;
+
+    if (tab === 'remaining_applications' || tab === 'total_applications') {
+      page = this.totalAppPage - 1;
+      size = this.totalAppPageSize;
+      search = this.totalAppSearch;
+      source = this.appFilterSource;
+      scholar = this.appFilterScholar;
+      sortBy = this.totalAppSortBy;
+      sortDir = this.totalAppSortDir;
+      duplicateOnly = this.appFilterDuplicate;
+      showOnlyFoc = this.appFilterFoc;
+      showOnlySbs = this.appFilterSbs;
+      tab = this.currentAppTab;
+    } else if (tab === 'cancelled_applications') {
+      page = this.cancelledAppPage - 1; size = this.cancelledAppPageSize; search = this.cancelledAppSearch; source = null; scholar = null; sortBy = this.cancelledAppSortBy; sortDir = this.cancelledAppSortDir;
+    } else if (tab === 'confirmed_admissions') {
+      page = this.totalAdmPage - 1;
+      size = this.totalAdmPageSize;
+      search = this.totalAdmSearch;
+      source = this.admFilterSource;
+      scholar = this.admFilterScholar;
+      sortBy = this.totalAdmSortBy;
+      sortDir = this.totalAdmSortDir;
+      duplicateOnly = this.admFilterDuplicate;
+      showOnlyFoc = this.admFilterFoc;
+      showOnlySbs = this.admFilterSbs;
+      tab = this.currentAdmTab;
+    } else if (tab === 'cancelled_admissions') {
+      page = this.cancelledAdmPage - 1; size = this.cancelledAdmPageSize; search = this.cancelledAdmSearch; source = null; scholar = null; sortBy = this.cancelledAdmSortBy; sortDir = this.cancelledAdmSortDir;
+    } else {
+      return;
     }
-    this.locationAnalyticsService.getStateStudentsPaged(this.stateName, page, size, tab, search, source || '', scholar, sortBy, sortDir)
-      .pipe(takeUntil(this.destroy$)).subscribe({
-        next: (res) => {
-          const content = res.content || [];
-          const total = res.totalElements || 0;
-          switch (tab) {
-            case 'remaining_applications': this.totalApplications.set(content); this.totalAppTotal = total; break;
-            case 'cancelled_applications': this.cancelledApplications.set(content); this.cancelledAppTotal = total; break;
-            case 'confirmed_admissions': this.totalAdmissions.set(content); this.totalAdmTotal = total; break;
-            case 'cancelled_admissions': this.cancelledAdmissions.set(content); this.cancelledAdmTotal = total; break;
-          }
-        },
-        error: err => console.error(`Error loading state students (${tab}):`, err)
-      });
+
+    this.locationAnalyticsService.getStateStudentsPaged(
+      this.stateName, page, size, tab, search, source || '', scholar, sortBy, sortDir, duplicateOnly, showOnlyFoc, showOnlySbs
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        const content = res.content || [];
+        const total = res.totalElements || 0;
+        if (tab === 'remaining_applications' || tab === 'total_applications') {
+          this.totalApplications.set(content);
+          this.totalAppTotal = total;
+        } else if (tab === 'cancelled_applications') {
+          this.cancelledApplications.set(content);
+          this.cancelledAppTotal = total;
+        } else if (tab === 'confirmed_admissions') {
+          this.totalAdmissions.set(content);
+          this.totalAdmTotal = total;
+        } else if (tab === 'cancelled_admissions') {
+          this.cancelledAdmissions.set(content);
+          this.cancelledAdmTotal = total;
+        }
+      },
+      error: err => console.error(`Error loading state students (${tab}):`, err)
+    });
   }
 
   // ---- User Breakdown ----
@@ -294,8 +336,136 @@ export class StateDetailComponent implements OnInit, OnDestroy {
   onCitySizeChange(): void { this.cityPage = 1; this.loadCityBreakdown(); }
 
   // ---- Filters ----
-  clearAppFilter(): void { this.appFilterSource = null; this.appFilterScholar = null; this.totalAppPage = 1; this.loadStudents('remaining_applications'); }
-  clearAdmFilter(): void { this.admFilterSource = null; this.admFilterScholar = null; this.totalAdmPage = 1; this.loadStudents('confirmed_admissions'); }
+  clearAppFilter(): void {
+    this.appFilterSource = null;
+    this.appFilterScholar = null;
+    this.appFilterDuplicate = null;
+    this.appFilterFoc = null;
+    this.appFilterSbs = null;
+    this.currentAppTab = 'remaining_applications';
+    this.totalAppPage = 1;
+    this.loadStudents('remaining_applications');
+  }
+
+  clearAdmFilter(): void {
+    this.admFilterSource = null;
+    this.admFilterScholar = null;
+    this.admFilterDuplicate = null;
+    this.admFilterFoc = null;
+    this.admFilterSbs = null;
+    this.currentAdmTab = 'confirmed_admissions';
+    this.totalAdmPage = 1;
+    this.loadStudents('confirmed_admissions');
+  }
+
+  onStatClick(stat: string): void {
+    this.appFilterSource = null;
+    this.appFilterScholar = null;
+    this.appFilterDuplicate = null;
+    this.appFilterFoc = null;
+    this.appFilterSbs = null;
+    this.currentAppTab = 'remaining_applications';
+
+    this.admFilterSource = null;
+    this.admFilterScholar = null;
+    this.admFilterDuplicate = null;
+    this.admFilterFoc = null;
+    this.admFilterSbs = null;
+    this.currentAdmTab = 'confirmed_admissions';
+
+    if (stat === 'total_applications') {
+      this.currentAppTab = 'total_applications';
+      this.totalAppPage = 1;
+      this.loadStudents('remaining_applications');
+      this.scrollTo('total-apps');
+    }
+    else if (stat === 'remaining_applications') {
+      this.currentAppTab = 'remaining_applications';
+      this.totalAppPage = 1;
+      this.loadStudents('remaining_applications');
+      this.scrollTo('total-apps');
+    }
+    else if (stat === 'cancelled_applications') {
+      this.cancelledAppPage = 1;
+      this.loadStudents('cancelled_applications');
+      this.scrollTo('cancelled-apps');
+    }
+    else if (stat === 'total_admissions') {
+      this.currentAdmTab = 'confirmed_admissions';
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+    else if (stat === 'cancelled_admissions') {
+      this.cancelledAdmPage = 1;
+      this.loadStudents('cancelled_admissions');
+      this.scrollTo('cancelled-adms');
+    }
+    else if (stat === 'scholar_applications') {
+      this.currentAppTab = 'total_applications';
+      this.appFilterScholar = true;
+      this.totalAppPage = 1;
+      this.loadStudents('remaining_applications');
+      this.scrollTo('total-apps');
+    }
+    else if (stat === 'scholar_admissions') {
+      this.admFilterScholar = true;
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+    else if (stat === 'foc_admissions') {
+      this.admFilterFoc = true;
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+    else if (stat === 'sbs_admissions') {
+      this.admFilterSbs = true;
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+    else if (stat === 'direct_applications') {
+      this.currentAppTab = 'total_applications';
+      this.appFilterSource = 'USER';
+      this.totalAppPage = 1;
+      this.loadStudents('remaining_applications');
+      this.scrollTo('total-apps');
+    }
+    else if (stat === 'direct_admissions') {
+      this.admFilterSource = 'USER';
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+    else if (stat === 'consultancy_applications') {
+      this.currentAppTab = 'total_applications';
+      this.appFilterSource = 'CONSULTANCY';
+      this.totalAppPage = 1;
+      this.loadStudents('remaining_applications');
+      this.scrollTo('total-apps');
+    }
+    else if (stat === 'consultancy_admissions') {
+      this.admFilterSource = 'CONSULTANCY';
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+    else if (stat === 'duplicate_applications') {
+      this.currentAppTab = 'total_applications';
+      this.appFilterDuplicate = true;
+      this.totalAppPage = 1;
+      this.loadStudents('remaining_applications');
+      this.scrollTo('total-apps');
+    }
+    else if (stat === 'duplicate_admissions') {
+      this.admFilterDuplicate = true;
+      this.totalAdmPage = 1;
+      this.loadStudents('confirmed_admissions');
+      this.scrollTo('total-adms');
+    }
+  }
 
   // ---- Export ----
   downloadBlob(blob: Blob, filename: string): void {
@@ -310,11 +480,34 @@ export class StateDetailComponent implements OnInit, OnDestroy {
     const key = `students_${tab}`;
     this.exporting[key] = true;
     let search = '', source = '', scholar: boolean | null = null;
-    if (tab === 'remaining_applications') { search = this.totalAppSearch; source = this.appFilterSource || ''; scholar = this.appFilterScholar; }
-    else if (tab === 'confirmed_admissions') { search = this.totalAdmSearch; source = this.admFilterSource || ''; scholar = this.admFilterScholar; }
+    let duplicateOnly: boolean | null = null;
+    let showOnlyFoc: boolean | null = null;
+    let showOnlySbs: boolean | null = null;
+
+    if (tab === 'remaining_applications') {
+      search = this.totalAppSearch;
+      source = this.appFilterSource || '';
+      scholar = this.appFilterScholar;
+      duplicateOnly = this.appFilterDuplicate;
+      showOnlyFoc = this.appFilterFoc;
+      showOnlySbs = this.appFilterSbs;
+      tab = this.currentAppTab;
+    }
+    else if (tab === 'confirmed_admissions') {
+      search = this.totalAdmSearch;
+      source = this.admFilterSource || '';
+      scholar = this.admFilterScholar;
+      duplicateOnly = this.admFilterDuplicate;
+      showOnlyFoc = this.admFilterFoc;
+      showOnlySbs = this.admFilterSbs;
+      tab = this.currentAdmTab;
+    }
     else if (tab === 'cancelled_applications') { search = this.cancelledAppSearch; }
     else if (tab === 'cancelled_admissions') { search = this.cancelledAdmSearch; }
-    this.locationAnalyticsService.exportStateStudents(this.stateName, tab, search, source, scholar).subscribe({
+
+    this.locationAnalyticsService.exportStateStudents(
+      this.stateName, tab, search, source, scholar, duplicateOnly, showOnlyFoc, showOnlySbs
+    ).subscribe({
       next: (blob) => { this.downloadBlob(blob, `State_${this.stateName}_${tab}.xlsx`); this.exporting[key] = false; },
       error: (err) => { console.error(err); this.exporting[key] = false; }
     });

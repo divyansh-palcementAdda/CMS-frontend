@@ -33,7 +33,7 @@
                   <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
               </button>
-              <div class="header-icon-container green">
+              <div class="header-icon-container">
                 <span class="material-symbols-outlined header-icon">map</span>
               </div>
               <div class="title-info">
@@ -60,66 +60,135 @@
           </div>
 
           <!-- KPI Stats Grid -->
-          <div class="kpi-grid">
-            <div class="kpi-card primary" (click)="scrollTo('total-apps')">
-              <div class="kpi-label">Total Applications</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.totalApplications | number }}</div>
-              <div class="kpi-sub">All-time applications</div>
+          <div class="kpi-grid" *ngIf="stateDetail && stateDetail.kpiStats">
+            <!-- Row 1: 5 cards -->
+            <div class="kpi-row row-5">
+              <div class="kpi-card primary"
+                [class.active-kpi]="currentAppTab === 'total_applications' && !appFilterScholar && !appFilterDuplicate && !appFilterSource"
+                (click)="onStatClick('total_applications')">
+                <span class="material-symbols-outlined kpi-icon">assignment</span>
+                <div class="kpi-label">Total Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.totalApplications | number }}</div>
+                <div class="kpi-sub">Total student applications</div>
+              </div>
+              <div class="kpi-card primary"
+                [class.active-kpi]="currentAppTab === 'remaining_applications' && !appFilterScholar && !appFilterDuplicate && !appFilterSource"
+                (click)="onStatClick('remaining_applications')">
+                <span class="material-symbols-outlined kpi-icon">hourglass_empty</span>
+                <div class="kpi-label">Remaining Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.remainingApplications | number }}</div>
+                <div class="kpi-sub">Applications awaiting admission</div>
+              </div>
+              <div class="kpi-card danger" (click)="onStatClick('cancelled_applications')">
+                <span class="material-symbols-outlined kpi-icon">cancel</span>
+                <div class="kpi-label">Cancelled Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.cancelledApplications | number }}</div>
+                <div class="kpi-sub">Applications cancelled before admission</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && !admFilterScholar && !admFilterDuplicate && !admFilterSource && !admFilterFoc && !admFilterSbs"
+                (click)="onStatClick('total_admissions')">
+                <span class="material-symbols-outlined kpi-icon">school</span>
+                <div class="kpi-label">Total Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.totalAdmissions | number }}</div>
+                <div class="kpi-sub">Successfully confirmed admissions</div>
+              </div>
+              <div class="kpi-card danger" (click)="onStatClick('cancelled_admissions')">
+                <span class="material-symbols-outlined kpi-icon">block</span>
+                <div class="kpi-label">Cancelled Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.cancelledAdmissions | number }}</div>
+                <div class="kpi-sub">Cancelled confirmed admissions</div>
+              </div>
             </div>
-            <div class="kpi-card success" (click)="scrollTo('total-adms')">
-              <div class="kpi-label">Total Admissions</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.totalAdmissions | number }}</div>
-              <div class="kpi-sub">Confirmed admissions</div>
+
+            <!-- Row 2: 4 cards -->
+            <div class="kpi-row row-4">
+              <div class="kpi-card purple"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterScholar"
+                (click)="onStatClick('scholar_applications')">
+                <span class="material-symbols-outlined kpi-icon">workspace_premium</span>
+                <div class="kpi-label">Scholar Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.scholarApplications | number }}</div>
+                <div class="kpi-sub">Scholarship applications</div>
+              </div>
+              <div class="kpi-card purple"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterScholar"
+                (click)="onStatClick('scholar_admissions')">
+                <span class="material-symbols-outlined kpi-icon">military_tech</span>
+                <div class="kpi-label">Scholar Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.scholarAdmissions | number }}</div>
+                <div class="kpi-sub">Scholarship admissions</div>
+              </div>
+              <div class="kpi-card purple" [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterFoc"
+                (click)="onStatClick('foc_admissions')">
+                <span class="material-symbols-outlined kpi-icon">volunteer_activism</span>
+                <div class="kpi-label">FOC Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.focAdmissions | number }}</div>
+                <div class="kpi-sub">Free of Cost admissions</div>
+              </div>
+              <div class="kpi-card purple" [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSbs"
+                (click)="onStatClick('sbs_admissions')">
+                <span class="material-symbols-outlined kpi-icon">account_balance</span>
+                <div class="kpi-label">SBS Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.sbsAdmissions | number }}</div>
+                <div class="kpi-sub">State Benefit Scheme admissions</div>
+              </div>
             </div>
-            <div class="kpi-card warning" (click)="scrollTo('total-apps')">
-              <div class="kpi-label">Remaining Apps</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.remainingApplications | number }}</div>
-              <div class="kpi-sub">Active applications</div>
+
+            <!-- Row 3: 4 cards -->
+            <div class="kpi-row row-4">
+              <div class="kpi-card info"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterSource === 'USER'"
+                (click)="onStatClick('direct_applications')">
+                <span class="material-symbols-outlined kpi-icon">person</span>
+                <div class="kpi-label">Direct Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.directApplications | number }}</div>
+                <div class="kpi-sub">Direct walk-in applications</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSource === 'USER'"
+                (click)="onStatClick('direct_admissions')">
+                <span class="material-symbols-outlined kpi-icon">person_check</span>
+                <div class="kpi-label">Direct Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.directAdmissions | number }}</div>
+                <div class="kpi-sub">Direct confirmed admissions</div>
+              </div>
+              <div class="kpi-card info"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterSource === 'CONSULTANCY'"
+                (click)="onStatClick('consultancy_applications')">
+                <span class="material-symbols-outlined kpi-icon">groups</span>
+                <div class="kpi-label">Consultancy Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.consultancyApplications | number }}</div>
+                <div class="kpi-sub">Applications via consultancy</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSource === 'CONSULTANCY'"
+                (click)="onStatClick('consultancy_admissions')">
+                <span class="material-symbols-outlined kpi-icon">handshake</span>
+                <div class="kpi-label">Consultancy Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.consultancyAdmissions | number }}</div>
+                <div class="kpi-sub">Consultancy confirmed admissions</div>
+              </div>
             </div>
-            <div class="kpi-card danger" (click)="scrollTo('cancelled-apps')">
-              <div class="kpi-label">Cancelled Apps</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.cancelledApplications | number }}</div>
-              <div class="kpi-sub">Withdrawn applications</div>
-            </div>
-            <div class="kpi-card danger" (click)="scrollTo('cancelled-adms')">
-              <div class="kpi-label">Cancelled Adm.</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.cancelledAdmissions | number }}</div>
-              <div class="kpi-sub">Revoked admissions</div>
-            </div>
-            <div class="kpi-card purple" (click)="scrollTo('total-adms')">
-              <div class="kpi-label">Scholar Admissions</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.scholarAdmissions | number }}</div>
-              <div class="kpi-sub">of {{ stateDetail.kpiStats.scholarApplications | number }} apps</div>
-            </div>
-            <div class="kpi-card info" (click)="scrollTo('total-adms')">
-              <div class="kpi-label">Direct Admissions</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.directAdmissions | number }}</div>
-              <div class="kpi-sub">of {{ stateDetail.kpiStats.directApplications | number }} apps</div>
-            </div>
-            <div class="kpi-card teal" (click)="scrollTo('consultancy-section')">
-              <div class="kpi-label">Consultancy Adm.</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.consultancyAdmissions | number }}</div>
-              <div class="kpi-sub">of {{ stateDetail.kpiStats.consultancyApplications | number }} apps</div>
-            </div>
-            <div class="kpi-card orange">
-              <div class="kpi-label">FOC Admissions</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.focAdmissions | number }}</div>
-              <div class="kpi-sub">Free of charge</div>
-            </div>
-            <div class="kpi-card orange">
-              <div class="kpi-label">SBS Admissions</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.sbsAdmissions | number }}</div>
-              <div class="kpi-sub">Subsidized</div>
-            </div>
-            <div class="kpi-card warning">
-              <div class="kpi-label">Duplicate Apps</div>
-              <div class="kpi-value">{{ stateDetail.kpiStats.duplicateApplications | number }}</div>
-              <div class="kpi-sub">of {{ stateDetail.kpiStats.duplicateAdmissions | number }} adm.</div>
-            </div>
-            <div class="kpi-card primary" (click)="scrollTo('city-section')">
-              <div class="kpi-label">Total Cities</div>
-              <div class="kpi-value">{{ stateDetail.basicInfo.totalCities | number }}</div>
-              <div class="kpi-sub">Cities in this state</div>
+
+            <!-- Row 4: 2 cards -->
+            <div class="kpi-row row-2">
+              <div class="kpi-card orange"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterDuplicate"
+                (click)="onStatClick('duplicate_applications')">
+                <span class="material-symbols-outlined kpi-icon">content_copy</span>
+                <div class="kpi-label">Duplicate Applications</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.duplicateApplications | number }}</div>
+                <div class="kpi-sub">Applications marked duplicate</div>
+              </div>
+              <div class="kpi-card orange"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterDuplicate"
+                (click)="onStatClick('duplicate_admissions')">
+                <span class="material-symbols-outlined kpi-icon">rule</span>
+                <div class="kpi-label">Duplicate Admissions</div>
+                <div class="kpi-value">{{ stateDetail.kpiStats.duplicateAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions marked duplicate</div>
+              </div>
             </div>
           </div>
 
@@ -131,8 +200,13 @@
                   <span class="material-symbols-outlined">assignment</span>
                 </div>
                 <div class="title-text-group">
-                  <h2>Total Applications <span class="count-badge">{{ totalAppTotal | number }}</span></h2>
-                  <p class="section-subtitle">All student applications for this state</p>
+                  <h2>
+                    {{ currentAppTab === 'total_applications' ? 'Total Applications' : 'Remaining Applications' }}
+                    <span class="count-badge">{{ totalAppTotal | number }}</span>
+                  </h2>
+                  <p class="section-subtitle">
+                    {{ currentAppTab === 'total_applications' ? 'All student applications for this state' : 'Students pending admission confirmation' }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -176,13 +250,16 @@
                   <tr>
                     <th (click)="sortStudents('remaining_applications','fullName')">Student <i class='bx'
                         [ngClass]="getSortIcon(totalAppSortBy,'fullName',totalAppSortDir)"></i></th>
-                    <th>Mobile</th>
+                    <th (click)="sortStudents('remaining_applications','phoneNumber')">Mobile <i class='bx'
+                        [ngClass]="getSortIcon(totalAppSortBy,'phoneNumber',totalAppSortDir)"></i></th>
                     <th (click)="sortStudents('remaining_applications','courseName')">Course <i class='bx'
                         [ngClass]="getSortIcon(totalAppSortBy,'courseName',totalAppSortDir)"></i></th>
                     <th (click)="sortStudents('remaining_applications','date')">Date <i class='bx'
                         [ngClass]="getSortIcon(totalAppSortBy,'date',totalAppSortDir)"></i></th>
                     <th>Source</th>
                     <th>Scholar</th>
+                    <th (click)="sortStudents('remaining_applications','status')">Status <i class='bx'
+                        [ngClass]="getSortIcon(totalAppSortBy,'status',totalAppSortDir)"></i></th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -204,13 +281,21 @@
                     <td><span class="badge" [ngClass]="s.isScholar ? 'badge-green' : 'badge-orange'">{{ s.isScholar ?
                         'Scholar' : 'Regular' }}</span></td>
                     <td>
+                      <span class="badge" [ngClass]="{
+                        'badge-green': s.status === 'Confirmed' || s.status === 'ADMITTED',
+                        'badge-red': s.status === 'Cancelled' || s.status === 'CANCELLED',
+                        'badge-orange': s.status === 'Duplicate',
+                        'badge-purple': s.status !== 'Confirmed' && s.status !== 'ADMITTED' && s.status !== 'Cancelled' && s.status !== 'CANCELLED' && s.status !== 'Duplicate'
+                      }">{{ s.status || '—' }}</span>
+                    </td>
+                    <td>
                       <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
                         <span class="material-symbols-outlined">visibility</span> View
                       </button>
                     </td>
                   </tr>
                   <tr *ngIf="paginatedTotalApplications.length === 0">
-                    <td colspan="7">
+                    <td colspan="8">
                       <div class="empty-state-container">
                         <span class="material-symbols-outlined empty-icon">inbox</span>
                         <h3>No Applications Found</h3>
@@ -753,9 +838,12 @@
                         [ngClass]="getSortIcon(userSortBy,'totalApplications',userSortDir)"></i></th>
                     <th class="num-col" (click)="sortUsers('totalAdmissions')">Total Adm. <i class='bx'
                         [ngClass]="getSortIcon(userSortBy,'totalAdmissions',userSortDir)"></i></th>
-                    <th class="num-col">Remaining</th>
-                    <th class="num-col">Cancelled Apps</th>
-                    <th class="num-col">Cancelled Adm.</th>
+                    <th class="num-col" (click)="sortUsers('remainingApplications')">Remaining <i class='bx'
+                        [ngClass]="getSortIcon(userSortBy,'remainingApplications',userSortDir)"></i></th>
+                    <th class="num-col" (click)="sortUsers('cancelledApplications')">Cancelled Apps <i class='bx'
+                        [ngClass]="getSortIcon(userSortBy,'cancelledApplications',userSortDir)"></i></th>
+                    <th class="num-col" (click)="sortUsers('cancelledAdmissions')">Cancelled Adm. <i class='bx'
+                        [ngClass]="getSortIcon(userSortBy,'cancelledAdmissions',userSortDir)"></i></th>
                     <th class="num-col">Scholar</th>
                     <th class="num-col">FOC</th>
                     <th class="num-col">SBS</th>
@@ -1176,7 +1264,11 @@
                     <th class="num-col">Total Apps</th>
                     <th class="num-col">Total Adm.</th>
                     <th class="num-col">Remaining</th>
+                    <th class="num-col">Cancelled Apps</th>
                     <th class="num-col">Scholar Adm.</th>
+                    <th class="num-col">FOC</th>
+                    <th class="num-col">SBS</th>
+                    <th class="num-col">Duplicates</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1185,10 +1277,14 @@
                     <td class="num-col">{{ ct.totalApplications | number }}</td>
                     <td class="num-col">{{ ct.totalAdmissions | number }}</td>
                     <td class="num-col">{{ ct.remainingApplications | number }}</td>
+                    <td class="num-col">{{ ct.cancelledApplications | number }}</td>
                     <td class="num-col">{{ ct.scholarAdmissions | number }}</td>
+                    <td class="num-col">{{ ct.focStudents | number }}</td>
+                    <td class="num-col">{{ ct.sbsStudents | number }}</td>
+                    <td class="num-col">{{ ct.duplicateApplications | number }}</td>
                   </tr>
                   <tr *ngIf="courseTypeList.length === 0">
-                    <td colspan="5">
+                    <td colspan="9">
                       <div class="empty-state-container">
                         <span class="material-symbols-outlined empty-icon">inbox</span>
                         <h3>No Course Type Data Found</h3>
@@ -1229,7 +1325,9 @@
                     <th class="num-col">Total Apps</th>
                     <th class="num-col">Total Adm.</th>
                     <th class="num-col">Remaining</th>
+                    <th class="num-col">Cancelled Apps</th>
                     <th class="num-col">FOC Adm.</th>
+                    <th class="num-col">Duplicates</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1238,10 +1336,12 @@
                     <td class="num-col">{{ ls.totalApplications | number }}</td>
                     <td class="num-col">{{ ls.totalAdmissions | number }}</td>
                     <td class="num-col">{{ ls.remainingApplications | number }}</td>
+                    <td class="num-col">{{ ls.cancelledApplications | number }}</td>
                     <td class="num-col">{{ ls.focAdmissions | number }}</td>
+                    <td class="num-col">{{ ls.duplicateApplications | number }}</td>
                   </tr>
                   <tr *ngIf="leadSourceList.length === 0">
-                    <td colspan="5">
+                    <td colspan="7">
                       <div class="empty-state-container">
                         <span class="material-symbols-outlined empty-icon">inbox</span>
                         <h3>No Lead Source Data Found</h3>
