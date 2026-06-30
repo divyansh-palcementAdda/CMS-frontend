@@ -25,6 +25,10 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
   @Input() initialTab: string = 'ALL_APPLICATIONS';
   @Input() city: string = '';
   @Input() state: string = '';
+  // Breakdown-specific ID inputs (only one will be non-zero/non-null at a time)
+  @Input() consultancyId?: number;
+  @Input() institutionId?: number;
+  @Input() inputLeadSourceId?: string;
 
   @Output() close = new EventEmitter<void>();
 
@@ -276,14 +280,30 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       fiftyPercentFeesPaid,
       this.startDate || undefined,
       this.endDate || undefined,
-      this.leadSourceId || undefined,
+      this.leadSourceId || this.inputLeadSourceId || undefined, // filter dropdown OR breakdown input
       undefined, // appStartDate
       undefined, // appEndDate
       undefined, // admStartDate
       undefined, // admEndDate
       undefined, // isDiscounted
-      undefined, // consultancyId (removed)
-      this.userId ? Number(this.userId) : undefined
+      this.consultancyId ? Number(this.consultancyId) : undefined, // consultancyId
+      this.userId ? Number(this.userId) : undefined,               // userId
+      undefined, // showOnlyPaid
+      undefined, // showOnlyFoc
+      undefined, // showOnlySbs
+      undefined, // states
+      undefined, // cities
+      undefined, // courseTypes
+      undefined, // sessions
+      undefined, // admissionTypes
+      undefined, // leadSources
+      undefined, // userIds
+      undefined, // consultancyIds
+      undefined, // courseIds
+      undefined, // duplicateOnly
+      undefined, // excludeDuplicate
+      undefined, // includeDuplicate
+      this.institutionId ? Number(this.institutionId) : undefined  // institutionId
     ).subscribe({
       next: (res) => {
         this.admissions = res.admissions || [];

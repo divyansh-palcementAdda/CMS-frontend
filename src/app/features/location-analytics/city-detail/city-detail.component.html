@@ -877,9 +877,14 @@
                     <td class="num-col">{{ c.sbsStudents | number }}</td>
                     <td class="num-col">{{ c.duplicateApplications | number }}</td>
                     <td>
-                      <button class="action-icon-btn" (click)="onViewConsultancy(c.consultancyId)">
-                        <span class="material-symbols-outlined">visibility</span> View
-                      </button>
+                      <div style="display:flex; gap:6px;">
+                        <button class="action-icon-btn" (click)="onViewDetails(c.consultancyId, c.consultancyName, 'ALL_APPLICATIONS', cityDetail.basicInfo.name || '', cityDetail.basicInfo.state || '', 'consultancy')">
+                          <span class="material-symbols-outlined">analytics</span> Analytics
+                        </button>
+                        <button class="action-icon-btn" (click)="onViewConsultancy(c.consultancyId)">
+                          <span class="material-symbols-outlined">visibility</span> View
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr *ngIf="paginatedConsultancies.length === 0">
@@ -979,9 +984,14 @@
                     <td class="num-col">{{ inst.cancelledAdmissions | number }}</td>
                     <td class="num-col">{{ inst.duplicateApplications | number }}</td>
                     <td>
-                      <button class="action-icon-btn" (click)="onViewInstitution(inst.institutionId)">
-                        <span class="material-symbols-outlined">visibility</span> View
-                      </button>
+                      <div style="display:flex; gap:6px;">
+                        <button class="action-icon-btn" (click)="onViewDetails(inst.institutionId, inst.institutionName, 'ALL_APPLICATIONS', cityDetail.basicInfo.name || '', cityDetail.basicInfo.state || '', 'institution')">
+                          <span class="material-symbols-outlined">analytics</span> Analytics
+                        </button>
+                        <button class="action-icon-btn" (click)="onViewInstitution(inst.institutionId)">
+                          <span class="material-symbols-outlined">visibility</span> View
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr *ngIf="paginatedInstitutions.length === 0">
@@ -1085,9 +1095,14 @@
                     <td class="num-col">{{ c.sbsStudents | number }}</td>
                     <td class="num-col">{{ c.duplicateApplications | number }}</td>
                     <td>
-                      <button class="action-icon-btn" (click)="onViewCourse(c.courseId)">
-                        <span class="material-symbols-outlined">visibility</span> View
-                      </button>
+                      <div style="display:flex; gap:6px;">
+                        <button class="action-icon-btn" (click)="onViewDetails(c.courseId, c.courseName, 'ALL_APPLICATIONS', cityDetail.basicInfo.name || '', cityDetail.basicInfo.state || '', 'course')">
+                          <span class="material-symbols-outlined">analytics</span> Analytics
+                        </button>
+                        <button class="action-icon-btn" (click)="onViewCourse(c.courseId)">
+                          <span class="material-symbols-outlined">visibility</span> View
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   <tr *ngIf="paginatedCourses.length === 0">
@@ -1230,6 +1245,7 @@
                     <th class="num-col">Cancelled Apps</th>
                     <th class="num-col">FOC Adm.</th>
                     <th class="num-col">Duplicates</th>
+                    <th class="num-col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1241,6 +1257,14 @@
                     <td class="num-col">{{ ls.cancelledApplications | number }}</td>
                     <td class="num-col">{{ ls.focAdmissions | number }}</td>
                     <td class="num-col">{{ ls.duplicateApplications | number }}</td>
+                    <td class="num-col">
+                    <div style="display:flex; gap:6px;">
+                        <button class="action-icon-btn"
+                          (click)="onViewDetails(ls.leadSourceId, ls.leadSourceName, 'ALL_APPLICATIONS', cityDetail.basicInfo.name || '', cityDetail.basicInfo.state || '', 'leadSource')">
+                          <span class="material-symbols-outlined">analytics</span> Analytics
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                   <tr *ngIf="leadSourceList.length === 0">
                     <td colspan="7">
@@ -1264,5 +1288,11 @@
 
 <!-- Analytics Modal -->
 <app-student-analytics-modal *ngIf="showAnalyticsModal" [userId]="modalUserId" [counselorName]="modalUserName"
-  [initialTab]="modalInitialTab" [city]="modalCity" [state]="modalState" (close)="onCloseAnalyticsModal()">
+  [initialTab]="modalInitialTab"
+  [city]="modalCity" [state]="modalState"
+  [consultancyId]="modalConsultancyId || 0"
+  [institutionId]="modalInstitutionId || 0"
+  [courseId]="modalCourseId || 0"
+  [inputLeadSourceId]="modalLeadSourceId"
+  (close)="onCloseAnalyticsModal()">
 </app-student-analytics-modal>

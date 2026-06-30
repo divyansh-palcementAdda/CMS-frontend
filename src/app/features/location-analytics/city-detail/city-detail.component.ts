@@ -94,6 +94,11 @@ export class CityDetailComponent implements OnInit, OnDestroy {
   modalInitialTab = 'ALL_APPLICATIONS';
   modalCity = '';
   modalState = '';
+  // Breakdown-specific IDs (only one set at a time)
+  modalConsultancyId: number | undefined = undefined;
+  modalInstitutionId: number | undefined = undefined;
+  modalCourseId: number | undefined = undefined;
+  modalLeadSourceId: string | undefined = undefined;
 
   // --- Export ---
   exporting: { [key: string]: boolean } = {};
@@ -545,22 +550,80 @@ export class CityDetailComponent implements OnInit, OnDestroy {
   }
 
   // ---- Analytics Modal ----
-  onViewDetails(userId: number, userName: string, initialTab: string, city?: string, state?: string): void {
-    this.modalUserId = userId; this.modalUserName = userName; this.modalInitialTab = initialTab;
+  onViewDetails(entityId: number | string, entityName: string, initialTab: string, city?: string, state?: string, breakdownType?: string): void {
+    // Clear all breakdown-specific IDs first
+    this.modalUserId = 0;
+    this.modalConsultancyId = undefined;
+    this.modalInstitutionId = undefined;
+    this.modalCourseId = undefined;
+    this.modalLeadSourceId = undefined;
+
+    // Route ID to the correct modal property
+    if (!breakdownType || breakdownType === 'user') {
+      this.modalUserId = Number(entityId);
+    } else if (breakdownType === 'consultancy') {
+      this.modalConsultancyId = Number(entityId);
+    } else if (breakdownType === 'institution') {
+      this.modalInstitutionId = Number(entityId);
+    } else if (breakdownType === 'course') {
+      this.modalCourseId = Number(entityId);
+    } else if (breakdownType === 'leadSource') {
+      this.modalLeadSourceId = String(entityId);
+    }
+
+    this.modalUserName = entityName;
+    this.modalInitialTab = initialTab;
     this.modalCity = city || '';
     this.modalState = state || this.modalState || '';
     this.showAnalyticsModal = true;
-    this.router.navigate([], { 
-      relativeTo: this.route, 
-      queryParams: { 
-        showAnalyticsModal: 'true', 
-        modalUserId: userId, 
-        modalUserName: userName, 
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        showAnalyticsModal: 'true',
+        modalUserId: !breakdownType || breakdownType === 'user' ? entityId : null,
+        modalUserName: entityName,
         modalInitialTab: initialTab,
         modalCity: city || null,
-        modalState: state || null
-      }, 
-      queryParamsHandling: 'merge' 
+        modalState: state || null,
+        breakdownType: breakdownType || 'user'
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onViewBreakdownDetails(item: any, breakdownType: string, initialTab: string, city?: string, state?: string): void {
+    // Determine the name for the modal title
+    let modalName = '', entityId = 0;
+    if (breakdownType === 'consultancy') modalName = item.consultancyName;
+    else if (breakdownType === 'institution') modalName = item.institutionName;
+    else if (breakdownType === 'course') modalName = item.courseName;
+    else if (breakdownType === 'leadSource') modalName = item.leadSourceName;
+
+    // Determine the ID for the given breakdown
+    if (breakdownType === 'consultancy') entityId = item.consultancyId;
+    else if (breakdownType === 'institution') entityId = item.institutionId;
+    else if (breakdownType === 'course') entityId = item.courseId;
+    else if (breakdownType === 'leadSource') entityId = item.leadSourceId;
+
+    this.modalUserId = entityId; // Re-use the existing property to hold the ID
+    this.modalUserName = modalName;
+    this.modalInitialTab = initialTab;
+    this.modalCity = city || '';
+    this.modalState = state || this.modalState || '';
+
+    this.showAnalyticsModal = true;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+      showAnalyticsModal: 'true',
+        modalUserId: entityId, // Pass the entity ID via the existing query param
+        modalUserName: modalName,
+        modalInitialTab: initialTab,
+        modalCity: city || null,
+        modalState: state || null,
+        breakdownType: breakdownType // Pass the type of breakdown
+      },
+      queryParamsHandling: 'merge'
     });
   }
 
@@ -573,7 +636,8 @@ export class CityDetailComponent implements OnInit, OnDestroy {
         modalUserName: null, 
         modalInitialTab: null,
         modalCity: null,
-        modalState: null
+        modalState: null,
+        breakdownType: null
       }, 
       queryParamsHandling: 'merge' 
     });

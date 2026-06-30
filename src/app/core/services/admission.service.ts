@@ -64,7 +64,8 @@ export class AdmissionService {
     courseIds?: number[],
     duplicateOnly?: boolean,
     excludeDuplicate?: boolean,
-    includeDuplicate?: boolean
+    includeDuplicate?: boolean,
+    institutionId?: number
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -113,6 +114,7 @@ export class AdmissionService {
     if (duplicateOnly !== undefined && duplicateOnly !== null) params = params.set('duplicateOnly', duplicateOnly.toString());
     if (excludeDuplicate !== undefined && excludeDuplicate !== null) params = params.set('excludeDuplicate', excludeDuplicate.toString());
     if (includeDuplicate !== undefined && includeDuplicate !== null) params = params.set('includeDuplicate', includeDuplicate.toString());
+    if (institutionId) params = params.set('institutionId', institutionId.toString());
 
     console.log('Final Payload', {
       userIds: userIds || null,
