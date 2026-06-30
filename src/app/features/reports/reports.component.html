@@ -151,8 +151,7 @@
 
                         <!-- Revenue Summary KPI Grid for COURSE_REVENUE -->
                         <div class="kpi-grid-premium revenue-kpi-grid" *ngIf="activeReport === 'COURSE_REVENUE'">
-                            <div class="kpi-card-v2" [class.is-loading]="loading"
-                                style="--before-bg: #10b981;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading" style="--before-bg: #10b981;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #10b981;">payments</span></div>
                                 <div class="kpi-label">Total Collected Till Date (A)</div>
@@ -164,8 +163,7 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2" [class.is-loading]="loading"
-                                style="--before-bg: #ef4444;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading" style="--before-bg: #ef4444;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #ef4444;">keyboard_return</span></div>
                                 <div class="kpi-label">Total Refunded Till Date</div>
@@ -178,8 +176,7 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2" [class.is-loading]="loading"
-                                style="--before-bg: #4f46e5;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading" style="--before-bg: #4f46e5;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #4f46e5;">account_balance</span></div>
                                 <div class="kpi-label">Net Collected Revenue</div>
@@ -192,8 +189,7 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2" [class.is-loading]="loading"
-                                style="--before-bg: #f59e0b;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading" style="--before-bg: #f59e0b;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #f59e0b;">account_balance_wallet</span></div>
                                 <div class="kpi-label">Total Remaining To Collect (B)</div>
@@ -205,8 +201,7 @@
                                 </div>
                             </div>
 
-                            <div class="kpi-card-v2" [class.is-loading]="loading"
-                                style="--before-bg: #8b5cf6;">
+                            <div class="kpi-card-v2" [class.is-loading]="loading" style="--before-bg: #8b5cf6;">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined"
                                         style="color: #8b5cf6;">analytics</span></div>
                                 <div class="kpi-label">Overall Revenue By All Courses</div>
@@ -543,15 +538,18 @@
                                         </div>
                                         <div class="kpi-mini-card gross">
                                             <span class="label">Actual Admissions</span>
-                                            <span class="val">{{dailySummaryData.actualAdmissionsWithoutScholarship | number}}</span>
+                                            <span class="val">{{dailySummaryData.actualAdmissionsWithoutScholarship |
+                                                number}}</span>
                                         </div>
                                         <div class="kpi-mini-card refund">
                                             <span class="label">Applications Cancelled</span>
-                                            <span class="val">{{dailySummaryData.applicationCancelledCount | number}}</span>
+                                            <span class="val">{{dailySummaryData.applicationCancelledCount |
+                                                number}}</span>
                                         </div>
                                         <div class="kpi-mini-card refund">
                                             <span class="label">Admissions Cancelled</span>
-                                            <span class="val">{{dailySummaryData.admissionCancelledCount | number}}</span>
+                                            <span class="val">{{dailySummaryData.admissionCancelledCount |
+                                                number}}</span>
                                         </div>
                                         <div class="kpi-mini-card duplicate">
                                             <span class="label">Duplicate Forms</span>
@@ -559,7 +557,8 @@
                                         </div>
                                         <div class="kpi-mini-card net">
                                             <span class="label">Remaining Forms</span>
-                                            <span class="val">{{dailySummaryData.totalFormsRemainingTillDate | number}}</span>
+                                            <span class="val">{{dailySummaryData.totalFormsRemainingTillDate |
+                                                number}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -568,11 +567,15 @@
                             <!-- Course-wise First Fees Paid Analytics -->
                             <div class="op-section first-fees-analytics-section"
                                 style="margin-top: 2rem; border-top: 1px solid var(--slate-200); padding-top: 1.75rem; width: 100%;">
-                                <div class="section-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
-                                    <span style="width: 40px; height: 40px; background: #eef2ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                        <span class="material-symbols-outlined" style="color: var(--primary); font-size: 22px;">leaderboard</span>
+                                <div class="section-header"
+                                    style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+                                    <span
+                                        style="width: 40px; height: 40px; background: #eef2ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-symbols-outlined"
+                                            style="color: var(--primary); font-size: 22px;">leaderboard</span>
                                     </span>
-                                    <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--slate-800); text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <h3
+                                        style="margin: 0; font-size: 15px; font-weight: 800; color: var(--slate-800); text-transform: uppercase; letter-spacing: 0.5px;">
                                         Course-wise First Fees Paid Analytics</h3>
                                 </div>
 
@@ -600,12 +603,15 @@
                                         </div>
 
                                         <!-- Hierarchical Breakdown Wrapper -->
-                                        <div class="course-type-grid-layout" *ngIf="dailySummaryData.transformedCourseTypeBreakdown">
-                                            <div *ngFor="let group of dailySummaryData.transformedCourseTypeBreakdown" class="course-type-card">
+                                        <div class="course-type-grid-layout"
+                                            *ngIf="dailySummaryData.transformedCourseTypeBreakdown">
+                                            <div *ngFor="let group of dailySummaryData.transformedCourseTypeBreakdown"
+                                                class="course-type-card">
                                                 <!-- Header & Total -->
                                                 <div class="course-type-card-header">
                                                     <span class="category-title">🎓 {{group.courseType}}</span>
-                                                    <span class="category-total">{{group.totalFeesPaid | number:'2.0-0'}} Students</span>
+                                                    <span class="category-total">{{group.totalFeesPaid |
+                                                        number:'2.0-0'}} Students</span>
                                                 </div>
 
                                                 <!-- Divider & Course List only if totalFeesPaid > 0 -->
@@ -615,7 +621,8 @@
                                                         <div *ngFor="let course of group.courses" class="course-row">
                                                             <span class="course-name">{{course.courseName}}</span>
                                                             <span class="dots"></span>
-                                                            <span class="course-val">{{course.feesPaid | number:'2.0-0'}}</span>
+                                                            <span class="course-val">{{course.feesPaid |
+                                                                number:'2.0-0'}}</span>
                                                         </div>
                                                     </div>
                                                 </ng-container>
@@ -783,7 +790,6 @@
                                                 class="text-center group-border">{{h}}</th>
                                             <th rowspan="2" class="text-right align-middle">Total Forms</th>
                                             <th rowspan="2" class="text-right align-middle">Confirmed</th>
-                                            <th rowspan="2" class="text-right align-middle">Total Fees</th>
                                         </tr>
                                         <tr>
                                             <ng-container *ngFor="let h of leadSourceHeaders">
@@ -812,9 +818,6 @@
                                             <td class="text-right">{{d.totalForms}}</td>
                                             <td class="text-right"><span
                                                     class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
-                                            </td>
-                                            <td class="text-right"><span
-                                                    class="pill-status primary">{{d.totalFeesReceived}}</span>
                                             </td>
                                         </tr>
                                     </tbody>
