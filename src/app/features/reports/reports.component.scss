@@ -1713,6 +1713,7 @@
     tbody {
         tr {
             transition: var(--transition);
+            background-color: #ffffff;
 
             &:hover {
                 background-color: var(--slate-50);
@@ -5791,5 +5792,96 @@
     .analytics-chart-card {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* ==========================================================================
+   Responsive Enhancements for Data Intelligence Table (Min 320px)
+   ========================================================================== */
+
+/* Container overrides for smooth scrolling on small devices */
+@media (max-width: 1024px) {
+    .enterprise-table-wrapper {
+        -webkit-overflow-scrolling: touch;
+        
+        .enterprise-table {
+            th.sticky-col, td.sticky-col {
+                max-width: 250px;
+                white-space: normal !important;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .enterprise-table-wrapper {
+        overflow-x: auto;
+        
+        .enterprise-table {
+            th, td {
+                padding: 12px 16px !important;
+                font-size: 13px !important;
+            }
+            
+            th.sticky-col, td.sticky-col {
+                max-width: 200px;
+                min-width: 120px;
+                white-space: normal !important;
+                word-wrap: break-word;
+                overflow-wrap: anywhere;
+            }
+
+            thead.colorful-header th {
+                padding: 12px 16px !important;
+                font-size: 12px !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .enterprise-table-wrapper {
+        .enterprise-table {
+            th.sticky-col, td.sticky-col {
+                max-width: 140px;
+                min-width: 100px;
+                font-size: 12px !important;
+            }
+            
+            th, td {
+                padding: 10px 12px !important;
+                font-size: 12px !important;
+            }
+            
+            thead.colorful-header th {
+                font-size: 11px !important;
+                padding: 10px 12px !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 320px) {
+    .enterprise-table-wrapper {
+        .enterprise-table {
+            th.sticky-col, td.sticky-col {
+                max-width: 110px;
+                min-width: 90px;
+                font-size: 11px !important;
+                padding: 8px 10px !important;
+            }
+            
+            th, td {
+                padding: 8px 10px !important;
+                font-size: 11px !important;
+            }
+            
+            thead.colorful-header th {
+                font-size: 10px !important;
+                padding: 8px 10px !important;
+            }
+        }
     }
 }

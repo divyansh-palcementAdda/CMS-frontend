@@ -615,7 +615,7 @@ export class CityDetailComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-      showAnalyticsModal: 'true',
+        showAnalyticsModal: 'true',
         modalUserId: entityId, // Pass the entity ID via the existing query param
         modalUserName: modalName,
         modalInitialTab: initialTab,
@@ -629,17 +629,17 @@ export class CityDetailComponent implements OnInit, OnDestroy {
 
   onCloseAnalyticsModal(): void {
     this.showAnalyticsModal = false;
-    this.router.navigate([], { 
-      queryParams: { 
-        showAnalyticsModal: null, 
-        modalUserId: null, 
-        modalUserName: null, 
+    this.router.navigate([], {
+      queryParams: {
+        showAnalyticsModal: null,
+        modalUserId: null,
+        modalUserName: null,
         modalInitialTab: null,
         modalCity: null,
         modalState: null,
         breakdownType: null
-      }, 
-      queryParamsHandling: 'merge' 
+      },
+      queryParamsHandling: 'merge'
     });
   }
 

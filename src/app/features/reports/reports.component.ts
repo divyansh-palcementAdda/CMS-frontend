@@ -1165,12 +1165,38 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.barChartOptions && !this.pieChartOptions && !this.lineChartOptions) {
       // Simple Top 10 Bar for anything else
       const top10 = data.slice(0, 10);
+      const fallbackSeries = top10.map(d => d.totalForms || d.formCount || 0);
+      const fallbackLabels = top10.map(d => d.courseName || d.studentName || d.leadSourceName || 'N/A');
+
       this.barChartOptions = {
-        series: [{ name: 'Count', data: top10.map(d => d.totalForms || d.formCount || 0) }],
+        series: [{ name: 'Count', data: fallbackSeries }],
         chart: { ...COMMON_CHART_OPTIONS, type: 'bar', height: 350 },
         plotOptions: { bar: { columnWidth: '50%', borderRadius: 6 } },
         colors: ['#435fff'],
-        xaxis: { categories: top10.map(d => d.courseName || d.studentName || 'N/A') }
+        xaxis: { categories: fallbackLabels }
+      };
+
+      this.pieChartOptions = {
+        series: fallbackSeries,
+        labels: fallbackLabels,
+        chart: { ...COMMON_CHART_OPTIONS, type: 'donut', height: 420 },
+        colors: CHART_COLORS,
+        stroke: { width: 4, colors: ['#fff'] },
+        legend: { position: 'bottom', fontWeight: 600, markers: { radius: 12 } },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '85%',
+              labels: {
+                show: true,
+                total: { show: true, label: 'DISTRIBUTION', fontSize: '12px', fontWeight: 800, color: '#94a3b8' },
+                value: { fontSize: '24px', fontWeight: 800, color: '#1e293b' }
+              }
+            }
+          }
+        },
+        dataLabels: { enabled: false },
+        tooltip: { theme: 'dark' }
       };
     }
   }
