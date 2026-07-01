@@ -3667,14 +3667,16 @@
 
 // --- WhatsApp Preview Dialog Premium Aesthetics ---
 .whatsapp-preview-modal-overlay {
+    position: fixed;
+    inset: 0;
     backdrop-filter: blur(12px) saturate(120%);
     -webkit-backdrop-filter: blur(12px) saturate(120%);
-    background: rgba(15, 23, 42, 0.45);
+    background: rgba(15, 23, 42, 0.65);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
-    z-index: 1100;
+    z-index: 999999;
     animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 
     .whatsapp-preview-panel {

@@ -1618,7 +1618,7 @@
     </div>
     <!-- Modern WhatsApp Preview Modal Overlay -->
     <div class="modal-overlay whatsapp-preview-modal-overlay" *ngIf="showWhatsAppPreview"
-        (click)="showWhatsAppPreview = false">
+        (click)="closeWhatsAppPreview()">
         <div class="whatsapp-preview-panel" (click)="$event.stopPropagation()">
             <div class="panel-header">
                 <div class="panel-title">
@@ -1631,7 +1631,7 @@
                         <p>Format & Analytics Validation</p>
                     </div>
                 </div>
-                <button class="btn-close-panel" (click)="showWhatsAppPreview = false">
+                <button class="btn-close-panel" (click)="closeWhatsAppPreview()">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -1656,7 +1656,7 @@
             </div>
 
             <div class="panel-footer justify-between">
-                <button class="btn-panel-action secondary close-btn" (click)="showWhatsAppPreview = false">
+                <button class="btn-panel-action secondary close-btn" (click)="closeWhatsAppPreview()">
                     Dismiss
                 </button>
                 <div class="footer-actions-group">

@@ -106,10 +106,10 @@
                                     </svg>
                                 </div>
                                 <div class="today-card-details">
-                                    <span class="today-label">{{ labels.total }}</span>
+                                    <span class="today-label">{{isApplicationTab ? "Total Application" : "Comfirmed Admission" }}</span>
                                     <span class="today-value">
                                         {{ isApplicationTab ? pageData.stats.totalApplication : (filters.tab ===
-                                        'Admission' ? pageData.stats.admTotal : pageData.stats.totalApplication) }}
+                                        'Admission' ?  pageData.stats.appConfirmed : pageData.stats.totalApplication) }}
                                     </span>
                                     <span class="today-desc">{{ labels.totalDesc }}</span>
                                 </div>
@@ -282,8 +282,8 @@
                                                 </svg>
                                             </div>
                                             <div class="mini-data">
-                                                <span class="mini-val">{{ pageData.stats.appConfirmed }}</span>
-                                                <span class="mini-label">Confirmed Admissions</span>
+                                                <span class="mini-val">{{pageData.stats.admTotal}}</span>
+                                                <span class="mini-label">Total Admissions</span>
                                             </div>
                                         </div>
                                         <div class="stat-mini-card status-cancelled-app"
@@ -363,8 +363,8 @@
                                                 </svg>
                                             </div>
                                             <div class="mini-data">
-                                                <span class="mini-val">{{ pageData.stats.admConfirmed }}</span>
-                                                <span class="mini-label">Confirmed Admissions</span>
+                                                <span class="mini-val">{{pageData.stats.admTotal}}</span>
+                                                <span class="mini-label">Total Admissions</span>
                                             </div>
                                         </div>
                                         <div class="stat-mini-card status-cancelled-adm"
@@ -613,7 +613,8 @@
                                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg>
                                     <input type="text" [placeholder]="'Search students...'" [(ngModel)]="searchTerm"
-                                        (ngModelChange)="onSearchChange()">
+                                        (ngModelChange)="onSearchChange()"
+                                        (paste)="onSearchPaste($event)">
                                 </div>
                                 <button class="filter-btn" (click)="showFilterDrawer = true"
                                     [class.has-filters]="activeFilterCount > 0">
@@ -982,7 +983,7 @@
                                                 </label>
                                                 <span
                                                     style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748B;">
-                                                    {{ item.isDuplicateForm ? 'Duplicate' : 'Normal' }}
+                                                    {{ item.isDuplicateForm ? 'Yes' : 'No' }}
                                                 </span>
                                             </div>
                                         </td>

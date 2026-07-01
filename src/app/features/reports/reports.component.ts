@@ -1238,6 +1238,7 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
           this.whatsappPreviewText = reportContent;
           this.showWhatsAppPreview = true;
           this.whatsappCopiedText = false;
+          document.body.classList.add('modal-open');
         } else {
           console.error('WhatsApp report content is missing in payload:', res);
         }
@@ -1247,6 +1248,11 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
         console.error('Failed to generate WhatsApp report:', err);
       }
     });
+  }
+
+  closeWhatsAppPreview() {
+    this.showWhatsAppPreview = false;
+    document.body.classList.remove('modal-open');
   }
 
   copyWhatsAppToClipboard() {

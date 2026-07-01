@@ -382,10 +382,15 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Debounced search — now drives URL state
+    // Debounced search — now drives URL state.
+    // distinctUntilChanged is intentionally removed here: the router navigation
+    // is already idempotent (navigating to the same URL is a no-op), so we don't
+    // need it on the subject. Keeping it caused paste to be silently swallowed
+    // whenever the pasted value matched the subject's stale last-emitted value
+    // (e.g. after a tab switch that resets searchTerm via queryParams without
+    // pushing into searchSubject).
     this.searchSub = this.searchSubject.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
+      debounceTime(240)
     ).subscribe(term => {
       this.router.navigate([], {
         relativeTo: this.route,
@@ -1439,6 +1444,17 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   onSearchChange(): void {
     const trimmedTerm = (this.searchTerm || '').trim();
     this.searchSubject.next(trimmedTerm);
+  }
+
+  // Handles paste events explicitly — on some browsers the paste completes
+  // after Angular's ngModelChange fires with the pre-paste value, so we read
+  // the final value from the DOM via setTimeout to guarantee we get the
+  // fully-pasted string.
+  onSearchPaste(event: ClipboardEvent): void {
+    setTimeout(() => {
+      const trimmedTerm = (this.searchTerm || '').trim();
+      this.searchSubject.next(trimmedTerm);
+    }, 0);
   }
 
   // ── Sorting ───────────────────────────────────────────────────────────
