@@ -959,6 +959,7 @@ $text-light: #64748B;
     display: flex;
     flex-direction: column;
     overflow: visible; // Allow sticky headers/cols to breathe
+    padding: 8px;
 
     .table-header {
       padding: 20px 24px;
