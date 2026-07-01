@@ -798,7 +798,6 @@
                                                 class="text-center group-border">{{h}}</th>
                                             <th rowspan="2" class="text-right align-middle">Total Forms</th>
                                             <th rowspan="2" class="text-right align-middle">Confirmed</th>
-                                            <th rowspan="2" class="text-right align-middle">Total Fees</th>
                                         </tr>
                                         <tr>
                                             <ng-container *ngFor="let h of leadSourceHeaders">
@@ -827,9 +826,6 @@
                                             <td class="text-right">{{d.totalForms}}</td>
                                             <td class="text-right"><span
                                                     class="pill-status success">{{d.totalConfirmedAdmissions}}</span>
-                                            </td>
-                                            <td class="text-right"><span
-                                                    class="pill-status primary">{{d.totalFeesReceived}}</span>
                                             </td>
                                         </tr>
                                     </tbody>
