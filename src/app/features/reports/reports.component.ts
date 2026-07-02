@@ -115,8 +115,8 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Pagination
   currentPage = 1;
-  pageSize = 10;
-  pageSizeOptions = [10, 25, 50, 100];
+  pageSize = 30;
+  pageSizeOptions = [10, 30, 50, 100];
   protected readonly Math = Math;
 
   filters: ReportFilter = {

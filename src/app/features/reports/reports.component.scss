@@ -1759,6 +1759,14 @@
         background: var(--slate-900);
         box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.15);
 
+        &.overall-total-row {
+            background: #1e293b;
+            td {
+                border-top: 4px solid #00d2ff;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            }
+        }
+
         td {
             padding: 16px 20px;
             color: #ffffff;
@@ -4002,6 +4010,20 @@
         grid-template-columns: 1fr;
         gap: 1.25rem;
     }
+
+    // Scrollbar styling when used inside overflow-x wrapper
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+        &:hover { background: #94a3b8; }
+    }
 }
 
 .course-type-card {
@@ -4091,9 +4113,9 @@
 }
 
 .breakdown-total-aggregate {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
     padding: 1.25rem 1.5rem;
     background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);
     border: 2px solid var(--primary-light);
@@ -4101,10 +4123,29 @@
     font-weight: 800;
     color: var(--slate-800);
     font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+
+    // Visible scrollbar for webkit
+    &::-webkit-scrollbar {
+        height: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: #e2e8f0;
+        border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 3px;
+        &:hover { background: #64748b; }
+    }
 
     .aggregate-label {
         font-weight: 800;
         color: var(--slate-700);
+        white-space: nowrap;
     }
 
     .aggregate-value {
@@ -4112,6 +4153,7 @@
         font-weight: 800;
         color: var(--primary);
         font-family: 'JetBrains Mono', monospace;
+        white-space: nowrap;
     }
 }
 
