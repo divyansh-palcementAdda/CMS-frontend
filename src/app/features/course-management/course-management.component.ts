@@ -7,11 +7,12 @@ import { TopbarComponent } from '../../shared/components/topbar/topbar.component
 import { CourseService } from '../../core/services/course.service';
 import { CourseItem, CoursePageData } from '../../core/models/course.model';
 import { Subject } from 'rxjs';
-import { takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddCourseModalComponent } from './components/add-course-modal/add-course-modal.component';
 import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-modal/bulk-upload-modal.component';
 import { StatePreservationService } from '../../core/services/state-preservation.service';
+import { ExcelExportService, ExcelColumn } from '../../core/services/excel-export.service';
 
 @Component({
   selector: 'app-course-management',
@@ -50,6 +51,9 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   showBulkUploadModal = false;
   editCourseId: number | null = null;
 
+  // Export
+  exporting = false;
+
   // ── RxJS teardown + search debounce ─────────────────────────────────────────
   private readonly destroy$ = new Subject<void>();
   // searchSubject is set up ONCE here; never re-subscribed
@@ -60,7 +64,8 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
-    private statePreservationService: StatePreservationService
+    private statePreservationService: StatePreservationService,
+    private excelExportService: ExcelExportService
   ) {
     this.generateSessions();
   }
@@ -304,6 +309,65 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
     this.pageSize = size;
     this.currentPage = 1;
     this.loadData();
+  }
+
+  // ── Export ────────────────────────────────────────────────────────────────────
+
+  exportToExcel(): void {
+    this.exporting = true;
+
+    // Fetch ALL records (page 0, very large size) respecting current search/sort
+    this.courseService.getCoursesPaged(
+      0,
+      this.totalElements || 10000,
+      this.searchTerm,
+      this.activeFilter,
+      this.sortBy,
+      this.sortDirection
+    )
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (res) => {
+        const columns: ExcelColumn<CourseItem>[] = [
+          { header: 'S.No',                    key: 'sNo',                    width: 8  },
+          { header: 'Course Name',              key: 'name',                   width: 30 },
+          { header: 'Course Type',              key: 'courseType',             width: 18 },
+          { header: 'Total Applications',       key: 'totalApplications',      width: 20 },
+          { header: 'Total Admissions',         key: 'totalAdmissions',        width: 20 },
+          { header: 'Remaining Applications',   key: 'remainingApplications',  width: 22 },
+          { header: 'Cancelled Admissions',     key: 'cancelledAdmissions',    width: 22 },
+          { header: 'Cancelled Applications',   key: 'cancelledApplications',  width: 22 },
+          {
+            header: 'Total Fees Collected (₹)',
+            key: 'totalFeesCollected',
+            width: 24,
+            transform: (val) => Number(val ?? 0)
+          },
+          { header: 'Status', key: 'status', width: 12 },
+        ];
+
+        const fileName = `Course_Management_Export_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}`;
+
+        try {
+          this.excelExportService.exportToExcel<CourseItem>({
+            sheetName: 'Courses',
+            fileName,
+            columns,
+            data: res.content,
+          });
+        } catch (err) {
+          console.error('Excel export failed', err);
+          alert('Export failed. Please try again.');
+        } finally {
+          this.exporting = false;
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch data for export', err);
+        alert('Export failed: could not load data. Please try again.');
+        this.exporting = false;
+      }
+    });
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────────
