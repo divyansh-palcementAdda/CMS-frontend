@@ -474,48 +474,45 @@
                                                 <span class="mini-label">FOC (Free of Cost)</span>
                                             </div>
                                         </div>
+
+                                        <!-- 50% Fee Paid -->
+                                        <div class="stat-mini-card status-confirmed"
+                                            [class.active]="filters.statFilter === 'PARTIAL_PAID'"
+                                            (click)="onStatFilter('PARTIAL_PAID')">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ pageData.stats.partialFeesPaid }}</span>
+                                                <span class="mini-label">50% Fee Paid</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- 50% Fee Unpaid -->
+                                        <div class="stat-mini-card status-cancelled-app"
+                                            [class.active]="filters.statFilter === 'UNPAID'"
+                                            (click)="onStatFilter('UNPAID')">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ pageData.stats.partialfessUnpaid }}</span>
+                                                <span class="mini-label">50% Fee Unpaid</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- 4th Breakdown (Lead Source Wise) -->
-
 
                             </div>
 
-                        </div>
-
-                        <!-- Secondary Finance Counters (Only for Admission/All tab, preserved) -->
-                        <div class="breakdown-grid sub-stats-mini" *ngIf="filters.tab !== 'applications'">
-                            <div class="stat-mini-card status-confirmed"
-                                [class.active]="filters.statFilter === 'PARTIAL_PAID'"
-                                (click)="onStatFilter('PARTIAL_PAID')">
-                                <div class="mini-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                    </svg>
-                                </div>
-                                <div class="mini-data">
-                                    <span class="mini-val">{{ pageData.stats.partialFeesPaid }}</span>
-                                    <span class="mini-label">50% Fee Paid</span>
-                                </div>
-                            </div>
-
-                            <div class="stat-mini-card status-cancelled-app"
-                                [class.active]="filters.statFilter === 'UNPAID'"
-                                (click)="onStatFilter('UNPAID')">
-                                <div class="mini-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                    </svg>
-                                </div>
-                                <div class="mini-data">
-                                    <span class="mini-val">{{ pageData.stats.partialfessUnpaid }}</span>
-                                    <span class="mini-label">50% Fee Unpaid</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
 

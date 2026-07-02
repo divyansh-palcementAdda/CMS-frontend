@@ -538,19 +538,16 @@ $text-light: #64748B;
     gap: 16px;
 
     &.foc-sbs-grid {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 220px));
-      justify-content: start;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
 
     &.sub-stats-mini {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 220px));
-      justify-content: start;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       margin-bottom: 24px;
     }
 
     &.status-grid {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 220px));
-      justify-content: start;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
 
     &.tri-column {
