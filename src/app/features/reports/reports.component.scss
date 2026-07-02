@@ -2264,6 +2264,59 @@
     }
 }
 
+// --- 11b. Mobile chart toggle helpers (COURSE_LEAD_SOURCE) ---
+// Default: show bar chart, hide mobile-donut and keep side panel visible
+.hide-on-mobile {
+    display: block;
+}
+
+// Use height:0 + overflow:hidden instead of display:none so ApexCharts
+// can still initialize and measure itself even when visually hidden
+.show-on-mobile {
+    display: flex !important;   // keep in DOM so ApexCharts mounts correctly
+    height: 0 !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: none;
+}
+
+.hide-side-on-mobile {
+    display: block;
+}
+
+// On small screens (≤480px): reveal the donut, hide the bar and side panel
+@media (max-width: 480px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    .show-on-mobile {
+        display: flex !important;
+        height: auto !important;
+        overflow: visible !important;
+        min-height: 320px !important;
+        padding: 16px 0 !important;
+        margin: 0 !important;
+        pointer-events: auto;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+
+        // Make ApexCharts fill the container
+        apx-chart,
+        .apexcharts-canvas {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    }
+
+    .hide-side-on-mobile {
+        display: none !important;
+    }
+}
+
 // --- 12. Premium Empty State ---
 .premium-empty-state {
     padding: 80px 40px;
@@ -5429,7 +5482,15 @@
                 }
             }
         }
-        
+
+        // Ensure the mobile donut chart is properly sized at 320px
+        .chart-wrapper.mobile-chart.show-on-mobile {
+            min-height: 300px !important;
+            height: auto !important;
+            overflow: visible !important;
+            padding: 12px 0 !important;
+        }
+
         .chart-wrapper {
             min-height: 250px !important;
         }
