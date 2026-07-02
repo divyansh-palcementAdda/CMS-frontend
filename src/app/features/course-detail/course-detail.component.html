@@ -183,6 +183,68 @@
               </div>
             </div>
           </div>
+          <div class="stat-premium-card purple" (click)="onRecentFormsClick(10)">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Forms (Last 10 Days)</span>
+                <span class="value">{{ courseDetail?.last10DaysForms || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#8B5CF6" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16M8 17H12" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#8B5CF6" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="stat-premium-card pink" (click)="onRecentFormsClick(30)">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Forms (Last 30 Days)</span>
+                <span class="value">{{ courseDetail?.last30DaysForms || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#EC4899" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16M8 17H12" stroke="#EC4899" stroke-width="2" stroke-linecap="round" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#EC4899" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="stat-premium-card teal" (click)="onRecentAdmissionsClick(10)">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">First Fees (Last 10 Days)</span>
+                <span class="value">{{ courseDetail?.last10DaysAdmissions || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#0D9488" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16" stroke="#0D9488" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="17" cy="17" r="3" stroke="#0D9488" stroke-width="2" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#0D9488" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="stat-premium-card indigo" (click)="onRecentAdmissionsClick(30)">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">First Fees (Last 30 Days)</span>
+                <span class="value">{{ courseDetail?.last30DaysAdmissions || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#4F46E5" fill-opacity="0.1" />
+                  <path d="M8 7H16M8 12H16" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="17" cy="17" r="3" stroke="#4F46E5" stroke-width="2" />
+                  <rect x="5" y="4" width="14" height="16" rx="2" stroke="#4F46E5" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="stats-grid-container">

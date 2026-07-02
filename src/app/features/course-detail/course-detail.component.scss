@@ -1179,6 +1179,26 @@
     &::before { background: #F59E0B; }
     &:hover { border-color: #F59E0B; }
   }
+
+  &.purple {
+    &::before { background: #8B5CF6; }
+    &:hover { border-color: #8B5CF6; }
+  }
+
+  &.pink {
+    &::before { background: #EC4899; }
+    &:hover { border-color: #EC4899; }
+  }
+
+  &.teal {
+    &::before { background: #0D9488; }
+    &:hover { border-color: #0D9488; }
+  }
+
+  &.indigo {
+    &::before { background: #4F46E5; }
+    &:hover { border-color: #4F46E5; }
+  }
 }
 
 @media (max-width: 1200px) {

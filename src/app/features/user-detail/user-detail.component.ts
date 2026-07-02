@@ -16,11 +16,12 @@ import { AdmissionItem } from '../../core/models/admission.model';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AddUserModalComponent } from '../user-management/components/add-user-modal/add-user-modal.component';
 import { FeeStatusPipe, FeeStatusClassPipe } from '../../shared/pipes/fee-status.pipe';
+import { StudentAnalyticsModalComponent } from '../../shared/components/student-analytics-modal/student-analytics-modal.component';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent, FeeStatusClassPipe],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarComponent, TopbarComponent, ConfirmationModalComponent, AddUserModalComponent, FeeStatusClassPipe, StudentAnalyticsModalComponent],
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss']
 })
@@ -110,6 +111,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     private statePreservationService: StatePreservationService
   ) { }
 
+  showAnalyticsModal = false;
+
   ngOnInit() {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const idParam = params.get('id');
@@ -117,6 +120,14 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         this.userId = +idParam;
         this.restoreState();
         this.loadData();
+      }
+    });
+
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      if (params['showAnalyticsModal'] === 'true') {
+        this.showAnalyticsModal = true;
+      } else {
+        this.showAnalyticsModal = false;
       }
     });
   }
@@ -691,6 +702,61 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           alert('Failed to export Excel data. Please try again.');
         }
       });
+  }
+
+  onRecentFormsClick(days: number): void {
+    const today = new Date();
+    const startDate = new Date();
+    startDate.setDate(today.getDate() - (days - 1));
+
+    const formatDate = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        showAnalyticsModal: 'true',
+        modalUserId: this.userId,
+        modalUserName: this.user?.fullName || '',
+        modalInitialTab: 'ALL_APPLICATIONS',
+        modalTab: 'ALL_APPLICATIONS',
+        modalAppStartDate: formatDate(startDate),
+        modalAppEndDate: formatDate(today)
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onCloseAnalyticsModal(): void {
+    this.showAnalyticsModal = false;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        showAnalyticsModal: null,
+        modalUserId: null,
+        modalUserName: null,
+        modalInitialTab: null,
+        modalTab: null,
+        modalSearch: null,
+        modalSession: null,
+        modalStartDate: null,
+        modalEndDate: null,
+        modalFeesStatus: null,
+        modalLeadSourceId: null,
+        modalReportedStatus: null,
+        modalSourceType: null,
+        modalShowFilterDrawer: null,
+        modalSortColumn: null,
+        modalSortDirection: null,
+        modalAppStartDate: null,
+        modalAppEndDate: null
+      },
+      queryParamsHandling: 'merge'
+    });
   }
 
   ngOnDestroy() {

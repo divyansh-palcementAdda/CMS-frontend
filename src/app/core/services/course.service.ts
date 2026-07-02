@@ -260,7 +260,9 @@ export class CourseService {
     reportedStatus?: string,
     sourceType?: string,
     sortBy: string = 'createdAt',
-    sortDirection: string = 'desc'
+    sortDirection: string = 'desc',
+    appStartDate?: string,
+    appEndDate?: string
   ): Observable<Blob> {
     const params: any = { tab, sortBy, sortDirection };
     if (search) params.search = search;
@@ -273,6 +275,8 @@ export class CourseService {
     if (leadSourceId) params.leadSourceId = leadSourceId;
     if (reportedStatus && reportedStatus !== 'ALL') params.reportedStatus = reportedStatus;
     if (sourceType) params.sourceType = sourceType;
+    if (appStartDate) params.appStartDate = appStartDate;
+    if (appEndDate) params.appEndDate = appEndDate;
 
     return this.http.get(`${this.apiUrl}/${courseId}/user/${userId}/export`, {
       params,

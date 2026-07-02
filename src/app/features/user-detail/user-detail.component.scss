@@ -601,7 +601,7 @@
 /* Categorized Premium Stats */
 .categorized-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 32px;
 }
@@ -681,6 +681,16 @@
   &.orange {
     &::before { background: #F59E0B; }
     &:hover { border-color: #F59E0B; }
+  }
+
+  &.purple {
+    &::before { background: #8B5CF6; }
+    &:hover { border-color: #8B5CF6; }
+  }
+
+  &.pink {
+    &::before { background: #EC4899; }
+    &:hover { border-color: #EC4899; }
   }
 }
 

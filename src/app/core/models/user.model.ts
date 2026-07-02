@@ -98,6 +98,8 @@ export interface UserDetail {
   totalAdmissions: UserAdmissionDetail[];
   cancelledApplications: UserAdmissionDetail[];
   cancelledAdmissions: UserAdmissionDetail[];
+  last3DaysForms?: number;
+  last7DaysForms?: number;
 }
 
 export interface UserStats {

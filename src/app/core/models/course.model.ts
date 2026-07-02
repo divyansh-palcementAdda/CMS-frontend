@@ -124,6 +124,10 @@ export interface CourseDetail {
     label: string;
     value: number;
   }>;
+  last10DaysForms?: number;
+  last30DaysForms?: number;
+  last10DaysAdmissions?: number;
+  last30DaysAdmissions?: number;
 }
 
 export interface BulkUploadResponse {

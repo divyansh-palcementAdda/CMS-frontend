@@ -37,6 +37,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
   session: string = '';
   startDate: string = '';
   endDate: string = '';
+  appStartDate: string = '';
+  appEndDate: string = '';
   feesStatus: string = 'ALL';
   leadSourceId: string = '';
   reportedStatus: string = 'ALL';
@@ -99,6 +101,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
     if (queryParams['modalSession']) this.session = queryParams['modalSession'];
     if (queryParams['modalStartDate']) this.startDate = queryParams['modalStartDate'];
     if (queryParams['modalEndDate']) this.endDate = queryParams['modalEndDate'];
+    if (queryParams['modalAppStartDate']) this.appStartDate = queryParams['modalAppStartDate'];
+    if (queryParams['modalAppEndDate']) this.appEndDate = queryParams['modalAppEndDate'];
     if (queryParams['modalFeesStatus']) this.feesStatus = queryParams['modalFeesStatus'];
     if (queryParams['modalLeadSourceId']) this.leadSourceId = queryParams['modalLeadSourceId'];
     if (queryParams['modalReportedStatus']) this.reportedStatus = queryParams['modalReportedStatus'];
@@ -156,6 +160,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       modalSession: this.session || null,
       modalStartDate: this.startDate || null,
       modalEndDate: this.endDate || null,
+      modalAppStartDate: this.appStartDate || null,
+      modalAppEndDate: this.appEndDate || null,
       modalFeesStatus: this.feesStatus !== 'ALL' ? this.feesStatus : null,
       modalLeadSourceId: this.leadSourceId || null,
       modalReportedStatus: this.reportedStatus !== 'ALL' ? this.reportedStatus : null,
@@ -214,6 +220,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
     this.session = '';
     this.startDate = '';
     this.endDate = '';
+    this.appStartDate = '';
+    this.appEndDate = '';
     this.feesStatus = 'ALL';
     this.leadSourceId = '';
     this.reportedStatus = 'ALL';
@@ -269,7 +277,7 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       this.courseId ? Number(this.courseId) : undefined,
       this.sortColumn,
       this.sortDirection,
-      undefined, // tab
+      this.activeTab === 'TOTAL_ADMISSIONS' || this.activeTab === 'CANCELLED_ADM' ? 'Admission' : undefined, // tab
       statusFilterParam,
       this.sourceType || undefined,
       undefined, // isScholar
@@ -281,8 +289,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       this.startDate || undefined,
       this.endDate || undefined,
       this.leadSourceId || this.inputLeadSourceId || undefined, // filter dropdown OR breakdown input
-      undefined, // appStartDate
-      undefined, // appEndDate
+      this.appStartDate || undefined, // appStartDate
+      this.appEndDate || undefined, // appEndDate
       undefined, // admStartDate
       undefined, // admEndDate
       undefined, // isDiscounted
@@ -396,7 +404,9 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       this.reportedStatus !== 'ALL' ? this.reportedStatus : undefined,
       this.sourceType || undefined,
       this.sortColumn,
-      this.sortDirection
+      this.sortDirection,
+      this.appStartDate || undefined,
+      this.appEndDate || undefined
     ).subscribe({
       next: (blob: Blob) => {
         const tabLabels: Record<string, string> = {
