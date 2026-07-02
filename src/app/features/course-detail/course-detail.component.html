@@ -216,7 +216,7 @@
           <div class="stat-premium-card teal" (click)="onRecentAdmissionsClick(10)">
             <div class="card-content">
               <div class="info">
-                <span class="label">First Fees (Last 10 Days)</span>
+                <span class="label">Fees (Last 10 Days)</span>
                 <span class="value">{{ courseDetail.last10DaysAdmissions || 0 }}</span>
               </div>
               <div class="icon">
@@ -232,7 +232,7 @@
           <div class="stat-premium-card indigo" (click)="onRecentAdmissionsClick(30)">
             <div class="card-content">
               <div class="info">
-                <span class="label">First Fees (Last 30 Days)</span>
+                <span class="label">Fees (Last 30 Days)</span>
                 <span class="value">{{ courseDetail.last30DaysAdmissions || 0 }}</span>
               </div>
               <div class="icon">
@@ -877,8 +877,7 @@
               </div>
               <button
                 style="display: flex; align-items: center; gap: 6px; padding: 9px 18px; background: #10B981; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;"
-                (click)="openBreakdownDownloadModal()"
-                title="Download User Wise Breakdown as Excel">
+                (click)="openBreakdownDownloadModal()" title="Download User Wise Breakdown as Excel">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
@@ -896,19 +895,23 @@
                   <th class="sortable" (click)="sortBreakdown('userName')" style="cursor: pointer;">
                     User/Counselor <i class="bx" [ngClass]="getBreakdownSortIcon('userName')"></i>
                   </th>
-                  <th class="text-center sortable" (click)="sortBreakdown('totalApplications')" style="cursor: pointer;">
+                  <th class="text-center sortable" (click)="sortBreakdown('totalApplications')"
+                    style="cursor: pointer;">
                     Total Applications <i class="bx" [ngClass]="getBreakdownSortIcon('totalApplications')"></i>
                   </th>
                   <th class="text-center sortable" (click)="sortBreakdown('totalAdmissions')" style="cursor: pointer;">
                     Total Admissions <i class="bx" [ngClass]="getBreakdownSortIcon('totalAdmissions')"></i>
                   </th>
-                  <th class="text-center sortable" (click)="sortBreakdown('cancelledApplications')" style="cursor: pointer;">
+                  <th class="text-center sortable" (click)="sortBreakdown('cancelledApplications')"
+                    style="cursor: pointer;">
                     Cancelled Applications <i class="bx" [ngClass]="getBreakdownSortIcon('cancelledApplications')"></i>
                   </th>
-                  <th class="text-center sortable" (click)="sortBreakdown('cancelledAdmissions')" style="cursor: pointer;">
+                  <th class="text-center sortable" (click)="sortBreakdown('cancelledAdmissions')"
+                    style="cursor: pointer;">
                     Cancelled Admissions <i class="bx" [ngClass]="getBreakdownSortIcon('cancelledAdmissions')"></i>
                   </th>
-                  <th class="text-center sortable" (click)="sortBreakdown('remainingApplications')" style="cursor: pointer;">
+                  <th class="text-center sortable" (click)="sortBreakdown('remainingApplications')"
+                    style="cursor: pointer;">
                     Remaining Applications <i class="bx" [ngClass]="getBreakdownSortIcon('remainingApplications')"></i>
                   </th>
                   <th class="text-center sortable" (click)="sortBreakdown('focStudents')" style="cursor: pointer;">
@@ -961,13 +964,15 @@
                   </td>
                   <!-- FOC count -->
                   <td class="text-center">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; background: #FAF5FF; color: #6D28D9; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid #DDD6FE;">
+                    <span
+                      style="display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; background: #FAF5FF; color: #6D28D9; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid #DDD6FE;">
                       {{ item.focStudents || 0 }}
                     </span>
                   </td>
                   <!-- SBS count -->
                   <td class="text-center">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; background: #FFFBEB; color: #B45309; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid #FDE68A;">
+                    <span
+                      style="display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; background: #FFFBEB; color: #B45309; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid #FDE68A;">
                       {{ item.sbsStudents || 0 }}
                     </span>
                   </td>
@@ -1210,15 +1215,11 @@
       </app-student-analytics-modal>
 
       <!-- User Wise Breakdown Download Confirmation Modal -->
-      <app-download-confirmation-modal
-        *ngIf="showBreakdownDownloadModal"
-        title="Download User Wise Breakdown"
-        [totalRecords]="breakdownTotal"
-        [sorting]="breakdownSortBy + ' ' + breakdownSortDir"
+      <app-download-confirmation-modal *ngIf="showBreakdownDownloadModal" title="Download User Wise Breakdown"
+        [totalRecords]="breakdownTotal" [sorting]="breakdownSortBy + ' ' + breakdownSortDir"
         [loading]="breakdownDownloading"
         [extraMeta]="[{ label: 'Course ID', value: courseId }, { label: 'Includes', value: 'FOC & SBS columns' }]"
-        (confirm)="confirmBreakdownDownload()"
-        (cancel)="showBreakdownDownloadModal = false">
+        (confirm)="confirmBreakdownDownload()" (cancel)="showBreakdownDownloadModal = false">
       </app-download-confirmation-modal>
 
       <!-- Loading State -->
