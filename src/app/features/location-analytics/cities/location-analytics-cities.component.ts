@@ -320,7 +320,7 @@ export class LocationAnalyticsCitiesComponent implements OnInit, OnDestroy {
   getPagesArray(): (number | string)[] {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
-    
+
     if (this.totalPages <= maxVisible) {
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
