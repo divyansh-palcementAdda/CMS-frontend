@@ -30,7 +30,7 @@
                             </div>
                             <div>
                                 <h2 class="page-title">Admission Management</h2>
-                                <!-- <div class="tab-switcher">
+                                <div class="tab-switcher">
                                     <button class="tab-btn" [class.tab-active]="filters.tab === ''"
                                         (click)="setTab('')">All
                                         Records</button>
@@ -38,7 +38,7 @@
                                         (click)="setTab('Admission')">Admissions</button>
                                     <button class="tab-btn" [class.tab-active]="filters.tab === 'applications'"
                                         (click)="setTab('applications')">Applications</button>
-                                </div> -->
+                                </div>
                             </div>
                         </div>
                         <!-- /.title-container -->
@@ -106,10 +106,11 @@
                                     </svg>
                                 </div>
                                 <div class="today-card-details">
-                                    <span class="today-label">{{isApplicationTab ? "Total Application" : "Comfirmed Admission" }}</span>
+                                    <span class="today-label">{{isApplicationTab ? "Total Application" : "Comfirmed
+                                        Admission" }}</span>
                                     <span class="today-value">
                                         {{ isApplicationTab ? pageData.stats.totalApplication : (filters.tab ===
-                                        'Admission' ?  pageData.stats.appConfirmed : pageData.stats.totalApplication) }}
+                                        'Admission' ? pageData.stats.appConfirmed : pageData.stats.totalApplication) }}
                                     </span>
                                     <span class="today-desc">{{ labels.totalDesc }}</span>
                                 </div>
@@ -435,7 +436,7 @@
                                 <div class="breakdown-row" *ngIf="filters.tab !== 'applications'">
                                     <div class="breakdown-title">
                                         <span class="pulse-indicator foc-pulse"></span>
-                                        <h4>4th Breakdown (FOC / SBS Wise)</h4>
+                                        <h4>4th Breakdown</h4>
                                     </div>
                                     <div class="breakdown-grid source-grid foc-sbs-grid">
                                         <!-- SBS -->
@@ -480,7 +481,8 @@
                                             [class.active]="filters.statFilter === 'PARTIAL_PAID'"
                                             (click)="onStatFilter('PARTIAL_PAID')">
                                             <div class="mini-icon">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
                                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                                 </svg>
@@ -496,7 +498,8 @@
                                             [class.active]="filters.statFilter === 'UNPAID'"
                                             (click)="onStatFilter('UNPAID')">
                                             <div class="mini-icon">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
                                                     <circle cx="12" cy="12" r="10"></circle>
                                                     <line x1="12" y1="8" x2="12" y2="12"></line>
                                                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -610,8 +613,7 @@
                                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg>
                                     <input type="text" [placeholder]="'Search students...'" [(ngModel)]="searchTerm"
-                                        (ngModelChange)="onSearchChange()"
-                                        (paste)="onSearchPaste($event)">
+                                        (ngModelChange)="onSearchChange()" (paste)="onSearchPaste($event)">
                                 </div>
                                 <button class="filter-btn" (click)="showFilterDrawer = true"
                                     [class.has-filters]="activeFilterCount > 0">
