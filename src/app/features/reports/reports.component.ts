@@ -66,6 +66,7 @@ const COMMON_CHART_OPTIONS = {
   zoom: { enabled: false },
   pan: { enabled: false },
   selection: { enabled: false },
+  width: '100%',
   animations: {
     enabled: true,
     easing: 'easeinout',
@@ -929,7 +930,7 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
       return name.length > 25 ? name.substring(0, 23) + '...' : name;
     });
 
-    // 1. LEAD SOURCE MATRIX - Modern Horizontal Stacked Bars
+    // 1. LEAD SOURCE MATRIX - Modern Horizontal Stacked Bars + Donut Chart
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
       const chartData = data.slice(0, 20);
       const dynamicHeight = Math.max(chartData.length * 65, 600);
@@ -994,6 +995,78 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
           y: { formatter: (val: any) => val + ' Forms' }
         },
         grid: { borderColor: '#f1f5f9', strokeDashArray: 4, padding: { left: 20, right: 20 } }
+      };
+
+      // Donut Chart: Aggregate totals by Lead Source
+      const leadSourceTotals: { [key: string]: number } = {};
+      data.forEach((d: any) => {
+        d.leadSources?.forEach((ls: any) => {
+          leadSourceTotals[ls.leadSourceName] = (leadSourceTotals[ls.leadSourceName] || 0) + ls.formsReceived;
+        });
+      });
+
+      const donutSeries = Object.values(leadSourceTotals);
+      const donutLabels = Object.keys(leadSourceTotals);
+
+      this.pieChartOptions = {
+        series: donutSeries,
+        labels: donutLabels,
+        chart: { 
+          ...COMMON_CHART_OPTIONS, 
+          type: 'donut', 
+          height: 420,
+          responsive: [{
+            breakpoint: 480,
+            options: {
+              chart: { height: 380 },
+              legend: { position: 'bottom', fontSize: '12px' },
+              plotOptions: { pie: { donut: { size: '65%' } } }
+            }
+          }, {
+            breakpoint: 320,
+            options: {
+              chart: { height: 320 },
+              legend: { 
+                position: 'bottom', 
+                fontSize: '11px',
+                itemMargin: { horizontal: 6, vertical: 4 }
+              },
+              plotOptions: { pie: { donut: { size: '60%' } } }
+            }
+          }]
+        },
+        colors: CHART_COLORS,
+        stroke: { width: 4, colors: ['#fff'] },
+        legend: { 
+          position: 'bottom', 
+          fontWeight: 600, 
+          fontSize: '14px',
+          markers: { radius: 12, width: 12, height: 12 },
+          itemMargin: { horizontal: 12, vertical: 8 }
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '70%',
+              labels: {
+                show: true,
+                total: { 
+                  show: true, 
+                  label: 'Total Forms', 
+                  fontSize: '14px', 
+                  fontWeight: 800, 
+                  color: '#94a3b8' 
+                },
+                value: { fontSize: '32px', fontWeight: 900, color: '#1e293b' }
+              }
+            }
+          }
+        },
+        dataLabels: { enabled: true, style: { fontSize: '14px', fontWeight: 700 } },
+        tooltip: { 
+          theme: 'dark',
+          y: { formatter: (val: any) => val + ' Forms' }
+        }
       };
     }
 

@@ -944,19 +944,24 @@ table {
   .table-controls {
     padding: 16px;
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
 
     .search-box {
       max-width: 100%;
+      width: 100%;
+      height: 40px;
+      box-sizing: border-box;
     }
 
     .filter-actions-group {
       flex-direction: column;
-      align-items: stretch;
+      align-items: flex-start;
+      width: 100%;
 
       .filter-selects {
         flex-direction: column;
         align-items: stretch;
+        width: 100%;
       }
 
       .filter-select, .clear-filter-btn, .btn-excel-export {
@@ -1005,4 +1010,227 @@ table {
   .detail-container { padding: 12px; }
 
   .kpi-grid { grid-template-columns: 1fr; }
+}
+
+// ===== EXTRA SMALL SCREENS (320px–479px) =====
+@media (max-width: 420px) {
+  .detail-container { padding: 10px 8px; }
+
+  .breadcrumbs { font-size: 11px; gap: 3px; margin-bottom: 12px; }
+
+  // Header
+  .detail-header {
+    margin-bottom: 16px;
+
+    .header-left {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      .back-btn {
+        width: 36px;
+        height: 36px;
+
+        svg { width: 18px; height: 18px; }
+      }
+
+      .header-icon-container {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+
+        .header-icon { font-size: 22px; }
+      }
+
+      .title-info {
+        gap: 8px;
+        width: 100%;
+
+        .title-row-1 {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 6px;
+
+          h1 { font-size: 22px; }
+        }
+
+        .title-row-2 {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 2px;
+          font-size: 13px;
+
+          .divider-dot { display: none; }
+        }
+
+        .title-row-3 {
+          gap: 4px;
+
+          .subtle-chip { font-size: 10px; padding: 3px 7px; }
+        }
+      }
+    }
+  }
+
+  // KPI
+  .kpi-grid { gap: 8px; margin-bottom: 16px; }
+  .kpi-row.row-5,
+  .kpi-row.row-4,
+  .kpi-row.row-2 { grid-template-columns: 1fr; gap: 8px; }
+
+  .kpi-card {
+    padding: 12px 14px;
+    border-radius: 12px;
+
+    .kpi-label { font-size: 10px; margin-bottom: 6px; }
+    .kpi-value { font-size: 20px; }
+    .kpi-sub { font-size: 11px; }
+    .kpi-icon { font-size: 18px; top: 12px; right: 12px; }
+  }
+
+  // Section header
+  .section-header {
+    padding: 14px 14px;
+    gap: 10px;
+
+    .section-title {
+      gap: 10px;
+
+      .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        flex-shrink: 0;
+
+        .material-symbols-outlined, i { font-size: 18px; }
+      }
+
+      .title-text-group {
+        h2 {
+          font-size: 15px;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .section-subtitle { font-size: 11px; }
+      }
+
+      .count-badge { font-size: 11px; padding: 2px 8px; }
+    }
+  }
+
+  // Table controls
+  .table-controls {
+    padding: 10px 12px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start; // FIXED: prevents search box height inflation
+
+    .search-box {
+      max-width: 100%;
+      flex: none;
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 8px;
+      height: 38px; // FIXED: explicit height
+      box-sizing: border-box;
+
+      .material-symbols-outlined, i { font-size: 17px; }
+      input { font-size: 13px; }
+    }
+
+    .filter-actions-group {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+
+      .filter-selects {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .filter-select {
+        width: 100%;
+        height: 38px;
+        font-size: 13px;
+        padding: 6px 10px;
+      }
+
+      .clear-filter-btn {
+        width: 100%;
+        height: 38px;
+        font-size: 12px;
+        justify-content: center;
+      }
+
+      .btn-excel-export {
+        width: 100%;
+        height: 38px;
+        font-size: 13px;
+        justify-content: center;
+      }
+    }
+  }
+
+  // Table
+  table {
+    min-width: 480px;
+    font-size: 12px;
+
+    thead tr th { padding: 10px 12px; font-size: 11px; }
+    tbody tr td { padding: 10px 12px; font-size: 12px; }
+  }
+
+  // Footer
+  .table-footer {
+    padding: 12px 12px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .footer-left { font-size: 12px; }
+
+    .footer-right {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .page-size-selector {
+      font-size: 12px;
+      justify-content: center;
+
+      select { font-size: 12px; padding: 5px 8px; }
+    }
+
+    .pagination-controls {
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      .page-num { font-size: 12px; padding: 0 4px; }
+
+      button {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+
+        .material-symbols-outlined { font-size: 17px; }
+      }
+    }
+  }
+
+  // Action buttons — stack them
+  .action-icon-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+
+    .material-symbols-outlined, i { font-size: 14px; }
+  }
+
+  // Badges
+  .badge { font-size: 10px; padding: 3px 7px; }
 }

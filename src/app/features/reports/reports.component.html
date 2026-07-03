@@ -219,9 +219,32 @@
                         <!-- Professional Analytics Visualization -->
                         <div class="analytics-visualization-grid"
                             *ngIf="!loading && reportData.length > 0 && activeReport !== 'COURSE_REVENUE'">
-                            <!-- Main Trends Section -->
+                            
+                            <!-- For COURSE_LEAD_SOURCE: Show Donut Chart as Main Chart -->
+                            <div class="analytics-chart-card main-insight full-width" 
+                                *ngIf="activeReport === 'COURSE_LEAD_SOURCE' && pieChartOptions">
+                                <div class="chart-header">
+                                    <div class="title-group">
+                                        <span class="material-symbols-outlined icon">donut_small</span>
+                                        <h3>Lead Source Distribution Matrix</h3>
+                                    </div>
+                                    <div class="chart-actions">
+                                        <span class="badge premium">Real-time Analysis</span>
+                                    </div>
+                                </div>
+                                <div class="chart-wrapper donut-center">
+                                    <apx-chart [series]="pieChartOptions.series!" [chart]="pieChartOptions.chart!"
+                                        [labels]="pieChartOptions.labels!" [colors]="pieChartOptions.colors!"
+                                        [legend]="pieChartOptions.legend!" [plotOptions]="pieChartOptions.plotOptions!"
+                                        [dataLabels]="pieChartOptions.dataLabels!" [tooltip]="pieChartOptions.tooltip!"
+                                        [stroke]="pieChartOptions.stroke!">
+                                    </apx-chart>
+                                </div>
+                            </div>
+
+                            <!-- For Other Reports: Show Bar/Line Chart as Main -->
                             <div class="analytics-chart-card main-insight" [class.full-width]="!pieChartOptions"
-                                *ngIf="barChartOptions || lineChartOptions">
+                                *ngIf="activeReport !== 'COURSE_LEAD_SOURCE' && (barChartOptions || lineChartOptions)">
                                 <div class="chart-header">
                                     <div class="title-group">
                                         <span class="material-symbols-outlined icon">insights</span>
@@ -231,7 +254,7 @@
                                         <span class="badge premium">Real-time Analysis</span>
                                     </div>
                                 </div>
-                                <div class="chart-wrapper" [class.hide-on-mobile]="activeReport === 'COURSE_LEAD_SOURCE'">
+                                <div class="chart-wrapper">
                                     <apx-chart *ngIf="barChartOptions" [series]="barChartOptions.series!"
                                         [chart]="barChartOptions.chart!" [xaxis]="barChartOptions.xaxis!"
                                         [yaxis]="barChartOptions.yaxis!" [plotOptions]="barChartOptions.plotOptions!"
@@ -248,18 +271,11 @@
                                         [grid]="lineChartOptions.grid!">
                                     </apx-chart>
                                 </div>
-                                <div class="chart-wrapper mobile-chart show-on-mobile donut-center" *ngIf="activeReport === 'COURSE_LEAD_SOURCE' && pieChartOptions">
-                                    <apx-chart [series]="pieChartOptions.series!" [chart]="pieChartOptions.chart!"
-                                        [labels]="pieChartOptions.labels!" [colors]="pieChartOptions.colors!"
-                                        [legend]="pieChartOptions.legend!" [plotOptions]="pieChartOptions.plotOptions!"
-                                        [dataLabels]="pieChartOptions.dataLabels!" [tooltip]="pieChartOptions.tooltip!"
-                                        [stroke]="pieChartOptions.stroke!">
-                                    </apx-chart>
-                                </div>
                             </div>
 
-                            <!-- Secondary Distribution Section -->
-                            <div class="analytics-chart-card side-distribution" *ngIf="pieChartOptions" [class.hide-side-on-mobile]="activeReport === 'COURSE_LEAD_SOURCE'">
+                            <!-- Side Distribution (for non-LEAD_SOURCE reports) -->
+                            <div class="analytics-chart-card side-distribution" 
+                                *ngIf="activeReport !== 'COURSE_LEAD_SOURCE' && pieChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
                                         <span class="material-symbols-outlined icon">donut_small</span>
@@ -897,10 +913,10 @@
                                                 <span class="footer-val is-confirmed"
                                                     [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
                                             </td>
-                                            <td class="text-right">
+                                            <!-- <td class="text-right">
                                                 <span class="footer-val is-confirmed"
                                                     [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
-                                            </td>
+                                            </td> -->
                                         </tr>
                                     </tfoot>
                                     <!-- Aggregated Totals row -->
@@ -925,10 +941,10 @@
                                                 <span class="footer-val is-confirmed"
                                                     [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
                                             </td>
-                                            <td class="text-right">
+                                            <!-- <td class="text-right">
                                                 <span class="footer-val is-confirmed"
                                                     [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
-                                            </td>
+                                            </td> -->
                                         </tr>
                                     </tfoot>
                                 </table>
