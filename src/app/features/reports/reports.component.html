@@ -891,11 +891,11 @@
                                             </td>
                                         </tr>
                                     </tbody>
-                                    <!-- Overall Total row — sits just above Aggregated Totals, identical style -->
-                                    <tfoot *ngIf="totalsRow">
+                                    <!-- Overall Total row — full dataset total from backend -->
+                                    <tfoot *ngIf="overallRow">
                                         <tr class="summary-footer overall-total-row">
                                             <td class="sticky-col">Overall Total</td>
-                                            <ng-container *ngFor="let t of totalsRow.leadSourceTotals">
+                                            <ng-container *ngFor="let t of overallRow.leadSourceTotals">
                                                 <td class="text-center">
                                                     <span class="footer-val" [class.has-value]="t.forms > 0"
                                                         [class.zero-val]="t.forms === 0">{{t.forms}}</span>
@@ -906,17 +906,13 @@
                                                 </td>
                                             </ng-container>
                                             <td class="text-right">
-                                                <span class="footer-val" [class.has-value]="totalsRow.totalForms > 0"
-                                                    [class.zero-val]="totalsRow.totalForms === 0">{{totalsRow.totalForms}}</span>
+                                                <span class="footer-val" [class.has-value]="overallRow.totalForms > 0"
+                                                    [class.zero-val]="overallRow.totalForms === 0">{{overallRow.totalForms}}</span>
                                             </td>
                                             <td class="text-right">
                                                 <span class="footer-val is-confirmed"
-                                                    [class.zero-val]="totalsRow.totalConfirmed === 0">{{totalsRow.totalConfirmed}}</span>
+                                                    [class.zero-val]="overallRow.totalConfirmed === 0">{{overallRow.totalConfirmed}}</span>
                                             </td>
-                                            <!-- <td class="text-right">
-                                                <span class="footer-val is-confirmed"
-                                                    [class.zero-val]="totalsRow.totalFeesReceived === 0">{{totalsRow.totalFeesReceived}}</span>
-                                            </td> -->
                                         </tr>
                                     </tfoot>
                                     <!-- Aggregated Totals row -->
