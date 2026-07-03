@@ -111,13 +111,16 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
   showReportSelector = false;
   activeReport = 'COURSE_LEAD_SOURCE';
   reportData: any[] = [];
-  leadSourceHeaders: string[] = [];
+  leadSourceHeaders: any[] = [];
 
   // Pagination
   currentPage = 1;
   pageSize = 30;
   pageSizeOptions = [10, 30, 50, 100];
   protected readonly Math = Math;
+
+  sortBy = 'courseName';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   filters: ReportFilter = {
     filterType: 'TODAY',
@@ -327,6 +330,17 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchSubject.next(this.filters.search || '');
   }
 
+  toggleSort(column: string) {
+    if (this.sortBy === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortDirection = 'asc';
+    }
+    this.filters.page = 0;
+    this.loadReport();
+  }
+
   onPageSizeChange() {
     this.filters.size = this.pageSize;
     this.filters.page = 0;
@@ -506,7 +520,7 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
       const at = this.aggregatedTotals || {};
       const leadSourceTotals = this.leadSourceHeaders.map(h => {
-        const prefix = this.getLeadSourceKeyPrefix(h);
+        const prefix = this.getLeadSourceKeyPrefix(h.name);
         return {
           forms: at[prefix + 'Forms'] ?? 0,
           fees: at[prefix + 'Fees'] ?? 0
@@ -638,6 +652,14 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.lineChartOptions = null;
     this.comparisonFormsChartOptions = null;
     this.comparisonFeesChartOptions = null;
+
+    if (type === 'STUDENT_DETAIL') {
+      this.sortBy = 'studentName';
+    } else {
+      this.sortBy = 'courseName';
+    }
+    this.sortDirection = 'asc';
+
     this.loadReport();
     if (type === 'DAILY_SESSION_SUMMARY') {
       this.loadSessionCumulativeStats();
@@ -700,7 +722,12 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.loading = true;
 
-    const apiFilter: ReportFilter = { ...this.filters };
+    const apiFilter: ReportFilter = {
+      ...this.filters,
+      sortBy: this.sortBy,
+      sortDir: this.sortDirection,
+      sortDirection: this.sortDirection
+    };
     console.log('Reports: Outgoing Payload ->', apiFilter);
 
     if (apiFilter.session === 'OVERALL') {
@@ -710,25 +737,29 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     let obs;
     const baseType = this.getBaseReportType(this.activeReport);
 
-    switch (baseType) {
-      case 'COURSE_ANALYTICS':
-        obs = this.reportsService.getCourseAnalyticsReport(apiFilter);
-        break;
-      case 'COURSE_LEAD_SOURCE':
-        obs = this.reportsService.getCourseLeadSourceReport(apiFilter);
-        break;
-      case 'LEAD_SOURCE_CONVERSION':
-        obs = this.reportsService.getLeadSourceConversionReport(apiFilter);
-        break;
-      case 'USER_ADMISSION':
-        obs = this.reportsService.getUserAdmissionReport(apiFilter);
-        break;
-      case 'STUDENT_DETAIL':
-        obs = this.reportsService.getStudentDetailReport(apiFilter);
-        break;
-      case 'DAILY_SESSION_SUMMARY':
-        obs = this.reportsService.getDailySessionSummaryReport(apiFilter);
-        break;
+    if (this.activeReport === 'COURSE_REVENUE') {
+      obs = this.reportsService.getCourseRevenueReport(apiFilter);
+    } else {
+      switch (baseType) {
+        case 'COURSE_ANALYTICS':
+          obs = this.reportsService.getCourseAnalyticsReport(apiFilter);
+          break;
+        case 'COURSE_LEAD_SOURCE':
+          obs = this.reportsService.getCourseLeadSourceReport(apiFilter);
+          break;
+        case 'LEAD_SOURCE_CONVERSION':
+          obs = this.reportsService.getLeadSourceConversionReport(apiFilter);
+          break;
+        case 'USER_ADMISSION':
+          obs = this.reportsService.getUserAdmissionReport(apiFilter);
+          break;
+        case 'STUDENT_DETAIL':
+          obs = this.reportsService.getStudentDetailReport(apiFilter);
+          break;
+        case 'DAILY_SESSION_SUMMARY':
+          obs = this.reportsService.getDailySessionSummaryReport(apiFilter);
+          break;
+      }
     }
 
     if (obs) {
@@ -803,7 +834,10 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
           }
 
           if (baseType === 'COURSE_LEAD_SOURCE' && this.reportData.length > 0 && this.reportData[0].leadSources) {
-            this.leadSourceHeaders = this.reportData[0].leadSources.map((ls: any) => ls.leadSourceName);
+            this.leadSourceHeaders = this.reportData[0].leadSources.map((ls: any) => ({
+              id: ls.leadSourceId,
+              name: ls.leadSourceName
+            }));
           }
 
           setTimeout(() => this.initCharts(), 10);
@@ -901,9 +935,9 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
       const dynamicHeight = Math.max(chartData.length * 65, 600);
 
       const series = this.leadSourceHeaders.map(ls => ({
-        name: ls,
+        name: ls.name,
         data: chartData.map((d: any) => {
-          const stat = d.leadSources?.find((s: any) => s.leadSourceName === ls);
+          const stat = d.leadSources?.find((s: any) => s.leadSourceName === ls.name);
           return stat ? stat.formsReceived : 0;
         })
       }));

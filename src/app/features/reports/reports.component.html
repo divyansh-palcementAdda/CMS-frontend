@@ -824,16 +824,31 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th rowspan="2" class="align-middle sticky-col">Program Name</th>
+                                            <th rowspan="2" class="align-middle sticky-col cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                                Program Name
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
                                             <th *ngFor="let h of leadSourceHeaders" colspan="2"
-                                                class="text-center group-border">{{h}}</th>
-                                            <th rowspan="2" class="text-right align-middle">Total Forms</th>
-                                            <th rowspan="2" class="text-right align-middle">Confirmed</th>
+                                                class="text-center group-border">{{h.name}}</th>
+                                            <th rowspan="2" class="text-right align-middle cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalForms')">
+                                                Total Forms
+                                                <span *ngIf="sortBy === 'totalForms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th rowspan="2" class="text-right align-middle cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('confirmedAdmissions')">
+                                                Confirmed
+                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
                                         </tr>
                                         <tr>
                                             <ng-container *ngFor="let h of leadSourceHeaders">
-                                                <th class="text-center sub-col">Forms</th>
-                                                <th class="text-center sub-col group-border">Fees</th>
+                                                <th class="text-center sub-col cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('leadSource_' + h.id + '_forms')">
+                                                    Forms
+                                                    <span *ngIf="sortBy === 'leadSource_' + h.id + '_forms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                </th>
+                                                <th class="text-center sub-col group-border cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('leadSource_' + h.id + '_fees')">
+                                                    Fees
+                                                    <span *ngIf="sortBy === 'leadSource_' + h.id + '_fees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                </th>
                                             </ng-container>
                                         </tr>
                                     </thead>
@@ -843,14 +858,14 @@
                                             <ng-container *ngFor="let h of leadSourceHeaders">
                                                 <td class="text-center">
                                                     <span class="count-chip"
-                                                        [class.dimmed]="getLeadVal(d, h, 'forms') === 0">
-                                                        {{getLeadVal(d, h, 'forms')}}
+                                                        [class.dimmed]="getLeadVal(d, h.name, 'forms') === 0">
+                                                        {{getLeadVal(d, h.name, 'forms')}}
                                                     </span>
                                                 </td>
                                                 <td class="text-center group-border">
                                                     <span class="count-chip"
-                                                        [class.dimmed]="getLeadVal(d, h, 'fees') === 0">
-                                                        {{getLeadVal(d, h, 'fees')}}
+                                                        [class.dimmed]="getLeadVal(d, h.name, 'fees') === 0">
+                                                        {{getLeadVal(d, h.name, 'fees')}}
                                                     </span>
                                                 </td>
                                             </ng-container>
@@ -996,12 +1011,30 @@
                                     *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS' && activeReport !== 'COURSE_REVENUE'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th>Program Details</th>
-                                            <th class="text-center">Forms</th>
-                                            <th class="text-center">Confirmed</th>
-                                            <th class="text-right">Gross Paid</th>
-                                            <th class="text-right">Refunded</th>
-                                            <th class="text-right">Balance</th>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                                Program Details
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-center cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalForms')">
+                                                Forms
+                                                <span *ngIf="sortBy === 'totalForms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-center cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('confirmedAdmissions')">
+                                                Confirmed
+                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalFeesCollected')">
+                                                Gross Paid
+                                                <span *ngIf="sortBy === 'totalFeesCollected'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalRefunded')">
+                                                Refunded
+                                                <span *ngIf="sortBy === 'totalRefunded'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('remainingAmount')">
+                                                Balance
+                                                <span *ngIf="sortBy === 'remainingAmount'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1045,13 +1078,34 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'COURSE_REVENUE'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th>Course Name</th>
-                                            <th class="text-right">Course Fees</th>
-                                            <th class="text-center">Confirmed Admissions</th>
-                                            <th class="text-right">Projected Revenue</th>
-                                            <th class="text-right">Overall Collected</th>
-                                            <th class="text-right">Refunded Amount</th>
-                                            <th class="text-right">Net Collected</th>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                                Course Name
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseFees')">
+                                                Course Fees
+                                                <span *ngIf="sortBy === 'courseFees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-center cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('confirmedAdmissions')">
+                                                Confirmed Admissions
+                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalRevenue')">
+                                                Projected Revenue
+                                                <span *ngIf="sortBy === 'totalRevenue'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalFeesCollected')">
+                                                Overall Collected
+                                                <span *ngIf="sortBy === 'totalFeesCollected'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalRefunded')">
+                                                Refunded Amount
+                                                <span *ngIf="sortBy === 'totalRefunded'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('netCollected')">
+                                                Net Collected
+                                                <span *ngIf="sortBy === 'netCollected'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1090,11 +1144,23 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'STUDENT_DETAIL'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th>Student Information</th>
-                                            <th>Academic Context</th>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('studentName')">
+                                                Student Information
+                                                <span *ngIf="sortBy === 'studentName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                                Academic Context
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
                                             <th class="text-center">Threshold</th>
-                                            <th class="text-right">Paid</th>
-                                            <th class="text-right">Pending</th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalFeesPaid')">
+                                                Paid
+                                                <span *ngIf="sortBy === 'totalFeesPaid'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('remainingFees')">
+                                                Pending
+                                                <span *ngIf="sortBy === 'remainingFees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>

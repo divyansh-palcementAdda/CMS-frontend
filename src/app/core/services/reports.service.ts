@@ -15,6 +15,7 @@ export interface ReportFilter {
   size?: number;
   sortBy?: string;
   sortDir?: string;
+  sortDirection?: string;
 }
 
 @Injectable({
@@ -35,6 +36,10 @@ export class ReportsService {
 
   getCourseAnalyticsReport(filter: ReportFilter): Observable<any> {
     return this.http.post(`${this.apiUrl}/course-analytics`, filter);
+  }
+
+  getCourseRevenueReport(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/course-revenue`, filter);
   }
 
   getLeadSourceConversionReport(filter: ReportFilter): Observable<any> {
