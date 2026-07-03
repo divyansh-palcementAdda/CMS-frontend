@@ -519,33 +519,25 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get totalsRow() {
     if (this.activeReport === 'COURSE_LEAD_SOURCE') {
-      const at = this.aggregatedTotals || {};
-      const leadSourceTotals = this.leadSourceHeaders.map(h => {
-        const prefix = this.getLeadSourceKeyPrefix(h.name);
-        return {
-          forms: at[prefix + 'Forms'] ?? 0,
-          fees: at[prefix + 'Fees'] ?? 0
-        };
+      // Aggregated Totals = current visible page rows only
+      const page = this.paginatedData;
+      const leadSourceTotals = this.leadSourceHeaders.map((h: any) => {
+        const forms = page.reduce((sum: number, d: any) => sum + this.getLeadVal(d, h.name, 'forms'), 0);
+        const fees  = page.reduce((sum: number, d: any) => sum + this.getLeadVal(d, h.name, 'fees'),  0);
+        return { forms, fees };
       });
-      const totalFeesReceived = leadSourceTotals.reduce((sum, t) => sum + t.fees, 0);
+      const totalForms     = page.reduce((sum: number, d: any) => sum + (d.totalForms ?? 0), 0);
+      const totalConfirmed = page.reduce((sum: number, d: any) => sum + (d.totalConfirmedAdmissions ?? 0), 0);
+      const totalFeesReceived = leadSourceTotals.reduce((sum: number, t: any) => sum + t.fees, 0);
       return {
-        revConfirmed: 0,
-        revProjected: 0,
-        revCollected: 0,
-        revRefunded: 0,
-        revNet: 0,
-        revRemaining: 0,
-        totalForms: at.totalForms ?? 0,
-        totalConfirmed: at.confirmed ?? 0,
-        totalFeesCollected: 0,
-        totalRemaining: 0,
-        totalRevenue: 0,
-        totalFeesPaid: 0,
-        totalRemainingFees: 0,
-        totalRefunded: 0,
-        totalStudents: this.totalElements,
-        totalFeesReceived: totalFeesReceived,
-        leadSourceTotals: leadSourceTotals
+        revConfirmed: 0, revProjected: 0, revCollected: 0, revRefunded: 0, revNet: 0, revRemaining: 0,
+        totalForms,
+        totalConfirmed,
+        totalFeesCollected: 0, totalRemaining: 0, totalRevenue: 0,
+        totalFeesPaid: 0, totalRemainingFees: 0, totalRefunded: 0,
+        totalStudents: page.length,
+        totalFeesReceived,
+        leadSourceTotals
       };
     }
 
@@ -597,6 +589,29 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
       totalFeesReceived: 0,
       leadSourceTotals: []
     };
+  }
+
+  // Overall Total row — full dataset totals (backend aggregatedTotals, with fallback to serverSummary)
+  get overallRow() {
+    if (this.activeReport !== 'COURSE_LEAD_SOURCE') return null;
+
+    // Try aggregatedTotals first (per-lead-source breakdown)
+    const at = this.aggregatedTotals || {};
+
+    // Build per-lead-source totals from aggregatedTotals keys
+    const leadSourceTotals = this.leadSourceHeaders.map((h: any) => {
+      const prefix = this.getLeadSourceKeyPrefix(h.name);
+      // aggregatedTotals may use different key formats — try both camelCase prefix and direct name
+      const forms = at[prefix + 'Forms'] ?? at[h.name + 'Forms'] ?? 0;
+      const fees  = at[prefix + 'Fees']  ?? at[h.name + 'Fees']  ?? 0;
+      return { forms, fees };
+    });
+
+    // For totals: prefer aggregatedTotals, fallback to serverSummary
+    const totalForms    = at['totalForms']  ?? this.serverSummary.totalApplications  ?? 0;
+    const totalConfirmed = at['confirmed']  ?? this.serverSummary.confirmedAdmissions ?? 0;
+
+    return { leadSourceTotals, totalForms, totalConfirmed };
   }
 
   getLeadSourceKeyPrefix(name: string): string {
