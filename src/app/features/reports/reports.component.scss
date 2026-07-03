@@ -1421,6 +1421,8 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-width: 0;          // prevent flex blowout
+    overflow: hidden;      // clip corners cleanly
     margin-bottom: 40px;
 
     .surface-top {
@@ -1555,8 +1557,21 @@
     flex-direction: column;
 
     .enterprise-table-wrapper {
-        overflow-x: auto;
         width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        // Only show horizontal scrollbar when table actually overflows
+        &::-webkit-scrollbar {
+            height: 6px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: var(--slate-300);
+            border-radius: 10px;
+        }
+        &::-webkit-scrollbar-track {
+            background: var(--slate-100);
+        }
     }
 
     &::-webkit-scrollbar {
@@ -1641,6 +1656,7 @@
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 16px 16px 0 0;
+    table-layout: auto; // columns size to content on large screens
 
     thead {
         position: sticky;
@@ -1653,11 +1669,12 @@
                 background: #435fff !important;
                 color: #ffffff !important;
                 border-bottom: none !important;
-                letter-spacing: 0.12em !important;
+                letter-spacing: 0.08em !important;
                 font-weight: 800 !important;
-                padding: 16px 20px !important;
+                padding: 14px 16px !important;
                 text-transform: uppercase !important;
-                font-size: 13px !important;
+                font-size: 12px !important;
+                white-space: nowrap;
 
                 &:first-child {
                     border-radius: 16px 0 0 0 !important;
@@ -1680,13 +1697,13 @@
         }
 
         th {
-            padding: 24px 32px;
+            padding: 18px 20px;
             background: var(--slate-50);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--slate-600);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             text-align: left;
             border-bottom: 2px solid var(--slate-200);
             white-space: nowrap;
@@ -1720,9 +1737,9 @@
             }
 
             td {
-                padding: 20px 32px;
+                padding: 16px 20px;
                 border-bottom: 1px solid var(--slate-100);
-                font-size: 15px;
+                font-size: 14px;
                 color: var(--slate-700);
                 font-weight: 600;
 
@@ -1746,7 +1763,7 @@
 
                 &.font-mono {
                     font-family: 'JetBrains Mono', monospace;
-                    font-size: 14px;
+                    font-size: 13px;
                 }
             }
         }
@@ -1762,17 +1779,18 @@
         &.overall-total-row {
             background: #1e293b;
             td {
-                border-top: 4px solid #00d2ff;
+                // No top border — removed as requested
+                border-top: none;
                 border-bottom: 2px solid rgba(255, 255, 255, 0.08);
             }
         }
 
         td {
-            padding: 16px 20px;
+            padding: 14px 16px;
             color: #ffffff;
             font-weight: 800;
-            font-size: 14px;
-            border-top: 4px solid #435fff;
+            font-size: 13px;
+            border-top: none; // Removed top border on all tfoot rows
             white-space: nowrap;
             text-align: center;
 
@@ -1825,6 +1843,11 @@
                 }
             }
         }
+    }
+
+    // On smaller screens allow min-width so table can scroll horizontally
+    @media (max-width: 1024px) {
+        min-width: 700px;
     }
 }
 

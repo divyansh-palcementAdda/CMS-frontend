@@ -124,7 +124,7 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     session: new Date().getFullYear().toString(),
     search: '',
     page: 0,
-    size: 10
+    size: 30
   };
 
   serverSummary: any = {
