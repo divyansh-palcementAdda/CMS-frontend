@@ -2267,6 +2267,18 @@
             overflow-x: auto;
             overflow-y: hidden;
             padding-top: 24px;
+            -webkit-overflow-scrolling: touch;
+
+            // Inner chart must have a real pixel width so ApexCharts renders bars
+            apx-chart {
+                display: block;
+                min-width: 100%;
+                width: 100%;
+            }
+
+            .apexcharts-canvas {
+                min-width: 100%;
+            }
 
             &.donut-center {
                 display: flex;
@@ -2287,56 +2299,47 @@
     }
 }
 
-// --- 11b. Mobile chart toggle helpers (COURSE_LEAD_SOURCE) ---
-// Default: show bar chart, hide mobile-donut and keep side panel visible
-.hide-on-mobile {
-    display: block;
-}
+// --- 11b. Chart layout adjustments for small screens ---
+// All charts are visible on all screen sizes
 
-// Use height:0 + overflow:hidden instead of display:none so ApexCharts
-// can still initialize and measure itself even when visually hidden
-.show-on-mobile {
-    display: flex !important;   // keep in DOM so ApexCharts mounts correctly
-    height: 0 !important;
-    overflow: hidden !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    pointer-events: none;
-}
-
-.hide-side-on-mobile {
-    display: block;
-}
-
-// On small screens (≤480px): reveal the donut, hide the bar and side panel
+// Responsive adjustments for small screens (≤480px)
 @media (max-width: 480px) {
-    .hide-on-mobile {
-        display: none !important;
-    }
-
-    .show-on-mobile {
-        display: flex !important;
-        height: auto !important;
-        overflow: visible !important;
-        min-height: 320px !important;
-        padding: 16px 0 !important;
-        margin: 0 !important;
-        pointer-events: auto;
-        width: 100%;
-        align-items: center;
-        justify-content: center;
-
-        // Make ApexCharts fill the container
-        apx-chart,
-        .apexcharts-canvas {
+    .analytics-chart-card.main-insight,
+    .analytics-chart-card.side-distribution {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        padding: 16px !important;
+        
+        .chart-wrapper {
+            min-height: 380px !important;
             width: 100% !important;
-            max-width: 100% !important;
+            min-width: 0 !important;
+            padding: 12px 0 !important;
+            overflow: visible;
+            
+            &.donut-center {
+                min-height: 320px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            apx-chart {
+                display: block !important;
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+
+            .apexcharts-canvas {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
         }
     }
 
-    .hide-side-on-mobile {
-        display: none !important;
+    .analytics-chart-card.full-width {
+        grid-column: span 12 !important;
     }
 }
 
@@ -5496,26 +5499,90 @@
     }
 
     .analytics-chart-card {
-        padding: 10px;
+        padding: 12px;
+        border-radius: 16px;
         
         .chart-header {
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            
             .title-group {
+                gap: 8px;
+                
+                .icon {
+                    font-size: 20px;
+                }
+                
                 h3 {
                     font-size: 13px;
+                    line-height: 1.3;
                 }
+            }
+            
+            .badge.premium {
+                font-size: 9px;
+                padding: 4px 8px;
             }
         }
 
-        // Ensure the mobile donut chart is properly sized at 320px
-        .chart-wrapper.mobile-chart.show-on-mobile {
-            min-height: 300px !important;
-            height: auto !important;
-            overflow: visible !important;
-            padding: 12px 0 !important;
+        .chart-wrapper {
+            min-height: 320px !important;
+            width: 100% !important;
+            padding: 6px 0 !important;
+            box-sizing: border-box;
+            
+            &.donut-center {
+                min-height: 300px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 0 !important;
+            }
+            
+            apx-chart {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .apexcharts-canvas {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            // Donut chart specific 320px adjustments
+            .apexcharts-legend {
+                font-size: 11px !important;
+                padding: 8px 4px !important;
+                
+                .apexcharts-legend-text {
+                    font-size: 11px !important;
+                    line-height: 1.4 !important;
+                }
+            }
+
+            .apexcharts-datalabels-group {
+                font-size: 10px !important;
+            }
         }
 
-        .chart-wrapper {
-            min-height: 250px !important;
+        &.full-width {
+            grid-column: span 12 !important;
+            width: 100% !important;
+        }
+    }
+
+    .analytics-visualization-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        
+        .analytics-chart-card.main-insight,
+        .analytics-chart-card.side-distribution,
+        .analytics-chart-card.full-width {
+            grid-column: span 1 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
         }
     }
 
