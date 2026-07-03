@@ -7,11 +7,10 @@ on:
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -27,10 +26,19 @@ jobs:
       - name: Build Angular
         run: npm run build -- --configuration production
 
+      - name: Verify Build
+        run: |
+          ls -la dist
+          ls -la dist/cms-angular
+          ls -la dist/cms-angular/browser
+
       - name: Create Archive
         run: |
           cd dist/cms-angular/browser
           tar -czf ../../../cms-build.tar.gz .
+
+      - name: Verify Archive
+        run: ls -lh cms-build.tar.gz
 
       - name: Upload Archive
         uses: appleboy/scp-action@v0.1.7
@@ -38,10 +46,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: cms-build.tar.gz
-          target: /opt/deployments/cms
+          source: "cms-build.tar.gz"
+          target: "/opt/deployments/cms"
 
-      - name: Deploy
+      - name: Deploy on VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.HOST }}
