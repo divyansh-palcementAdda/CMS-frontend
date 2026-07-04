@@ -373,6 +373,7 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
   // ── Lifecycle ─────────────────────────────────────────────────────────────────
 
   ngOnDestroy(): void {
+    this.statePreservationService.clearState('cms_course_management_state');
     this.destroy$.next();
     this.destroy$.complete();
   }
