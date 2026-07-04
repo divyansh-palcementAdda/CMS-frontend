@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ActivityItem } from '../../../../core/models/dashboard.model';
@@ -13,7 +13,6 @@ interface ActivityVm {
   time: string;
   hasDetails: boolean;
   details: Array<{ key: string; value: string }>;
-  isExpanded: boolean;
 }
 
 @Component({
@@ -29,7 +28,7 @@ interface ActivityVm {
       <ng-container *ngIf="vm.length; else empty">
         <div class="activity-list">
           <div *ngFor="let a of vm; trackBy: trackByFn" class="activity-item-wrapper">
-            <div class="activity-item" [class.clickable]="a.hasDetails" (click)="toggleDetails(a)">
+            <div class="activity-item" [class.clickable]="a.hasDetails" (click)="openModal(a)">
               <div class="activity-icon" [style.background]="a.iconBg">{{ a.icon }}</div>
               <div class="activity-body">
                 <div class="activity-row">
@@ -39,19 +38,9 @@ interface ActivityVm {
                 <div class="activity-desc">{{ a.desc }}</div>
                 <div class="activity-footer">
                   <span class="activity-by" *ngIf="a.by">{{ a.by }}</span>
-                  <span class="activity-details-toggle" *ngIf="a.hasDetails">
-                    {{ a.isExpanded ? 'Hide Details ▲' : 'View Details ▼' }}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Expandable Details Section -->
-            <div class="activity-details-panel" *ngIf="a.hasDetails && a.isExpanded">
-              <div class="details-grid">
-                <div *ngFor="let detail of a.details" class="detail-row">
-                  <span class="detail-key">{{ detail.key }}</span>
-                  <span class="detail-value">{{ detail.value }}</span>
+                  <button class="activity-details-toggle" *ngIf="a.hasDetails" (click)="openModal(a); $event.stopPropagation()">
+                    View Details
+                  </button>
                 </div>
               </div>
             </div>
@@ -62,6 +51,46 @@ interface ActivityVm {
         <div class="empty-activity" *ngIf="!loading">No recent activity</div>
       </ng-template>
     </div>
+
+    <!-- Activity Details Modal -->
+    <div class="activity-modal-backdrop" *ngIf="selectedActivity" (click)="closeModal()">
+      <div class="activity-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" [attr.aria-label]="selectedActivity?.title">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-icon" [style.background]="selectedActivity.iconBg">
+              {{ selectedActivity.icon }}
+            </div>
+            <div>
+              <h3 class="modal-title">{{ selectedActivity.title }}</h3>
+              <span class="modal-time">{{ selectedActivity.time }}</span>
+            </div>
+          </div>
+          <button class="modal-close-btn" (click)="closeModal()" aria-label="Close modal">&#x2715;</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <p class="modal-desc">{{ selectedActivity.desc }}</p>
+          <p class="modal-by" *ngIf="selectedActivity.by">{{ selectedActivity.by }}</p>
+
+          <div class="modal-details-section" *ngIf="selectedActivity.details.length">
+            <div class="modal-details-label">Details</div>
+            <div class="modal-details-grid">
+              <ng-container *ngFor="let detail of selectedActivity.details">
+                <span class="modal-detail-key">{{ detail.key }}</span>
+                <span class="modal-detail-value">{{ detail.value }}</span>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button class="modal-close-action-btn" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -71,9 +100,15 @@ interface ActivityVm {
 export class ActivityFeedComponent implements OnInit, OnDestroy {
   vm: ActivityVm[] = [];
   loading = true;
+  selectedActivity: ActivityVm | null = null;
   private sub?: Subscription;
 
   constructor(private activityService: ActivityService) { }
+
+  @HostListener('document:keydown.escape')
+  onEscKey(): void {
+    this.closeModal();
+  }
 
   ngOnInit(): void {
     this.fetchActivities();
@@ -138,38 +173,41 @@ export class ActivityFeedComponent implements OnInit, OnDestroy {
         by: byText,
         time: String(a?.time ?? a?.timeAgo ?? ''),
         hasDetails: hasDetailsVal,
-        details: detailsList,
-        isExpanded: false
+        details: detailsList
       };
     });
   }
 
   loadStaticFallback(): void {
     this.vm = [
-      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
-      { icon: '✅', iconBg: '#eff6ff', title: 'Admission Confirmed', desc: 'Neill admitted to Engineering Batch 2026', by: 'by Admin User', time: '2 days ago', hasDetails: false, details: [], isExpanded: false }
+      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago', hasDetails: false, details: [] },
+      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago', hasDetails: false, details: [] },
+      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago', hasDetails: false, details: [] },
+      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago', hasDetails: false, details: [] },
+      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago', hasDetails: false, details: [] },
+      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [] },
+      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago', hasDetails: false, details: [] },
+      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago', hasDetails: false, details: [] },
+      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago', hasDetails: false, details: [] },
+      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago', hasDetails: false, details: [] },
+      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago', hasDetails: false, details: [] },
+      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [] },
+      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [] },
+      { icon: '✅', iconBg: '#eff6ff', title: 'Admission Confirmed', desc: 'Neill admitted to Engineering Batch 2026', by: 'by Admin User', time: '2 days ago', hasDetails: false, details: [] }
     ];
   }
 
-  toggleDetails(item: ActivityVm): void {
+  openModal(item: ActivityVm): void {
     if (item.hasDetails) {
-      item.isExpanded = !item.isExpanded;
+      this.selectedActivity = item;
     }
   }
 
-  trackByFn(index: number, item: ActivityVm): any {
+  closeModal(): void {
+    this.selectedActivity = null;
+  }
+
+  trackByFn(index: number, _item: ActivityVm): any {
     return index;
   }
 
