@@ -647,11 +647,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      this.router.navigate(['/users']);
-    }
+    this.router.navigate(['/users']);
   }
 
   downloadExcel(tab: string) {
@@ -727,7 +723,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         modalAppStartDate: formatDate(startDate),
         modalAppEndDate: formatDate(today)
       },
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
+      replaceUrl: true
     });
   }
 
@@ -755,7 +752,8 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         modalAppStartDate: null,
         modalAppEndDate: null
       },
-      queryParamsHandling: 'merge'
+      queryParamsHandling: 'merge',
+      replaceUrl: true
     });
   }
 

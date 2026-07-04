@@ -287,5 +287,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.sub) this.sub.unsubscribe();
     if (this.searchSub) this.searchSub.unsubscribe();
+    // Clear preserved state so search/filters reset on next visit
+    this.statePreservationService.clearState('cms_user_management_state');
   }
 }
