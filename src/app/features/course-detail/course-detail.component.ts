@@ -851,7 +851,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   onViewUser(userId: number): void {
-    this.router.navigate(['/users', userId]);
+    const returnUrl = `/courses/${this.courseId}`;
+    this.router.navigate(['/users', userId], { queryParams: { returnUrl } });
   }
 
   openBreakdownDownloadModal(): void {
