@@ -139,7 +139,7 @@
                       <span *ngIf="sortBy !== 'cancelledAdmissions'" style="opacity: 0.3;">▲▼</span>
                     </span>
                   </th>
-                  <th class="text-center" style="min-width: 120px;">Action</th>
+                  <th style="min-width: 120px;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,9 +155,13 @@
                   <td class="text-center">{{ item.remainingApplications }}</td>
                   <td class="text-center">{{ item.cancelledApplications }}</td>
                   <td class="text-center">{{ item.cancelledAdmissions }}</td>
-                  <td class="text-center">
-                    <button class="action-btn text-primary" (click)="navigateToGenderDetail(item.gender)" title="View breakdown and metrics">
-                      View Details &rarr;
+                  <td class="action-cell">
+                    <button class="btn-view" (click)="navigateToGenderDetail(item.gender)" title="View breakdown and metrics">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      View
                     </button>
                   </td>
                 </tr>
@@ -170,18 +174,25 @@
             </table>
           </div>
 
-          <!-- Pagination Footer -->
-          <div class="table-footer" *ngIf="gendersData.length > 0">
-            <div class="pagination-info text-light">
+          <!-- Pagination -->
+          <div class="pagination-section" *ngIf="totalPages > 0">
+            <span class="showing-text">
               Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalElements) }} of {{ totalElements }} entries
-            </div>
+            </span>
             <div class="pagination-controls">
-              <button class="pag-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">&larr; Previous</button>
-              <span class="pag-page" *ngFor="let p of [].constructor(totalPages); let idx = index" 
-                    [class.active]="currentPage === (idx + 1)" (click)="onPageChange(idx + 1)">
-                {{ idx + 1 }}
-              </span>
-              <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">Next &rarr;</button>
+              <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button class="page-btn" *ngFor="let p of getPagesArray()" [class.active]="p === currentPage" [class.ellipsis]="p === '...'" [disabled]="p === '...'" (click)="p !== '...' && goToPage(+p)">
+                {{ p }}
+              </button>
+              <button class="page-btn nav-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
             </div>
           </div>
         </div>

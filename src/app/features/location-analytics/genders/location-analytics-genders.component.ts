@@ -297,6 +297,33 @@ export class LocationAnalyticsGendersComponent implements OnInit, OnDestroy {
     }
   }
 
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.applyFiltersAndReload();
+    }
+  }
+
+  getPagesArray(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const maxVisible = 5;
+
+    if (this.totalPages <= maxVisible) {
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (this.currentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', this.totalPages);
+      } else if (this.currentPage >= this.totalPages - 2) {
+        pages.push(1, '...', this.totalPages - 3, this.totalPages - 2, this.totalPages - 1, this.totalPages);
+      } else {
+        pages.push(1, '...', this.currentPage - 1, this.currentPage, this.currentPage + 1, '...', this.totalPages);
+      }
+    }
+    return pages;
+  }
+
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
