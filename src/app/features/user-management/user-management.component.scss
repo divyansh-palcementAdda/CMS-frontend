@@ -262,22 +262,34 @@ $text-light: #64748B;
                 text-align: center !important;
                 font-weight: 700;
                 font-size: 14px;
+
+                &.apps-count {
+                  color: #10B981 !important;
+                }
+                &.adms-count {
+                  color: #3B82F6 !important;
+                }
+                &.rem-count {
+                  color: #6366F1 !important;
+                }
+                &.can-adms-count {
+                  color: #EF4444 !important;
+                }
+                &.can-apps-count {
+                  color: #EF4444 !important;
+                }
               }
 
-              &:nth-child(3) {
-                color: #10B981;
-              }
-
-              &:nth-child(4) {
-                color: #3B82F6;
-              }
-
-              &:nth-child(5) {
-                color: #F97316;
-              }
-
-              &:nth-child(6) {
-                color: #EF4444;
+              .kpi-badge {
+                display: inline-block;
+                padding: 4px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                background-color: #F1F5F9;
+                color: #475569;
+                min-width: 24px;
+                text-align: center;
               }
 
               .status-pill {

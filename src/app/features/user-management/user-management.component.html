@@ -156,6 +156,22 @@
                                                     [ngClass]="sortBy === 'totalApplications' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                                             </span>
                                         </th>
+                                        <th class="sortable" (click)="toggleSort('forms3days')"
+                                            style="cursor: pointer;">
+                                            Forms (3 Days)
+                                            <span class="sort-icon" style="margin-left: 4px;">
+                                                <i class="fas"
+                                                    [ngClass]="sortBy === 'forms3days' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                                            </span>
+                                        </th>
+                                        <th class="sortable" (click)="toggleSort('forms7days')"
+                                            style="cursor: pointer;">
+                                            Forms (7 Days)
+                                            <span class="sort-icon" style="margin-left: 4px;">
+                                                <i class="fas"
+                                                    [ngClass]="sortBy === 'forms7days' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                                            </span>
+                                        </th>
                                         <th class="sortable" (click)="toggleSort('totalAdmissions')"
                                             style="cursor: pointer;">
                                             Total Admissions
@@ -199,12 +215,17 @@
                                         <td class="text-center text-bold num-col ">{{ (currentPage - 1) * pageSize + i +
                                             1 }}</td>
                                         <td class="user-name">{{ item.fullName }}</td>
-                                        <td class="user-counts">{{ item.totalApplications }}</td>
-                                        <td class="user-counts">{{ item.totalAdmissions }}</td>
-                                        <td class="user-counts" style="color: #6366F1; font-weight: 600;">{{
-                                            item.remainingApplications }}</td>
-                                        <td class="user-counts">{{ item.cancelledAdmissions }}</td>
-                                        <td class="user-counts">{{ item.cancelledApplications }}</td>
+                                        <td class="user-counts apps-count">{{ item.totalApplications }}</td>
+                                        <td class="user-counts">
+                                            <span class="kpi-badge font-bold">{{ item.formsLast3Days || 0 }}</span>
+                                        </td>
+                                        <td class="user-counts">
+                                            <span class="kpi-badge font-bold">{{ item.formsLast7Days || 0 }}</span>
+                                        </td>
+                                        <td class="user-counts adms-count">{{ item.totalAdmissions }}</td>
+                                        <td class="user-counts rem-count">{{ item.remainingApplications }}</td>
+                                        <td class="user-counts can-adms-count">{{ item.cancelledAdmissions }}</td>
+                                        <td class="user-counts can-apps-count">{{ item.cancelledApplications }}</td>
                                         <td>
                                             <div class="roles-container"
                                                 style="display: flex; gap: 4px; flex-wrap: wrap;">

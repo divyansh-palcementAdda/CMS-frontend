@@ -208,7 +208,11 @@ export class CourseService {
             totalAdmissions: c.totalAdmissions || 0,
             cancelledApplications: c.cancelledApplications || 0,
             cancelledAdmissions: c.cancelledAdmissions || 0,
-            totalFeesCollected: c.totalFeesCollected || 0
+            totalFeesCollected: c.totalFeesCollected || 0,
+            formsLast7Days: c.formsLast7Days || 0,
+            formsLast30Days: c.formsLast30Days || 0,
+            feesLast7Days: c.feesLast7Days || 0,
+            feesLast30Days: c.feesLast30Days || 0
           };
         });
 

@@ -42,6 +42,8 @@ export interface UserItem {
   remainingApplications?: number;
   cancelledAdmissions?: number;
   cancelledApplications?: number;
+  formsLast3Days?: number;
+  formsLast7Days?: number;
 
   // Dynamic stats from backend
   admissionStats?: {

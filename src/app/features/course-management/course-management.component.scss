@@ -654,3 +654,15 @@ $text-light: #64748B;
     }
   }
 }
+
+.kpi-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #F1F5F9;
+  color: #475569;
+  min-width: 24px;
+  text-align: center;
+}

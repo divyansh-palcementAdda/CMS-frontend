@@ -17,6 +17,10 @@ export interface CourseDTO {
   institutionIds?: number[];
   totalFeesCollected?: number;
   remainingApplications?: number;
+  formsLast7Days?: number;
+  formsLast30Days?: number;
+  feesLast7Days?: number;
+  feesLast30Days?: number;
 }
 
 export interface CreateCourseDTO {
@@ -47,6 +51,10 @@ export interface CourseItem {
   cancelledApplications: number;
   cancelledAdmissions: number;
   totalFeesCollected?: number;
+  formsLast7Days?: number;
+  formsLast30Days?: number;
+  feesLast7Days?: number;
+  feesLast30Days?: number;
 }
 
 export interface CourseStats {

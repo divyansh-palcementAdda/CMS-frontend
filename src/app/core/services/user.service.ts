@@ -141,7 +141,9 @@ export class UserService {
       totalApplications: u.admissionStats?.admissionInAllCourses || 0,
       remainingApplications: u.admissionStats?.activeApplications || 0,
       cancelledAdmissions: u.admissionStats?.cancelledAdmissions || 0,
-      cancelledApplications: u.admissionStats?.cancelledApplications || 0
+      cancelledApplications: u.admissionStats?.cancelledApplications || 0,
+      formsLast3Days: u.formsLast3Days || 0,
+      formsLast7Days: u.formsLast7Days || 0
     };
   }
 
