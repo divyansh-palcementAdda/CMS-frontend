@@ -144,56 +144,56 @@
               </thead>
               <tbody>
                 <tr *ngFor="let item of castesData; let i = index">
-                  <td class="text-center text-light">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-                  <td class="font-medium">
-                    <span class="clickable-name" (click)="navigateToCasteDetail(item.casteCategory)">
-                      {{ item.casteCategory || 'UNKNOWN' }}
-                    </span>
-                  </td>
-                  <td class="text-center">{{ item.totalApplications }}</td>
-                  <td class="text-center">{{ item.totalAdmissions }}</td>
-                  <td class="text-center">{{ item.remainingApplications }}</td>
-                  <td class="text-center">{{ item.cancelledApplications }}</td>
-                  <td class="text-center">{{ item.cancelledAdmissions }}</td>
-                  <td class="text-center">
-                    <button class="action-btn text-primary" (click)="navigateToCasteDetail(item.casteCategory)" title="View breakdown and metrics">
-                      View Details &rarr;
+                  <td class="text-center text-bold">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                  <td class="font-medium text-dark">{{ item.casteCategory || 'UNKNOWN' }}</td>
+                  <td class="text-center text-bold">{{ item.totalApplications }}</td>
+                  <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                  <td class="text-center text-bold" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                  <td class="text-center text-bold">{{ item.cancelledApplications }}</td>
+                  <td class="text-center text-bold">{{ item.cancelledAdmissions }}</td>
+                  <td class="action-cell">
+                    <button class="btn-view" (click)="navigateToCasteDetail(item.casteCategory)" title="View analytics for {{ item.casteCategory }}">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      View
                     </button>
                   </td>
                 </tr>
                 <tr *ngIf="castesData.length === 0">
-                  <td colspan="8" class="text-center py-8 text-light text-sm">
-                    No caste/category analytics data found. Adjust your search or filters.
-                  </td>
+                  <td colspan="8" class="text-center py-4 text-gray-500">No caste/category analytics records found.</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- Pagination Footer -->
-          <div class="table-footer" *ngIf="castesData.length > 0">
-            <div class="pagination-info text-light">
-              Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalElements) }} of {{ totalElements }} entries
-            </div>
+          <!-- Pagination -->
+          <div class="pagination-section" *ngIf="totalPages > 0">
+            <span class="showing-text">
+              Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalElements) }} of {{ totalElements }} Castes
+            </span>
             <div class="pagination-controls">
-              <button class="pag-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">&larr; Previous</button>
-              <span class="pag-page" *ngFor="let p of [].constructor(totalPages); let idx = index" 
-                    [class.active]="currentPage === (idx + 1)" (click)="onPageChange(idx + 1)">
-                {{ idx + 1 }}
-              </span>
-              <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">Next &rarr;</button>
+              <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button class="page-btn" *ngFor="let p of getPagesArray()" [class.active]="p === currentPage" [class.ellipsis]="p === '...'" [disabled]="p === '...'" (click)="p !== '...' && onPageChange(+p)">
+                {{ p }}
+              </button>
+              <button class="page-btn nav-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Filters Drawer -->
-        <app-filter-drawer [isOpen]="showFilterDrawer" (close)="showFilterDrawer = false">
-          <div class="drawer-header">
-            <h3>Advanced Filters</h3>
-            <button class="btn-text-secondary" (click)="resetFilters()">Clear All</button>
-          </div>
-
-          <div class="drawer-body">
+        <app-filter-drawer [isOpen]="showFilterDrawer" (close)="showFilterDrawer = false" (apply)="applyFiltersAndReload()" (clear)="resetFilters()">
+          <div class="filter-drawer-content">
             
             <!-- Academic Session -->
             <div class="filter-group">
