@@ -167,6 +167,30 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' }
   },
+  {
+    path: 'location-analytics/genders',
+    loadComponent: () => import('./features/location-analytics/genders/location-analytics-genders.component').then(m => m.LocationAnalyticsGendersComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'location-analytics/genders/:genderId',
+    loadComponent: () => import('./features/location-analytics/gender-detail/gender-detail.component').then(m => m.GenderDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'location-analytics/castes',
+    loadComponent: () => import('./features/location-analytics/castes/location-analytics-castes.component').then(m => m.LocationAnalyticsCastesComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
+    path: 'location-analytics/castes/:casteId',
+    loadComponent: () => import('./features/location-analytics/caste-detail/caste-detail.component').then(m => m.CasteDetailComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
   { path: '**', redirectTo: '/admin/dashboard' }
 
 ];

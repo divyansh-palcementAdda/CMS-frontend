@@ -29,6 +29,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
   @Input() consultancyId?: number;
   @Input() institutionId?: number;
   @Input() inputLeadSourceId?: string;
+  @Input() gender?: string;
+  @Input() casteCategory?: string;
 
   @Output() close = new EventEmitter<void>();
 
@@ -113,6 +115,8 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
     if (queryParams['modalSortColumn']) this.sortColumn = queryParams['modalSortColumn'];
     if (queryParams['modalSortDirection']) this.sortDirection = queryParams['modalSortDirection'];
     if (queryParams['modalShowFilterDrawer'] === 'true') this.showFilterDrawer = true;
+    if (queryParams['modalGender']) this.gender = queryParams['modalGender'];
+    if (queryParams['modalCasteCategory']) this.casteCategory = queryParams['modalCasteCategory'];
 
     // Load filter listings
     this.loadFilterDropdowns();
@@ -170,7 +174,9 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       modalSize: this.size !== 10 ? this.size : null,
       modalSortColumn: this.sortColumn !== 'createdAt' ? this.sortColumn : null,
       modalSortDirection: this.sortDirection !== 'desc' ? this.sortDirection : null,
-      modalShowFilterDrawer: this.showFilterDrawer ? 'true' : null
+      modalShowFilterDrawer: this.showFilterDrawer ? 'true' : null,
+      modalGender: this.gender || null,
+      modalCasteCategory: this.casteCategory || null
     };
 
     this.router.navigate([], {
@@ -311,7 +317,9 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       undefined, // duplicateOnly
       undefined, // excludeDuplicate
       undefined, // includeDuplicate
-      this.institutionId ? Number(this.institutionId) : undefined  // institutionId
+      this.institutionId ? Number(this.institutionId) : undefined,  // institutionId
+      this.gender || undefined,
+      this.casteCategory || undefined
     ).subscribe({
       next: (res) => {
         this.admissions = res.admissions || [];

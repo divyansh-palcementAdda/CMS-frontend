@@ -7,6 +7,8 @@ import {
   LocationAnalyticsDTO,
   CityDetailDTO,
   StateDetailDTO,
+  GenderDetailDTO,
+  CasteDetailDTO,
   UserBreakdown,
   ConsultancyBreakdown,
   InstitutionBreakdown,
@@ -499,5 +501,383 @@ export class LocationAnalyticsService {
     if (sortBy) params = params.set('sortBy', sortBy);
     if (sortDirection) params = params.set('sortDirection', sortDirection);
     return this.http.get(`${this.apiUrl}/states/${encodeURIComponent(stateName)}/cities/export`, { params, responseType: 'blob' });
+  }
+
+  // ===================== GENDER & CASTE ANALYTICS =====================
+
+  getTopGendersByApplications(filter?: any): Observable<LocationAnalyticsDTO[]> {
+    const params = this.buildParams(filter);
+    return this.http.get<any>(`${this.apiUrl}/genders/top-applications`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getTopGendersByAdmissions(filter?: any): Observable<LocationAnalyticsDTO[]> {
+    const params = this.buildParams(filter);
+    return this.http.get<any>(`${this.apiUrl}/genders/top-admissions`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getTopCastesByApplications(filter?: any): Observable<LocationAnalyticsDTO[]> {
+    const params = this.buildParams(filter);
+    return this.http.get<any>(`${this.apiUrl}/castes/top-applications`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getTopCastesByAdmissions(filter?: any): Observable<LocationAnalyticsDTO[]> {
+    const params = this.buildParams(filter);
+    return this.http.get<any>(`${this.apiUrl}/castes/top-admissions`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getGendersAnalytics(filter?: any): Observable<any> {
+    const params = this.buildParams(filter);
+    return this.http.get<any>(`${this.apiUrl}/genders`, { params }).pipe(
+      map(res => res.data || {})
+    );
+  }
+
+  getCastesAnalytics(filter?: any): Observable<any> {
+    const params = this.buildParams(filter);
+    return this.http.get<any>(`${this.apiUrl}/castes`, { params }).pipe(
+      map(res => res.data || {})
+    );
+  }
+
+  getGenderDetail(gender: string, session?: string): Observable<GenderDetailDTO> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/detail`, { params }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getCasteDetail(casteCategory: string, session?: string): Observable<CasteDetailDTO> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/detail`, { params }).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getGenderUserBreakdown(gender: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<UserBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/users`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getCasteUserBreakdown(casteCategory: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<UserBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/users`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getGenderConsultancyBreakdown(gender: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<ConsultancyBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/consultancies`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getCasteConsultancyBreakdown(casteCategory: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<ConsultancyBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/consultancies`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getGenderInstitutionBreakdown(gender: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<InstitutionBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/institutions`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getCasteInstitutionBreakdown(casteCategory: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<InstitutionBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/institutions`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getGenderCourseBreakdown(gender: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<CourseBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/courses`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getCasteCourseBreakdown(casteCategory: string, page: number, size: number, sortBy: string, sortDirection: string, session?: string): Observable<PageResponse<CourseBreakdown>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/courses`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getGenderCourseTypeBreakdown(gender: string, session?: string): Observable<CourseTypeBreakdown[]> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/course-types`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getCasteCourseTypeBreakdown(casteCategory: string, session?: string): Observable<CourseTypeBreakdown[]> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/course-types`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getGenderLeadSourceBreakdown(gender: string, session?: string): Observable<LeadSourceBreakdown[]> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/lead-sources`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getCasteLeadSourceBreakdown(casteCategory: string, session?: string): Observable<LeadSourceBreakdown[]> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/lead-sources`, { params }).pipe(
+      map(res => res.data || [])
+    );
+  }
+
+  getGenderStudentsPaged(
+    gender: string,
+    page: number,
+    size: number,
+    tab: string,
+    search: string,
+    source: string,
+    scholar: boolean | null,
+    sortBy: string,
+    sortDirection: string,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('tab', tab)
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (search) params = params.set('search', search);
+    if (source) params = params.set('source', source);
+    if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
+    return this.http.get<any>(`${this.apiUrl}/genders/${gender}/students`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  getCasteStudentsPaged(
+    casteCategory: string,
+    page: number,
+    size: number,
+    tab: string,
+    search: string,
+    source: string,
+    scholar: boolean | null,
+    sortBy: string,
+    sortDirection: string,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('tab', tab)
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+    if (search) params = params.set('search', search);
+    if (source) params = params.set('source', source);
+    if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
+    return this.http.get<any>(`${this.apiUrl}/castes/${casteCategory}/students`, { params }).pipe(
+      map(res => res.data || { content: [], totalElements: 0 })
+    );
+  }
+
+  exportGenderStudents(
+    gender: string,
+    tab: string,
+    search?: string,
+    source?: string,
+    scholar?: boolean | null,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<Blob> {
+    let params = new HttpParams().set('tab', tab);
+    if (search) params = params.set('search', search);
+    if (source) params = params.set('source', source);
+    if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
+    return this.http.get(`${this.apiUrl}/genders/${gender}/students/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteStudents(
+    casteCategory: string,
+    tab: string,
+    search?: string,
+    source?: string,
+    scholar?: boolean | null,
+    duplicateOnly?: boolean | null,
+    showOnlyFoc?: boolean | null,
+    showOnlySbs?: boolean | null
+  ): Observable<Blob> {
+    let params = new HttpParams().set('tab', tab);
+    if (search) params = params.set('search', search);
+    if (source) params = params.set('source', source);
+    if (scholar !== null && scholar !== undefined) params = params.set('scholar', scholar.toString());
+    if (duplicateOnly !== null && duplicateOnly !== undefined) params = params.set('duplicateOnly', duplicateOnly.toString());
+    if (showOnlyFoc !== null && showOnlyFoc !== undefined) params = params.set('showOnlyFoc', showOnlyFoc.toString());
+    if (showOnlySbs !== null && showOnlySbs !== undefined) params = params.set('showOnlySbs', showOnlySbs.toString());
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/students/export`, { params, responseType: 'blob' });
+  }
+
+  exportGenderUsers(gender: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/genders/${gender}/users/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteUsers(casteCategory: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/users/export`, { params, responseType: 'blob' });
+  }
+
+  exportGenderConsultancies(gender: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/genders/${gender}/consultancies/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteConsultancies(casteCategory: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/consultancies/export`, { params, responseType: 'blob' });
+  }
+
+  exportGenderInstitutions(gender: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/genders/${gender}/institutions/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteInstitutions(casteCategory: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/institutions/export`, { params, responseType: 'blob' });
+  }
+
+  exportGenderCourses(gender: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/genders/${gender}/courses/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteCourses(casteCategory: string, session?: string, sortBy?: string, sortDirection?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (sortDirection) params = params.set('sortDirection', sortDirection);
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/courses/export`, { params, responseType: 'blob' });
+  }
+
+  exportGenderCourseTypes(gender: string, session?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get(`${this.apiUrl}/genders/${gender}/course-types/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteCourseTypes(casteCategory: string, session?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/course-types/export`, { params, responseType: 'blob' });
+  }
+
+  exportGenderLeadSources(gender: string, session?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get(`${this.apiUrl}/genders/${gender}/lead-sources/export`, { params, responseType: 'blob' });
+  }
+
+  exportCasteLeadSources(casteCategory: string, session?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (session) params = params.set('session', session);
+    return this.http.get(`${this.apiUrl}/castes/${casteCategory}/lead-sources/export`, { params, responseType: 'blob' });
   }
 }

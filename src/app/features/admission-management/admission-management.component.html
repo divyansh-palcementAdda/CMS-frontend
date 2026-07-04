@@ -106,8 +106,8 @@
                                     </svg>
                                 </div>
                                 <div class="today-card-details">
-                                    <span class="today-label">{{isApplicationTab ? "Total Application" : "Comfirmed
-                                        Admission" }}</span>
+                                    <span class="today-label">{{!isApplicationTab ? "Comfirmed
+                                        Admission" : "Total Application" }}</span>
                                     <span class="today-value">
                                         {{ isApplicationTab ? pageData.stats.totalApplication : (filters.tab ===
                                         'Admission' ? pageData.stats.appConfirmed : pageData.stats.totalApplication) }}

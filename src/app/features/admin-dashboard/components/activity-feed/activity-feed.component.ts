@@ -11,6 +11,9 @@ interface ActivityVm {
   desc: string;
   by: string;
   time: string;
+  hasDetails: boolean;
+  details: Array<{ key: string; value: string }>;
+  isExpanded: boolean;
 }
 
 @Component({
@@ -25,15 +28,32 @@ interface ActivityVm {
       </div>
       <ng-container *ngIf="vm.length; else empty">
         <div class="activity-list">
-          <div *ngFor="let a of vm; trackBy: trackByTitle" class="activity-item">
-            <div class="activity-icon" [style.background]="a.iconBg">{{ a.icon }}</div>
-            <div class="activity-body">
-              <div class="activity-row">
-                <span class="activity-name">{{ a.title }}</span>
-                <span class="activity-time">{{ a.time }}</span>
+          <div *ngFor="let a of vm; trackBy: trackByFn" class="activity-item-wrapper">
+            <div class="activity-item" [class.clickable]="a.hasDetails" (click)="toggleDetails(a)">
+              <div class="activity-icon" [style.background]="a.iconBg">{{ a.icon }}</div>
+              <div class="activity-body">
+                <div class="activity-row">
+                  <span class="activity-name">{{ a.title }}</span>
+                  <span class="activity-time">{{ a.time }}</span>
+                </div>
+                <div class="activity-desc">{{ a.desc }}</div>
+                <div class="activity-footer">
+                  <span class="activity-by" *ngIf="a.by">{{ a.by }}</span>
+                  <span class="activity-details-toggle" *ngIf="a.hasDetails">
+                    {{ a.isExpanded ? 'Hide Details ▲' : 'View Details ▼' }}
+                  </span>
+                </div>
               </div>
-              <div class="activity-desc">{{ a.desc }}</div>
-              <div class="activity-by" *ngIf="a.by">{{ a.by }}</div>
+            </div>
+            
+            <!-- Expandable Details Section -->
+            <div class="activity-details-panel" *ngIf="a.hasDetails && a.isExpanded">
+              <div class="details-grid">
+                <div *ngFor="let detail of a.details" class="detail-row">
+                  <span class="detail-key">{{ detail.key }}</span>
+                  <span class="detail-value">{{ detail.value }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -87,40 +107,70 @@ export class ActivityFeedComponent implements OnInit, OnDestroy {
         byText = `by ${String(a.performedBy)}`;
       }
 
+      const rawDesc = String(a?.desc ?? a?.description ?? '');
+      
+      // Parse description and metadata
+      const parts = rawDesc.split(/--- Metadata ---/i);
+      const cleanDesc = parts[0].trim();
+      const detailsList: Array<{ key: string; value: string }> = [];
+      let hasDetailsVal = false;
+
+      if (parts.length > 1) {
+        hasDetailsVal = true;
+        const lines = parts[1].split('\n');
+        lines.forEach(line => {
+          const colonIdx = line.indexOf(':');
+          if (colonIdx !== -1) {
+            const key = line.substring(0, colonIdx).trim();
+            const value = line.substring(colonIdx + 1).trim();
+            if (key && value) {
+              detailsList.push({ key, value });
+            }
+          }
+        });
+      }
+
       return {
         icon: a?.icon ? String(a.icon) : '🕒',
         iconBg: bgColor,
         title: String(a?.title ?? 'Activity'),
-        // Prefer 'desc' over 'description'
-        desc: String(a?.desc ?? a?.description ?? ''),
+        desc: cleanDesc,
         by: byText,
-        // Prefer 'time' over 'timeAgo'
-        time: String(a?.time ?? a?.timeAgo ?? '')
+        time: String(a?.time ?? a?.timeAgo ?? ''),
+        hasDetails: hasDetailsVal,
+        details: detailsList,
+        isExpanded: false
       };
     });
   }
 
   loadStaticFallback(): void {
     this.vm = [
-      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago' },
-      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago' },
-      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago' },
-      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago' },
-      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago' },
-      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago' },
-      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago' },
-      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago' },
-      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago' },
-      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago' },
-      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago' },
-      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago' },
-      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago' },
-      { icon: '✅', iconBg: '#eff6ff', title: 'Admission Confirmed', desc: 'Neill admitted to Engineering Batch 2026', by: 'by Admin User', time: '2 days ago' }
+      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '📝', iconBg: '#f5f3ff', title: 'New Admission Form', desc: 'Rahul Sharma submitted application for B.Tech', by: 'by Agent Amit', time: '10 mins ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '💰', iconBg: '#eff6ff', title: 'Fee Payment Received', desc: '₹50,000 processed for first semester', by: 'by System', time: '1 hour ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '📄', iconBg: '#f0fdf4', title: 'Document Verified', desc: '10th & 12th marksheets verified for Priya', by: 'by Admin User', time: '3 hours ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '🏛', iconBg: '#fff7ed', title: 'Institute Onboarded', desc: 'Global Tech University added to portal', by: 'by Super Admin', time: '5 hours ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '🎓', iconBg: '#fdf4ff', title: 'Course Published', desc: 'New MBA Analytics specialization added', by: 'by Admin User', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '📞', iconBg: '#f5f3ff', title: 'Follow-up Scheduled', desc: 'Consultancy call scheduled with Abhishek', by: 'by Agent Rohan', time: '1 day ago', hasDetails: false, details: [], isExpanded: false },
+      { icon: '✅', iconBg: '#eff6ff', title: 'Admission Confirmed', desc: 'Neill admitted to Engineering Batch 2026', by: 'by Admin User', time: '2 days ago', hasDetails: false, details: [], isExpanded: false }
     ];
   }
 
-  trackByTitle(index: number, item: ActivityVm): string {
-    return item.title;
+  toggleDetails(item: ActivityVm): void {
+    if (item.hasDetails) {
+      item.isExpanded = !item.isExpanded;
+    }
+  }
+
+  trackByFn(index: number, item: ActivityVm): any {
+    return index;
   }
 
   // Still keeping the input fallback so it won't break parent component bindings

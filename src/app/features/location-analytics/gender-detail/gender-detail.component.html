@@ -1,0 +1,835 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-body">
+    <app-topbar></app-topbar>
+
+    <main class="main-content">
+      <div class="detail-container">
+
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-overlay">
+          <div class="spinner"></div>
+          <p>Loading gender details...</p>
+        </div>
+
+        <!-- Content -->
+        <ng-container *ngIf="!loading && genderDetail">
+
+          <!-- Breadcrumbs -->
+          <div class="breadcrumbs">
+            <span (click)="router.navigate(['/location-analytics'])">Location Analytics</span>
+            <i class='bx bx-chevron-right'></i>
+            <span (click)="goBack()">Genders</span>
+            <i class='bx bx-chevron-right'></i>
+            <span class="active">{{ genderDetail.basicInfo.name }}</span>
+          </div>
+
+          <!-- Header -->
+          <div class="detail-header">
+            <div class="header-left">
+              <button class="back-btn" (click)="goBack()" title="Go back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div class="header-icon-container">
+                <span class="material-symbols-outlined header-icon">wc</span>
+              </div>
+              <div class="title-info">
+                <div class="title-row-1">
+                  <h1>{{ genderDetail.basicInfo.name }}</h1>
+                  <span class="state-badge">
+                    Active
+                  </span>
+                </div>
+                <div class="title-row-2">
+                  <span>{{ genderDetail.basicInfo.totalStudents | number }} Students</span>
+                  <span class="divider-dot">&bull;</span>
+                  <span>Gender Analytics Dashboard</span>
+                </div>
+                <div class="title-row-3">
+                  <span class="subtle-chip">Updated Today</span>
+                  <span class="subtle-chip">Status Active</span>
+                  <span class="subtle-chip">Location Analytics</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Stats Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-row row-5">
+              <div class="kpi-card primary"
+                [class.active-kpi]="currentAppTab === 'total_applications' && !appFilterScholar && !appFilterDuplicate && !appFilterSource"
+                (click)="onStatClick('total_applications')">
+                <span class="material-symbols-outlined kpi-icon">assignment</span>
+                <div class="kpi-label">Total Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.totalApplications | number }}</div>
+                <div class="kpi-sub">Total student applications</div>
+              </div>
+              <div class="kpi-card primary"
+                [class.active-kpi]="currentAppTab === 'remaining_applications' && !appFilterScholar && !appFilterDuplicate && !appFilterSource"
+                (click)="onStatClick('remaining_applications')">
+                <span class="material-symbols-outlined kpi-icon">hourglass_empty</span>
+                <div class="kpi-label">Remaining Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.remainingApplications | number }}</div>
+                <div class="kpi-sub">Applications pending admission</div>
+              </div>
+              <div class="kpi-card danger" (click)="onStatClick('cancelled_applications')">
+                <span class="material-symbols-outlined kpi-icon">cancel</span>
+                <div class="kpi-label">Cancelled Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.cancelledApplications | number }}</div>
+                <div class="kpi-sub">Applications cancelled before admission</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && !admFilterScholar && !admFilterDuplicate && !admFilterSource && !admFilterFoc && !admFilterSbs"
+                (click)="onStatClick('total_admissions')">
+                <span class="material-symbols-outlined kpi-icon">school</span>
+                <div class="kpi-label">Total Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.totalAdmissions | number }}</div>
+                <div class="kpi-sub">Successfully confirmed admissions</div>
+              </div>
+              <div class="kpi-card danger" (click)="onStatClick('cancelled_admissions')">
+                <span class="material-symbols-outlined kpi-icon">block</span>
+                <div class="kpi-label">Cancelled Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.cancelledAdmissions | number }}</div>
+                <div class="kpi-sub">Confirmed admissions later cancelled</div>
+              </div>
+            </div>
+
+            <div class="kpi-row row-4">
+              <div class="kpi-card purple"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterScholar"
+                (click)="onStatClick('scholar_applications')">
+                <span class="material-symbols-outlined kpi-icon">workspace_premium</span>
+                <div class="kpi-label">Scholar Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.scholarApplications | number }}</div>
+                <div class="kpi-sub">Scholarship applications</div>
+              </div>
+              <div class="kpi-card purple"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterScholar"
+                (click)="onStatClick('scholar_admissions')">
+                <span class="material-symbols-outlined kpi-icon">military_tech</span>
+                <div class="kpi-label">Scholar Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.scholarAdmissions | number }}</div>
+                <div class="kpi-sub">Scholarship admissions</div>
+              </div>
+              <div class="kpi-card purple" [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterFoc"
+                (click)="onStatClick('foc_admissions')">
+                <span class="material-symbols-outlined kpi-icon">volunteer_activism</span>
+                <div class="kpi-label">FOC Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.focAdmissions | number }}</div>
+                <div class="kpi-sub">Free of Cost admissions</div>
+              </div>
+              <div class="kpi-card purple" [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSbs"
+                (click)="onStatClick('sbs_admissions')">
+                <span class="material-symbols-outlined kpi-icon">account_balance</span>
+                <div class="kpi-label">SBS Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.sbsAdmissions | number }}</div>
+                <div class="kpi-sub">State Benefit Scheme admissions</div>
+              </div>
+            </div>
+
+            <div class="kpi-row row-4">
+              <div class="kpi-card info"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterSource === 'USER'"
+                (click)="onStatClick('direct_applications')">
+                <span class="material-symbols-outlined kpi-icon">person</span>
+                <div class="kpi-label">Direct Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.directApplications | number }}</div>
+                <div class="kpi-sub">Direct walk-in applications</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSource === 'USER'"
+                (click)="onStatClick('direct_admissions')">
+                <span class="material-symbols-outlined kpi-icon">person_check</span>
+                <div class="kpi-label">Direct Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.directAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions from direct applicants</div>
+              </div>
+              <div class="kpi-card info"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterSource === 'CONSULTANCY'"
+                (click)="onStatClick('consultancy_applications')">
+                <span class="material-symbols-outlined kpi-icon">groups</span>
+                <div class="kpi-label">Consultancy Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.consultancyApplications | number }}</div>
+                <div class="kpi-sub">Applications via consultancy</div>
+              </div>
+              <div class="kpi-card success"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterSource === 'CONSULTANCY'"
+                (click)="onStatClick('consultancy_admissions')">
+                <span class="material-symbols-outlined kpi-icon">handshake</span>
+                <div class="kpi-label">Consultancy Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.consultancyAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions via consultancy</div>
+              </div>
+            </div>
+
+            <div class="kpi-row row-2">
+              <div class="kpi-card orange"
+                [class.active-kpi]="currentAppTab === 'total_applications' && appFilterDuplicate"
+                (click)="onStatClick('duplicate_applications')">
+                <span class="material-symbols-outlined kpi-icon">content_copy</span>
+                <div class="kpi-label">Duplicate Applications</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.duplicateApplications | number }}</div>
+                <div class="kpi-sub">Applications marked duplicate</div>
+              </div>
+              <div class="kpi-card orange"
+                [class.active-kpi]="currentAdmTab === 'confirmed_admissions' && admFilterDuplicate"
+                (click)="onStatClick('duplicate_admissions')">
+                <span class="material-symbols-outlined kpi-icon">rule</span>
+                <div class="kpi-label">Duplicate Admissions</div>
+                <div class="kpi-value">{{ genderDetail.kpiStats.duplicateAdmissions | number }}</div>
+                <div class="kpi-sub">Admissions marked duplicate</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Layout Grid -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-top: 32px; align-items: start;">
+            
+            <!-- Left Panel: Student Lists -->
+            <div>
+              <!-- Remaining / Total Applications -->
+              <div class="section" id="total-apps">
+                <div class="section-header">
+                  <div class="section-title">
+                    <div class="section-icon">
+                      <span class="material-symbols-outlined">assignment</span>
+                    </div>
+                    <div class="title-text-group">
+                      <h2>
+                        {{ currentAppTab === 'total_applications' ? 'Total Applications' : 'Remaining Applications' }}
+                        <span class="count-badge">{{ totalAppTotal | number }}</span>
+                      </h2>
+                      <p class="section-subtitle">
+                        {{ currentAppTab === 'total_applications' ? 'All student applications' : 'Students pending admission confirmation' }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-controls">
+                  <div class="search-box">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" placeholder="Search student..." [ngModel]="totalAppSearch"
+                      (ngModelChange)="onSearchStudent('remaining_applications', $event)">
+                  </div>
+                  <div class="filter-actions-group">
+                    <div class="filter-selects">
+                      <select [(ngModel)]="appFilterSource"
+                        (change)="onFilterChange('remaining_applications')" class="filter-select">
+                        <option [ngValue]="null">All Sources</option>
+                        <option value="USER">Direct</option>
+                        <option value="CONSULTANCY">Consultancy</option>
+                      </select>
+                      <select [(ngModel)]="appFilterScholar"
+                        (change)="onFilterChange('remaining_applications')" class="filter-select">
+                        <option [ngValue]="null">All Types</option>
+                        <option [ngValue]="true">Scholar</option>
+                        <option [ngValue]="false">Non-Scholar</option>
+                      </select>
+                    </div>
+                    <button
+                      *ngIf="appFilterSource || appFilterScholar !== null || appFilterDuplicate || appFilterFoc || appFilterSbs || currentAppTab !== 'remaining_applications'"
+                      class="clear-filter-btn" (click)="clearAppFilter()">
+                      <span class="material-symbols-outlined">close</span> Clear Filter
+                    </button>
+                    <button class="btn-excel-export" (click)="exportStudents('remaining_applications')"
+                      [disabled]="exporting['students_remaining_applications']">
+                      <span class="material-symbols-outlined"
+                        *ngIf="!exporting['students_remaining_applications']">file_download</span>
+                      <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_remaining_applications']"></i>
+                      Export Excel
+                    </button>
+                  </div>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th (click)="sortStudents('remaining_applications','fullName')">Student <i class='bx' [ngClass]="getSortIcon(totalAppSortBy,'fullName',totalAppSortDir)"></i></th>
+                        <th (click)="sortStudents('remaining_applications','phoneNumber')">Mobile <i class='bx' [ngClass]="getSortIcon(totalAppSortBy,'phoneNumber',totalAppSortDir)"></i></th>
+                        <th (click)="sortStudents('remaining_applications','courseName')">Course <i class='bx' [ngClass]="getSortIcon(totalAppSortBy,'courseName',totalAppSortDir)"></i></th>
+                        <th (click)="sortStudents('remaining_applications','date')">Date <i class='bx' [ngClass]="getSortIcon(totalAppSortBy,'date',totalAppSortDir)"></i></th>
+                        <th>Source</th>
+                        <th>Scholar</th>
+                        <th (click)="sortStudents('remaining_applications','status')">Status <i class='bx' [ngClass]="getSortIcon(totalAppSortBy,'status',totalAppSortDir)"></i></th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let s of paginatedTotalApplications">
+                        <td><strong>{{ s.fullName || s.studentName }}</strong></td>
+                        <td>{{ s.phoneNumber || '—' }}</td>
+                        <td>{{ s.courseName || '—' }}</td>
+                        <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="{
+                            'badge-blue': s.leadSource?.name?.toLowerCase()?.includes('consult'),
+                            'badge-purple': s.leadSource?.name?.toLowerCase()?.includes('direct') || !s.leadSource?.name,
+                            'badge-green': s.leadSource?.name?.toLowerCase()?.includes('digital'),
+                            'badge-teal': s.leadSource?.name?.toLowerCase()?.includes('orai'),
+                            'badge-orange': s.leadSource?.name?.toLowerCase()?.includes('raw')
+                          }">{{ s.leadSource?.name || 'Direct' }}</span>
+                        </td>
+                        <td><span class="badge" [ngClass]="s.isScholar ? 'badge-green' : 'badge-orange'">{{ s.isScholar ? 'Scholar' : 'Regular' }}</span></td>
+                        <td>
+                          <span class="badge" [ngClass]="{
+                            'badge-green': s.status === 'Confirmed' || s.status === 'ADMITTED',
+                            'badge-red': s.status === 'Cancelled' || s.status === 'CANCELLED',
+                            'badge-orange': s.status === 'Duplicate',
+                            'badge-purple': s.status !== 'Confirmed' && s.status !== 'ADMITTED' && s.status !== 'Cancelled' && s.status !== 'CANCELLED' && s.status !== 'Duplicate'
+                          }">{{ s.status || '—' }}</span>
+                        </td>
+                        <td>
+                          <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                            <span class="material-symbols-outlined">visibility</span> View
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="paginatedTotalApplications.length === 0">
+                        <td colspan="8" class="text-center py-8">No applications found</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-footer" *ngIf="totalAppTotal > 0">
+                  <div class="pagination-info">
+                    Showing {{ (totalAppPage - 1) * totalAppPageSize + 1 }} to {{ Math.min(totalAppPage * totalAppPageSize, totalAppTotal) }} of {{ totalAppTotal }}
+                  </div>
+                  <div class="pagination-controls">
+                    <button class="pag-btn" [disabled]="totalAppPage === 1" (click)="changeTotalAppPage(-1)">Previous</button>
+                    <span class="pag-page active">{{ totalAppPage }} of {{ getTotalPages(totalAppTotal, totalAppPageSize) }}</span>
+                    <button class="pag-btn" [disabled]="totalAppPage >= getTotalPages(totalAppTotal, totalAppPageSize)" (click)="changeTotalAppPage(1)">Next</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Confirmed Admissions -->
+              <div class="section" id="total-adms" style="margin-top: 32px;">
+                <div class="section-header">
+                  <div class="section-title">
+                    <div class="section-icon success">
+                      <span class="material-symbols-outlined">school</span>
+                    </div>
+                    <div class="title-text-group">
+                      <h2>
+                        Confirmed Admissions
+                        <span class="count-badge success">{{ totalAdmTotal | number }}</span>
+                      </h2>
+                      <p class="section-subtitle">Successfully confirmed student admissions</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-controls">
+                  <div class="search-box">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" placeholder="Search student..." [ngModel]="totalAdmSearch"
+                      (ngModelChange)="onSearchStudent('confirmed_admissions', $event)">
+                  </div>
+                  <div class="filter-actions-group">
+                    <div class="filter-selects">
+                      <select [(ngModel)]="admFilterSource"
+                        (change)="onFilterChange('confirmed_admissions')" class="filter-select">
+                        <option [ngValue]="null">All Sources</option>
+                        <option value="USER">Direct</option>
+                        <option value="CONSULTANCY">Consultancy</option>
+                      </select>
+                      <select [(ngModel)]="admFilterScholar"
+                        (change)="onFilterChange('confirmed_admissions')" class="filter-select">
+                        <option [ngValue]="null">All Types</option>
+                        <option [ngValue]="true">Scholar</option>
+                        <option [ngValue]="false">Non-Scholar</option>
+                      </select>
+                    </div>
+                    <button
+                      *ngIf="admFilterSource || admFilterScholar !== null || admFilterDuplicate || admFilterFoc || admFilterSbs || currentAdmTab !== 'confirmed_admissions'"
+                      class="clear-filter-btn" (click)="clearAdmFilter()">
+                      <span class="material-symbols-outlined">close</span> Clear Filter
+                    </button>
+                    <button class="btn-excel-export" (click)="exportStudents('confirmed_admissions')"
+                      [disabled]="exporting['students_confirmed_admissions']">
+                      <span class="material-symbols-outlined"
+                        *ngIf="!exporting['students_confirmed_admissions']">file_download</span>
+                      <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_confirmed_admissions']"></i>
+                      Export Excel
+                    </button>
+                  </div>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th (click)="sortStudents('confirmed_admissions','fullName')">Student <i class='bx' [ngClass]="getSortIcon(totalAdmSortBy,'fullName',totalAdmSortDir)"></i></th>
+                        <th (click)="sortStudents('confirmed_admissions','phoneNumber')">Mobile <i class='bx' [ngClass]="getSortIcon(totalAdmSortBy,'phoneNumber',totalAdmSortDir)"></i></th>
+                        <th (click)="sortStudents('confirmed_admissions','courseName')">Course <i class='bx' [ngClass]="getSortIcon(totalAdmSortBy,'courseName',totalAdmSortDir)"></i></th>
+                        <th (click)="sortStudents('confirmed_admissions','date')">Date <i class='bx' [ngClass]="getSortIcon(totalAdmSortBy,'date',totalAdmSortDir)"></i></th>
+                        <th>Source</th>
+                        <th>Scholar</th>
+                        <th (click)="sortStudents('confirmed_admissions','status')">Status <i class='bx' [ngClass]="getSortIcon(totalAdmSortBy,'status',totalAdmSortDir)"></i></th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let s of paginatedTotalAdmissions">
+                        <td><strong>{{ s.fullName || s.studentName }}</strong></td>
+                        <td>{{ s.phoneNumber || '—' }}</td>
+                        <td>{{ s.courseName || '—' }}</td>
+                        <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                        <td>
+                          <span class="badge" [ngClass]="{
+                            'badge-blue': s.leadSource?.name?.toLowerCase()?.includes('consult'),
+                            'badge-purple': s.leadSource?.name?.toLowerCase()?.includes('direct') || !s.leadSource?.name,
+                            'badge-green': s.leadSource?.name?.toLowerCase()?.includes('digital'),
+                            'badge-teal': s.leadSource?.name?.toLowerCase()?.includes('orai'),
+                            'badge-orange': s.leadSource?.name?.toLowerCase()?.includes('raw')
+                          }">{{ s.leadSource?.name || 'Direct' }}</span>
+                        </td>
+                        <td><span class="badge" [ngClass]="s.isScholar ? 'badge-green' : 'badge-orange'">{{ s.isScholar ? 'Scholar' : 'Regular' }}</span></td>
+                        <td>
+                          <span class="badge badge-green">{{ s.status || 'Admitted' }}</span>
+                        </td>
+                        <td>
+                          <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                            <span class="material-symbols-outlined">visibility</span> View
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="paginatedTotalAdmissions.length === 0">
+                        <td colspan="8" class="text-center py-8">No admissions found</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-footer" *ngIf="totalAdmTotal > 0">
+                  <div class="pagination-info">
+                    Showing {{ (totalAdmPage - 1) * totalAdmPageSize + 1 }} to {{ Math.min(totalAdmPage * totalAdmPageSize, totalAdmTotal) }} of {{ totalAdmTotal }}
+                  </div>
+                  <div class="pagination-controls">
+                    <button class="pag-btn" [disabled]="totalAdmPage === 1" (click)="changeTotalAdmPage(-1)">Previous</button>
+                    <span class="pag-page active">{{ totalAdmPage }} of {{ getTotalPages(totalAdmTotal, totalAdmPageSize) }}</span>
+                    <button class="pag-btn" [disabled]="totalAdmPage >= getTotalPages(totalAdmTotal, totalAdmPageSize)" (click)="changeTotalAdmPage(1)">Next</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cancelled Applications -->
+              <div class="section" id="cancelled-apps" style="margin-top: 32px;">
+                <div class="section-header">
+                  <div class="section-title">
+                    <div class="section-icon danger">
+                      <span class="material-symbols-outlined">cancel</span>
+                    </div>
+                    <div class="title-text-group">
+                      <h2>
+                        Cancelled Applications
+                        <span class="count-badge danger">{{ cancelledAppTotal | number }}</span>
+                      </h2>
+                      <p class="section-subtitle">Applications cancelled before admission</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-controls">
+                  <div class="search-box">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" placeholder="Search student..." [ngModel]="cancelledAppSearch"
+                      (ngModelChange)="onSearchStudent('cancelled_applications', $event)">
+                  </div>
+                  <button class="btn-excel-export" (click)="exportStudents('cancelled_applications')"
+                    [disabled]="exporting['students_cancelled_applications']">
+                    <span class="material-symbols-outlined"
+                      *ngIf="!exporting['students_cancelled_applications']">file_download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_cancelled_applications']"></i>
+                    Export Excel
+                  </button>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th (click)="sortStudents('cancelled_applications','fullName')">Student <i class='bx' [ngClass]="getSortIcon(cancelledAppSortBy,'fullName',cancelledAppSortDir)"></i></th>
+                        <th (click)="sortStudents('cancelled_applications','phoneNumber')">Mobile <i class='bx' [ngClass]="getSortIcon(cancelledAppSortBy,'phoneNumber',cancelledAppSortDir)"></i></th>
+                        <th (click)="sortStudents('cancelled_applications','courseName')">Course <i class='bx' [ngClass]="getSortIcon(cancelledAppSortBy,'courseName',cancelledAppSortDir)"></i></th>
+                        <th (click)="sortStudents('cancelled_applications','date')">Date <i class='bx' [ngClass]="getSortIcon(cancelledAppSortBy,'date',cancelledAppSortDir)"></i></th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let s of paginatedCancelledApplications">
+                        <td><strong>{{ s.fullName || s.studentName }}</strong></td>
+                        <td>{{ s.phoneNumber || '—' }}</td>
+                        <td>{{ s.courseName || '—' }}</td>
+                        <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                        <td><span class="badge badge-red">Cancelled</span></td>
+                        <td>
+                          <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                            <span class="material-symbols-outlined">visibility</span> View
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="paginatedCancelledApplications.length === 0">
+                        <td colspan="6" class="text-center py-8">No cancelled applications found</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-footer" *ngIf="cancelledAppTotal > 0">
+                  <div class="pagination-info">
+                    Showing {{ (cancelledAppPage - 1) * cancelledAppPageSize + 1 }} to {{ Math.min(cancelledAppPage * cancelledAppPageSize, cancelledAppTotal) }} of {{ cancelledAppTotal }}
+                  </div>
+                  <div class="pagination-controls">
+                    <button class="pag-btn" [disabled]="cancelledAppPage === 1" (click)="changeCancelledAppPage(-1)">Previous</button>
+                    <span class="pag-page active">{{ cancelledAppPage }} of {{ getTotalPages(cancelledAppTotal, cancelledAppPageSize) }}</span>
+                    <button class="pag-btn" [disabled]="cancelledAppPage >= getTotalPages(cancelledAppTotal, cancelledAppPageSize)" (click)="changeCancelledAppPage(1)">Next</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cancelled Admissions -->
+              <div class="section" id="cancelled-adms" style="margin-top: 32px;">
+                <div class="section-header">
+                  <div class="section-title">
+                    <div class="section-icon danger">
+                      <span class="material-symbols-outlined">block</span>
+                    </div>
+                    <div class="title-text-group">
+                      <h2>
+                        Cancelled Admissions
+                        <span class="count-badge danger">{{ cancelledAdmTotal | number }}</span>
+                      </h2>
+                      <p class="section-subtitle">Confirmed admissions that were later cancelled</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-controls">
+                  <div class="search-box">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" placeholder="Search student..." [ngModel]="cancelledAdmSearch"
+                      (ngModelChange)="onSearchStudent('cancelled_admissions', $event)">
+                  </div>
+                  <button class="btn-excel-export" (click)="exportStudents('cancelled_admissions')"
+                    [disabled]="exporting['students_cancelled_admissions']">
+                    <span class="material-symbols-outlined"
+                      *ngIf="!exporting['students_cancelled_admissions']">file_download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['students_cancelled_admissions']"></i>
+                    Export Excel
+                  </button>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th (click)="sortStudents('cancelled_admissions','fullName')">Student <i class='bx' [ngClass]="getSortIcon(cancelledAdmSortBy,'fullName',cancelledAdmSortDir)"></i></th>
+                        <th (click)="sortStudents('cancelled_admissions','phoneNumber')">Mobile <i class='bx' [ngClass]="getSortIcon(cancelledAdmSortBy,'phoneNumber',cancelledAdmSortDir)"></i></th>
+                        <th (click)="sortStudents('cancelled_admissions','courseName')">Course <i class='bx' [ngClass]="getSortIcon(cancelledAdmSortBy,'courseName',cancelledAdmSortDir)"></i></th>
+                        <th (click)="sortStudents('cancelled_admissions','date')">Date <i class='bx' [ngClass]="getSortIcon(cancelledAdmSortBy,'date',cancelledAdmSortDir)"></i></th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let s of paginatedCancelledAdmissions">
+                        <td><strong>{{ s.fullName || s.studentName }}</strong></td>
+                        <td>{{ s.phoneNumber || '—' }}</td>
+                        <td>{{ s.courseName || '—' }}</td>
+                        <td>{{ s.admissionDate | date:'dd MMM yyyy' }}</td>
+                        <td><span class="badge badge-red">Cancelled</span></td>
+                        <td>
+                          <button class="action-icon-btn" (click)="onViewAdmission(s.id)">
+                            <span class="material-symbols-outlined">visibility</span> View
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="paginatedCancelledAdmissions.length === 0">
+                        <td colspan="6" class="text-center py-8">No cancelled admissions found</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-footer" *ngIf="cancelledAdmTotal > 0">
+                  <div class="pagination-info">
+                    Showing {{ (cancelledAdmPage - 1) * cancelledAdmPageSize + 1 }} to {{ Math.min(cancelledAdmPage * cancelledAdmPageSize, cancelledAdmTotal) }} of {{ cancelledAdmTotal }}
+                  </div>
+                  <div class="pagination-controls">
+                    <button class="pag-btn" [disabled]="cancelledAdmPage === 1" (click)="changeCancelledAdmPage(-1)">Previous</button>
+                    <span class="pag-page active">{{ cancelledAdmPage }} of {{ getTotalPages(cancelledAdmTotal, cancelledAdmPageSize) }}</span>
+                    <button class="pag-btn" [disabled]="cancelledAdmPage >= getTotalPages(cancelledAdmTotal, cancelledAdmPageSize)" (click)="changeCancelledAdmPage(1)">Next</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Panel: Breakdowns -->
+            <div>
+              
+              <!-- Counselors Breakdown -->
+              <div class="section-card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span class="material-symbols-outlined card-title-icon">person</span>
+                    Counselor Breakdown
+                  </h3>
+                  <button class="btn-icon-only" (click)="exportUsers()" [disabled]="exporting['users']" title="Export Counselors to Excel">
+                    <span class="material-symbols-outlined" *ngIf="!exporting['users']">download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['users']"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="card-table">
+                      <thead>
+                        <tr>
+                          <th (click)="sortUsers('userName')">Counselor</th>
+                          <th (click)="sortUsers('totalAdmissions')" class="text-center">Adms</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of paginatedUsers">
+                          <td class="font-medium clickable-name" (click)="onViewUser(item.userId)">
+                            {{ item.userName || 'Unnamed' }}
+                          </td>
+                          <td class="text-center font-semibold">{{ item.totalAdmissions }}</td>
+                          <td class="text-center">
+                            <button class="action-link-btn" (click)="viewUserBreakdownForms(item.userId, item.userName, 'CONFIRMED_ADMISSIONS')">
+                              Forms
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card-footer-pagination" *ngIf="userTotal > userPageSize">
+                    <button class="pag-arrow" [disabled]="userPage === 1" (click)="changeUserPage(-1)">&larr;</button>
+                    <span>Page {{ userPage }} of {{ getTotalPages(userTotal, userPageSize) }}</span>
+                    <button class="pag-arrow" [disabled]="userPage >= getTotalPages(userTotal, userPageSize)" (click)="changeUserPage(1)">&rarr;</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Consultancy Breakdown -->
+              <div class="section-card" style="margin-top: 24px;">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span class="material-symbols-outlined card-title-icon">groups</span>
+                    Consultancy Breakdown
+                  </h3>
+                  <button class="btn-icon-only" (click)="exportConsultancies()" [disabled]="exporting['consultancies']" title="Export Consultancies to Excel">
+                    <span class="material-symbols-outlined" *ngIf="!exporting['consultancies']">download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['consultancies']"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="card-table">
+                      <thead>
+                        <tr>
+                          <th (click)="sortCons('consultancyName')">Consultancy</th>
+                          <th (click)="sortCons('totalAdmissions')" class="text-center">Adms</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of paginatedConsultancies">
+                          <td class="font-medium clickable-name" (click)="onViewConsultancy(item.consultancyId)">
+                            {{ item.consultancyName }}
+                          </td>
+                          <td class="text-center font-semibold">{{ item.totalAdmissions }}</td>
+                          <td class="text-center">
+                            <button class="action-link-btn" (click)="viewConsultancyForms(item.consultancyId, item.consultancyName, 'CONFIRMED_ADMISSIONS')">
+                              Forms
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card-footer-pagination" *ngIf="consTotal > consPageSize">
+                    <button class="pag-arrow" [disabled]="consPage === 1" (click)="changeConsPage(-1)">&larr;</button>
+                    <span>Page {{ consPage }} of {{ getTotalPages(consTotal, consPageSize) }}</span>
+                    <button class="pag-arrow" [disabled]="consPage >= getTotalPages(consTotal, consPageSize)" (click)="changeConsPage(1)">&rarr;</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Institution Breakdown -->
+              <div class="section-card" style="margin-top: 24px;">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span class="material-symbols-outlined card-title-icon">apartment</span>
+                    Institution Breakdown
+                  </h3>
+                  <button class="btn-icon-only" (click)="exportInstitutions()" [disabled]="exporting['institutions']" title="Export Institutions to Excel">
+                    <span class="material-symbols-outlined" *ngIf="!exporting['institutions']">download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['institutions']"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="card-table">
+                      <thead>
+                        <tr>
+                          <th (click)="sortInst('institutionName')">Institution</th>
+                          <th (click)="sortInst('totalAdmissions')" class="text-center">Adms</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of paginatedInstitutions">
+                          <td class="font-medium clickable-name" (click)="onViewInstitution(item.institutionId)">
+                            {{ item.institutionName }}
+                          </td>
+                          <td class="text-center font-semibold">{{ item.totalAdmissions }}</td>
+                          <td class="text-center">
+                            <button class="action-link-btn" (click)="viewInstitutionForms(item.institutionId, item.institutionName, 'CONFIRMED_ADMISSIONS')">
+                              Forms
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card-footer-pagination" *ngIf="instTotal > instPageSize">
+                    <button class="pag-arrow" [disabled]="instPage === 1" (click)="changeInstPage(-1)">&larr;</button>
+                    <span>Page {{ instPage }} of {{ getTotalPages(instTotal, instPageSize) }}</span>
+                    <button class="pag-arrow" [disabled]="instPage >= getTotalPages(instTotal, instPageSize)" (click)="changeInstPage(1)">&rarr;</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Breakdown -->
+              <div class="section-card" style="margin-top: 24px;">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span class="material-symbols-outlined card-title-icon">auto_stories</span>
+                    Course Breakdown
+                  </h3>
+                  <button class="btn-icon-only" (click)="exportCourses()" [disabled]="exporting['courses']" title="Export Courses to Excel">
+                    <span class="material-symbols-outlined" *ngIf="!exporting['courses']">download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['courses']"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="card-table">
+                      <thead>
+                        <tr>
+                          <th (click)="sortCourse('courseName')">Course</th>
+                          <th (click)="sortCourse('totalAdmissions')" class="text-center">Adms</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of paginatedCourses">
+                          <td class="font-medium clickable-name" (click)="onViewCourse(item.courseId)">
+                            {{ item.courseName }}
+                          </td>
+                          <td class="text-center font-semibold">{{ item.totalAdmissions }}</td>
+                          <td class="text-center">
+                            <button class="action-link-btn" (click)="viewCourseForms(item.courseId, item.courseName, 'CONFIRMED_ADMISSIONS')">
+                              Forms
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="card-footer-pagination" *ngIf="courseTotal > coursePageSize">
+                    <button class="pag-arrow" [disabled]="coursePage === 1" (click)="changeCoursePage(-1)">&larr;</button>
+                    <span>Page {{ coursePage }} of {{ getTotalPages(courseTotal, coursePageSize) }}</span>
+                    <button class="pag-arrow" [disabled]="coursePage >= getTotalPages(courseTotal, coursePageSize)" (click)="changeCoursePage(1)">&rarr;</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Type Breakdown -->
+              <div class="section-card" style="margin-top: 24px;">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span class="material-symbols-outlined card-title-icon">category</span>
+                    Course Type Breakdown
+                  </h3>
+                  <button class="btn-icon-only" (click)="exportCourseTypes()" [disabled]="exporting['courseType']" title="Export Course Types to Excel">
+                    <span class="material-symbols-outlined" *ngIf="!exporting['courseType']">download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['courseType']"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="card-table">
+                      <thead>
+                        <tr>
+                          <th>Course Type</th>
+                          <th class="text-center">Admissions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of courseTypeList">
+                          <td class="font-medium">{{ item.courseType || 'Unknown' }}</td>
+                          <td class="text-center font-semibold">{{ item.totalAdmissions }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lead Source Breakdown -->
+              <div class="section-card" style="margin-top: 24px;">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span class="material-symbols-outlined card-title-icon">link</span>
+                    Lead Source Breakdown
+                  </h3>
+                  <button class="btn-icon-only" (click)="exportLeadSources()" [disabled]="exporting['leadSource']" title="Export Lead Sources to Excel">
+                    <span class="material-symbols-outlined" *ngIf="!exporting['leadSource']">download</span>
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="exporting['leadSource']"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="card-table">
+                      <thead>
+                        <tr>
+                          <th>Lead Source</th>
+                          <th class="text-center">Adms</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of leadSourceList">
+                          <td class="font-medium">{{ item.leadSourceName }}</td>
+                          <td class="text-center font-semibold">{{ item.totalAdmissions }}</td>
+                          <td class="text-center">
+                            <button class="action-link-btn" (click)="viewLeadSourceForms(item.leadSourceId, item.leadSourceName, 'CONFIRMED_ADMISSIONS')">
+                              Forms
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Student Analytics Modal -->
+          <app-student-analytics-modal *ngIf="showAnalyticsModal"
+              [userId]="modalUserId" [counselorName]="modalUserName" [initialTab]="modalInitialTab"
+              [city]="modalCity" [state]="modalState"
+              [consultancyId]="modalConsultancyId || 0" [institutionId]="modalInstitutionId || 0"
+              [courseId]="modalCourseId || 0" [inputLeadSourceId]="modalLeadSourceId"
+              [gender]="genderId"
+              (close)="onCloseAnalyticsModal()"></app-student-analytics-modal>
+
+        </ng-container>
+      </div>
+    </main>
+  </div>
+</div>

@@ -6,10 +6,48 @@ export interface LocationAnalyticsDTO {
   totalAdmissions: number;
   remainingApplications: number;
   cancelledApplications: number;
-  cancelledAdmissions: number;
+  cancelledAdmissions?: number;
+  duplicateApplications?: number;
+  duplicateAdmissions?: number;
+  scholarApplications?: number;
+  scholarAdmissions?: number;
+  focAdmissions?: number;
+  sbsAdmissions?: number;
+  directApplications?: number;
+  directAdmissions?: number;
+  consultancyApplications?: number;
+  consultancyAdmissions?: number;
+  gender?: string;
+  casteCategory?: string;
 }
 
 // ===== DETAIL DTOs =====
+
+export interface GenderDetailBasicInfo {
+  name: string;
+  totalStudents: number;
+  createdDate?: string;
+  updatedDate?: string;
+  status?: string;
+}
+
+export interface GenderDetailDTO {
+  basicInfo: GenderDetailBasicInfo;
+  kpiStats: LocationKPIStats;
+}
+
+export interface CasteDetailBasicInfo {
+  name: string;
+  totalStudents: number;
+  createdDate?: string;
+  updatedDate?: string;
+  status?: string;
+}
+
+export interface CasteDetailDTO {
+  basicInfo: CasteDetailBasicInfo;
+  kpiStats: LocationKPIStats;
+}
 
 export interface CityDetailBasicInfo {
   id: number;

@@ -5,23 +5,23 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { Subject, Subscription, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
-import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
-import { FilterDrawerComponent } from '../../shared/components/filter-drawer/filter-drawer.component';
-import { MultiSelectModalComponent } from '../../shared/components/multi-select-modal/multi-select-modal.component';
-import { LocationAnalyticsService } from '../../core/services/location-analytics.service';
-import { LocationAnalyticsDTO } from '../../core/models/location-analytics.model';
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
+import { TopbarComponent } from '../../../shared/components/topbar/topbar.component';
+import { FilterDrawerComponent } from '../../../shared/components/filter-drawer/filter-drawer.component';
+import { MultiSelectModalComponent } from '../../../shared/components/multi-select-modal/multi-select-modal.component';
+import { LocationAnalyticsService } from '../../../core/services/location-analytics.service';
+import { LocationAnalyticsDTO } from '../../../core/models/location-analytics.model';
 
 // Service Imports for Filters
-import { CourseService } from '../../core/services/course.service';
-import { ConsultancyService } from '../../core/services/consultancy.service';
-import { UserService } from '../../core/services/user.service';
-import { LeadSourceService } from '../../core/services/lead-source.service';
-import { CourseTypeService } from '../../core/services/course-type.service';
-import { LocationService } from '../../core/services/location.service';
+import { CourseService } from '../../../core/services/course.service';
+import { ConsultancyService } from '../../../core/services/consultancy.service';
+import { UserService } from '../../../core/services/user.service';
+import { LeadSourceService } from '../../../core/services/lead-source.service';
+import { CourseTypeService } from '../../../core/services/course-type.service';
+import { LocationService } from '../../../core/services/location.service';
 
 @Component({
-  selector: 'app-location-analytics',
+  selector: 'app-location-analytics-castes',
   standalone: true,
   imports: [
     CommonModule,
@@ -32,44 +32,21 @@ import { LocationService } from '../../core/services/location.service';
     FilterDrawerComponent,
     MultiSelectModalComponent
   ],
-  templateUrl: './location-analytics.component.html',
-  styleUrl: './location-analytics.component.scss'
+  templateUrl: './location-analytics-castes.component.html',
+  styleUrl: './location-analytics-castes.component.scss'
 })
-export class LocationAnalyticsComponent implements OnInit, OnDestroy {
-  // Data Lists
-  topCitiesByApps: LocationAnalyticsDTO[] = [];
-  topCitiesByAdms: LocationAnalyticsDTO[] = [];
-  topStatesByApps: LocationAnalyticsDTO[] = [];
-  topStatesByAdms: LocationAnalyticsDTO[] = [];
-  topGendersByApps: LocationAnalyticsDTO[] = [];
-  topGendersByAdms: LocationAnalyticsDTO[] = [];
-  topCastesByApps: LocationAnalyticsDTO[] = [];
-  topCastesByAdms: LocationAnalyticsDTO[] = [];
+export class LocationAnalyticsCastesComponent implements OnInit, OnDestroy {
+  castesData: LocationAnalyticsDTO[] = [];
 
-  // Summary Metrics
-  topCityByAppsName = 'N/A';
-  topCityByAppsCount = 0;
-  topCityByAdmsName = 'N/A';
-  topCityByAdmsCount = 0;
-  totalCitiesCount = 0;
+  // Pagination states
+  currentPage = 1;
+  pageSize = 10;
+  totalElements = 0;
+  totalPages = 0;
 
-  topStateByAppsName = 'N/A';
-  topStateByAppsCount = 0;
-  topStateByAdmsName = 'N/A';
-  topStateByAdmsCount = 0;
-  totalStatesCount = 0;
-
-  topGenderByAppsName = 'N/A';
-  topGenderByAppsCount = 0;
-  topGenderByAdmsName = 'N/A';
-  topGenderByAdmsCount = 0;
-  totalGendersCount = 0;
-
-  topCasteByAppsName = 'N/A';
-  topCasteByAppsCount = 0;
-  topCasteByAdmsName = 'N/A';
-  topCasteByAdmsCount = 0;
-  totalCastesCount = 0;
+  // Sorting
+  sortBy = 'totalApplications';
+  sortDirection = 'desc';
 
   // UI States
   loading = true;
@@ -79,7 +56,8 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
   private searchSubject = new Subject<string>();
   private searchSubscription?: Subscription;
 
-  // Filters object mapping exactly to AdmissionPageRequest fields
+  Math = Math;
+
   filters: any = {
     search: '',
     statusFilter: '',
@@ -109,7 +87,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     admDateRangeType: ''
   };
 
-  // Dropdown visibility states
   dropdowns = {
     session: false,
     admissionType: false,
@@ -119,7 +96,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     courseType: false
   };
 
-  // Filter option lists loaded from services
   sessionsList: string[] = (() => {
     const currentYear = new Date().getFullYear();
     const result = [];
@@ -134,7 +110,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
   citiesList: string[] = [];
   loadingCities = false;
 
-  // Searchable Selector Modal State
   activeModal: 'user' | 'consultancy' | 'course' | null = null;
   modalItems: any[] = [];
   modalLoading: boolean = false;
@@ -144,10 +119,8 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
   modalTotalElements: number = 0;
   modalPageSize: number = 10;
 
-  // Selection Cache Map
   modalSelectionCache: Map<any, any> = new Map();
 
-  // Search filter options in dropdowns
   searchTerms = {
     session: '',
     admissionType: '',
@@ -157,7 +130,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     courseType: ''
   };
 
-  // Injecting services
   private locationAnalyticsService = inject(LocationAnalyticsService);
   private courseService = inject(CourseService);
   private consultancyService = inject(ConsultancyService);
@@ -174,18 +146,16 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
       distinctUntilChanged()
     ).subscribe(term => {
       this.filters.search = term;
+      this.currentPage = 1;
       this.applyFiltersAndReload();
     });
   }
 
   ngOnInit(): void {
-    // 1. Load Filter options
     this.loadFilterOptions();
-
-    // 2. Parse query parameters to restore filter state
     this.route.queryParams.subscribe(params => {
       this.parseQueryParams(params);
-      this.loadAllAnalytics();
+      this.loadData();
     });
   }
 
@@ -194,7 +164,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   private loadFilterOptions(): void {
-    // States
     this.locationService.getAllStates().subscribe({
       next: (data) => {
         this.statesList = data;
@@ -205,13 +174,11 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
       error: (err) => console.error('Error loading states', err)
     });
 
-    // Lead Sources
     this.leadSourceService.getActive().subscribe({
       next: (res: any) => this.leadSources = res?.data || [],
       error: (err) => console.error('Error loading active lead sources', err)
     });
 
-    // Course Types
     this.courseTypeService.getActiveCourseTypes().subscribe({
       next: (res: any[]) => this.courseTypes = res || [],
       error: (err) => console.error('Error loading active course types', err)
@@ -219,16 +186,18 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   private parseQueryParams(params: any): void {
-    // Parse search
+    this.currentPage = params.page ? +params.page : 1;
+    this.pageSize = params.size ? +params.size : 10;
+    this.sortBy = params.sortColumn || 'totalApplications';
+    this.sortDirection = params.sortDirection || 'desc';
+
     this.searchTerm = params.search || '';
     this.filters.search = this.searchTerm;
 
-    // Parse single selects
     this.filters.isScholar = params.isScholar !== undefined ? params.isScholar : '';
     this.filters.statusFilter = params.statusFilter || '';
     this.filters.focType = params.focType || '';
 
-    // Parse dates
     this.filters.startDate = params.startDate || '';
     this.filters.endDate = params.endDate || '';
     this.filters.appStartDate = params.appStartDate || '';
@@ -238,17 +207,14 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     this.filters.appDateRangeType = params.appDateRangeType || '';
     this.filters.admDateRangeType = params.admDateRangeType || '';
 
-    // Parse FOC indicators
     this.filters.showOnlyPaid = params.showOnlyPaid === 'true' ? true : (params.showOnlyPaid === 'false' ? false : null);
     this.filters.showOnlyFoc = params.showOnlyFoc === 'true' ? true : (params.showOnlyFoc === 'false' ? false : null);
     this.filters.showOnlySbs = params.showOnlySbs === 'true' ? true : (params.showOnlySbs === 'false' ? false : null);
 
-    // Parse duplicates
     this.filters.duplicateOnly = params.duplicateOnly === 'true' ? true : (params.duplicateOnly === 'false' ? false : null);
-    this.filters.excludeDuplicate = params.excludeDuplicate === 'false' ? false : true; // Default true
+    this.filters.excludeDuplicate = params.excludeDuplicate === 'false' ? false : true;
     this.filters.includeDuplicate = params.includeDuplicate === 'true' ? true : (params.includeDuplicate === 'false' ? false : null);
 
-    // Parse multi-select arrays (split by comma)
     this.filters.states = params.states ? params.states.split(',') : [];
     this.filters.cities = params.cities ? params.cities.split(',') : [];
     this.filters.courseTypes = params.courseTypes ? params.courseTypes.split(',') : [];
@@ -263,8 +229,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
 
   private calculateActiveFilterCount(): void {
     let count = 0;
-
-    // Check simple strings/booleans
     if (this.filters.isScholar !== '') count++;
     if (this.filters.statusFilter !== '') count++;
     if (this.filters.focType !== '') count++;
@@ -275,7 +239,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     if (this.filters.admDateRangeType !== '') count++;
     if (this.filters.duplicateOnly != null) count++;
 
-    // Check arrays
     if (this.filters.states.length > 0) count++;
     if (this.filters.cities.length > 0) count++;
     if (this.filters.courseTypes.length > 0) count++;
@@ -288,156 +251,25 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     this.activeFilterCount = count;
   }
 
-  loadAllAnalytics(): void {
+  loadData(): void {
     this.loading = true;
+    const requestPayload = {
+      ...this.filters,
+      page: this.currentPage - 1,
+      size: this.pageSize,
+      sortColumn: this.sortBy,
+      sortDirection: this.sortDirection
+    };
 
-    // Build the request payload matching backend model
-    const requestPayload = { ...this.filters };
-
-    // Fetch all top rankings in parallel
-    this.locationAnalyticsService.getTopCitiesByApplications(requestPayload).subscribe({
-      next: (data) => {
-        this.topCitiesByApps = data;
-        if (data.length > 0) {
-          this.topCityByAppsName = `${data[0].city}, ${data[0].state}`;
-          this.topCityByAppsCount = data[0].totalApplications;
-        } else {
-          this.topCityByAppsName = 'N/A';
-          this.topCityByAppsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top cities by apps', err)
-    });
-
-    this.locationAnalyticsService.getTopCitiesByAdmissions(requestPayload).subscribe({
-      next: (data) => {
-        this.topCitiesByAdms = data;
-        if (data.length > 0) {
-          this.topCityByAdmsName = `${data[0].city}, ${data[0].state}`;
-          this.topCityByAdmsCount = data[0].totalAdmissions;
-        } else {
-          this.topCityByAdmsName = 'N/A';
-          this.topCityByAdmsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top cities by adms', err)
-    });
-
-    this.locationAnalyticsService.getTopStatesByApplications(requestPayload).subscribe({
-      next: (data) => {
-        this.topStatesByApps = data;
-        if (data.length > 0) {
-          this.topStateByAppsName = data[0].state;
-          this.topStateByAppsCount = data[0].totalApplications;
-        } else {
-          this.topStateByAppsName = 'N/A';
-          this.topStateByAppsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top states by apps', err)
-    });
-
-    this.locationAnalyticsService.getTopStatesByAdmissions(requestPayload).subscribe({
-      next: (data) => {
-        this.topStatesByAdms = data;
-        if (data.length > 0) {
-          this.topStateByAdmsName = data[0].state;
-          this.topStateByAdmsCount = data[0].totalAdmissions;
-        } else {
-          this.topStateByAdmsName = 'N/A';
-          this.topStateByAdmsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top states by adms', err)
-    });
-
-    // Gender rankings
-    this.locationAnalyticsService.getTopGendersByApplications(requestPayload).subscribe({
-      next: (data) => {
-        this.topGendersByApps = data;
-        if (data.length > 0) {
-          this.topGenderByAppsName = data[0].gender || 'N/A';
-          this.topGenderByAppsCount = data[0].totalApplications;
-        } else {
-          this.topGenderByAppsName = 'N/A';
-          this.topGenderByAppsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top genders by apps', err)
-    });
-
-    this.locationAnalyticsService.getTopGendersByAdmissions(requestPayload).subscribe({
-      next: (data) => {
-        this.topGendersByAdms = data;
-        if (data.length > 0) {
-          this.topGenderByAdmsName = data[0].gender || 'N/A';
-          this.topGenderByAdmsCount = data[0].totalAdmissions;
-        } else {
-          this.topGenderByAdmsName = 'N/A';
-          this.topGenderByAdmsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top genders by adms', err)
-    });
-
-    // Caste rankings
-    this.locationAnalyticsService.getTopCastesByApplications(requestPayload).subscribe({
-      next: (data) => {
-        this.topCastesByApps = data;
-        if (data.length > 0) {
-          this.topCasteByAppsName = data[0].casteCategory || 'N/A';
-          this.topCasteByAppsCount = data[0].totalApplications;
-        } else {
-          this.topCasteByAppsName = 'N/A';
-          this.topCasteByAppsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top castes by apps', err)
-    });
-
-    this.locationAnalyticsService.getTopCastesByAdmissions(requestPayload).subscribe({
-      next: (data) => {
-        this.topCastesByAdms = data;
-        if (data.length > 0) {
-          this.topCasteByAdmsName = data[0].casteCategory || 'N/A';
-          this.topCasteByAdmsCount = data[0].totalAdmissions;
-        } else {
-          this.topCasteByAdmsName = 'N/A';
-          this.topCasteByAdmsCount = 0;
-        }
-      },
-      error: (err) => console.error('Error loading top castes by adms', err)
-    });
-
-    // Load total counts from paginated listings
-    this.locationAnalyticsService.getCitiesAnalytics({ ...requestPayload, page: 1, size: 1 }).subscribe({
+    this.locationAnalyticsService.getCastesAnalytics(requestPayload).subscribe({
       next: (res) => {
-        this.totalCitiesCount = res.totalElements || 0;
-      },
-      error: (err) => console.error('Error fetching total cities count', err)
-    });
-
-    this.locationAnalyticsService.getStatesAnalytics({ ...requestPayload, page: 1, size: 1 }).subscribe({
-      next: (res) => {
-        this.totalStatesCount = res.totalElements || 0;
-      },
-      error: (err) => console.error('Error fetching total states count', err)
-    });
-
-    this.locationAnalyticsService.getGendersAnalytics({ ...requestPayload, page: 1, size: 1 }).subscribe({
-      next: (res) => {
-        this.totalGendersCount = res.totalElements || 0;
-      },
-      error: (err) => console.error('Error fetching total genders count', err)
-    });
-
-    this.locationAnalyticsService.getCastesAnalytics({ ...requestPayload, page: 1, size: 1 }).subscribe({
-      next: (res) => {
-        this.totalCastesCount = res.totalElements || 0;
+        this.castesData = res.content || [];
+        this.totalElements = res.totalElements || 0;
+        this.totalPages = res.totalPages || 0;
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error fetching total castes count', err);
+        console.error('Error loading castes analytics', err);
         this.loading = false;
       }
     });
@@ -447,18 +279,51 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     this.searchSubject.next(term);
   }
 
-  applyFiltersAndReload(): void {
-    this.showFilterDrawer = false;
-    this.calculateActiveFilterCount();
+  toggleSort(column: string): void {
+    if (this.sortBy === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortDirection = 'desc';
+    }
+    this.currentPage = 1;
+    this.applyFiltersAndReload();
+  }
 
-    // Map properties to query parameters in URL
-    const queryParams: any = {};
+  onPageChange(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.applyFiltersAndReload();
+    }
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    this.applyFiltersAndReload();
+  }
+
+  applyFiltersAndReload(): void {
+    const queryParams: any = {
+      page: this.currentPage,
+      size: this.pageSize,
+      sortColumn: this.sortBy,
+      sortDirection: this.sortDirection
+    };
+
     if (this.filters.search) queryParams.search = this.filters.search;
     if (this.filters.isScholar !== '') queryParams.isScholar = this.filters.isScholar;
     if (this.filters.statusFilter !== '') queryParams.statusFilter = this.filters.statusFilter;
     if (this.filters.focType !== '') queryParams.focType = this.filters.focType;
 
-    // Date filters
+    if (this.filters.showOnlyPaid != null) queryParams.showOnlyPaid = this.filters.showOnlyPaid;
+    if (this.filters.showOnlyFoc != null) queryParams.showOnlyFoc = this.filters.showOnlyFoc;
+    if (this.filters.showOnlySbs != null) queryParams.showOnlySbs = this.filters.showOnlySbs;
+
+    if (this.filters.duplicateOnly != null) queryParams.duplicateOnly = this.filters.duplicateOnly;
+    queryParams.excludeDuplicate = this.filters.excludeDuplicate;
+    if (this.filters.includeDuplicate != null) queryParams.includeDuplicate = this.filters.includeDuplicate;
+
     if (this.filters.startDate) queryParams.startDate = this.filters.startDate;
     if (this.filters.endDate) queryParams.endDate = this.filters.endDate;
     if (this.filters.appStartDate) queryParams.appStartDate = this.filters.appStartDate;
@@ -468,17 +333,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     if (this.filters.appDateRangeType) queryParams.appDateRangeType = this.filters.appDateRangeType;
     if (this.filters.admDateRangeType) queryParams.admDateRangeType = this.filters.admDateRangeType;
 
-    // FOC flags
-    if (this.filters.showOnlyPaid != null) queryParams.showOnlyPaid = this.filters.showOnlyPaid.toString();
-    if (this.filters.showOnlyFoc != null) queryParams.showOnlyFoc = this.filters.showOnlyFoc.toString();
-    if (this.filters.showOnlySbs != null) queryParams.showOnlySbs = this.filters.showOnlySbs.toString();
-
-    // Duplicates flags
-    if (this.filters.duplicateOnly != null) queryParams.duplicateOnly = this.filters.duplicateOnly.toString();
-    if (this.filters.excludeDuplicate === false) queryParams.excludeDuplicate = 'false';
-    if (this.filters.includeDuplicate != null) queryParams.includeDuplicate = this.filters.includeDuplicate.toString();
-
-    // Multi select arrays
     if (this.filters.states.length > 0) queryParams.states = this.filters.states.join(',');
     if (this.filters.cities.length > 0) queryParams.cities = this.filters.cities.join(',');
     if (this.filters.courseTypes.length > 0) queryParams.courseTypes = this.filters.courseTypes.join(',');
@@ -490,8 +344,8 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
 
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: queryParams,
-      replaceUrl: true
+      queryParams,
+      queryParamsHandling: 'merge'
     });
   }
 
@@ -525,18 +379,19 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
       admDateRangeType: ''
     };
     this.searchTerm = '';
+    this.currentPage = 1;
     this.applyFiltersAndReload();
   }
 
   refreshData(): void {
-    this.loadAllAnalytics();
+    this.loadData();
   }
 
   placeholderDownload(): void {
-    alert('Excel Report Download placeholder triggered. Future reporting extension template is ready.');
+    alert('Excel Export is not directly supported on grouped Caste list. Please go to individual Caste detail view to export detailed spreadsheets.');
   }
 
-  // ── Searchable Modal Selector Helpers ─────────────────────────────
+  // --- Searchable selector modals ---
   cacheSelectedItem(item: any) {
     if (!item) return;
     const id = this.getItemId(item);
@@ -606,7 +461,7 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
           this.modalLoading = false;
         },
         error: (err) => {
-          console.error('Error loading user modal data', err);
+          console.error(err);
           this.modalLoading = false;
         }
       });
@@ -624,7 +479,7 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
           this.modalLoading = false;
         },
         error: (err) => {
-          console.error('Error loading consultancy modal data', err);
+          console.error(err);
           this.modalLoading = false;
         }
       });
@@ -642,7 +497,7 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
           this.modalLoading = false;
         },
         error: (err) => {
-          console.error('Error loading course modal data', err);
+          console.error(err);
           this.modalLoading = false;
         }
       });
@@ -686,7 +541,7 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     this.activeModal = null;
   }
 
-  // ── Multi-select Helpers ──────────────────────────────────────────────
+  // Multi-select Helpers
   toggleSessionSelection(session: string): void {
     const idx = this.filters.sessions.indexOf(session);
     if (idx > -1) {
@@ -748,7 +603,7 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     } else {
       this.filters.states.push(state);
     }
-    this.filters.cities = []; // Clear city selections when state choices change
+    this.filters.cities = [];
     this.loadCitiesForSelectedStates();
   }
 
@@ -759,21 +614,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     } else {
       this.filters.cities.push(city);
     }
-  }
-
-  // City-State loader helpers
-  loadCities(state: string): void {
-    this.loadingCities = true;
-    this.locationService.getCitiesByState(state).subscribe({
-      next: (data) => {
-        this.citiesList = data;
-        this.loadingCities = false;
-      },
-      error: (err) => {
-        console.error('Error loading cities', err);
-        this.loadingCities = false;
-      }
-    });
   }
 
   loadCitiesForSelectedStates(): void {
@@ -792,13 +632,12 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
         this.loadingCities = false;
       },
       error: (err) => {
-        console.error('Error loading cities for selected states', err);
+        console.error('Error loading cities', err);
         this.loadingCities = false;
       }
     });
   }
 
-  // Option text resolve helpers
   getCourseNameById(id: number): string {
     const item = this.modalSelectionCache.get(id);
     return item ? item.name : `Course #${id}`;
@@ -819,7 +658,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     return item ? item.name : `Source #${id}`;
   }
 
-  // Date handlers
   onDateRangeTypeChange(type: 'application' | 'admission'): void {
     const rangeType = type === 'application' ? this.filters.appDateRangeType : this.filters.admDateRangeType;
     let start = '';
@@ -854,7 +692,7 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
         this.filters.endDate = end;
       }
     } else if (rangeType === 'custom') {
-      // Prompt custom selector
+      // Custom date
     } else {
       if (type === 'application') {
         this.filters.appStartDate = '';
@@ -882,7 +720,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     return [year, month, day].join('-');
   }
 
-  // Duplicate settings
   getDuplicateFilterValue(): string {
     if (this.filters.duplicateOnly === true) return 'only';
     if (this.filters.includeDuplicate === true) return 'all';
@@ -905,7 +742,6 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Dropdown search filters
   get filteredSessions(): string[] {
     const q = this.searchTerms.session.toLowerCase().trim();
     return this.sessionsList.filter(s => s.toLowerCase().includes(q));
@@ -929,5 +765,10 @@ export class LocationAnalyticsComponent implements OnInit, OnDestroy {
   get filteredCourseTypes(): any[] {
     const q = this.searchTerms.courseType.toLowerCase().trim();
     return this.courseTypes.filter(c => c.name.toLowerCase().includes(q));
+  }
+
+  navigateToCasteDetail(casteCategory: string | undefined): void {
+    if (!casteCategory) return;
+    this.router.navigate(['/location-analytics/castes', casteCategory]);
   }
 }

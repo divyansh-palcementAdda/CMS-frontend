@@ -5,20 +5,20 @@
     <app-topbar></app-topbar>
 
     <main class="main-content" style="padding: 0; background: transparent;">
-      <div class="location-analytics-wrapper">
+      <div class="location-page-wrapper">
         
         <!-- Header Section -->
         <div class="header-section">
           <div class="title-container">
-            <div class="back-btn" title="Back" routerLink="/admin/dashboard">
+            <div class="back-btn" title="Back" routerLink="/location-analytics">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="12" fill="#6366F1" />
                 <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
             <div>
-              <h2 class="page-title">Location Analytics</h2>
-              <p class="page-subtitle text-light">City-wise and State-wise student application and admission analytics</p>
+              <h2 class="page-title">Caste Analytics</h2>
+              <p class="page-subtitle text-light">Detailed caste/category-wise admission and application metrics</p>
             </div>
           </div>
 
@@ -29,7 +29,7 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" placeholder="Search city or state..." [ngModel]="searchTerm" (ngModelChange)="onSearchChange($event)">
+              <input type="text" placeholder="Search caste category..." [ngModel]="searchTerm" (ngModelChange)="onSearchChange($event)">
             </div>
 
             <!-- Actions buttons -->
@@ -74,317 +74,130 @@
           </div>
         </div>
 
-        <!-- Main Content Area -->
-        <ng-container *ngIf="!loading">
-          <!-- Stats Grid -->
-          <div class="stats-grid">
-            <!-- Top City by Applications -->
-            <div class="stat-card">
-              <div class="stat-content">
-                <span class="stat-label">Top City (Applications)</span>
-                <div class="stat-icon-wrapper purple">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 20 10.2c0 7.3-8 11.8-8 11.8z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                </div>
+        <!-- Table Card -->
+        <div class="table-card stat-card table-only" *ngIf="!loading">
+          <div class="table-header">
+            <h3 class="table-title">Caste-wise Metrics</h3>
+            <div class="table-toolbar">
+              <div class="entries-selector">
+                <span>Show</span>
+                <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChange(+$event)">
+                  <option [value]="10">10</option>
+                  <option [value]="20">20</option>
+                  <option [value]="50">50</option>
+                  <option [value]="100">100</option>
+                </select>
+                <span>entries</span>
               </div>
-              <div class="stat-value text-truncate" [title]="topCityByAppsName">{{ topCityByAppsName }}</div>
-              <div class="stat-subtext">{{ topCityByAppsCount }} total applications</div>
             </div>
-
-            <!-- Top City by Admissions -->
-            <div class="stat-card">
-              <div class="stat-content">
-                <span class="stat-label">Top City (Admissions)</span>
-                <div class="stat-icon-wrapper purple">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-value text-truncate" [title]="topCityByAdmsName">{{ topCityByAdmsName }}</div>
-              <div class="stat-subtext">{{ topCityByAdmsCount }} total admissions</div>
-            </div>
-
-            <!-- Top State by Applications -->
-            <div class="stat-card">
-              <div class="stat-content">
-                <span class="stat-label">Top State (Applications)</span>
-                <div class="stat-icon-wrapper purple">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                    <line x1="4" y1="22" x2="4" y2="15"></line>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-value text-truncate" [title]="topStateByAppsName">{{ topStateByAppsName }}</div>
-              <div class="stat-subtext">{{ topStateByAppsCount }} total applications</div>
-            </div>
-
-            <!-- Top State by Admissions -->
-            <div class="stat-card">
-              <div class="stat-content">
-                <span class="stat-label">Top State (Admissions)</span>
-                <div class="stat-icon-wrapper purple">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-value text-truncate" [title]="topStateByAdmsName">{{ topStateByAdmsName }}</div>
-              <div class="stat-subtext">{{ topStateByAdmsCount }} total admissions</div>
-            </div>
-
-            <!-- Top Gender by Applications -->
-            <div class="stat-card">
-              <div class="stat-content">
-                <span class="stat-label">Top Gender (Applications)</span>
-                <div class="stat-icon-wrapper purple">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 2v20M2 12h20"></path>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-value text-truncate" [title]="topGenderByAppsName">{{ topGenderByAppsName }}</div>
-              <div class="stat-subtext">{{ topGenderByAppsCount }} total applications</div>
-            </div>
-
-            <!-- Top Caste by Applications -->
-            <div class="stat-card">
-              <div class="stat-content">
-                <span class="stat-label">Top Caste (Applications)</span>
-                <div class="stat-icon-wrapper purple">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-value text-truncate" [title]="topCasteByAppsName">{{ topCasteByAppsName }}</div>
-              <div class="stat-subtext">{{ topCasteByAppsCount }} total applications</div>
-            </div>
-
           </div>
 
-          <!-- Top 5 Rankings Grid -->
-          <div class="rankings-grid">
-            
-            <!-- Table 1: Top 5 Cities by Applications -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Top 5 Cities by Applications</h3>
-                <a routerLink="/location-analytics/cities" class="view-all-link">View All Cities ({{ totalCitiesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 80px;">City</th>
-                      <th style="min-width: 80px;">State</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topCitiesByApps; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
-                      <td class="text-light">{{ item.state }}</td>
-                      <td class="text-center text-bold">{{ item.totalApplications }}</td>
-                      <td class="text-center">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topCitiesByApps.length === 0">
-                      <td colspan="6" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Table 2: Top 5 Cities by Admissions -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Top 5 Cities by Admissions</h3>
-                <a routerLink="/location-analytics/cities" class="view-all-link">View All Cities ({{ totalCitiesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 80px;">City</th>
-                      <th style="min-width: 80px;">State</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topCitiesByAdms; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
-                      <td class="text-light">{{ item.state }}</td>
-                      <td class="text-center">{{ item.totalApplications }}</td>
-                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topCitiesByAdms.length === 0">
-                      <td colspan="6" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Table 3: Top 5 States by Applications -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Top 5 States by Applications</h3>
-                <a routerLink="/location-analytics/states" class="view-all-link">View All States ({{ totalStatesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 100px;">State</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topStatesByApps; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.state }}</td>
-                      <td class="text-center text-bold">{{ item.totalApplications }}</td>
-                      <td class="text-center">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topStatesByApps.length === 0">
-                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Table 4: Top 5 States by Admissions -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Top 5 States by Admissions</h3>
-                <a routerLink="/location-analytics/states" class="view-all-link">View All States ({{ totalStatesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 100px;">State</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topStatesByAdms; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.state }}</td>
-                      <td class="text-center">{{ item.totalApplications }}</td>
-                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topStatesByAdms.length === 0">
-                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Table 5: Top Genders by Applications -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Genders by Applications</h3>
-                <a routerLink="/location-analytics/genders" class="view-all-link">View All Genders ({{ totalGendersCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 100px;">Gender</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topGendersByApps; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.gender || 'N/A' }}</td>
-                      <td class="text-center text-bold">{{ item.totalApplications }}</td>
-                      <td class="text-center">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topGendersByApps.length === 0">
-                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Table 6: Top Castes by Applications -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Caste/Category by Applications</h3>
-                <a routerLink="/location-analytics/castes" class="view-all-link">View All Castes ({{ totalCastesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 100px;">Caste/Category</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Left</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topCastesByApps; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.casteCategory || 'N/A' }}</td>
-                      <td class="text-center text-bold">{{ item.totalApplications }}</td>
-                      <td class="text-center">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topCastesByApps.length === 0">
-                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 50px;">#</th>
+                  <th class="sortable" (click)="toggleSort('casteCategory')" style="cursor: pointer; min-width: 150px;">
+                    Caste Category
+                    <span class="sort-icon" style="margin-left: 4px;">
+                      <span *ngIf="sortBy === 'casteCategory'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span *ngIf="sortBy !== 'casteCategory'" style="opacity: 0.3;">▲▼</span>
+                    </span>
+                  </th>
+                  <th class="sortable text-center" (click)="toggleSort('totalApplications')" style="cursor: pointer; min-width: 100px;">
+                    Total Apps
+                    <span class="sort-icon" style="margin-left: 4px;">
+                      <span *ngIf="sortBy === 'totalApplications'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span *ngIf="sortBy !== 'totalApplications'" style="opacity: 0.3;">▲▼</span>
+                    </span>
+                  </th>
+                  <th class="sortable text-center" (click)="toggleSort('totalAdmissions')" style="cursor: pointer; min-width: 100px;">
+                    Total Adms
+                    <span class="sort-icon" style="margin-left: 4px;">
+                      <span *ngIf="sortBy === 'totalAdmissions'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span *ngIf="sortBy !== 'totalAdmissions'" style="opacity: 0.3;">▲▼</span>
+                    </span>
+                  </th>
+                  <th class="sortable text-center" (click)="toggleSort('remainingApplications')" style="cursor: pointer; min-width: 100px;">
+                    Remaining
+                    <span class="sort-icon" style="margin-left: 4px;">
+                      <span *ngIf="sortBy === 'remainingApplications'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span *ngIf="sortBy !== 'remainingApplications'" style="opacity: 0.3;">▲▼</span>
+                    </span>
+                  </th>
+                  <th class="sortable text-center" (click)="toggleSort('cancelledApplications')" style="cursor: pointer; min-width: 110px;">
+                    Cancelled Apps
+                    <span class="sort-icon" style="margin-left: 4px;">
+                      <span *ngIf="sortBy === 'cancelledApplications'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span *ngIf="sortBy !== 'cancelledApplications'" style="opacity: 0.3;">▲▼</span>
+                    </span>
+                  </th>
+                  <th class="sortable text-center" (click)="toggleSort('cancelledAdmissions')" style="cursor: pointer; min-width: 110px;">
+                    Cancelled Adms
+                    <span class="sort-icon" style="margin-left: 4px;">
+                      <span *ngIf="sortBy === 'cancelledAdmissions'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span *ngIf="sortBy !== 'cancelledAdmissions'" style="opacity: 0.3;">▲▼</span>
+                    </span>
+                  </th>
+                  <th class="text-center" style="min-width: 120px;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of castesData; let i = index">
+                  <td class="text-center text-light">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                  <td class="font-medium">
+                    <span class="clickable-name" (click)="navigateToCasteDetail(item.casteCategory)">
+                      {{ item.casteCategory || 'UNKNOWN' }}
+                    </span>
+                  </td>
+                  <td class="text-center">{{ item.totalApplications }}</td>
+                  <td class="text-center">{{ item.totalAdmissions }}</td>
+                  <td class="text-center">{{ item.remainingApplications }}</td>
+                  <td class="text-center">{{ item.cancelledApplications }}</td>
+                  <td class="text-center">{{ item.cancelledAdmissions }}</td>
+                  <td class="text-center">
+                    <button class="action-btn text-primary" (click)="navigateToCasteDetail(item.casteCategory)" title="View breakdown and metrics">
+                      View Details &rarr;
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="castesData.length === 0">
+                  <td colspan="8" class="text-center py-8 text-light text-sm">
+                    No caste/category analytics data found. Adjust your search or filters.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </ng-container>
 
-        <!-- Advanced Filter Drawer -->
-        <app-filter-drawer [isOpen]="showFilterDrawer" (close)="showFilterDrawer = false" (apply)="applyFiltersAndReload()" (clear)="resetFilters()">
-          <div class="filter-drawer-content">
+          <!-- Pagination Footer -->
+          <div class="table-footer" *ngIf="castesData.length > 0">
+            <div class="pagination-info text-light">
+              Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalElements) }} of {{ totalElements }} entries
+            </div>
+            <div class="pagination-controls">
+              <button class="pag-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">&larr; Previous</button>
+              <span class="pag-page" *ngFor="let p of [].constructor(totalPages); let idx = index" 
+                    [class.active]="currentPage === (idx + 1)" (click)="onPageChange(idx + 1)">
+                {{ idx + 1 }}
+              </span>
+              <button class="pag-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">Next &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters Drawer -->
+        <app-filter-drawer [isOpen]="showFilterDrawer" (close)="showFilterDrawer = false">
+          <div class="drawer-header">
+            <h3>Advanced Filters</h3>
+            <button class="btn-text-secondary" (click)="resetFilters()">Clear All</button>
+          </div>
+
+          <div class="drawer-body">
             
-            <!-- Primary Filters -->
+            <!-- Academic Session -->
             <div class="filter-group">
-              <h4 class="group-title">Primary Filters</h4>
-              
-              <!-- Sessions -->
+              <h4 class="group-title">Academic Session</h4>
               <div class="filter-section">
                 <label class="filter-label">Session</label>
                 <div class="multi-select-container" (click)="$event.stopPropagation()">
@@ -409,51 +222,44 @@
                         <input type="checkbox" [checked]="filters.sessions.includes(s)" (click)="$event.stopPropagation(); toggleSessionSelection(s)">
                         <span>{{ s }}</span>
                       </div>
-                      <div *ngIf="filteredSessions.length === 0" class="no-options">No sessions found</div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Scholarship -->
+            <!-- Scholar & Duplicate Status -->
+            <div class="filter-group">
+              <h4 class="group-title">Student Attributes</h4>
+              
               <div class="filter-section">
-                <label class="filter-label">Scholarship</label>
+                <label class="filter-label">Scholar Filter</label>
                 <select [(ngModel)]="filters.isScholar" class="filter-input">
                   <option value="">All Students</option>
-                  <option value="true">Scholarship Students</option>
-                  <option value="false">Non-Scholarship</option>
+                  <option value="true">Scholar Students Only</option>
+                  <option value="false">Non-Scholar Students Only</option>
                 </select>
               </div>
 
-              <!-- Record Status -->
-              <div class="filter-section">
-                <label class="filter-label">Record Status</label>
-                <select [(ngModel)]="filters.statusFilter" class="filter-input">
-                  <option value="">Active Admissions</option>
-                  <option value="CANCELLED">Cancelled Admissions</option>
-                </select>
-              </div>
-
-              <!-- Duplicate Forms -->
               <div class="filter-section">
                 <label class="filter-label">Duplicate Forms</label>
                 <select [ngModel]="getDuplicateFilterValue()" (ngModelChange)="setDuplicateFilterValue($event)" class="filter-input">
-                  <option value="exclude">Exclude Duplicate (Default)</option>
-                  <option value="only">Only Duplicate</option>
-                  <option value="all">Include Duplicate</option>
+                  <option value="exclude">Exclude Duplicates (Default)</option>
+                  <option value="only">Show Duplicates Only</option>
+                  <option value="all">Include Both (Duplicates + Unique)</option>
                 </select>
               </div>
             </div>
 
-            <!-- Date Filters -->
+            <!-- Date Ranges -->
             <div class="filter-group">
               <h4 class="group-title">Date Filters</h4>
-              
-              <!-- Application Date Range -->
+
+              <!-- Application Date -->
               <div class="filter-section">
                 <label class="filter-label">Application Date Range</label>
-                <select [(ngModel)]="filters.appDateRangeType" (change)="onDateRangeTypeChange('application')" class="filter-input">
-                  <option value="">All Dates</option>
+                <select [(ngModel)]="filters.appDateRangeType" (ngModelChange)="onDateRangeTypeChange('application')" class="filter-input">
+                  <option value="">All Time</option>
                   <option value="today">Today</option>
                   <option value="week">This Week</option>
                   <option value="month">This Month</option>
@@ -463,16 +269,13 @@
                   <input type="date" [(ngModel)]="filters.appStartDate" class="filter-input" placeholder="Start Date">
                   <input type="date" [(ngModel)]="filters.appEndDate" class="filter-input" placeholder="End Date">
                 </div>
-                <div class="range-preview" *ngIf="filters.appStartDate && filters.appDateRangeType !== 'custom'" style="margin-top: 4px; font-size: 12px; color: #6366F1;">
-                  <span>{{ filters.appStartDate | date:'dd MMM' }} - {{ filters.appEndDate | date:'dd MMM, yyyy' }}</span>
-                </div>
               </div>
 
-              <!-- Admission Date Range -->
+              <!-- Admission Date -->
               <div class="filter-section">
                 <label class="filter-label">Admission Date Range</label>
-                <select [(ngModel)]="filters.admDateRangeType" (change)="onDateRangeTypeChange('admission')" class="filter-input">
-                  <option value="">All Dates</option>
+                <select [(ngModel)]="filters.admDateRangeType" (ngModelChange)="onDateRangeTypeChange('admission')" class="filter-input">
+                  <option value="">All Time</option>
                   <option value="today">Today</option>
                   <option value="week">This Week</option>
                   <option value="month">This Month</option>
@@ -481,9 +284,6 @@
                 <div class="date-range-inputs" *ngIf="filters.admDateRangeType === 'custom'" style="margin-top: 8px; display: flex; gap: 8px;">
                   <input type="date" [(ngModel)]="filters.admStartDate" class="filter-input" placeholder="Start Date">
                   <input type="date" [(ngModel)]="filters.admEndDate" class="filter-input" placeholder="End Date">
-                </div>
-                <div class="range-preview" *ngIf="filters.admStartDate && filters.admDateRangeType !== 'custom'" style="margin-top: 4px; font-size: 12px; color: #6366F1;">
-                  <span>{{ filters.admStartDate | date:'dd MMM' }} - {{ filters.admEndDate | date:'dd MMM, yyyy' }}</span>
                 </div>
               </div>
             </div>
@@ -550,7 +350,6 @@
                         <input type="checkbox" [checked]="filters.states.includes(s)" (click)="$event.stopPropagation(); toggleStateSelection(s)">
                         <span>{{ s }}</span>
                       </div>
-                      <div *ngIf="filteredStates.length === 0" class="no-options">No states found</div>
                     </div>
                   </div>
                 </div>
@@ -583,7 +382,6 @@
                         <input type="checkbox" [checked]="filters.cities.includes(c)" (click)="$event.stopPropagation(); toggleCitySelection(c)">
                         <span>{{ c }}</span>
                       </div>
-                      <div *ngIf="filteredCities.length === 0" class="no-options">No cities found</div>
                     </div>
                   </div>
                 </div>
@@ -614,7 +412,6 @@
                         <input type="checkbox" [checked]="filters.leadSources.includes(s.id)" (click)="$event.stopPropagation(); toggleLeadSourceSelection(s.id)">
                         <span>{{ s.name }}</span>
                       </div>
-                      <div *ngIf="filteredLeadSources.length === 0" class="no-options">No lead sources found</div>
                     </div>
                   </div>
                 </div>
@@ -650,7 +447,6 @@
                         <input type="checkbox" [checked]="filters.courseTypes.includes(ct.name)" (click)="$event.stopPropagation(); toggleCourseTypeSelection(ct.name)">
                         <span>{{ ct.name }}</span>
                       </div>
-                      <div *ngIf="filteredCourseTypes.length === 0" class="no-options">No course types found</div>
                     </div>
                   </div>
                 </div>
@@ -721,11 +517,14 @@
             </div>
 
           </div>
+          <div class="drawer-footer">
+            <button class="btn-primary w-full" (click)="showFilterDrawer = false; applyFiltersAndReload();">Apply Filters</button>
+          </div>
         </app-filter-drawer>
 
         <!-- Searchable Selection Modals -->
         <app-multi-select-modal *ngIf="activeModal === 'user'" [title]="'Select Counselor / User'"
-            [placeholder]="'Search counselor by name, email, or phone...'" [items]="modalItems"
+            [placeholder]="'Search counselor by name...'" [items]="modalItems"
             [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
             [totalPages]="modalTotalPages" [selectedItems]="getSelectedUsers()" [displayField]="'fullName'"
             [subtitleField]="'email'" [tagField]="'mobile'" (search)="onModalSearch($event)"
@@ -733,7 +532,7 @@
             (close)="onModalClose()"></app-multi-select-modal>
 
         <app-multi-select-modal *ngIf="activeModal === 'consultancy'" [title]="'Select Consultancy'"
-            [placeholder]="'Search consultancy by name or firm name...'" [items]="modalItems"
+            [placeholder]="'Search consultancy by name...'" [items]="modalItems"
             [loading]="modalLoading" [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage"
             [totalPages]="modalTotalPages" [selectedItems]="getSelectedConsultancies()" [displayField]="'name'"
             [subtitleField]="'firmName'" [tagField]="'city'" (search)="onModalSearch($event)"
@@ -741,7 +540,7 @@
             (close)="onModalClose()"></app-multi-select-modal>
 
         <app-multi-select-modal *ngIf="activeModal === 'course'" [title]="'Select Course'"
-            [placeholder]="'Search course by name or code...'" [items]="modalItems" [loading]="modalLoading"
+            [placeholder]="'Search course by name...'" [items]="modalItems" [loading]="modalLoading"
             [totalElements]="modalTotalElements" [currentPage]="modalCurrentPage" [totalPages]="modalTotalPages"
             [selectedItems]="getSelectedCourses()" [displayField]="'name'" [subtitleField]="'duration'"
             [tagField]="'courseType'" (search)="onModalSearch($event)" (pageChange)="onModalPageChange($event)"
