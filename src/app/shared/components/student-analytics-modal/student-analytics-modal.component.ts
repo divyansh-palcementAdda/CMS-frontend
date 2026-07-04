@@ -6,7 +6,6 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AdmissionService } from '../../../core/services/admission.service';
 import { LeadSourceService } from '../../../core/services/lead-source.service';
-import { CourseService } from '../../../core/services/course.service';
 
 @Component({
   selector: 'app-student-analytics-modal',
@@ -81,7 +80,6 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
   constructor(
     private admissionService: AdmissionService,
     private leadSourceService: LeadSourceService,
-    private courseService: CourseService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -373,6 +371,16 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
     this.exportError = '';
     this.exportSuccess = false;
 
+    // Map internal tab IDs → API tab values
+    const tabApiMap: Record<string, string> = {
+      ALL_APPLICATIONS: 'applications',
+      TOTAL_ADMISSIONS: 'admissions',
+      CANCELLED_APP:    'cancelled_applications',
+      CANCELLED_ADM:    'cancelled_admissions',
+      REMAINING_APP:    'remaining_applications'
+    };
+    const apiTab = tabApiMap[this.activeTab] ?? 'applications';
+
     // Resolve fees status to boolean parameter
     let fiftyPercentFeesPaid: boolean | undefined = undefined;
     if (this.feesStatus === 'PAID') {
@@ -381,48 +389,46 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
       fiftyPercentFeesPaid = false;
     }
 
-    // Debug: log active state snapshot at export time
-    console.log('[EXPORT] Active state snapshot:', {
-      activeTab: this.activeTab,
-      courseId: this.courseId,
-      userId: this.userId,
-      search: this.searchQuery,
-      session: this.session,
-      feesStatus: this.feesStatus,
-      fiftyPercentFeesPaid,
-      reportedStatus: this.reportedStatus,
-      sourceType: this.sourceType,
-      leadSourceId: this.leadSourceId,
-      startDate: this.startDate,
-      endDate: this.endDate,
-      sortColumn: this.sortColumn,
-      sortDirection: this.sortDirection
-    });
-
-    this.courseService.exportCourseUserBreakdownExcel(
-      this.courseId,
-      this.userId,
-      this.activeTab,
-      this.searchQuery.trim() || undefined,
-      this.session || undefined,
-      fiftyPercentFeesPaid,
-      this.startDate || undefined,
-      this.endDate || undefined,
-      this.leadSourceId || undefined,
-      this.reportedStatus !== 'ALL' ? this.reportedStatus : undefined,
-      this.sourceType || undefined,
-      this.sortColumn,
-      this.sortDirection,
-      this.appStartDate || undefined,
-      this.appEndDate || undefined
+    this.admissionService.exportStudents(
+      apiTab,                                                          // tab
+      undefined,                                                       // statusFilter
+      this.sourceType || undefined,                                    // source
+      undefined,                                                       // isScholar
+      undefined,                                                       // statFilter
+      this.state || undefined,                                         // state
+      this.city || undefined,                                          // city
+      this.session || undefined,                                       // session
+      undefined,                                                       // commissionStatus
+      fiftyPercentFeesPaid,                                            // fiftyPercentFeesPaid
+      this.startDate || undefined,                                     // startDate ← from filter
+      this.endDate || undefined,                                       // endDate   ← from filter
+      this.leadSourceId || this.inputLeadSourceId || undefined,        // leadSourceId
+      this.searchQuery.trim() || undefined,                            // search
+      undefined,                                                       // isDiscounted
+      this.consultancyId ? Number(this.consultancyId) : undefined,     // consultancyId
+      undefined,                                                       // userId (single)
+      undefined,                                                       // states
+      undefined,                                                       // cities
+      undefined,                                                       // courseTypes
+      undefined,                                                       // sessions
+      undefined,                                                       // admissionTypes
+      undefined,                                                       // leadSources
+      this.userId ? [Number(this.userId)] : undefined,                 // userIds ← key param
+      undefined,                                                       // consultancyIds
+      this.courseId ? [Number(this.courseId)] : undefined,             // courseIds
+      undefined,                                                       // duplicateOnly
+      true,                                                            // excludeDuplicate = true
+      undefined,                                                       // includeDuplicate
+      this.appStartDate || undefined,                                  // appStartDate ← from card filter
+      this.appEndDate || undefined                                     // appEndDate   ← from card filter
     ).subscribe({
       next: (blob: Blob) => {
         const tabLabels: Record<string, string> = {
           ALL_APPLICATIONS: 'All_Applications',
           TOTAL_ADMISSIONS: 'Admissions',
-          CANCELLED_APP: 'Cancelled_Applications',
-          CANCELLED_ADM: 'Cancelled_Admissions',
-          REMAINING_APP: 'Remaining_Applications'
+          CANCELLED_APP:    'Cancelled_Applications',
+          CANCELLED_ADM:    'Cancelled_Admissions',
+          REMAINING_APP:    'Remaining_Applications'
         };
         const tabLabel = tabLabels[this.activeTab] || this.activeTab;
         const safeUserName = (this.counselorName || 'Counselor').replace(/\s+/g, '_');
@@ -440,7 +446,6 @@ export class StudentAnalyticsModalComponent implements OnInit, OnDestroy {
 
         this.exporting = false;
         this.exportSuccess = true;
-        // Auto-hide success badge after 4s
         if (this.exportSuccessTimer) clearTimeout(this.exportSuccessTimer);
         this.exportSuccessTimer = setTimeout(() => { this.exportSuccess = false; }, 4000);
       },

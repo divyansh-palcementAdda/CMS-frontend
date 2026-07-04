@@ -258,7 +258,9 @@ export class AdmissionService {
     courseIds?: number[],
     duplicateOnly?: boolean,
     excludeDuplicate?: boolean,
-    includeDuplicate?: boolean
+    includeDuplicate?: boolean,
+    appStartDate?: string,
+    appEndDate?: string
   ): Observable<Blob> {
     let params = new HttpParams();
     if (tab) params = params.set('tab', tab);
@@ -292,6 +294,8 @@ export class AdmissionService {
     if (duplicateOnly !== undefined && duplicateOnly !== null) params = params.set('duplicateOnly', duplicateOnly.toString());
     if (excludeDuplicate !== undefined && excludeDuplicate !== null) params = params.set('excludeDuplicate', excludeDuplicate.toString());
     if (includeDuplicate !== undefined && includeDuplicate !== null) params = params.set('includeDuplicate', includeDuplicate.toString());
+    if (appStartDate) params = params.set('appStartDate', appStartDate);
+    if (appEndDate) params = params.set('appEndDate', appEndDate);
 
     return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
   }
