@@ -206,6 +206,17 @@
   }
 }
 
+// ===== FIX: search-box height stretch on tablet =====
+@media (max-width: 768px) {
+  .table-controls {
+    .search-box {
+      flex: none;
+      height: 40px;
+      align-items: center;
+    }
+  }
+}
+
 // ===== RESPONSIVE — BREAKDOWN CARDS =====
 @media (max-width: 768px) {
   .section-card {
