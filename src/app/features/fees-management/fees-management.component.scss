@@ -140,6 +140,7 @@
 /* Quick Search & Filters Bar */
 .quick-actions-bar {
   display: flex;
+  flex-direction: row-reverse;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
