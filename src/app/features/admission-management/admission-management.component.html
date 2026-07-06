@@ -20,25 +20,26 @@
                 <ng-container *ngIf="pageData">
                     <div class="header-section">
                         <div class="title-container">
-                            <div class="back-btn" (click)="goBack()">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="12" cy="12" r="12" fill="#6366F1" />
-                                    <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 class="page-title">Admission Management</h2>
-                                <div class="tab-switcher">
-                                    <button class="tab-btn" [class.tab-active]="filters.tab === ''"
-                                        (click)="setTab('')">All
-                                        Records</button>
-                                    <button class="tab-btn" [class.tab-active]="filters.tab === 'Admission'"
-                                        (click)="setTab('Admission')">Admissions</button>
-                                    <button class="tab-btn" [class.tab-active]="filters.tab === 'applications'"
-                                        (click)="setTab('applications')">Applications</button>
+                                <!-- Top row: back btn + title -->
+                            <div class="title-top-row">
+                                <div class="back-btn" (click)="goBack()">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="12" fill="#6366F1" />
+                                        <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
                                 </div>
+                                <h2 class="page-title">Admission Management</h2>
+                            </div>
+                            <!-- Bottom row: tab switcher -->
+                            <div class="tab-switcher">
+                                <button class="tab-btn" [class.tab-active]="filters.tab === ''"
+                                    (click)="setTab('')">All Records</button>
+                                <button class="tab-btn" [class.tab-active]="filters.tab === 'Admission'"
+                                    (click)="setTab('Admission')">Admissions</button>
+                                <button class="tab-btn" [class.tab-active]="filters.tab === 'applications'"
+                                    (click)="setTab('applications')">Applications</button>
                             </div>
                         </div>
                         <!-- /.title-container -->
