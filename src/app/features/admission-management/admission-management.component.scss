@@ -2749,10 +2749,32 @@ tr.duplicate-row {
 // ── 480px and below: compact header buttons ───────────────────────────────────
 @media (max-width: 480px) {
   .admission-page-wrapper {
+    padding: 16px 12px;
+
     .header-section {
       flex-direction: column;
       align-items: flex-start;
       gap: 12px;
+
+      .title-container {
+        width: 100%;
+        gap: 10px;
+        flex-direction: column;   // back btn on top, title+tabs full width below
+        align-items: flex-start;
+
+        .back-btn {
+          flex-shrink: 0;
+        }
+
+        > div {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .page-title {
+          font-size: 20px;
+        }
+      }
 
       .header-actions {
         display: flex;
@@ -2760,7 +2782,6 @@ tr.duplicate-row {
         gap: 8px;
         width: 100%;
 
-        // Bulk Import button
         .btn-secondary {
           flex: 1 1 auto;
           justify-content: center;
@@ -2772,7 +2793,6 @@ tr.duplicate-row {
           span { white-space: nowrap; }
         }
 
-        // Download Excel button
         .btn-excel {
           flex: 1 1 auto;
           justify-content: center;
@@ -2784,7 +2804,6 @@ tr.duplicate-row {
           span { white-space: nowrap; }
         }
 
-        // Add New Application button
         .btn-primary {
           flex: 1 1 100%;
           justify-content: center;
@@ -2795,25 +2814,43 @@ tr.duplicate-row {
           span { white-space: nowrap; }
         }
 
-        // Hide active filter badge text on tiny screens
         .active-filter-badge {
           font-size: 11px;
           padding: 4px 8px;
         }
       }
     }
+
+    // Tab switcher — full width, no cut
+    .tab-switcher {
+      display: flex;
+      gap: 2px;
+      padding: 3px;
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .tab-btn {
+      flex: 1;                  // each tab takes equal width
+      padding: 7px 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      text-align: center;
+    }
   }
 }
 
-// ── 320px: ultra compact ──────────────────────────────────────────────────────
+// ── 360px and below: ultra compact ────────────────────────────────────────────
 @media (max-width: 360px) {
   .admission-page-wrapper {
-    padding: 10px;
+    padding: 10px 8px;
 
     .header-section {
+      gap: 10px;
+
       .title-container {
         .page-title {
-          font-size: 20px;
+          font-size: 18px;
         }
       }
 
@@ -2835,6 +2872,11 @@ tr.duplicate-row {
           svg { width: 15px; height: 15px; }
         }
       }
+    }
+
+    .tab-btn {
+      padding: 6px 6px;
+      font-size: 11px;
     }
   }
 }

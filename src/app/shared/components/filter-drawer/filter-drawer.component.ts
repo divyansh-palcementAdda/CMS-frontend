@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -145,17 +145,46 @@ import { CommonModule } from '@angular/common';
       transform: translateY(-1px);
       box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
     }
-    @media (max-width: 480px) {
+    @media (max-width: 768px) {
       .filter-drawer {
         width: 100%;
         right: -100%;
+        height: 100vh;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+      .drawer-footer {
+        padding: 16px;
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+        flex-shrink: 0;
+        background: white;
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+      }
+      .drawer-content {
+        flex: 1;
+        overflow-y: auto;
+        /* Ensure content doesn't get clipped behind footer */
+        padding-bottom: 8px;
       }
     }
   `]
 })
-export class FilterDrawerComponent {
+export class FilterDrawerComponent implements OnChanges {
   @Input() isOpen = false;
   @Output() close = new EventEmitter<void>();
   @Output() apply = new EventEmitter<void>();
   @Output() clear = new EventEmitter<void>();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen']) {
+      if (this.isOpen) {
+        document.body.classList.add('filter-drawer-open');
+      } else {
+        document.body.classList.remove('filter-drawer-open');
+      }
+    }
+  }
 }

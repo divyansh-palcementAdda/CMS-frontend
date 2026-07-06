@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnDestroy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -48,7 +48,7 @@ export interface NavItem {
     </aside>
 
     <!-- Mobile Floating Bottom Navigation Dock -->
-    <div class="mobile-bottom-bar">
+    <div class="mobile-bottom-bar" *ngIf="!filterDrawerOpen()">
       <div class="bottom-bar-container">
         <a *ngFor="let item of bottomBarItems"
            [routerLink]="item.path"
@@ -150,10 +150,12 @@ export interface NavItem {
   `,
   styleUrl: './sidebar.component.scss'
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnDestroy {
   collapsed = signal(false);
   searchQuery = '';
   moreSheetOpen = false;
+  filterDrawerOpen = signal(false);
+  private mutationObserver: MutationObserver | null = null;
   private sanitizer = inject(DomSanitizer);
 
   navItems: NavItem[] = [
@@ -174,7 +176,16 @@ export class SidebarComponent {
     { label: 'My Profile', icon: this.sanitizer.bypassSecurityTrustHtml(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`), path: '/admin/profile' },
   ];
 
-  constructor(private auth: AuthService) { }
+  constructor(private auth: AuthService) {
+    this.mutationObserver = new MutationObserver(() => {
+      this.filterDrawerOpen.set(document.body.classList.contains('filter-drawer-open'));
+    });
+    this.mutationObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  ngOnDestroy(): void {
+    this.mutationObserver?.disconnect();
+  }
 
   toggleCollapse(): void { 
     this.collapsed.update(v => !v); 
