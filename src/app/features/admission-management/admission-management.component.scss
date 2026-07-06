@@ -24,22 +24,37 @@ $text-light: #64748B;
 
     .title-container {
       display: flex;
+      flex-direction: column;   // col: top-row then tab-switcher below
       align-items: flex-start;
-      gap: 16px;
+      gap: 12px;
 
-      .back-btn {
-        cursor: pointer;
+      // Row 1: back btn + title side by side
+      .title-top-row {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        justify-content: center;
-        margin-top: 4px;
+        gap: 12px;
+
+        .back-btn {
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .page-title {
+          font-size: 24px;
+          font-weight: 700;
+          margin: 0;
+          color: $text-dark;
+          line-height: 1.2;
+        }
       }
 
-      .page-title {
-        font-size: 24px;
-        font-weight: 700;
-        margin: 0 0 10px 0;
-        color: $text-dark;
+      // Row 2: tab switcher sits below the title row
+      .tab-switcher {
+        // inherits global .tab-switcher styles
       }
     }
   }
@@ -2746,7 +2761,7 @@ tr.duplicate-row {
 }
 
 
-// ── 480px and below: compact header buttons ───────────────────────────────────
+// ── 480px and below ───────────────────────────────────────────────────────────
 @media (max-width: 480px) {
   .admission-page-wrapper {
     padding: 16px 12px;
@@ -2759,20 +2774,20 @@ tr.duplicate-row {
       .title-container {
         width: 100%;
         gap: 10px;
-        flex-direction: column;   // back btn on top, title+tabs full width below
-        align-items: flex-start;
 
-        .back-btn {
-          flex-shrink: 0;
+        // Row 1: back btn + title inline
+        .title-top-row {
+          gap: 10px;
+
+          .page-title {
+            font-size: 20px;
+          }
         }
 
-        > div {
+        // Row 2: tab switcher full width
+        .tab-switcher {
           width: 100%;
-          min-width: 0;
-        }
-
-        .page-title {
-          font-size: 20px;
+          box-sizing: border-box;
         }
       }
 
@@ -2782,6 +2797,12 @@ tr.duplicate-row {
         gap: 8px;
         width: 100%;
 
+        .active-filter-badge {
+          font-size: 11px;
+          padding: 4px 8px;
+          width: 100%;
+        }
+
         .btn-secondary {
           flex: 1 1 auto;
           justify-content: center;
@@ -2789,7 +2810,6 @@ tr.duplicate-row {
           font-size: 12px !important;
           border-radius: 10px !important;
           min-width: 0;
-
           span { white-space: nowrap; }
         }
 
@@ -2800,7 +2820,6 @@ tr.duplicate-row {
           font-size: 12px;
           border-radius: 10px;
           min-width: 0;
-
           span { white-space: nowrap; }
         }
 
@@ -2810,37 +2829,31 @@ tr.duplicate-row {
           padding: 10px 12px;
           font-size: 13px;
           border-radius: 10px;
-
           span { white-space: nowrap; }
-        }
-
-        .active-filter-badge {
-          font-size: 11px;
-          padding: 4px 8px;
         }
       }
     }
 
-    // Tab switcher — full width, no cut
     .tab-switcher {
-      display: flex;
       gap: 2px;
       padding: 3px;
-      width: 100%;
       border-radius: 10px;
+      overflow: hidden;
     }
 
     .tab-btn {
-      flex: 1;                  // each tab takes equal width
-      padding: 7px 8px;
+      flex: 1;
+      padding: 7px 4px;
       font-size: 12px;
       white-space: nowrap;
       text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
 
-// ── 360px and below: ultra compact ────────────────────────────────────────────
+// ── 360px and below ────────────────────────────────────────────────────────────
 @media (max-width: 360px) {
   .admission-page-wrapper {
     padding: 10px 8px;
@@ -2849,8 +2862,19 @@ tr.duplicate-row {
       gap: 10px;
 
       .title-container {
-        .page-title {
-          font-size: 18px;
+        gap: 8px;
+
+        .title-top-row {
+          gap: 8px;
+
+          .back-btn svg {
+            width: 20px;
+            height: 20px;
+          }
+
+          .page-title {
+            font-size: 17px;
+          }
         }
       }
 
@@ -2861,22 +2885,71 @@ tr.duplicate-row {
         .btn-excel {
           padding: 8px 10px !important;
           font-size: 11px !important;
-
           svg { width: 15px; height: 15px; }
         }
 
         .btn-primary {
           padding: 9px 10px;
           font-size: 12px;
-
           svg { width: 15px; height: 15px; }
         }
       }
     }
 
     .tab-btn {
-      padding: 6px 6px;
+      padding: 6px 3px;
       font-size: 11px;
+    }
+  }
+}
+
+// ── 320px and below ────────────────────────────────────────────────────────────
+@media (max-width: 320px) {
+  .admission-page-wrapper {
+    padding: 8px 8px;
+
+    .header-section {
+      gap: 8px;
+
+      .title-container {
+        gap: 8px;
+
+        .title-top-row {
+          gap: 6px;
+
+          .back-btn svg {
+            width: 20px;
+            height: 20px;
+          }
+
+          .page-title {
+            font-size: 15px;
+            line-height: 1.25;
+          }
+        }
+      }
+
+      .header-actions {
+        gap: 5px;
+
+        .btn-secondary,
+        .btn-excel {
+          padding: 7px 8px !important;
+          font-size: 11px !important;
+          svg { width: 14px; height: 14px; }
+        }
+
+        .btn-primary {
+          padding: 8px 8px;
+          font-size: 11px;
+          svg { width: 14px; height: 14px; }
+        }
+      }
+    }
+
+    .tab-btn {
+      padding: 5px 2px;
+      font-size: 10px;
     }
   }
 }
