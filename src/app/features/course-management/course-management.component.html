@@ -250,6 +250,15 @@
                           [ngClass]="sortBy === 'forms7days' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
+
+                      <th class="sortable" (click)="toggleSort('fees7days')" style="cursor: pointer;">
+                      Fees (7 Days)
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'fees7days' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+
                     <th class="sortable" (click)="toggleSort('forms30days')" style="cursor: pointer;">
                       Forms (30 Days)
                       <span class="sort-icon" style="margin-left: 4px;">
@@ -257,13 +266,7 @@
                           [ngClass]="sortBy === 'forms30days' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
-                    <th class="sortable" (click)="toggleSort('fees7days')" style="cursor: pointer;">
-                      Fees (7 Days)
-                      <span class="sort-icon" style="margin-left: 4px;">
-                        <i class="fas"
-                          [ngClass]="sortBy === 'fees7days' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
-                      </span>
-                    </th>
+                   
                     <th class="sortable" (click)="toggleSort('fees30days')" style="cursor: pointer;">
                       Fees (30 Days)
                       <span class="sort-icon" style="margin-left: 4px;">
@@ -311,12 +314,13 @@
                     <td class="text-center">
                       <span class="kpi-badge font-bold">{{ item.formsLast7Days || 0 }}</span>
                     </td>
+                     <td class="text-center">
+                      <span class="kpi-badge font-bold">{{ item.feesLast7Days || 0 }}</span>
+                    </td>
                     <td class="text-center">
                       <span class="kpi-badge font-bold">{{ item.formsLast30Days || 0 }}</span>
                     </td>
-                    <td class="text-center">
-                      <span class="kpi-badge font-bold">{{ item.feesLast7Days || 0 }}</span>
-                    </td>
+                   
                     <td class="text-center">
                       <span class="kpi-badge font-bold">{{ item.feesLast30Days || 0 }}</span>
                     </td>

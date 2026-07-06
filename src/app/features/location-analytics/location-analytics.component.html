@@ -206,42 +206,8 @@
               </div>
             </div>
 
-            <!-- Table 2: Top 5 Cities by Admissions -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Top 5 Cities by Admissions</h3>
-                <a routerLink="/location-analytics/cities" class="view-all-link">View All Cities ({{ totalCitiesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 80px;">City</th>
-                      <th style="min-width: 80px;">State</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Remaining</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topCitiesByAdms; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
-                      <td class="text-light">{{ item.state }}</td>
-                      <td class="text-center">{{ item.totalApplications }}</td>
-                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topCitiesByAdms.length === 0">
-                      <td colspan="6" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
 
-            <!-- Table 3: Top 5 States by Applications -->
+                <!-- Table 3: Top 5 States by Applications -->
             <div class="table-card stat-card table-only">
               <div class="table-header">
                 <h3 class="table-title">Top 5 States by Applications</h3>
@@ -274,40 +240,8 @@
               </div>
             </div>
 
-            <!-- Table 4: Top 5 States by Admissions -->
-            <div class="table-card stat-card table-only">
-              <div class="table-header">
-                <h3 class="table-title">Top 5 States by Admissions</h3>
-                <a routerLink="/location-analytics/states" class="view-all-link">View All States ({{ totalStatesCount }}) &rarr;</a>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th class="text-center hide-xs" style="width: 44px;">#</th>
-                      <th style="min-width: 100px;">State</th>
-                      <th class="text-center" style="min-width: 68px;">Apps</th>
-                      <th class="text-center" style="min-width: 68px;">Adms</th>
-                      <th class="text-center" style="min-width: 68px;">Remaining</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of topStatesByAdms; let i = index">
-                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
-                      <td class="font-medium text-dark">{{ item.state }}</td>
-                      <td class="text-center">{{ item.totalApplications }}</td>
-                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
-                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
-                    </tr>
-                    <tr *ngIf="topStatesByAdms.length === 0">
-                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
 
-            <!-- Table 5: Top Genders by Applications -->
+              <!-- Table 5: Top Genders by Applications -->
             <div class="table-card stat-card table-only">
               <div class="table-header">
                 <h3 class="table-title">Genders by Applications</h3>
@@ -373,6 +307,78 @@
               </div>
             </div>
 
+
+            <!-- Table 2: Top 5 Cities by Admissions -->
+            <div class="table-card stat-card table-only">
+              <div class="table-header">
+                <h3 class="table-title">Top 5 Cities by Admissions</h3>
+                <a routerLink="/location-analytics/cities" class="view-all-link">View All Cities ({{ totalCitiesCount }}) &rarr;</a>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="text-center hide-xs" style="width: 44px;">#</th>
+                      <th style="min-width: 80px;">City</th>
+                      <th style="min-width: 80px;">State</th>
+                      <th class="text-center" style="min-width: 68px;">Apps</th>
+                      <th class="text-center" style="min-width: 68px;">Adms</th>
+                      <th class="text-center" style="min-width: 68px;">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of topCitiesByAdms; let i = index">
+                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
+                      <td class="font-medium text-dark">{{ item.city || 'N/A' }}</td>
+                      <td class="text-light">{{ item.state }}</td>
+                      <td class="text-center">{{ item.totalApplications }}</td>
+                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    </tr>
+                    <tr *ngIf="topCitiesByAdms.length === 0">
+                      <td colspan="6" class="text-center py-4 text-gray-500">No data found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+        
+
+            <!-- Table 4: Top 5 States by Admissions -->
+            <div class="table-card stat-card table-only">
+              <div class="table-header">
+                <h3 class="table-title">Top 5 States by Admissions</h3>
+                <a routerLink="/location-analytics/states" class="view-all-link">View All States ({{ totalStatesCount }}) &rarr;</a>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="text-center hide-xs" style="width: 44px;">#</th>
+                      <th style="min-width: 100px;">State</th>
+                      <th class="text-center" style="min-width: 68px;">Apps</th>
+                      <th class="text-center" style="min-width: 68px;">Adms</th>
+                      <th class="text-center" style="min-width: 68px;">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of topStatesByAdms; let i = index">
+                      <td class="text-center text-bold hide-xs">{{ i + 1 }}</td>
+                      <td class="font-medium text-dark">{{ item.state }}</td>
+                      <td class="text-center">{{ item.totalApplications }}</td>
+                      <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                      <td class="text-center" style="color: #6366F1; font-weight: 600;">{{ item.remainingApplications }}</td>
+                    </tr>
+                    <tr *ngIf="topStatesByAdms.length === 0">
+                      <td colspan="5" class="text-center py-4 text-gray-500">No data found</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          
           </div>
         </ng-container>
 
