@@ -13,24 +13,27 @@
 .page-subtitle { font-size: 14px; color: #64748b; }
 
 .btn-primary {
-  background: #6366f1;
+  background: linear-gradient(135deg, #af71ff, #435fff);
   color: white;
   padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(175, 113, 255, 0.2);
 }
-.btn-primary:hover { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(175, 113, 255, 0.3); opacity: 0.9; }
 
 .table-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.04);
   border: 1px solid #e2e8f0;
   overflow: hidden;
 }
@@ -94,13 +97,13 @@
   width: 100%;
   border-collapse: collapse;
   th {
-    background: #ffffff;
+    background: #435FFF;
     padding: 12px 24px;
     text-align: left;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    color: #64748b;
+    color: white;
     letter-spacing: 0.05em;
   }
   td {
@@ -110,6 +113,7 @@
     color: #334155;
   }
   tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f8fafc; }
 }
 
 .source-info {
@@ -136,23 +140,38 @@
 }
 
 .action-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1.5px solid transparent;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
   color: #64748b;
-  &:hover { transform: translateY(-1px); }
+  &:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
 }
 
-.edit-btn:hover { color: #6366f1; border-color: #6366f1; background: #eef2ff; }
-.status-btn:hover { color: #10b981; border-color: #10b981; background: #ecfdf5; }
-.delete-btn:hover { color: #ef4444; border-color: #ef4444; background: #fef2f2; }
+.edit-btn {
+  color: #8b5cf6;
+  background: #f5f3ff;
+  border-color: #ede9fe;
+  &:hover { background: #ede9fe; }
+}
+.status-btn {
+  color: #10b981;
+  background: #ecfdf5;
+  border-color: #d1fae5;
+  &:hover { background: #d1fae5; }
+}
+.delete-btn {
+  color: #ef4444;
+  background: #fef2f2;
+  border-color: #fecaca;
+  &:hover { background: #fee2e2; }
+}
 
 .text-right { text-align: right; }
 .empty-state, .loading-state { padding: 48px; text-align: center; color: #64748b; font-style: italic; }

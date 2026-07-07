@@ -145,7 +145,8 @@
       </div>
 
       <!-- Table View -->
-      <div class="table-container glassmorphic">
+      <div class="table-container">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
         <table class="data-table">
           <thead>
             <tr>
@@ -204,10 +205,10 @@
             </tr>
           </tbody>
         </table>
+        </div><!-- end scroll wrapper -->
 
         <!-- Enterprise Pagination Footer -->
-        <div class="pagination-footer" *ngIf="totalPages > 0">
-          <!-- Entries info + page size selector -->
+        <div class="pagination-footer" *ngIf="totalPages > 0">          <!-- Entries info + page size selector -->
           <div class="pagination-meta">
             <span class="entries-info">
               Showing
