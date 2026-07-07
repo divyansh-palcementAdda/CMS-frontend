@@ -54,7 +54,7 @@ interface ActivityVm {
 
     <!-- Activity Details Modal -->
     <div class="activity-modal-backdrop" *ngIf="selectedActivity" (click)="closeModal()">
-      <div class="activity-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" [attr.aria-label]="selectedActivity?.title">
+      <div class="activity-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" [attr.aria-label]="selectedActivity.title">
         <!-- Modal Header -->
         <div class="modal-header">
           <div class="modal-header-left">
@@ -143,7 +143,7 @@ export class ActivityFeedComponent implements OnInit, OnDestroy {
       }
 
       const rawDesc = String(a?.desc ?? a?.description ?? '');
-      
+
       // Parse description and metadata
       const parts = rawDesc.split(/--- Metadata ---/i);
       const cleanDesc = parts[0].trim();

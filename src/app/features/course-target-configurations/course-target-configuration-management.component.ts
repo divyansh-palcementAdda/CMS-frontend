@@ -23,7 +23,6 @@ import { ConfirmationModalComponent } from '../../shared/components/confirmation
     CommonModule,
     NgIf,
     NgFor,
-    NgClass,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,

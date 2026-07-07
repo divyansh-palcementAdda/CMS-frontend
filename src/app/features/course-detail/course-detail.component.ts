@@ -799,7 +799,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   onRecentFormsClick(days: number): void {
     const today = new Date();
     const startDate = new Date();
-    startDate.setDate(today.getDate() - (days - 1));
+    startDate.setDate(today.getDate() - days);
+    const endDate = new Date();
+    endDate.setDate(today.getDate() - 1);
 
     const formatDate = (date: Date) => {
       const y = date.getFullYear();
@@ -817,7 +819,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         modalInitialTab: 'ALL_APPLICATIONS',
         modalTab: 'ALL_APPLICATIONS',
         modalAppStartDate: formatDate(startDate),
-        modalAppEndDate: formatDate(today)
+        modalAppEndDate: formatDate(endDate)
       },
       queryParamsHandling: 'merge'
     });
@@ -826,7 +828,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   onRecentAdmissionsClick(days: number): void {
     const today = new Date();
     const startDate = new Date();
-    startDate.setDate(today.getDate() - (days - 1));
+    startDate.setDate(today.getDate() - days);
+    const endDate = new Date();
+    endDate.setDate(today.getDate() - 1);
 
     const formatDate = (date: Date) => {
       const y = date.getFullYear();
@@ -844,7 +848,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         modalInitialTab: 'TOTAL_ADMISSIONS',
         modalTab: 'TOTAL_ADMISSIONS',
         modalStartDate: formatDate(startDate),
-        modalEndDate: formatDate(today)
+        modalEndDate: formatDate(endDate)
       },
       queryParamsHandling: 'merge'
     });
