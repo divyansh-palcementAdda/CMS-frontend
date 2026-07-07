@@ -1236,7 +1236,14 @@
                                         <tr *ngFor="let d of paginatedData">
                                             <td>
                                                 <div class="program-info">
-                                                    <span class="p-name">{{d.courseName}}</span>
+                                                    <span class="p-name" [title]="d.mappedCourseNames ? d.mappedCourseNames.join('\n') : d.courseName" style="cursor: help; text-decoration: underline dotted #6366f1;">
+                                                        <ng-container *ngIf="d.mappedCourseNames && d.mappedCourseNames.length > 1">
+                                                            {{ d.mappedCourseNames[0] }} &amp; {{ d.mappedCourseNames.length - 1 }} more
+                                                        </ng-container>
+                                                        <ng-container *ngIf="!d.mappedCourseNames || d.mappedCourseNames.length <= 1">
+                                                            {{ d.courseName }}
+                                                        </ng-container>
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>

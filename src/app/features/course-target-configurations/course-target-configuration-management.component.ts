@@ -15,6 +15,7 @@ import {
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { MultiSelectModalComponent } from '../../shared/components/multi-select-modal/multi-select-modal.component';
 
 @Component({
   selector: 'app-course-target-configuration-management',
@@ -28,7 +29,8 @@ import { ConfirmationModalComponent } from '../../shared/components/confirmation
     RouterModule,
     SidebarComponent,
     TopbarComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    MultiSelectModalComponent
   ],
   templateUrl: './course-target-configuration-management.component.html',
   styleUrls: ['./course-target-configuration-management.component.scss']
@@ -55,6 +57,17 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
   coursesList: any[] = [];
   intervals = ['DAY', 'WEEK', 'MONTH'];
 
+  // Multi course select properties
+  selectedCourses: any[] = [];
+  activeModal: 'course' | null = null;
+  modalItems: any[] = [];
+  modalLoading = false;
+  modalTotalElements = 0;
+  modalCurrentPage = 1;
+  modalTotalPages = 1;
+  modalPageSize = 10;
+  modalSearchText = '';
+
   constructor(
     private targetService: CourseTargetConfigurationService,
     private courseService: CourseService,
@@ -63,7 +76,8 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
     private router: Router
   ) {
     this.configForm = this.fb.group({
-      courseId: [null, Validators.required],
+      courseId: [null],
+      courseIds: [[], [Validators.required, Validators.minLength(1)]],
       formTargetCount: [0, [Validators.required, Validators.min(0)]],
       formTargetInterval: ['MONTH', Validators.required],
       formTargetIntervalValue: [1, [Validators.required, Validators.min(1)]],
@@ -85,7 +99,6 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
-          // Filter to only active courses
           this.coursesList = data.filter((c: any) => c.active !== false);
         },
         error: (err) => {
@@ -112,11 +125,73 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
       });
   }
 
+  // MultiSelect Modal Hooks
+  openCourseModal() {
+    this.activeModal = 'course';
+    this.modalCurrentPage = 1;
+    this.modalSearchText = '';
+    this.loadModalData();
+  }
+
+  loadModalData() {
+    this.modalLoading = true;
+    this.courseService.getCoursesPaged(
+      this.modalCurrentPage - 1,
+      this.modalPageSize,
+      this.modalSearchText,
+      true
+    ).subscribe({
+      next: (res: any) => {
+        this.modalItems = res.content || [];
+        this.modalTotalElements = res.totalElements || 0;
+        this.modalTotalPages = res.totalPages || 0;
+        this.modalLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading course modal data', err);
+        this.modalLoading = false;
+      }
+    });
+  }
+
+  onModalSearch(term: string) {
+    this.modalSearchText = term;
+    this.modalCurrentPage = 1;
+    this.loadModalData();
+  }
+
+  onModalPageChange(page: number) {
+    this.modalCurrentPage = page;
+    this.loadModalData();
+  }
+
+  onModalSelect(items: any[]) {
+    if (!items) {
+      this.activeModal = null;
+      return;
+    }
+    this.selectedCourses = [...items];
+    const ids = items.map(item => item.id);
+    this.configForm.get('courseIds')?.setValue(ids);
+    this.activeModal = null;
+  }
+
+  onModalClose() {
+    this.activeModal = null;
+  }
+
+  removeCourse(courseId: number) {
+    this.selectedCourses = this.selectedCourses.filter(c => c.id !== courseId);
+    this.configForm.get('courseIds')?.setValue(this.selectedCourses.map(c => c.id));
+  }
+
   openAddModal() {
     this.isEditing = false;
     this.editingId = null;
+    this.selectedCourses = [];
     this.configForm.reset({
       courseId: null,
+      courseIds: [],
       formTargetCount: 0,
       formTargetInterval: 'MONTH',
       formTargetIntervalValue: 1,
@@ -126,15 +201,16 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
       active: true,
       remarks: ''
     });
-    this.configForm.get('courseId')?.enable();
     this.showAddEditModal = true;
   }
 
   openEditModal(item: CourseTargetConfigurationItem) {
     this.isEditing = true;
     this.editingId = item.id;
+    this.selectedCourses = item.courses ? [...item.courses] : [];
     this.configForm.reset({
       courseId: item.courseId,
+      courseIds: item.courseIds || [],
       formTargetCount: item.formTargetCount,
       formTargetInterval: item.formTargetInterval,
       formTargetIntervalValue: item.formTargetIntervalValue,
@@ -144,8 +220,6 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
       active: item.status === 'Active',
       remarks: item.remarks
     });
-    // Disable course change during editing
-    this.configForm.get('courseId')?.disable();
     this.showAddEditModal = true;
   }
 
@@ -160,11 +234,11 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
     }
 
     this.isSubmitting = true;
-    // Extract raw value since courseId might be disabled
     const formValue = this.configForm.getRawValue();
 
     const payload: CourseTargetConfigurationRequest = {
-      courseId: formValue.courseId,
+      courseId: formValue.courseIds && formValue.courseIds.length > 0 ? formValue.courseIds[0] : null,
+      courseIds: formValue.courseIds,
       formTargetCount: formValue.formTargetCount,
       formTargetInterval: formValue.formTargetInterval,
       formTargetIntervalValue: formValue.formTargetIntervalValue,

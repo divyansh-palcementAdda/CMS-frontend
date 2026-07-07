@@ -1,7 +1,10 @@
 export interface CourseTargetConfigurationDTO {
   id?: number;
+  configurationId?: number;
   courseId?: number;
   courseName?: string;
+  courses?: { id: number; name: string }[];
+  courseIds?: number[];
   formTargetCount?: number;
   formTargetInterval?: string; // 'DAY' | 'WEEK' | 'MONTH'
   formTargetIntervalValue?: number;
@@ -14,10 +17,13 @@ export interface CourseTargetConfigurationDTO {
   updatedBy?: string;
   createdAt?: string;
   updatedAt?: string;
+  currentForms?: number;
+  currentFirstFees?: number;
 }
 
 export interface CourseTargetConfigurationRequest {
-  courseId: number;
+  courseId?: number | null;
+  courseIds: number[];
   formTargetCount: number;
   formTargetInterval: string;
   formTargetIntervalValue: number;
@@ -33,6 +39,8 @@ export interface CourseTargetConfigurationItem {
   sNo: number;
   courseId: number;
   courseName: string;
+  courses: { id: number; name: string }[];
+  courseIds: number[];
   formTargetCount: number;
   formTargetInterval: string;
   formTargetIntervalValue: number;
@@ -41,6 +49,17 @@ export interface CourseTargetConfigurationItem {
   feeTargetIntervalValue: number;
   status: 'Active' | 'Inactive';
   remarks?: string;
+  coursesCount: number;
+  currentForms: number;
+  currentFirstFees: number;
+  formAchievementPct: number;
+  feeAchievementPct: number;
+  achievementStatus: string;
+  statusColor: string;
+  overAchievedForms: number;
+  missedTargetForms: number;
+  overAchievedFees: number;
+  missedTargetFees: number;
 }
 
 export interface CourseTargetConfigurationStats {

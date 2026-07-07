@@ -28,19 +28,70 @@ export class CourseTargetConfigurationService {
           const isActive = item.active !== false;
           if (isActive) activeCount++;
 
+          const courses = item.courses || [];
+          const courseIds = item.courseIds || [];
+          const coursesCount = courses.length;
+
+          const currentForms = item.currentForms || 0;
+          const currentFirstFees = item.currentFirstFees || 0;
+
+          const formTarget = item.formTargetCount || 0;
+          const feeTarget = item.feeTargetCount || 0;
+
+          const formAchievementPct = formTarget > 0 ? (currentForms / formTarget) * 100 : 0;
+          const feeAchievementPct = feeTarget > 0 ? (currentFirstFees / feeTarget) * 100 : 0;
+
+          const overAchievedForms = currentForms > formTarget ? (currentForms - formTarget) : 0;
+          const missedTargetForms = currentForms < formTarget ? (formTarget - currentForms) : 0;
+
+          const overAchievedFees = currentFirstFees > feeTarget ? (currentFirstFees - feeTarget) : 0;
+          const missedTargetFees = currentFirstFees < feeTarget ? (feeTarget - currentFirstFees) : 0;
+
+          let achievementStatus = 'Target Achieved';
+          let statusColor = 'green';
+
+          if (currentForms < formTarget || currentFirstFees < feeTarget) {
+            achievementStatus = 'Behind Target';
+            statusColor = 'red';
+          } else if (currentForms > formTarget || currentFirstFees > feeTarget) {
+            achievementStatus = 'Exceeded Target';
+            statusColor = 'blue';
+          } else {
+            achievementStatus = 'Target Achieved';
+            statusColor = 'green';
+          }
+
+          let courseName = item.courseName || '';
+          if (courses.length > 0) {
+            courseName = courses.map(c => c.name).join(', ');
+          }
+
           return {
             id: item.id || 0,
             sNo: index + 1,
             courseId: item.courseId || 0,
-            courseName: item.courseName || 'Unknown Course',
-            formTargetCount: item.formTargetCount || 0,
+            courseName: courseName || 'Unknown Course',
+            courses,
+            courseIds,
+            formTargetCount: formTarget,
             formTargetInterval: item.formTargetInterval || 'MONTH',
             formTargetIntervalValue: item.formTargetIntervalValue || 1,
-            feeTargetCount: item.feeTargetCount || 0,
+            feeTargetCount: feeTarget,
             feeTargetInterval: item.feeTargetInterval || 'MONTH',
             feeTargetIntervalValue: item.feeTargetIntervalValue || 1,
             status: isActive ? 'Active' : 'Inactive',
-            remarks: item.remarks
+            remarks: item.remarks,
+            coursesCount,
+            currentForms,
+            currentFirstFees,
+            formAchievementPct,
+            feeAchievementPct,
+            achievementStatus,
+            statusColor,
+            overAchievedForms,
+            missedTargetForms,
+            overAchievedFees,
+            missedTargetFees
           };
         });
 
