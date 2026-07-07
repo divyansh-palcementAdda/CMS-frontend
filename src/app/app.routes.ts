@@ -121,6 +121,12 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' }
   },
   {
+    path: 'course-target-configurations',
+    loadComponent: () => import('./features/course-target-configurations/course-target-configuration-management.component').then(m => m.CourseTargetConfigurationManagementComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' }
+  },
+  {
     path: 'fees',
     loadComponent: () => import('./features/fees-management/fees-management.component').then(m => m.FeesManagementComponent),
     canActivate: [authGuard, roleGuard],

@@ -68,6 +68,23 @@ import { BulkUploadModalComponent } from '../../shared/components/bulk-upload-mo
               </div>
             </div>
 
+            <div class="master-card" routerLink="/course-target-configurations">
+              <div class="card-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </div>
+              <div class="card-info">
+                <h3>Course Target Master</h3>
+                <p>Configure form admission and first-fee targets for each course</p>
+              </div>
+              <div class="card-action">
+                <span class="btn-text">Manage Targets</span>
+              </div>
+            </div>
+
             <div class="master-card" (click)="showBulkUpload = true">
               <div class="card-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

@@ -651,6 +651,7 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     { id: 'COURSE_REVENUE', label: 'Revenue Analysis', icon: 'payments', desc: 'Fees collection vs pending dues', color: 'emerald' },
     { id: 'DAILY_SESSION_SUMMARY', label: 'Session Operational Report', icon: 'analytics', desc: 'Daily MIS & Session Summary', color: 'orange' },
     { id: 'SESSION_COMPARISON', label: 'Session Comparison', icon: 'compare_arrows', desc: 'Compare course performance between sessions', color: 'indigo' },
+    { id: 'COURSE_TARGET_ACHIEVEMENT', label: 'Target Achievement', icon: 'track_changes', desc: 'Course targets vs current achievements', color: 'indigo' },
     { id: 'COURSE_ANALYTICS_APP', label: 'Application Trends', icon: 'description', desc: 'Form volume and status tracking', color: 'blue' },
     { id: 'COURSE_ANALYTICS_ADMISSION', label: 'Admission Metrics', icon: 'how_to_reg', desc: 'Confirmed vs cancelled adms', color: 'rose' },
     { id: 'DAILY_FEES', label: 'Daily Collection', icon: 'account_balance_wallet', desc: 'Real-time financial tracking', color: 'cyan' },
@@ -755,6 +756,8 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (this.activeReport === 'COURSE_REVENUE') {
       obs = this.reportsService.getCourseRevenueReport(apiFilter);
+    } else if (this.activeReport === 'COURSE_TARGET_ACHIEVEMENT') {
+      obs = this.reportsService.getCourseTargetAchievementReport(apiFilter);
     } else {
       switch (baseType) {
         case 'COURSE_ANALYTICS':
@@ -816,8 +819,8 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
           } else {
             this.dailySummaryData = null;
             this.reportData = (apiData.content || []).filter((d: any) => {
-              // Exclude courses with 0 forms, but preserve student detail records
-              if (this.activeReport === 'STUDENT_DETAIL') return true;
+              // Exclude courses with 0 forms, but preserve student detail and target achievement records
+              if (this.activeReport === 'STUDENT_DETAIL' || this.activeReport === 'COURSE_TARGET_ACHIEVEMENT') return true;
               return (d.totalForms || 0) > 0;
             });
           }

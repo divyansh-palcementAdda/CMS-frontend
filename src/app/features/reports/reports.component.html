@@ -86,10 +86,12 @@
                                 <span *ngIf="activeReport === 'LEAD_SOURCE_CONVERSION'">Source Conversion Rates</span>
                                 <span *ngIf="activeReport === 'COURSE_SUMMARY'">Program Performance Summary</span>
                                 <span *ngIf="activeReport === 'STUDENT_DETAIL'">Student Payment Thresholds</span>
+                                <span *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">Course Target Achievement</span>
                             </h2>
                             <div class="subtitle-wrap">
                                 <span class="status-dot"></span>
-                                <p class="report-subtitle">Session {{filters.session}} &bull; Live Intelligence</p>
+                                <p class="report-subtitle" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">Session {{filters.session}} &bull; Live Intelligence</p>
+                                <p class="report-subtitle" *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">Live Target Tracking</p>
                             </div>
                         </div>
                     </header>
@@ -98,7 +100,7 @@
                     <section class="analytics-layer"
                         *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY' && activeReport !== 'SESSION_COMPARISON'">
                         <!-- Modern KPI Grid for Standard Reports -->
-                        <div class="kpi-grid-premium" *ngIf="activeReport !== 'COURSE_REVENUE'">
+                        <div class="kpi-grid-premium" *ngIf="activeReport !== 'COURSE_REVENUE' && activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
                             <div class="kpi-card-v2 total" [class.is-loading]="loading">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined">analytics</span></div>
                                 <div class="kpi-label">Gross Volume (Applications)</div>
@@ -218,7 +220,7 @@
 
                         <!-- Professional Analytics Visualization -->
                         <div class="analytics-visualization-grid"
-                            *ngIf="!loading && reportData.length > 0 && activeReport !== 'COURSE_REVENUE'">
+                            *ngIf="!loading && reportData.length > 0 && activeReport !== 'COURSE_REVENUE' && activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
                             
                             <!-- For COURSE_LEAD_SOURCE: Show Donut Chart as Main Chart -->
                             <div class="analytics-chart-card main-insight full-width" 
@@ -766,7 +768,7 @@
                                     <input type="text" [(ngModel)]="filters.search" (input)="onSearch()"
                                         placeholder="Search records instantly...">
                                 </div>
-                                <div class="filter-controls">
+                                <div class="filter-controls" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
                                     <!-- Custom Date Applied Badge (Premium UI) -->
                                     <div class="custom-range-badge"
                                         *ngIf="(filters.filterType === 'CUSTOM' || filters.filterType === 'CUSTOM_DATE') && filters.startDate && filters.endDate">
@@ -1212,6 +1214,91 @@
                                             <td class="text-right">₹{{totalsRow.totalRemainingFees | number}}</td>
                                         </tr>
                                     </tfoot>
+                                </table>
+
+                                <!-- Report Type: COURSE_TARGET_ACHIEVEMENT -->
+                                <table class="enterprise-table" *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">
+                                    <thead class="colorful-header">
+                                        <tr>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                                Course Name
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                            </th>
+                                            <th>Configured Form Target</th>
+                                            <th>Forms Achieved</th>
+                                            <th class="text-center">Form Status</th>
+                                            <th>Configured Fee Target</th>
+                                            <th>First Fees Achieved</th>
+                                            <th class="text-center">Fee Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let d of paginatedData">
+                                            <td>
+                                                <div class="program-info">
+                                                    <span class="p-name">{{d.courseName}}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="target-badge forms" *ngIf="d.configuredFormTarget">{{d.configuredFormTarget}}</span>
+                                                <span *ngIf="!d.configuredFormTarget">-</span>
+                                            </td>
+                                            <td>
+                                                <div class="target-progress-container" *ngIf="d.configuredFormTarget" style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; padding: 4px 0;">
+                                                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                                                        <span style="color: var(--slate-600);">{{d.currentForms}} / {{d.configuredFormTarget.split(' ')[0]}}</span>
+                                                        <span style="color: var(--primary);">{{d.formAchievementPct | number:'1.0-0'}}%</span>
+                                                    </div>
+                                                    <div class="progress-bar-track" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; width: 100%;">
+                                                        <div class="progress-bar-fill"
+                                                             [style.width.%]="Math.min(d.formAchievementPct, 100)"
+                                                             [style.background]="d.formStatus === 'Achieved' || d.formStatus === 'Exceeded' ? '#10b981' : (d.formStatus === 'Pending' ? '#3b82f6' : '#ef4444')"
+                                                             style="height: 100%; border-radius: 3px; transition: width 0.3s ease;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span *ngIf="!d.configuredFormTarget">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="pill-status" *ngIf="d.configuredFormTarget"
+                                                    [class.success]="d.formStatus === 'Achieved' || d.formStatus === 'Exceeded'"
+                                                    [class.warning]="d.formStatus === 'Pending'"
+                                                    [class.danger]="d.formStatus === 'Behind Target'">
+                                                    {{d.formStatus}}
+                                                </span>
+                                                <span *ngIf="!d.configuredFormTarget">-</span>
+                                            </td>
+                                            <td>
+                                                <span class="target-badge fees" *ngIf="d.configuredFeeTarget">{{d.configuredFeeTarget}}</span>
+                                                <span *ngIf="!d.configuredFeeTarget">-</span>
+                                            </td>
+                                            <td>
+                                                <div class="target-progress-container" *ngIf="d.configuredFeeTarget" style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; padding: 4px 0;">
+                                                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                                                        <span style="color: var(--slate-600);">{{d.currentFirstFees}} / {{d.configuredFeeTarget.split(' ')[0]}}</span>
+                                                        <span style="color: #059669;">{{d.feeAchievementPct | number:'1.0-0'}}%</span>
+                                                    </div>
+                                                    <div class="progress-bar-track" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; width: 100%;">
+                                                        <div class="progress-bar-fill"
+                                                             [style.width.%]="Math.min(d.feeAchievementPct, 100)"
+                                                             [style.background]="d.feeStatus === 'Achieved' || d.feeStatus === 'Exceeded' ? '#10b981' : (d.feeStatus === 'Pending' ? '#3b82f6' : '#ef4444')"
+                                                             style="height: 100%; border-radius: 3px; transition: width 0.3s ease;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span *ngIf="!d.configuredFeeTarget">-</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="pill-status" *ngIf="d.configuredFeeTarget"
+                                                    [class.success]="d.feeStatus === 'Achieved' || d.feeStatus === 'Exceeded'"
+                                                    [class.warning]="d.feeStatus === 'Pending'"
+                                                    [class.danger]="d.feeStatus === 'Behind Target'">
+                                                    {{d.feeStatus}}
+                                                </span>
+                                                <span *ngIf="!d.configuredFeeTarget">-</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
 

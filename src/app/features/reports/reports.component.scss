@@ -6105,3 +6105,22 @@
     width: 100%;
     animation: title-scroll-animation 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.target-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+
+    &.forms {
+        background-color: #EEF2FF;
+        color: #4F46E5;
+    }
+
+    &.fees {
+        background-color: #ECFDF5;
+        color: #059669;
+    }
+}
