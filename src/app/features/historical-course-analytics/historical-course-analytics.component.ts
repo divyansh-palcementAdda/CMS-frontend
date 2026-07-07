@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
@@ -18,6 +18,7 @@ import { environment } from '../../../environments/environment';
 export class HistoricalCourseAnalyticsComponent implements OnInit, OnDestroy {
   private analyticsService = inject(HistoricalAnalyticsService);
   private courseService = inject(CourseService);
+  private location = inject(Location);
 
   // Lists
   records: any[] = [];
@@ -417,5 +418,9 @@ export class HistoricalCourseAnalyticsComponent implements OnInit, OnDestroy {
 
   downloadErrors(fileId: string) {
     window.open(`${this.apiUrl}/bulk-upload/errors/${fileId}`);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

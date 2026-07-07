@@ -5,8 +5,17 @@
     <main class="main-content">
       <!-- Page Header -->
       <div class="content-header">
-        <div>
-          <h2 class="page-title">Historical Course Snapshots</h2>
+        <div class="header-title-area">
+          <div class="back-button-and-title flex items-center">
+            <button class="back-btn" (click)="goBack()" title="Back">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#6366F1" />
+                <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </button>
+            <h2 class="page-title">Historical Course Snapshots</h2>
+          </div>
           <p class="page-subtitle">Manage daily forms and fees records of previous sessions for comparison reports</p>
         </div>
         <div class="header-actions">
@@ -134,8 +143,11 @@
           <div class="filter-group search-group">
             <label class="filter-label">Search</label>
             <div class="search-input-wrapper">
-              <input type="text" class="filter-input search-input" placeholder="Search by course snapshot name, remarks..." [(ngModel)]="filter.search" (input)="onSearchChange()" />
-              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <input type="text" class="filter-input search-input"
+                placeholder="Search by course snapshot name, remarks..." [(ngModel)]="filter.search"
+                (input)="onSearchChange()" />
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
@@ -145,74 +157,84 @@
       </div>
 
       <!-- Table View -->
-      <div class="table-container glassmorphic">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="sno-header">S.No</th>
-              <th (click)="setSort('courseNameSnapshot')">Course <span *ngIf="filter.sortBy === 'courseNameSnapshot'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th (click)="setSort('reportDate')">Date <span *ngIf="filter.sortBy === 'reportDate'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th (click)="setSort('session')">Session <span *ngIf="filter.sortBy === 'session'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th (click)="setSort('formsCount')">Forms Count <span *ngIf="filter.sortBy === 'formsCount'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th (click)="setSort('feesCount')">Confirmed Admissions <span *ngIf="filter.sortBy === 'feesCount'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th>Created By</th>
-              <th (click)="setSort('createdAt')">Created Date <span *ngIf="filter.sortBy === 'createdAt'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
-              <th class="actions-header">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of records; let i = index" class="table-row">
-              <td class="sno-cell">{{ (filter.page! * filter.size!) + i + 1 }}</td>
-              <td class="course-cell font-semibold">{{ row.courseNameSnapshot }}</td>
-              <td>{{ row.reportDate | date:'dd MMM yyyy' }}</td>
-              <td>
-                <span class="session-badge">{{ row.session }}</span>
-              </td>
-              <td class="font-semibold text-slate-700">{{ row.formsCount }}</td>
-              <td class="font-semibold text-indigo-600">{{ row.feesCount | number:'1.0-0' }}</td>
-              <td>{{ row.uploadedByUsername }}</td>
-              <td>{{ row.createdAt | date:'dd MMM yyyy HH:mm' }}</td>
-              <td class="actions-cell">
-                <button class="btn-icon" title="Edit Entry" (click)="openEditModal(row)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                </button>
-                <button class="btn-icon delete-btn" title="Delete Entry" (click)="deleteRecord(row.id)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="records.length === 0">
-              <td colspan="8" class="empty-state-cell">
-                <div class="empty-state">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                  <h4>No snapshot records found</h4>
-                  <p>Try refining your filters or upload a new spreadsheet file</p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="table-container">
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="sno-header">S.No</th>
+                <th (click)="setSort('courseNameSnapshot')">Course <span
+                    *ngIf="filter.sortBy === 'courseNameSnapshot'">{{ filter.sortDir === 'asc' ? '↑' : '↓' }}</span>
+                </th>
+                <th (click)="setSort('reportDate')">Date <span *ngIf="filter.sortBy === 'reportDate'">{{ filter.sortDir
+                    === 'asc' ? '↑' : '↓' }}</span></th>
+                <th (click)="setSort('session')">Session <span *ngIf="filter.sortBy === 'session'">{{ filter.sortDir ===
+                    'asc' ? '↑' : '↓' }}</span></th>
+                <th (click)="setSort('formsCount')">Forms Count <span *ngIf="filter.sortBy === 'formsCount'">{{
+                    filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
+                <th (click)="setSort('feesCount')">Confirmed Admissions <span *ngIf="filter.sortBy === 'feesCount'">{{
+                    filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
+                <th>Created By</th>
+                <th (click)="setSort('createdAt')">Created Date <span *ngIf="filter.sortBy === 'createdAt'">{{
+                    filter.sortDir === 'asc' ? '↑' : '↓' }}</span></th>
+                <th class="actions-header">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of records; let i = index" class="table-row">
+                <td class="sno-cell">{{ (filter.page! * filter.size!) + i + 1 }}</td>
+                <td class="course-cell font-semibold">{{ row.courseNameSnapshot }}</td>
+                <td>{{ row.reportDate | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span class="session-badge">{{ row.session }}</span>
+                </td>
+                <td class="font-semibold text-slate-700">{{ row.formsCount }}</td>
+                <td class="font-semibold text-indigo-600">{{ row.feesCount | number:'1.0-0' }}</td>
+                <td>{{ row.uploadedByUsername }}</td>
+                <td>{{ row.createdAt | date:'dd MMM yyyy HH:mm' }}</td>
+                <td class="actions-cell">
+                  <button class="btn-icon" title="Edit Entry" (click)="openEditModal(row)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button class="btn-icon delete-btn" title="Delete Entry" (click)="deleteRecord(row.id)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="records.length === 0">
+                <td colspan="8" class="empty-state-cell">
+                  <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="1.5">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <h4>No snapshot records found</h4>
+                    <p>Try refining your filters or upload a new spreadsheet file</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div><!-- end scroll wrapper -->
 
         <!-- Enterprise Pagination Footer -->
-        <div class="pagination-footer" *ngIf="totalPages > 0">
-          <!-- Entries info + page size selector -->
+        <div class="pagination-footer" *ngIf="totalPages > 0"> <!-- Entries info + page size selector -->
           <div class="pagination-meta">
             <span class="entries-info">
               Showing
-              <strong>{{ (filter.page! * filter.size!) + 1 }}</strong>–<strong>{{ ((filter.page! + 1) * filter.size!) < totalEntries ? ((filter.page! + 1) * filter.size!) : totalEntries }}</strong>
-              of <strong>{{ totalEntries }}</strong> entries
+              <strong>{{ (filter.page! * filter.size!) + 1 }}</strong>–<strong>{{ ((filter.page! + 1) * filter.size!) <
+                  totalEntries ? ((filter.page! + 1) * filter.size!) : totalEntries }}</strong>
+                  of <strong>{{ totalEntries }}</strong> entries
             </span>
             <div class="page-size-group">
               <label class="page-size-label">Rows:</label>
@@ -228,12 +250,19 @@
           <!-- Page navigation -->
           <div class="paginator" *ngIf="totalPages > 1">
             <!-- First -->
-            <button class="btn-page btn-page-edge" [disabled]="filter.page === 0" (click)="goToFirst()" title="First page">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+            <button class="btn-page btn-page-edge" [disabled]="filter.page === 0" (click)="goToFirst()"
+              title="First page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="11 17 6 12 11 7" />
+                <polyline points="18 17 13 12 18 7" />
+              </svg>
             </button>
             <!-- Prev -->
-            <button class="btn-page" [disabled]="filter.page === 0" (click)="changePage(filter.page! - 1)" title="Previous page">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            <button class="btn-page" [disabled]="filter.page === 0" (click)="changePage(filter.page! - 1)"
+              title="Previous page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
               <span>Prev</span>
             </button>
 
@@ -241,23 +270,28 @@
             <div class="page-numbers">
               <ng-container *ngFor="let p of getVisiblePages()">
                 <span *ngIf="p === '...'" class="page-ellipsis">…</span>
-                <button *ngIf="p !== '...'"
-                        class="btn-page-num"
-                        [class.active]="filter.page === p"
-                        (click)="changePage(+p)">
+                <button *ngIf="p !== '...'" class="btn-page-num" [class.active]="filter.page === p"
+                  (click)="changePage(+p)">
                   {{ +p + 1 }}
                 </button>
               </ng-container>
             </div>
 
             <!-- Next -->
-            <button class="btn-page" [disabled]="filter.page === totalPages - 1" (click)="changePage(filter.page! + 1)" title="Next page">
+            <button class="btn-page" [disabled]="filter.page === totalPages - 1" (click)="changePage(filter.page! + 1)"
+              title="Next page">
               <span>Next</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
             <!-- Last -->
-            <button class="btn-page btn-page-edge" [disabled]="filter.page === totalPages - 1" (click)="goToLast()" title="Last page">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+            <button class="btn-page btn-page-edge" [disabled]="filter.page === totalPages - 1" (click)="goToLast()"
+              title="Last page">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="13 17 18 12 13 7" />
+                <polyline points="6 17 11 12 6 7" />
+              </svg>
             </button>
           </div>
         </div>
@@ -276,18 +310,18 @@
     <div class="modal-body">
       <div class="alert alert-danger" *ngIf="formError">{{ formError }}</div>
 
-      <div class="form-grid">
-        <div class="form-group">
+      <div class="flex flex-col gap-4">
+        <div class="form-group w-full">
           <label class="form-label">Session *</label>
           <input type="text" class="form-input" placeholder="e.g. 2024-25" [(ngModel)]="formModel.session" required />
         </div>
 
-        <div class="form-group">
+        <div class="form-group w-full">
           <label class="form-label">Report Date *</label>
           <input type="date" class="form-input" [(ngModel)]="formModel.reportDate" required />
         </div>
 
-        <div class="form-group select-group">
+        <div class="form-group select-group w-full">
           <label class="form-label">Course *</label>
           <select class="form-input" [(ngModel)]="formModel.courseId" required>
             <option value="" disabled>Select Course</option>
@@ -295,19 +329,20 @@
           </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group w-full">
           <label class="form-label">Forms Count *</label>
           <input type="number" class="form-input" [(ngModel)]="formModel.formsCount" min="0" required />
         </div>
 
-        <div class="form-group">
+        <div class="form-group w-full">
           <label class="form-label">Confirmed Admissions (Count) *</label>
           <input type="number" class="form-input" [(ngModel)]="formModel.feesCount" min="0" step="1" required />
         </div>
 
         <div class="form-group full-width">
           <label class="form-label">Remarks (Optional)</label>
-          <textarea class="form-input text-area" rows="3" [(ngModel)]="formModel.remarks" placeholder="Additional details..."></textarea>
+          <textarea class="form-input text-area" rows="3" [(ngModel)]="formModel.remarks"
+            placeholder="Additional details..."></textarea>
         </div>
       </div>
     </div>
@@ -329,12 +364,12 @@
       <div class="alert alert-danger" *ngIf="uploadError">{{ uploadError }}</div>
 
       <!-- Configuration details -->
-      <div class="upload-config-row">
-        <div class="form-group">
+      <div class="upload-config-row flex flex-col gap-4">
+        <div class="form-group w-full">
           <label class="form-label">Target Session *</label>
           <input type="text" class="form-input" placeholder="e.g. 2024-25" [(ngModel)]="uploadSession" />
         </div>
-        <div class="form-group">
+        <div class="form-group w-full">
           <label class="form-label">Default Column Metric Type</label>
           <select class="form-input" [(ngModel)]="uploadDataType">
             <option value="FORMS">Forms Count</option>
@@ -354,24 +389,26 @@
 
       <div class="form-group">
         <label class="form-label">Remarks</label>
-        <input type="text" class="form-input" placeholder="e.g. Excel upload for 2024 session" [(ngModel)]="uploadRemarks" />
+        <input type="text" class="form-input" placeholder="e.g. Excel upload for 2024 session"
+          [(ngModel)]="uploadRemarks" />
       </div>
 
       <!-- Drag & Drop container -->
-      <div class="drag-drop-container" 
-           [class.drag-over]="dragOver"
-           (dragover)="onDragOver($event)"
-           (dragleave)="onDragLeave($event)"
-           (drop)="onDrop($event)">
+      <div class="drag-drop-container" [class.drag-over]="dragOver" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
         <div class="drag-drop-inner">
-          <svg class="upload-cloud" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <svg class="upload-cloud" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <p class="drag-text" *ngIf="!uploadFile">Drag & drop your Excel file here or <label class="file-label">browse<input type="file" (change)="onFileChange($event)" accept=".xlsx" style="display:none;" /></label></p>
+          <p class="drag-text" *ngIf="!uploadFile">Drag & drop your Excel file here or <label
+              class="file-label">browse<input type="file" (change)="onFileChange($event)" accept=".xlsx"
+                style="display:none;" /></label></p>
           <div *ngIf="uploadFile" class="selected-file-info">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="text-indigo-600">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
             </svg>
@@ -383,25 +420,31 @@
 
       <!-- Result breakdown -->
       <div class="upload-result" *ngIf="uploadResult">
-        <div class="result-summary" [class.success]="uploadResult.failureCount === 0" [class.partial-fail]="uploadResult.failureCount > 0">
+        <div class="result-summary" [class.success]="uploadResult.failureCount === 0"
+          [class.partial-fail]="uploadResult.failureCount > 0">
           <div class="result-icon-wrapper">
-            <svg *ngIf="uploadResult.failureCount === 0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg *ngIf="uploadResult.failureCount === 0" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <svg *ngIf="uploadResult.failureCount > 0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg *ngIf="uploadResult.failureCount > 0" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
           </div>
           <div class="result-details">
-            <h4 class="font-semibold">{{ uploadResult.failureCount === 0 ? 'Upload Completed Successfully' : 'Completed with Validation Failures' }}</h4>
-            <p>Total processed records: {{ uploadResult.totalCount }} | Saved new: {{ uploadResult.createdCount }} | Overwritten: {{ uploadResult.updatedCount }} | Failures: {{ uploadResult.failureCount }}</p>
+            <h4 class="font-semibold">{{ uploadResult.failureCount === 0 ? 'Upload Completed Successfully' : 'Completed
+              with Validation Failures' }}</h4>
+            <p>Total processed records: {{ uploadResult.totalCount }} | Saved new: {{ uploadResult.createdCount }} |
+              Overwritten: {{ uploadResult.updatedCount }} | Failures: {{ uploadResult.failureCount }}</p>
           </div>
         </div>
 
         <div class="error-download-card" *ngIf="uploadResult.failureCount > 0 && uploadResult.errorFileId">
-          <p class="font-semibold text-red-600">Some snapshots had numeric format or course mapping validation errors.</p>
+          <p class="font-semibold text-red-600">Some snapshots had numeric format or course mapping validation errors.
+          </p>
           <button class="btn-danger-outline" (click)="downloadErrors(uploadResult.errorFileId)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

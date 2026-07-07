@@ -242,7 +242,10 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
       this.tabsWheelListener = (e: WheelEvent) => {
         if (e.deltaY !== 0) {
           e.preventDefault();
-          this.tabsScrollContainer.nativeElement.scrollLeft += e.deltaY;
+          this.tabsScrollContainer.nativeElement.scrollBy({
+            left: e.deltaY * 6, // Multiplied by 4 for increased speed
+            behavior: 'smooth'
+          });
         }
       };
       this.tabsScrollContainer.nativeElement.addEventListener(
