@@ -16,6 +16,11 @@ export interface ReportFilter {
   sortBy?: string;
   sortDir?: string;
   sortDirection?: string;
+  formStatus?: string;
+  feeStatus?: string;
+  interval?: string;
+  active?: string;
+  achievement?: string;
 }
 
 @Injectable({

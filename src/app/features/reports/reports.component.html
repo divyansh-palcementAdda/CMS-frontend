@@ -785,6 +785,57 @@
                                     <input type="text" [(ngModel)]="filters.search" (input)="onSearch()"
                                         placeholder="Search records instantly...">
                                 </div>
+                                <!-- Target Achievement Filters -->
+                                <div class="filter-controls" *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                                    <div class="control-item">
+                                        <label>Form Status</label>
+                                        <select [(ngModel)]="filters.formStatus" (change)="onFilterChange()">
+                                            <option value="all">All Statuses</option>
+                                            <option value="Behind Target">Behind Target</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Achieved">Achieved</option>
+                                            <option value="Exceeded">Exceeded</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-item">
+                                        <label>Fee Status</label>
+                                        <select [(ngModel)]="filters.feeStatus" (change)="onFilterChange()">
+                                            <option value="all">All Statuses</option>
+                                            <option value="Behind Target">Behind Target</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Achieved">Achieved</option>
+                                            <option value="Exceeded">Exceeded</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-item">
+                                        <label>Interval</label>
+                                        <select [(ngModel)]="filters.interval" (change)="onFilterChange()">
+                                            <option value="all">All Intervals</option>
+                                            <option value="DAY">Day</option>
+                                            <option value="WEEK">Week</option>
+                                            <option value="MONTH">Month</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-item">
+                                        <label>Status</label>
+                                        <select [(ngModel)]="filters.active" (change)="onFilterChange()">
+                                            <option value="all">All</option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-item">
+                                        <label>Achievement</label>
+                                        <select [(ngModel)]="filters.achievement" (change)="onFilterChange()">
+                                            <option value="all">All</option>
+                                            <option value="achieved">Achieved (Both)</option>
+                                            <option value="not_achieved">Not Achieved</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn-sync" (click)="syncReport()" [class.syncing]="loading" title="Synchronize Data">
+                                        <span class="material-symbols-outlined">sync</span>
+                                    </button>
+                                </div>
                                 <div class="filter-controls" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
                                     <!-- Custom Date Applied Badge (Premium UI) -->
                                     <div class="custom-range-badge"
@@ -1304,15 +1355,59 @@
                                             <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
                                                 (click)="toggleSort('courseName')">
                                                 Course Name
-                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' :
-                                                    '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy !== 'courseName'">⇅</span>
                                             </th>
-                                            <th>Configured Form Target</th>
-                                            <th>Forms Achieved</th>
-                                            <th class="text-center">Form Status</th>
-                                            <th>Configured Fee Target</th>
-                                            <th>First Fees Achieved</th>
-                                            <th class="text-center">Fee Status</th>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('configuredFormTarget')">
+                                                Configured Form Target
+                                                <span *ngIf="sortBy === 'configuredFormTarget'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy !== 'configuredFormTarget'">⇅</span>
+                                            </th>
+                                            <th>
+                                                <div style="display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                                                    <span>Forms Achieved</span>
+                                                    <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 500;">
+                                                        <span class="cursor-pointer" (click)="$event.stopPropagation(); toggleSort('currentForms')" [style.color]="sortBy === 'currentForms' ? 'var(--primary)' : 'inherit'" style="cursor: pointer; user-select: none;">
+                                                            Count <span *ngIf="sortBy === 'currentForms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span><span *ngIf="sortBy !== 'currentForms'">⇅</span>
+                                                        </span>
+                                                        <span class="cursor-pointer" (click)="$event.stopPropagation(); toggleSort('formAchievementPct')" [style.color]="sortBy === 'formAchievementPct' ? 'var(--primary)' : 'inherit'" style="cursor: pointer; user-select: none;">
+                                                            % <span *ngIf="sortBy === 'formAchievementPct'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span><span *ngIf="sortBy !== 'formAchievementPct'">⇅</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th class="cursor-pointer text-center" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('formStatus')">
+                                                Form Status
+                                                <span *ngIf="sortBy === 'formStatus'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy !== 'formStatus'">⇅</span>
+                                            </th>
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('configuredFeeTarget')">
+                                                Configured Fee Target
+                                                <span *ngIf="sortBy === 'configuredFeeTarget'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy !== 'configuredFeeTarget'">⇅</span>
+                                            </th>
+                                            <th>
+                                                <div style="display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+                                                    <span>First Fees Achieved</span>
+                                                    <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 500;">
+                                                        <span class="cursor-pointer" (click)="$event.stopPropagation(); toggleSort('currentFirstFees')" [style.color]="sortBy === 'currentFirstFees' ? 'var(--primary)' : 'inherit'" style="cursor: pointer; user-select: none;">
+                                                            Count <span *ngIf="sortBy === 'currentFirstFees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span><span *ngIf="sortBy !== 'currentFirstFees'">⇅</span>
+                                                        </span>
+                                                        <span class="cursor-pointer" (click)="$event.stopPropagation(); toggleSort('feeAchievementPct')" [style.color]="sortBy === 'feeAchievementPct' ? 'var(--primary)' : 'inherit'" style="cursor: pointer; user-select: none;">
+                                                            % <span *ngIf="sortBy === 'feeAchievementPct'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span><span *ngIf="sortBy !== 'feeAchievementPct'">⇅</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th class="cursor-pointer text-center" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('feeStatus')">
+                                                Fee Status
+                                                <span *ngIf="sortBy === 'feeStatus'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy !== 'feeStatus'">⇅</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>

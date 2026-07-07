@@ -128,7 +128,12 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     session: new Date().getFullYear().toString(),
     search: '',
     page: 0,
-    size: 30
+    size: 30,
+    formStatus: 'all',
+    feeStatus: 'all',
+    interval: 'all',
+    active: 'all',
+    achievement: 'all'
   };
 
   serverSummary: any = {
@@ -669,6 +674,13 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.lineChartOptions = null;
     this.comparisonFormsChartOptions = null;
     this.comparisonFeesChartOptions = null;
+
+    // Reset target achievement filters when switching reports
+    this.filters.formStatus = 'all';
+    this.filters.feeStatus = 'all';
+    this.filters.interval = 'all';
+    this.filters.active = 'all';
+    this.filters.achievement = 'all';
 
     if (type === 'STUDENT_DETAIL') {
       this.sortBy = 'studentName';
