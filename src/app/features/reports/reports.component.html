@@ -86,12 +86,15 @@
                                 <span *ngIf="activeReport === 'LEAD_SOURCE_CONVERSION'">Source Conversion Rates</span>
                                 <span *ngIf="activeReport === 'COURSE_SUMMARY'">Program Performance Summary</span>
                                 <span *ngIf="activeReport === 'STUDENT_DETAIL'">Student Payment Thresholds</span>
-                                <span *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">Course Target Achievement</span>
+                                <span *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">Course Target
+                                    Achievement</span>
                             </h2>
                             <div class="subtitle-wrap">
                                 <span class="status-dot"></span>
-                                <p class="report-subtitle" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">Session {{filters.session}} &bull; Live Intelligence</p>
-                                <p class="report-subtitle" *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">Live Target Tracking</p>
+                                <p class="report-subtitle" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">Session
+                                    {{filters.session}} &bull; Live Intelligence</p>
+                                <p class="report-subtitle" *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">Live
+                                    Target Tracking</p>
                             </div>
                         </div>
                     </header>
@@ -100,7 +103,8 @@
                     <section class="analytics-layer"
                         *ngIf="activeReport !== 'DAILY_SESSION_SUMMARY' && activeReport !== 'SESSION_COMPARISON'">
                         <!-- Modern KPI Grid for Standard Reports -->
-                        <div class="kpi-grid-premium" *ngIf="activeReport !== 'COURSE_REVENUE' && activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
+                        <div class="kpi-grid-premium"
+                            *ngIf="activeReport !== 'COURSE_REVENUE' && activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
                             <div class="kpi-card-v2 total" [class.is-loading]="loading">
                                 <div class="card-bg-icon"><span class="material-symbols-outlined">analytics</span></div>
                                 <div class="kpi-label">Gross Volume (Applications)</div>
@@ -221,9 +225,9 @@
                         <!-- Professional Analytics Visualization -->
                         <div class="analytics-visualization-grid"
                             *ngIf="!loading && reportData.length > 0 && activeReport !== 'COURSE_REVENUE' && activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
-                            
+
                             <!-- For COURSE_LEAD_SOURCE: Show Donut Chart as Main Chart -->
-                            <div class="analytics-chart-card main-insight full-width" 
+                            <div class="analytics-chart-card main-insight full-width"
                                 *ngIf="activeReport === 'COURSE_LEAD_SOURCE' && pieChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
@@ -276,7 +280,7 @@
                             </div>
 
                             <!-- Side Distribution (for non-LEAD_SOURCE reports) -->
-                            <div class="analytics-chart-card side-distribution" 
+                            <div class="analytics-chart-card side-distribution"
                                 *ngIf="activeReport !== 'COURSE_LEAD_SOURCE' && pieChartOptions">
                                 <div class="chart-header">
                                     <div class="title-group">
@@ -630,10 +634,15 @@
 
                                         <!-- Hierarchical Breakdown Wrapper -->
                                         <!-- Scroll hint for horizontal scrollability -->
-                                        <div class="course-type-scroll-hint" style="position: relative; margin-bottom: 0.5rem;">
-                                            <div class="scroll-gradient-right" style="position: absolute; top: 0; right: 0; width: 48px; height: 100%; background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 2; border-radius: 0 12px 12px 0;"></div>
-                                            <div style="display: flex; align-items: center; gap: 6px; padding: 4px 0; color: var(--slate-400); font-size: 11px; font-weight: 600;">
-                                                <span class="material-symbols-outlined" style="font-size: 14px;">swipe</span>
+                                        <div class="course-type-scroll-hint"
+                                            style="position: relative; margin-bottom: 0.5rem;">
+                                            <div class="scroll-gradient-right"
+                                                style="position: absolute; top: 0; right: 0; width: 48px; height: 100%; background: linear-gradient(to left, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%); pointer-events: none; z-index: 2; border-radius: 0 12px 12px 0;">
+                                            </div>
+                                            <div
+                                                style="display: flex; align-items: center; gap: 6px; padding: 4px 0; color: var(--slate-400); font-size: 11px; font-weight: 600;">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size: 14px;">swipe</span>
                                                 <span>Scroll to view all programs</span>
                                             </div>
                                         </div>
@@ -666,20 +675,28 @@
                                         </div>
 
                                         <!-- Total Summary Card - New Overall Total Card -->
-                                        <div class="total-summary-card" style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; background: linear-gradient(135deg, #435fff 0%, #00d2ff 100%); border-radius: 16px; box-shadow: 0 8px 24px rgba(67, 95, 255, 0.25); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                                        <div class="total-summary-card"
+                                            style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; background: linear-gradient(135deg, #435fff 0%, #00d2ff 100%); border-radius: 16px; box-shadow: 0 8px 24px rgba(67, 95, 255, 0.25); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                                             <div style="display: flex; align-items: center; gap: 12px;">
-                                                <div style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-                                                    <span class="material-symbols-outlined" style="color: white; font-size: 28px;">analytics</span>
+                                                <div
+                                                    style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                                                    <span class="material-symbols-outlined"
+                                                        style="color: white; font-size: 28px;">analytics</span>
                                                 </div>
                                                 <div>
-                                                    <div style="font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.9); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">Overall Total</div>
-                                                    <div style="font-size: 28px; font-weight: 900; color: white; line-height: 1;">
+                                                    <div
+                                                        style="font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.9); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">
+                                                        Overall Total</div>
+                                                    <div
+                                                        style="font-size: 28px; font-weight: 900; color: white; line-height: 1;">
                                                         {{courseWiseFirstFeesTotalStudents | number:'2.0-0'}}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div style="text-align: right;">
-                                                <div style="font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.85); margin-bottom: 2px;">First Fees Paid</div>
+                                                <div
+                                                    style="font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.85); margin-bottom: 2px;">
+                                                    First Fees Paid</div>
                                                 <div style="font-size: 16px; font-weight: 800; color: white;">
                                                     {{courseWiseFirstFeesTotalStudents === 1 ? 'Student' : 'Students'}}
                                                 </div>
@@ -842,30 +859,47 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'COURSE_LEAD_SOURCE'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th rowspan="2" class="align-middle sticky-col cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                            <th rowspan="2" class="align-middle sticky-col cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('courseName')">
                                                 Program Name
-                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
                                             <th *ngFor="let h of leadSourceHeaders" colspan="2"
                                                 class="text-center group-border">{{h.name}}</th>
-                                            <th rowspan="2" class="text-right align-middle cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalForms')">
+                                            <th rowspan="2" class="text-right align-middle cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalForms')">
                                                 Total Forms
-                                                <span *ngIf="sortBy === 'totalForms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalForms'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
-                                            <th rowspan="2" class="text-right align-middle cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('confirmedAdmissions')">
+                                            <th rowspan="2" class="text-right align-middle cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('confirmedAdmissions')">
                                                 Confirmed
-                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc'
+                                                    ? '▲' : '▼'}}</span>
                                             </th>
                                         </tr>
                                         <tr>
                                             <ng-container *ngFor="let h of leadSourceHeaders">
-                                                <th class="text-center sub-col cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('leadSource_' + h.id + '_forms')">
+                                                <th class="text-center sub-col cursor-pointer"
+                                                    style="cursor: pointer; user-select: none;"
+                                                    (click)="toggleSort('leadSource_' + h.id + '_forms')">
                                                     Forms
-                                                    <span *ngIf="sortBy === 'leadSource_' + h.id + '_forms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                    <span
+                                                        *ngIf="sortBy === 'leadSource_' + h.id + '_forms'">{{sortDirection
+                                                        === 'asc' ? '▲' : '▼'}}</span>
                                                 </th>
-                                                <th class="text-center sub-col group-border cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('leadSource_' + h.id + '_fees')">
+                                                <th class="text-center sub-col group-border cursor-pointer"
+                                                    style="cursor: pointer; user-select: none;"
+                                                    (click)="toggleSort('leadSource_' + h.id + '_fees')">
                                                     Fees
-                                                    <span *ngIf="sortBy === 'leadSource_' + h.id + '_fees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                    <span
+                                                        *ngIf="sortBy === 'leadSource_' + h.id + '_fees'">{{sortDirection
+                                                        === 'asc' ? '▲' : '▼'}}</span>
                                                 </th>
                                             </ng-container>
                                         </tr>
@@ -1025,29 +1059,46 @@
                                     *ngIf="getBaseReportType(activeReport) === 'COURSE_ANALYTICS' && activeReport !== 'COURSE_REVENUE'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('courseName')">
                                                 Program Details
-                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
-                                            <th class="text-center cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalForms')">
+                                            <th class="text-center cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalForms')">
                                                 Forms
-                                                <span *ngIf="sortBy === 'totalForms'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalForms'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
-                                            <th class="text-center cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('confirmedAdmissions')">
+                                            <th class="text-center cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('confirmedAdmissions')">
                                                 Confirmed
-                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc'
+                                                    ? '▲' : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalFeesCollected')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalFeesCollected')">
                                                 Gross Paid
-                                                <span *ngIf="sortBy === 'totalFeesCollected'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalFeesCollected'">{{sortDirection === 'asc'
+                                                    ? '▲' : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalRefunded')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalRefunded')">
                                                 Refunded
-                                                <span *ngIf="sortBy === 'totalRefunded'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalRefunded'">{{sortDirection === 'asc' ? '▲'
+                                                    : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('remainingAmount')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('remainingAmount')">
                                                 Balance
-                                                <span *ngIf="sortBy === 'remainingAmount'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'remainingAmount'">{{sortDirection === 'asc' ?
+                                                    '▲' : '▼'}}</span>
                                             </th>
                                         </tr>
                                     </thead>
@@ -1092,33 +1143,53 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'COURSE_REVENUE'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('courseName')">
                                                 Course Name
-                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseFees')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('courseFees')">
                                                 Course Fees
-                                                <span *ngIf="sortBy === 'courseFees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseFees'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
-                                            <th class="text-center cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('confirmedAdmissions')">
+                                            <th class="text-center cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('confirmedAdmissions')">
                                                 Confirmed Admissions
-                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'confirmedAdmissions'">{{sortDirection === 'asc'
+                                                    ? '▲' : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalRevenue')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalRevenue')">
                                                 Projected Revenue
-                                                <span *ngIf="sortBy === 'totalRevenue'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalRevenue'">{{sortDirection === 'asc' ? '▲'
+                                                    : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalFeesCollected')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalFeesCollected')">
                                                 Overall Collected
-                                                <span *ngIf="sortBy === 'totalFeesCollected'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalFeesCollected'">{{sortDirection === 'asc'
+                                                    ? '▲' : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalRefunded')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalRefunded')">
                                                 Refunded Amount
-                                                <span *ngIf="sortBy === 'totalRefunded'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalRefunded'">{{sortDirection === 'asc' ? '▲'
+                                                    : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('netCollected')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('netCollected')">
                                                 Net Collected
-                                                <span *ngIf="sortBy === 'netCollected'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'netCollected'">{{sortDirection === 'asc' ? '▲'
+                                                    : '▼'}}</span>
                                             </th>
                                         </tr>
                                     </thead>
@@ -1158,22 +1229,32 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'STUDENT_DETAIL'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('studentName')">
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('studentName')">
                                                 Student Information
-                                                <span *ngIf="sortBy === 'studentName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'studentName'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
-                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('courseName')">
                                                 Academic Context
-                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
                                             <th class="text-center">Threshold</th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('totalFeesPaid')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('totalFeesPaid')">
                                                 Paid
-                                                <span *ngIf="sortBy === 'totalFeesPaid'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'totalFeesPaid'">{{sortDirection === 'asc' ? '▲'
+                                                    : '▼'}}</span>
                                             </th>
-                                            <th class="text-right cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('remainingFees')">
+                                            <th class="text-right cursor-pointer"
+                                                style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('remainingFees')">
                                                 Pending
-                                                <span *ngIf="sortBy === 'remainingFees'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'remainingFees'">{{sortDirection === 'asc' ? '▲'
+                                                    : '▼'}}</span>
                                             </th>
                                         </tr>
                                     </thead>
@@ -1220,9 +1301,11 @@
                                 <table class="enterprise-table" *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT'">
                                     <thead class="colorful-header">
                                         <tr>
-                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;" (click)="toggleSort('courseName')">
+                                            <th class="cursor-pointer" style="cursor: pointer; user-select: none;"
+                                                (click)="toggleSort('courseName')">
                                                 Course Name
-                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' : '▼'}}</span>
+                                                <span *ngIf="sortBy === 'courseName'">{{sortDirection === 'asc' ? '▲' :
+                                                    '▼'}}</span>
                                             </th>
                                             <th>Configured Form Target</th>
                                             <th>Forms Achieved</th>
@@ -1236,31 +1319,42 @@
                                         <tr *ngFor="let d of paginatedData">
                                             <td>
                                                 <div class="program-info">
-                                                    <span class="p-name" [title]="d.mappedCourseNames ? d.mappedCourseNames.join('\n') : d.courseName" style="cursor: help; text-decoration: underline dotted #6366f1;">
-                                                        <ng-container *ngIf="d.mappedCourseNames && d.mappedCourseNames.length > 1">
-                                                            {{ d.mappedCourseNames[0] }} &amp; {{ d.mappedCourseNames.length - 1 }} more
+                                                    <span class="p-name"
+                                                        [title]="d.mappedCourseNames ? d.mappedCourseNames.join('\n') : d.courseName"
+                                                        style="cursor: help; text-decoration: underline dotted #6366f1;">
+                                                        <ng-container
+                                                            *ngIf="d.mappedCourseNames && d.mappedCourseNames.length > 1">
+                                                            {{ d.mappedCourseNames[0] }} &amp; {{
+                                                            d.mappedCourseNames.length - 1 }} more
                                                         </ng-container>
-                                                        <ng-container *ngIf="!d.mappedCourseNames || d.mappedCourseNames.length <= 1">
+                                                        <ng-container
+                                                            *ngIf="!d.mappedCourseNames || d.mappedCourseNames.length <= 1">
                                                             {{ d.courseName }}
                                                         </ng-container>
                                                     </span>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="target-badge forms" *ngIf="d.configuredFormTarget">{{d.configuredFormTarget}}</span>
+                                                <span class="target-badge forms"
+                                                    *ngIf="d.configuredFormTarget">{{d.configuredFormTarget}}</span>
                                                 <span *ngIf="!d.configuredFormTarget">-</span>
                                             </td>
                                             <td>
-                                                <div class="target-progress-container" *ngIf="d.configuredFormTarget" style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; padding: 4px 0;">
-                                                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
-                                                        <span style="color: var(--slate-600);">{{d.currentForms}} / {{d.configuredFormTarget.split(' ')[0]}}</span>
-                                                        <span style="color: var(--primary);">{{d.formAchievementPct | number:'1.0-0'}}%</span>
+                                                <div class="target-progress-container" *ngIf="d.configuredFormTarget"
+                                                    style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; padding: 4px 0;">
+                                                    <div
+                                                        style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                                                        <span style="color: var(--slate-600);">{{d.currentForms}} /
+                                                            {{d.configuredFormTarget.split(' ')[0]}}</span>
+                                                        <span style="color: var(--primary);">{{d.formAchievementPct |
+                                                            number:'1.0-0'}}%</span>
                                                     </div>
-                                                    <div class="progress-bar-track" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; width: 100%;">
+                                                    <div class="progress-bar-track"
+                                                        style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; width: 100%;">
                                                         <div class="progress-bar-fill"
-                                                             [style.width.%]="Math.min(d.formAchievementPct, 100)"
-                                                             [style.background]="d.formStatus === 'Achieved' || d.formStatus === 'Exceeded' ? '#10b981' : (d.formStatus === 'Pending' ? '#3b82f6' : '#ef4444')"
-                                                             style="height: 100%; border-radius: 3px; transition: width 0.3s ease;">
+                                                            [style.width.%]="Math.min(d.formAchievementPct, 100)"
+                                                            [style.background]="d.formStatus === 'Achieved' || d.formStatus === 'Exceeded' ? '#10b981' : (d.formStatus === 'Pending' ? '#3b82f6' : '#ef4444')"
+                                                            style="height: 100%; border-radius: 3px; transition: width 0.3s ease;">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1276,20 +1370,26 @@
                                                 <span *ngIf="!d.configuredFormTarget">-</span>
                                             </td>
                                             <td>
-                                                <span class="target-badge fees" *ngIf="d.configuredFeeTarget">{{d.configuredFeeTarget}}</span>
+                                                <span class="target-badge fees"
+                                                    *ngIf="d.configuredFeeTarget">{{d.configuredFeeTarget}}</span>
                                                 <span *ngIf="!d.configuredFeeTarget">-</span>
                                             </td>
                                             <td>
-                                                <div class="target-progress-container" *ngIf="d.configuredFeeTarget" style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; padding: 4px 0;">
-                                                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
-                                                        <span style="color: var(--slate-600);">{{d.currentFirstFees}} / {{d.configuredFeeTarget.split(' ')[0]}}</span>
-                                                        <span style="color: #059669;">{{d.feeAchievementPct | number:'1.0-0'}}%</span>
+                                                <div class="target-progress-container" *ngIf="d.configuredFeeTarget"
+                                                    style="display: flex; flex-direction: column; gap: 4px; min-width: 130px; padding: 4px 0;">
+                                                    <div
+                                                        style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                                                        <span style="color: var(--slate-600);">{{d.currentFirstFees}} /
+                                                            {{d.configuredFeeTarget.split(' ')[0]}}</span>
+                                                        <span style="color: #059669;">{{d.feeAchievementPct |
+                                                            number:'1.0-0'}}%</span>
                                                     </div>
-                                                    <div class="progress-bar-track" style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; width: 100%;">
+                                                    <div class="progress-bar-track"
+                                                        style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; width: 100%;">
                                                         <div class="progress-bar-fill"
-                                                             [style.width.%]="Math.min(d.feeAchievementPct, 100)"
-                                                             [style.background]="d.feeStatus === 'Achieved' || d.feeStatus === 'Exceeded' ? '#10b981' : (d.feeStatus === 'Pending' ? '#3b82f6' : '#ef4444')"
-                                                             style="height: 100%; border-radius: 3px; transition: width 0.3s ease;">
+                                                            [style.width.%]="Math.min(d.feeAchievementPct, 100)"
+                                                            [style.background]="d.feeStatus === 'Achieved' || d.feeStatus === 'Exceeded' ? '#10b981' : (d.feeStatus === 'Pending' ? '#3b82f6' : '#ef4444')"
+                                                            style="height: 100%; border-radius: 3px; transition: width 0.3s ease;">
                                                         </div>
                                                     </div>
                                                 </div>
