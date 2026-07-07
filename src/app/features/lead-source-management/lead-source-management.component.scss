@@ -12,6 +12,12 @@
 .page-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
 .page-subtitle { font-size: 14px; color: #64748b; }
 
+.back-button-and-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #af71ff, #435fff);
   color: white;
@@ -175,6 +181,91 @@
 
 .text-right { text-align: right; }
 .empty-state, .loading-state { padding: 48px; text-align: center; color: #64748b; font-style: italic; }
+
+.table-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.entries-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+
+  select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+  }
+}
+
+.pagination-section {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f5f9;
+}
+
+.showing-text {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-btn {
+  height: 32px;
+  min-width: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-weight: 600;
+  font-size: 14px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &.active {
+    background: #eef2ff;
+    color: #6366f1;
+    border-color: #c7d2fe;
+  }
+
+  &.dots {
+    color: #94a3b8;
+    cursor: default;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    background: #f1f5f9;
+  }
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* Responsive Design */
 @media (max-width: 1024px) {

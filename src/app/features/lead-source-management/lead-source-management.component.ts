@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
@@ -22,15 +22,24 @@ export class LeadSourceManagementComponent implements OnInit {
   filteredLeadSources: LeadSourceDTO[] = [];
   searchTerm = '';
   
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 1;
+  paginatedLeadSources: LeadSourceDTO[] = [];
+
   showAddModal = false;
   showDeleteModal = false;
   selectedLeadSource: LeadSourceDTO | null = null;
   editingId: string | null = null;
 
-  constructor(private leadSourceService: LeadSourceService) { }
+  constructor(private leadSourceService: LeadSourceService, private location: Location) { }
 
   ngOnInit() {
     this.fetchData();
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   fetchData() {
@@ -38,7 +47,7 @@ export class LeadSourceManagementComponent implements OnInit {
     this.leadSourceService.getAll().subscribe({
       next: (res) => {
         this.leadSources = res.data;
-        this.applyFilter();
+        this.updatePaginatedLeadSources();
         this.loading = false;
       },
       error: (err) => {
@@ -48,7 +57,8 @@ export class LeadSourceManagementComponent implements OnInit {
     });
   }
 
-  applyFilter() {
+  updatePaginatedLeadSources() {
+    // Filter
     if (!this.searchTerm.trim()) {
       this.filteredLeadSources = [...this.leadSources];
     } else {
@@ -57,10 +67,54 @@ export class LeadSourceManagementComponent implements OnInit {
         ls.name.toLowerCase().includes(term)
       );
     }
+
+    // Paginate
+    this.totalPages = Math.ceil(this.filteredLeadSources.length / this.pageSize);
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.paginatedLeadSources = this.filteredLeadSources.slice(startIndex, startIndex + this.pageSize);
   }
 
   onSearchChange() {
-    this.applyFilter();
+    this.currentPage = 1;
+    this.updatePaginatedLeadSources();
+  }
+
+  onPageSizeChange(newSize: number) {
+    this.pageSize = newSize;
+    this.currentPage = 1;
+    this.updatePaginatedLeadSources();
+  }
+
+  goToPage(page: number | string) {
+    if (typeof page === 'number' && page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedLeadSources();
+    }
+  }
+
+  getPaginationRange(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const range: (number | string)[] = [];
+    const delta = 1;
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) range.push(i);
+      return range;
+    }
+
+    range.push(1);
+    if (current > delta + 2) range.push('...');
+
+    const start = Math.max(2, current - delta);
+    const end = Math.min(total - 1, current + delta);
+
+    for (let i = start; i <= end; i++) range.push(i);
+
+    if (current < total - delta - 1) range.push('...');
+    range.push(total);
+
+    return range;
   }
 
   openAddModal() {
