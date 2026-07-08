@@ -1470,6 +1470,13 @@
                     transition: var(--transition);
                     flex-shrink: 0;
                     max-width: 100%;
+                    overflow-x: auto;
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                    
+                    &::-webkit-scrollbar {
+                        display: none;
+                    }
 
                     &:hover {
                         border-color: var(--slate-300);
@@ -1952,6 +1959,7 @@
     font-size: 12px;
     font-weight: 800;
     text-transform: uppercase;
+    white-space: nowrap;
 
     &.success {
         background: #dcfce7;
@@ -6038,6 +6046,27 @@
 }
 
 @media (max-width: 480px) {
+    .entry-controls-premium {
+        padding: 4px;
+        gap: 4px;
+        .control-label {
+            padding: 0 4px;
+            gap: 4px;
+            span {
+                font-size: 9px;
+            }
+            .material-symbols-outlined {
+                font-size: 14px;
+            }
+        }
+        .btn-group button {
+            height: 28px;
+            min-width: 28px;
+            padding: 0 6px;
+            font-size: 11px;
+        }
+    }
+
     .pill-status {
         padding: 4px 8px !important;
         font-size: 10px !important;
@@ -6077,6 +6106,27 @@
 }
 
 @media (max-width: 320px) {
+    .entry-controls-premium {
+        padding: 2px;
+        gap: 2px;
+        .control-label {
+            padding: 0 2px;
+            gap: 2px;
+            span {
+                font-size: 8px;
+            }
+            .material-symbols-outlined {
+                font-size: 12px;
+            }
+        }
+        .btn-group button {
+            height: 24px;
+            min-width: 24px;
+            padding: 0 4px;
+            font-size: 10px;
+        }
+    }
+
     .pill-status {
         padding: 2px 6px !important;
         font-size: 9px !important;
