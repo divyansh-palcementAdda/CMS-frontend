@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, NgIf, NgFor, NgClass } from '@angular/common';
+import { CommonModule, NgIf, NgFor, NgClass, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
@@ -48,6 +48,8 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
   // Modals and form state
   showAddEditModal = false;
   showDeleteModal = false;
+  showMoreCoursesModal = false;
+  moreCoursesList: any[] = [];
   isEditing = false;
   editingId: number | null = null;
   selectedConfig: CourseTargetConfigurationItem | null = null;
@@ -73,7 +75,8 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
     private courseService: CourseService,
     private notification: NotificationService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {
     this.configForm = this.fb.group({
       courseId: [null],
@@ -92,6 +95,10 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
   ngOnInit() {
     this.loadData();
     this.loadCourses();
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   loadCourses() {
@@ -183,6 +190,16 @@ export class CourseTargetConfigurationManagementComponent implements OnInit, OnD
   removeCourse(courseId: number) {
     this.selectedCourses = this.selectedCourses.filter(c => c.id !== courseId);
     this.configForm.get('courseIds')?.setValue(this.selectedCourses.map(c => c.id));
+  }
+
+  openMoreCoursesModal(courses: any[]) {
+    this.moreCoursesList = courses;
+    this.showMoreCoursesModal = true;
+  }
+
+  closeMoreCoursesModal() {
+    this.showMoreCoursesModal = false;
+    this.moreCoursesList = [];
   }
 
   openAddModal() {

@@ -6,12 +6,12 @@
       <div class="content-header">
         <div class="header-title-area">
           <div class="back-button-and-title">
-            <button class="btn-primary" (click)="goBack()" title="Back">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
+            <div class="back-btn" title="Back" (click)="goBack()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#6366F1" />
+                <path d="M14 8L10 12L14 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-             
-            </button>
+            </div>
             <h2 class="page-title">Lead Source Management</h2>
           </div>
           <p class="page-subtitle">Manage dynamic sources for student admissions</p>
@@ -46,7 +46,8 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" placeholder="Search Lead Source" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+              <input type="text" placeholder="Search Lead Source" [(ngModel)]="searchTerm"
+                (ngModelChange)="onSearchChange()">
             </div>
           </div>
         </div>
@@ -80,20 +81,24 @@
                 <td class="text-right">
                   <div class="action-buttons">
                     <button class="action-btn edit-btn" (click)="onEdit(ls)" title="Edit">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                       </svg>
                     </button>
-                    <button class="action-btn status-btn" (click)="onToggleStatus(ls)" [title]="ls.active ? 'Deactivate' : 'Activate'">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <button class="action-btn status-btn" (click)="onToggleStatus(ls)"
+                      [title]="ls.active ? 'Deactivate' : 'Activate'">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="16"></line>
                         <line x1="8" y1="12" x2="16" y2="12"></line>
                       </svg>
                     </button>
                     <button class="action-btn delete-btn" (click)="onDelete(ls)" title="Delete">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                         <line x1="10" y1="11" x2="10" y2="17"></line>
@@ -114,17 +119,20 @@
         </div>
 
         <div class="pagination-section">
-          <span class="showing-text">Showing {{ paginatedLeadSources.length }} records out of {{ filteredLeadSources.length }} Lead Sources</span>
+          <span class="showing-text">Showing {{ paginatedLeadSources.length }} records out of {{
+            filteredLeadSources.length }} Lead Sources</span>
           <div class="pagination-controls">
             <button class="page-btn nav-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
-            <button class="page-btn" *ngFor="let p of getPaginationRange()" [class.active]="p === currentPage" [class.dots]="p === '...'" [disabled]="p === '...'" (click)="p !== '...' ? goToPage(p) : null">
+            <button class="page-btn" *ngFor="let p of getPaginationRange()" [class.active]="p === currentPage"
+              [class.dots]="p === '...'" [disabled]="p === '...'" (click)="p !== '...' ? goToPage(p) : null">
               {{ p }}
             </button>
-            <button class="page-btn nav-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+            <button class="page-btn nav-btn" (click)="goToPage(currentPage + 1)"
+              [disabled]="currentPage === totalPages">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
@@ -136,17 +144,10 @@
   </div>
 </div>
 
-<app-ls-add-modal
-  *ngIf="showAddModal"
-  [id]="editingId"
-  (closed)="showAddModal = false"
-  (success)="fetchData()">
+<app-ls-add-modal *ngIf="showAddModal" [id]="editingId" (closed)="showAddModal = false" (success)="fetchData()">
 </app-ls-add-modal>
 
-<app-confirmation-modal
-  *ngIf="showDeleteModal"
-  [title]="'Delete Lead Source'"
+<app-confirmation-modal *ngIf="showDeleteModal" [title]="'Delete Lead Source'"
   [message]="'Are you sure you want to delete \'' + selectedLeadSource?.name + '\'? This action cannot be undone.'"
-  (confirm)="confirmDelete()"
-  (cancel)="showDeleteModal = false">
+  (confirm)="confirmDelete()" (cancel)="showDeleteModal = false">
 </app-confirmation-modal>
