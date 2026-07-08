@@ -116,7 +116,7 @@ export class ActivityFeedComponent implements OnInit, OnDestroy {
 
   fetchActivities(): void {
     this.loading = true;
-    this.sub = this.activityService.getRecentActivities(16).subscribe((activities) => {
+    this.sub = this.activityService.getRecentActivities(14).subscribe((activities) => {
 
       if (activities && activities.length > 0) {
         this.mapData(activities);
