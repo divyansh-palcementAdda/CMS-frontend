@@ -73,4 +73,16 @@ export class ReportsService {
   getSessionComparisonReport(prevSession: string, currSession: string, filter: ReportFilter): Observable<any> {
     return this.http.post(`${this.apiUrl}/session-comparison?prevSession=${prevSession}&currSession=${currSession}`, filter);
   }
+
+  getSchedulerConfig(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/scheduler-config`);
+  }
+
+  updateSchedulerConfig(config: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/scheduler-config`, config);
+  }
+
+  backfillHistory(filter: ReportFilter): Observable<any> {
+    return this.http.post(`${this.apiUrl}/course-target-achievement/backfill`, filter);
+  }
 }
