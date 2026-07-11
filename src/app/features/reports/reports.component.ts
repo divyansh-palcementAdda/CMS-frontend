@@ -6,6 +6,7 @@ import { CourseService } from '../../core/services/course.service';
 import { LeadSourceService } from '../../core/services/lead-source.service';
 import { UserService } from '../../core/services/user.service';
 import { ConsultancyService } from '../../core/services/consultancy.service';
+import { AuthService } from '../../core/services/auth.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { finalize, Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
@@ -94,6 +95,7 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
   private leadSourceService = inject(LeadSourceService);
   private userService = inject(UserService);
   private consultancyService = inject(ConsultancyService);
+  private authService = inject(AuthService);
 
   @ViewChild('tabsScrollContainer') tabsScrollContainer!: ElementRef<HTMLElement>;
 
@@ -217,6 +219,141 @@ export class ReportsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get totalPages() {
     return this.serverPages;
+  }
+
+  // --- Dynamic Scheduler & Backfill states ---
+  showBackfillModal = false;
+  backfillStartDate = '';
+  backfillEndDate = '';
+  backfillValidationError = '';
+  backfillLoading = false;
+
+  showSchedulerModal = false;
+  schedulerConfig: any = {
+    businessDayStartTime: '19:00',
+    businessDayEndTime: '18:59:59',
+    schedulerExecutionTime: '19:05',
+    schedulerEnabled: true,
+    timeZone: 'Asia/Kolkata'
+  };
+  schedulerSaving = false;
+  schedulerValidationError = '';
+
+  get isSchedulerAdmin(): boolean {
+    return this.authService.hasRole('ADMIN') || this.authService.hasRole('SUPER_ADMIN');
+  }
+
+  openBackfillModal() {
+    this.showBackfillModal = true;
+    this.backfillStartDate = '';
+    this.backfillEndDate = '';
+    this.backfillValidationError = '';
+    this.backfillLoading = false;
+    document.body.classList.add('modal-open');
+  }
+
+  closeBackfillModal() {
+    this.showBackfillModal = false;
+    document.body.classList.remove('modal-open');
+  }
+
+  validateBackfillDates() {
+    this.backfillValidationError = '';
+    if (!this.backfillStartDate || !this.backfillEndDate) {
+      return;
+    }
+    const start = new Date(this.backfillStartDate);
+    const end = new Date(this.backfillEndDate);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    if (end < start) {
+      this.backfillValidationError = 'End Date cannot be before Start Date';
+    } else if (end > today) {
+      this.backfillValidationError = 'End Date cannot be in the future';
+    }
+  }
+
+  submitBackfill() {
+    this.validateBackfillDates();
+    if (this.backfillValidationError) {
+      return;
+    }
+    this.backfillLoading = true;
+    this.reportsService.backfillHistory({
+      startDate: this.backfillStartDate,
+      endDate: this.backfillEndDate
+    }).subscribe({
+      next: () => {
+        this.backfillLoading = false;
+        this.closeBackfillModal();
+        this.loadReport();
+      },
+      error: (err) => {
+        this.backfillLoading = false;
+        this.backfillValidationError = err.error?.message || 'Failed to rebuild historical snapshots.';
+      }
+    });
+  }
+
+  openSchedulerModal() {
+    this.showSchedulerModal = true;
+    this.schedulerValidationError = '';
+    this.reportsService.getSchedulerConfig().subscribe({
+      next: (res) => {
+        if (res && res.data) {
+          this.schedulerConfig = {
+            ...res.data,
+            businessDayStartTime: res.data.businessDayStartTime ? res.data.businessDayStartTime.substring(0, 5) : '19:00',
+            businessDayEndTime: res.data.businessDayEndTime ? res.data.businessDayEndTime.substring(0, 8) : '18:59:59',
+            schedulerExecutionTime: res.data.schedulerExecutionTime ? res.data.schedulerExecutionTime.substring(0, 5) : '19:05'
+          };
+        }
+        document.body.classList.add('modal-open');
+      },
+      error: () => {
+        this.schedulerValidationError = 'Failed to fetch scheduler configuration.';
+        document.body.classList.add('modal-open');
+      }
+    });
+  }
+
+  closeSchedulerModal() {
+    this.showSchedulerModal = false;
+    document.body.classList.remove('modal-open');
+  }
+
+  validateSchedulerConfig() {
+    this.schedulerValidationError = '';
+    if (!this.schedulerConfig.businessDayStartTime || !this.schedulerConfig.businessDayEndTime || !this.schedulerConfig.schedulerExecutionTime) {
+      this.schedulerValidationError = 'All fields are required';
+    }
+  }
+
+  submitSchedulerConfig() {
+    this.validateSchedulerConfig();
+    if (this.schedulerValidationError) {
+      return;
+    }
+    this.schedulerSaving = true;
+    
+    const payload = {
+      ...this.schedulerConfig,
+      businessDayStartTime: this.schedulerConfig.businessDayStartTime.length === 5 ? this.schedulerConfig.businessDayStartTime + ':00' : this.schedulerConfig.businessDayStartTime,
+      businessDayEndTime: this.schedulerConfig.businessDayEndTime.length === 5 ? this.schedulerConfig.businessDayEndTime + ':59' : this.schedulerConfig.businessDayEndTime,
+      schedulerExecutionTime: this.schedulerConfig.schedulerExecutionTime.length === 5 ? this.schedulerConfig.schedulerExecutionTime + ':00' : this.schedulerConfig.schedulerExecutionTime
+    };
+
+    this.reportsService.updateSchedulerConfig(payload).subscribe({
+      next: () => {
+        this.schedulerSaving = false;
+        this.closeSchedulerModal();
+      },
+      error: (err) => {
+        this.schedulerSaving = false;
+        this.schedulerValidationError = err.error?.message || 'Failed to save scheduler configuration.';
+      }
+    });
   }
 
   ngOnInit() {

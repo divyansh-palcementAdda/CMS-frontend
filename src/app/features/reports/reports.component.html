@@ -785,7 +785,7 @@
                                     <input type="text" [(ngModel)]="filters.search" (input)="onSearch()"
                                         placeholder="Search records instantly...">
                                 </div>
-                                <div class="filter-controls" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
+                                <div class="filter-controls">
                                     <!-- Custom Date Applied Badge (Premium UI) -->
                                     <div class="custom-range-badge"
                                         *ngIf="(filters.filterType === 'CUSTOM' || filters.filterType === 'CUSTOM_DATE') && filters.startDate && filters.endDate">
@@ -815,27 +815,35 @@
                                         <select [(ngModel)]="filters.filterType" (change)="onDateFilterChange()">
                                             <option value="TODAY">Today</option>
                                             <option value="YESTERDAY">Yesterday</option>
-                                            <option value="THIS_WEEK">This Week</option>
-                                            <option value="THIS_MONTH">This Month</option>
+                                            <option value="THIS_WEEK" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">This Week</option>
+                                            <option value="THIS_MONTH" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">This Month</option>
                                             <option value="ALL_TIME">All Time</option>
                                             <option value="CUSTOM_DATE">Custom Date</option>
-                                            <option value="CUSTOM_DATE_TIME">Custom Date & Time</option>
+                                            <option value="CUSTOM_DATE_TIME" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">Custom Date & Time</option>
                                         </select>
                                     </div>
-                                    <div class="control-item">
+                                    <div class="control-item" *ngIf="activeReport !== 'COURSE_TARGET_ACHIEVEMENT'">
                                         <label>Session</label>
                                         <select [(ngModel)]="filters.session" (change)="onSessionChange()">
                                             <option *ngFor="let s of sessions" [value]="s">{{s === 'OVERALL' ? 'Overall
                                                 / All Sessions' : s}}</option>
                                         </select>
                                     </div>
+                                    <!-- Target Achievement Specific Admin Controls -->
+                                    <ng-container *ngIf="activeReport === 'COURSE_TARGET_ACHIEVEMENT' && isSchedulerAdmin">
+                                        <button class="btn-sync" (click)="openSchedulerModal()" title="Scheduler Settings" style="background: var(--slate-100); color: var(--slate-700);">
+                                            <span class="material-symbols-outlined">settings</span>
+                                        </button>
+                                        <button class="btn-sync" (click)="openBackfillModal()" title="Rebuild History" style="background: var(--primary-light); color: var(--primary);">
+                                            <span class="material-symbols-outlined">restart_alt</span>
+                                        </button>
+                                    </ng-container>
                                     <button class="btn-sync" (click)="syncReport()" [class.syncing]="loading"
                                         title="Synchronize Data">
                                         <span class="material-symbols-outlined">sync</span>
                                     </button>
                                 </div>
                             </div>
-
                         </div>
 
                         <div class="table-container-v2">
@@ -2006,6 +2014,136 @@
                         <span>Share on WhatsApp</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rebuild Target History Modal Overlay -->
+    <div class="modal-overlay" *ngIf="showBackfillModal" (click)="closeBackfillModal()">
+        <div class="custom-date-picker-panel" (click)="$event.stopPropagation()">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="material-symbols-outlined">restart_alt</span>
+                    <div class="panel-header-text">
+                        <h4>Rebuild Target History</h4>
+                        <p>Recalculate snapshots using business dates</p>
+                    </div>
+                </div>
+                <button class="btn-close-panel" (click)="closeBackfillModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <p style="margin-bottom: 16px; font-size: 13px; color: var(--slate-600); line-height: 1.5;">
+                    Regenerate daily target snapshots for the specified date range. This will recalculate progress using the business configuration active during each date. Existing snapshots in the range will be updated.
+                </p>
+                <div class="date-inputs-group">
+                    <div class="date-input-field">
+                        <label>Start Date</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">calendar_month</span>
+                            <input type="date" [(ngModel)]="backfillStartDate" (change)="validateBackfillDates()">
+                        </div>
+                    </div>
+                    <div class="date-input-field">
+                        <label>End Date</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">calendar_month</span>
+                            <input type="date" [(ngModel)]="backfillEndDate" (change)="validateBackfillDates()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validation-message-container" *ngIf="backfillValidationError" style="margin-top: 12px; display: flex; align-items: center; gap: 6px; color: var(--danger); font-size: 12px; font-weight: 500;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">error</span>
+                    <span class="message-text">{{backfillValidationError}}</span>
+                </div>
+            </div>
+
+            <div class="panel-footer justify-between">
+                <button class="btn-panel-action secondary" (click)="closeBackfillModal()">
+                    Cancel
+                </button>
+                <button class="btn-panel-action primary"
+                    [disabled]="!!backfillValidationError || !backfillStartDate || !backfillEndDate || backfillLoading"
+                    (click)="submitBackfill()">
+                    {{ backfillLoading ? 'Rebuilding...' : 'Rebuild Snapshots' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scheduler Config Modal Overlay -->
+    <div class="modal-overlay" *ngIf="showSchedulerModal" (click)="closeSchedulerModal()">
+        <div class="custom-date-picker-panel" style="max-width: 480px;" (click)="$event.stopPropagation()">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="material-symbols-outlined">settings</span>
+                    <div class="panel-header-text">
+                        <h4>Scheduler & Business Day Settings</h4>
+                        <p>Configure automated target calculations</p>
+                    </div>
+                </div>
+                <button class="btn-close-panel" (click)="closeSchedulerModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="date-inputs-group" style="flex-direction: column; gap: 12px;">
+                    <div class="date-input-field" style="width: 100%;">
+                        <label>Business Day Start Time</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">schedule</span>
+                            <input type="time" [(ngModel)]="schedulerConfig.businessDayStartTime" (change)="validateSchedulerConfig()">
+                        </div>
+                    </div>
+                    <div class="date-input-field" style="width: 100%;">
+                        <label>Business Day End Time</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">schedule</span>
+                            <input type="time" [(ngModel)]="schedulerConfig.businessDayEndTime" (change)="validateSchedulerConfig()">
+                        </div>
+                        <p style="font-size: 11px; color: var(--slate-500); margin-top: 4px; line-height: 1.4;">
+                            Default: Start 19:00:00 (7:00 PM), End 18:59:59 (6:59:59 PM next day) to run overnight business day.
+                        </p>
+                    </div>
+                    <div class="date-input-field" style="width: 100%;">
+                        <label>Scheduler Daily Execution Time</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">alarm</span>
+                            <input type="time" [(ngModel)]="schedulerConfig.schedulerExecutionTime" (change)="validateSchedulerConfig()">
+                        </div>
+                    </div>
+                    <div class="date-input-field" style="width: 100%;">
+                        <label>Time Zone</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-outlined input-icon">language</span>
+                            <input type="text" [(ngModel)]="schedulerConfig.timeZone" (change)="validateSchedulerConfig()" placeholder="e.g. Asia/Kolkata">
+                        </div>
+                    </div>
+                    <div class="date-input-field" style="width: 100%; display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                        <label style="margin-bottom: 0;">Enable Daily Scheduler Snapshots</label>
+                        <input type="checkbox" [(ngModel)]="schedulerConfig.schedulerEnabled" style="width: 20px; height: 20px; cursor: pointer;">
+                    </div>
+                </div>
+
+                <div class="validation-message-container" *ngIf="schedulerValidationError" style="margin-top: 12px; display: flex; align-items: center; gap: 6px; color: var(--danger); font-size: 12px; font-weight: 500;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">error</span>
+                    <span class="message-text">{{schedulerValidationError}}</span>
+                </div>
+            </div>
+
+            <div class="panel-footer justify-between">
+                <button class="btn-panel-action secondary" (click)="closeSchedulerModal()">
+                    Cancel
+                </button>
+                <button class="btn-panel-action primary"
+                    [disabled]="!!schedulerValidationError || schedulerSaving"
+                    (click)="submitSchedulerConfig()">
+                    {{ schedulerSaving ? 'Saving...' : 'Save Settings' }}
+                </button>
             </div>
         </div>
     </div>
