@@ -21,6 +21,8 @@ export interface CourseDTO {
   formsLast30Days?: number;
   feesLast7Days?: number;
   feesLast30Days?: number;
+  todayForms?: number;
+  todayFirstFees?: number;
 }
 
 export interface CreateCourseDTO {
@@ -55,6 +57,8 @@ export interface CourseItem {
   formsLast30Days?: number;
   feesLast7Days?: number;
   feesLast30Days?: number;
+  todayForms?: number;
+  todayFirstFees?: number;
 }
 
 export interface CourseStats {

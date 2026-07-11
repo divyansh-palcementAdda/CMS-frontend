@@ -212,7 +212,9 @@ export class CourseService {
             formsLast7Days: c.formsLast7Days || 0,
             formsLast30Days: c.formsLast30Days || 0,
             feesLast7Days: c.feesLast7Days || 0,
-            feesLast30Days: c.feesLast30Days || 0
+            feesLast30Days: c.feesLast30Days || 0,
+            todayForms: c.todayForms || 0,
+            todayFirstFees: c.todayFirstFees || 0
           };
         });
 
