@@ -2105,9 +2105,9 @@
                             <span class="material-symbols-outlined input-icon">schedule</span>
                             <input type="time" [(ngModel)]="schedulerConfig.businessDayEndTime" (change)="validateSchedulerConfig()">
                         </div>
-                        <p style="font-size: 11px; color: var(--slate-500); margin-top: 4px; line-height: 1.4;">
+                        <!-- <p style="font-size: 11px; color: var(--slate-500); margin-top: 4px; line-height: 1.4;">
                             Default: Start 19:00:00 (7:00 PM), End 18:59:59 (6:59:59 PM next day) to run overnight business day.
-                        </p>
+                        </p> -->
                     </div>
                     <div class="date-input-field" style="width: 100%;">
                         <label>Scheduler Daily Execution Time</label>
@@ -2116,15 +2116,15 @@
                             <input type="time" [(ngModel)]="schedulerConfig.schedulerExecutionTime" (change)="validateSchedulerConfig()">
                         </div>
                     </div>
-                    <div class="date-input-field" style="width: 100%;">
+                    <div class="date-input-field" style="width: 100%;" >
                         <label>Time Zone</label>
                         <div class="input-wrapper">
                             <span class="material-symbols-outlined input-icon">language</span>
-                            <input type="text" [(ngModel)]="schedulerConfig.timeZone" (change)="validateSchedulerConfig()" placeholder="e.g. Asia/Kolkata">
+                            <input disabled type="text" [(ngModel)]="schedulerConfig.timeZone" (change)="validateSchedulerConfig()" placeholder="e.g. Asia/Kolkata">
                         </div>
                     </div>
-                    <div class="date-input-field" style="width: 100%; display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-                        <label style="margin-bottom: 0;">Enable Daily Scheduler Snapshots</label>
+                    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+                        <label style="font-size: 11px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.05em; padding-left: 2px; margin-bottom: 0;">Enable Daily Scheduler Snapshots</label>
                         <input type="checkbox" [(ngModel)]="schedulerConfig.schedulerEnabled" style="width: 20px; height: 20px; cursor: pointer;">
                     </div>
                 </div>
