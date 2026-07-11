@@ -244,6 +244,23 @@
                           [ngClass]="sortBy === 'totalAdmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
                       </span>
                     </th>
+
+                    <th class="sortable" (click)="toggleSort('todayForms')" style="cursor: pointer;">
+                      Forms (Today)
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'todayForms' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+
+                    <th class="sortable" (click)="toggleSort('todayFirstFees')" style="cursor: pointer;">
+                      Fees (Today)
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'todayFirstFees' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+
                     <th class="sortable" (click)="toggleSort('forms7days')" style="cursor: pointer;">
                       Forms (10 Days)
                       <span class="sort-icon" style="margin-left: 4px;">
@@ -312,6 +329,12 @@
                     </td>
                     <td class="text-center text-bold">{{ item.totalApplications }}</td>
                     <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
+                    <td class="text-center">
+                      <span class="kpi-badge font-bold">{{ item.todayForms || 0 }}</span>
+                    </td>
+                    <td class="text-center">
+                      <span class="kpi-badge font-bold">{{ item.todayFirstFees || 0 }}</span>
+                    </td>
                     <td class="text-center">
                       <span class="kpi-badge font-bold">{{ item.formsLast7Days || 0 }}</span>
                     </td>
