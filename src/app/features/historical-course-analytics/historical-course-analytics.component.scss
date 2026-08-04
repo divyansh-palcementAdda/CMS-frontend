@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ── Design Tokens (matches project theme) ─────────────────────────────────
 $primary:       #435FFF;
 $primary-light: #af71ff;
@@ -319,7 +321,7 @@ $success:       #10b981;
       user-select: none;
       transition: background 0.2s;
 
-      &:hover { background: darken($primary, 6%); }
+      &:hover { background: color.adjust($primary, $lightness: -6%); }
 
       &.sno-header {
         width: 56px;
@@ -855,7 +857,7 @@ $success:       #10b981;
     &.success {
       background: rgba($success, 0.07);
       border: 1px solid rgba($success, 0.15);
-      color: darken($success, 15%);
+      color: color.adjust($success, $lightness: -15%);
       .result-icon-wrapper { background: $success; }
     }
 

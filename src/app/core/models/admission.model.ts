@@ -35,6 +35,8 @@ export interface AdmissionStats {
   admUnmapped: number;
   
   admConfirmed: number;
+  admConfirmedExcludingSbsFoc?: number;
+  confirmedAdmissionsExcludingSbsFoc?: number;
   admCancelled: number;
   admRemainingActive: number;
 

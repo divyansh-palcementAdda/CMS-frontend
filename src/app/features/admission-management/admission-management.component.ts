@@ -222,6 +222,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     { value: 'INDIRECT', name: 'Indirect' },
     { value: 'UNMAPPED', name: 'Unmapped' },
     { value: 'CONFIRMED', name: 'Confirmed' },
+    { value: 'CONFIRMED_EXCLUDING_SBS_FOC', name: 'Confirmed (Excl. SBS & FOC)' },
     { value: 'CANCELLED_APP', name: 'Cancelled Applications' },
     { value: 'CANCELLED_ADM', name: 'Cancelled Admissions' },
     { value: 'REMAINING_APP', name: 'Remaining Applications' },

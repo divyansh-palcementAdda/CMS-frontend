@@ -2357,10 +2357,18 @@ $text-light: #64748B;
 // ── Live Today Counters Grid ──────────────────────────────
 .today-counters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 28px;
   width: 100%;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .today-stat-card {
@@ -2501,6 +2509,12 @@ $text-light: #64748B;
 
     &:hover {
       border-color: #34d399;
+    }
+
+    &.active {
+      border-color: #059669;
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      box-shadow: 0 8px 20px rgba(5, 150, 105, 0.2);
     }
   }
 
