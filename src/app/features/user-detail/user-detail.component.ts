@@ -705,6 +705,46 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  downloadConsultancyExcel() {
+    this.exporting['consultancy_ownership'] = true;
+    
+    // Get all consultancy data (not just paginated)
+    const allConsultancies = this.user?.consultancies || [];
+    
+    // Create CSV content
+    const headers = ['S.No', 'Name', 'Email', 'Mobile Number', 'City', 'Status', 'Commission %'];
+    const csvContent = [
+      headers.join(','),
+      ...allConsultancies.map((c, index) => [
+        index + 1,
+        `"${c.name || ''}"`,
+        `"${c.email || ''}"`,
+        `"${c.mobile || ''}"`,
+        `"${c.city || ''}"`,
+        `"${c.status || ''}"`,
+        c.commissionPercentage || 0
+      ].join(','))
+    ].join('\n');
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const timestamp = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    a.download = `consultancy_ownership_${timestamp}.csv`;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    this.exporting['consultancy_ownership'] = false;
+  }
+
   onRecentFormsClick(days: number): void {
     const today = new Date();
     const startDate = new Date();
