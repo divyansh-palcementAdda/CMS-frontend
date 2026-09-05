@@ -134,6 +134,16 @@
             </div>
           </div>
 
+          <div class="form-group form-group-half">
+            <label>Total Seats Capacity</label>
+            <input type="number" formControlName="totalSeats" placeholder="e.g. 60" min="0"
+                   [class.error]="(courseForm.get('totalSeats')?.invalid && courseForm.get('totalSeats')?.touched) || backendErrors['totalSeats']">
+            <div class="error-msg" *ngIf="(courseForm.get('totalSeats')?.invalid && courseForm.get('totalSeats')?.touched) || backendErrors['totalSeats']">
+              <small *ngIf="courseForm.get('totalSeats')?.invalid && courseForm.get('totalSeats')?.touched">Seats must be 0 or greater.</small>
+              <small *ngIf="backendErrors['totalSeats']">{{ backendErrors['totalSeats'] }}</small>
+            </div>
+          </div>
+
           <div class="form-group checklist-group form-group-full">
             <label>Link Institutions (Optional)</label>
             <div class="checklist-container">

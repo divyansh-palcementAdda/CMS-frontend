@@ -230,6 +230,42 @@
                     </th>
                     <th>Course Type</th>
 
+                    <th class="sortable" (click)="toggleSort('totalseats')" style="cursor: pointer;">
+                      Total Seats
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'totalseats' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+                    <th class="sortable" (click)="toggleSort('seatsfilled')" style="cursor: pointer;">
+                      Seats Filled
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'seatsfilled' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+                    <th class="sortable" (click)="toggleSort('remainingseats')" style="cursor: pointer;">
+                      Remaining Seats
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'remainingseats' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+                    <th class="sortable" (click)="toggleSort('excessadmissions')" style="cursor: pointer;">
+                      Excess Admissions
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'excessadmissions' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+                    <th class="sortable" (click)="toggleSort('lateralentry')" style="cursor: pointer;">
+                      Lateral Entry
+                      <span class="sort-icon" style="margin-left: 4px;">
+                        <i class="fas"
+                          [ngClass]="sortBy === 'lateralentry' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+                      </span>
+                    </th>
+
                     <th class="sortable" (click)="toggleSort('totalApplications')" style="cursor: pointer;">
                       Total Applications
                       <span class="sort-icon" style="margin-left: 4px;">
@@ -327,6 +363,13 @@
                       <span class="course-type filter-pill" [ngClass]="item.courseType.toLowerCase()">{{ item.courseType
                         }}</span>
                     </td>
+                    <td class="text-center text-bold">{{ item.totalSeats || 0 }}</td>
+                    <td class="text-center text-bold" style="color: #059669;">{{ item.seatsFilled || 0 }}</td>
+                    <td class="text-center text-bold" [style.color]="(item.remainingSeats || 0) === 0 ? '#DC2626' : '#2563EB'">{{ item.remainingSeats || 0 }}</td>
+                    <td class="text-center text-bold" [style.color]="(item.excessAdmissions || 0) > 0 ? '#DC2626' : '#6B7280'">{{ item.excessAdmissions || 0 }}</td>
+                    <td class="text-center">
+                      <span class="kpi-badge font-bold" style="background: rgba(139, 92, 246, 0.1); color: #7C3AED;">{{ item.lateralEntryCount || 0 }}</span>
+                    </td>
                     <td class="text-center text-bold">{{ item.totalApplications }}</td>
                     <td class="text-center text-bold">{{ item.totalAdmissions }}</td>
                     <td class="text-center">
@@ -385,7 +428,7 @@
                     </td>
                   </tr>
                   <tr *ngIf="paginatedCourses.length === 0">
-                    <td colspan="11" class="text-center py-4 text-gray-500">No courses found matching "{{searchTerm}}"
+                    <td colspan="16" class="text-center py-4 text-gray-500">No courses found matching "{{searchTerm}}"
                     </td>
                   </tr>
                 </tbody>

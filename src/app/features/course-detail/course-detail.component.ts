@@ -88,6 +88,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   breakdownTotal = 0;
   breakdownSortBy = 'userName';
   breakdownSortDir = 'asc';
+  selectedSession = '';
 
   // Search & Pagination States
   masterSearch = '';
@@ -194,7 +195,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   loadCourseDetail(): void {
     this.loading = true;
-    this.courseService.getCourseDetail(this.courseId).subscribe({
+    this.courseService.getCourseDetail(this.courseId, this.selectedSession || undefined).subscribe({
       next: (data) => {
         this.courseDetail = data;
         this.updateChartData();
@@ -621,6 +622,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     }
     else if (stat === 'active' || stat === 'inactive' || stat === 'dormant' || stat === 'total_cons') {
       this.scrollToTable('consultancy-section');
+    }
+    else if (stat === 'seats_filled' || stat === 'lateral_entry') {
+      this.scrollToTable('total-adms');
     }
   }
 

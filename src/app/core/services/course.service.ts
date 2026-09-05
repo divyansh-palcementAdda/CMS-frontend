@@ -13,8 +13,10 @@ export class CourseService {
 
   constructor(private http: HttpClient) { }
 
-  getCourseDetail(id: number): Observable<CourseDetail> {
-    return this.http.get<any>(`${this.apiUrl}/${id}/detail`).pipe(
+  getCourseDetail(id: number, session?: string): Observable<CourseDetail> {
+    const params: any = {};
+    if (session) params.session = session;
+    return this.http.get<any>(`${this.apiUrl}/${id}/detail`, { params }).pipe(
       map(response => response.data)
     );
   }
@@ -126,7 +128,12 @@ export class CourseService {
         totalAdmissions: course.totalAdmissions || 0,
         cancelledApplications: course.cancelledApplications || 0,
         cancelledAdmissions: course.cancelledAdmissions || 0,
-        totalFeesCollected: course.totalFeesCollected || 0
+        totalFeesCollected: course.totalFeesCollected || 0,
+        totalSeats: course.totalSeats ?? 0,
+        seatsFilled: course.seatsFilled ?? 0,
+        remainingSeats: course.remainingSeats ?? 0,
+        excessAdmissions: course.excessAdmissions ?? 0,
+        lateralEntryCount: course.lateralEntryCount ?? 0
       };
     });
 
@@ -176,11 +183,13 @@ export class CourseService {
     search: string = '',
     active: boolean | null = null,
     sortBy: string = 'name',
-    sortDirection: string = 'asc'
+    sortDirection: string = 'asc',
+    session: string = ''
   ): Observable<{ content: CourseItem[], totalElements: number, totalPages: number, stats: CourseStats }> {
     let params = `?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`;
     if (search) params += `&search=${encodeURIComponent(search)}`;
     if (active !== null) params += `&active=${active}`;
+    if (session) params += `&session=${encodeURIComponent(session)}`;
 
     return this.http.get<any>(`${this.apiUrl}/paged${params}`).pipe(
       map(res => {
@@ -214,7 +223,12 @@ export class CourseService {
             feesLast7Days: c.feesLast7Days || 0,
             feesLast30Days: c.feesLast30Days || 0,
             todayForms: c.todayForms || 0,
-            todayFirstFees: c.todayFirstFees || 0
+            todayFirstFees: c.todayFirstFees || 0,
+            totalSeats: c.totalSeats ?? 0,
+            seatsFilled: c.seatsFilled ?? 0,
+            remainingSeats: c.remainingSeats ?? 0,
+            excessAdmissions: c.excessAdmissions ?? 0,
+            lateralEntryCount: c.lateralEntryCount ?? 0
           };
         });
 

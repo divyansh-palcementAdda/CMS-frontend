@@ -160,6 +160,71 @@ export class FeePaymentModalComponent implements OnInit {
     this.close.emit();
   }
 
+  isLateralEntryModified(): boolean {
+    const originalChecked = Boolean(this.isLateralEntry);
+    const originalRemark = (this.lateralEntryRemarkInput || '').trim();
+    const currentChecked = this.isLateralEntryChecked;
+    const currentRemark = (this.lateralEntryRemark || '').trim();
+
+    if (currentChecked !== originalChecked) return true;
+    if (currentChecked && currentRemark !== originalRemark) return true;
+    return false;
+  }
+
+  get isSubmitDisabled(): boolean {
+    if (this.isSubmitting) return true;
+
+    // Lateral entry validation when checked
+    if (this.isLateralEntryChecked) {
+      if (!this.lateralEntryRemark || !this.lateralEntryRemark.trim() || this.lateralEntryRemark.trim().length > 500) {
+        return true;
+      }
+    }
+
+    // If FOC / SBS is selected
+    if (this.selectedFocType !== 'NONE') {
+      return false;
+    }
+
+    // If FOC is changed from something else to NONE
+    if (this.focType !== 'NONE' && this.selectedFocType === 'NONE') {
+      return false;
+    }
+
+    // If Lateral Entry is modified without fee payment
+    const amount = this.paymentForm.get('amount')?.value;
+    const hasAmount = amount !== null && amount !== undefined && amount !== '' && Number(amount) > 0;
+    if (this.isLateralEntryModified() && !hasAmount) {
+      return false; // Valid to submit lateral entry changes
+    }
+
+    // Default fee payment flow: requires valid payment form
+    return this.paymentForm.invalid;
+  }
+
+  get submitButtonText(): string {
+    if (this.isSubmitting) return 'Processing...';
+    if (this.selectedFocType !== 'NONE') return 'Save FOC Status';
+    const amount = this.paymentForm.get('amount')?.value;
+    const hasAmount = amount !== null && amount !== undefined && amount !== '' && Number(amount) > 0;
+    if (hasAmount) {
+      return this.feeId ? 'Update Payment' : 'Confirm Payment';
+    }
+    if (this.isLateralEntryModified()) {
+      return 'Save Lateral Entry';
+    }
+    return this.feeId ? 'Update Payment' : 'Confirm Payment';
+  }
+
+  get submitButtonIcon(): string {
+    if (this.selectedFocType !== 'NONE') return 'verified_user';
+    const amount = this.paymentForm.get('amount')?.value;
+    const hasAmount = amount !== null && amount !== undefined && amount !== '' && Number(amount) > 0;
+    if (hasAmount) return 'add_card';
+    if (this.isLateralEntryModified()) return 'save';
+    return 'add_card';
+  }
+
   async onSubmit() {
     // Validate lateral entry if enabled
     if (this.isLateralEntryChecked) {
@@ -173,10 +238,15 @@ export class FeePaymentModalComponent implements OnInit {
       }
     }
 
+    // 1. FOC / SBS Flow
     if (this.selectedFocType !== 'NONE') {
       this.isSubmitting = true;
       this.error = null;
-      await this.syncLateralEntryIfChanged();
+      const lateralSuccess = await this.syncLateralEntryIfChanged();
+      if (!lateralSuccess && this.error) {
+        this.isSubmitting = false;
+        return;
+      }
       this.admissionService.updateFocStatus(this.studentId!, this.selectedFocType, this.focRemarks).subscribe({
         next: () => {
           this.isSubmitting = false;
@@ -191,15 +261,21 @@ export class FeePaymentModalComponent implements OnInit {
       return;
     }
 
+    // 2. FOC cleared back to NONE Flow
     if (this.focType !== 'NONE' && this.selectedFocType === 'NONE') {
       this.isSubmitting = true;
       this.error = null;
-      await this.syncLateralEntryIfChanged();
+      const lateralSuccess = await this.syncLateralEntryIfChanged();
+      if (!lateralSuccess && this.error) {
+        this.isSubmitting = false;
+        return;
+      }
       this.admissionService.updateFocStatus(this.studentId!, 'NONE', '').subscribe({
         next: () => {
           this.focType = 'NONE';
           this.isSubmitting = false;
-          if (this.paymentForm.valid && this.paymentForm.get('amount')?.value) {
+          const amount = this.paymentForm.get('amount')?.value;
+          if (this.paymentForm.valid && amount && Number(amount) > 0) {
             this.recordPayment();
           } else {
             this.saved.emit(true);
@@ -211,6 +287,23 @@ export class FeePaymentModalComponent implements OnInit {
           this.error = err.error?.message || 'Failed to clear FOC status.';
         }
       });
+      return;
+    }
+
+    // 3. Only Lateral Entry modified without adding fee payment
+    const amountVal = this.paymentForm.get('amount')?.value;
+    const hasAmount = amountVal !== null && amountVal !== undefined && amountVal !== '' && Number(amountVal) > 0;
+
+    if (!hasAmount && this.isLateralEntryModified()) {
+      this.isSubmitting = true;
+      this.error = null;
+      const lateralSuccess = await this.syncLateralEntryIfChanged();
+      this.isSubmitting = false;
+      if (lateralSuccess) {
+        this.notificationService.success('Success', 'Lateral entry details updated successfully.');
+        this.saved.emit(false);
+        this.onClose();
+      }
       return;
     }
 

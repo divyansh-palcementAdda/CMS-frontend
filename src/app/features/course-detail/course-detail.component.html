@@ -88,6 +88,26 @@
                   <label>Status</label>
                   <span class="status-pill active">{{ courseDetail.basicInfo.status }}</span>
                 </div>
+                <div class="info-item">
+                  <label>Total Seats</label>
+                  <p class="font-bold text-dark">{{ courseDetail.basicInfo.totalSeats || 0 }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Seats Filled</label>
+                  <p class="font-bold" style="color: #059669;">{{ courseDetail.basicInfo.seatsFilled || 0 }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Remaining Seats</label>
+                  <p class="font-bold" [style.color]="(courseDetail.basicInfo.remainingSeats || 0) === 0 ? '#DC2626' : '#2563EB'">{{ courseDetail.basicInfo.remainingSeats || 0 }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Excess Admissions</label>
+                  <p class="font-bold" [style.color]="(courseDetail.basicInfo.excessAdmissions || 0) > 0 ? '#DC2626' : '#6B7280'">{{ courseDetail.basicInfo.excessAdmissions || 0 }}</p>
+                </div>
+                <div class="info-item">
+                  <label>Lateral Entry</label>
+                  <p class="font-bold" style="color: #7C3AED;">{{ courseDetail.basicInfo.lateralEntryCount || 0 }}</p>
+                </div>
               </div>
             </section>
           </div>
@@ -115,12 +135,99 @@
                   <span>Course Fees</span>
                   <span class="stat-value blue-text">{{ courseDetail.basicInfo.fees }}</span>
                 </div>
+                <div class="stat-row">
+                  <span>Seat Capacity</span>
+                  <span class="stat-value">{{ courseDetail.basicInfo.totalSeats || 0 }}</span>
+                </div>
               </div>
             </section>
           </div>
         </div>
 
         <div class="categorized-stats">
+          <!-- Total Seats Capacity -->
+          <div class="stat-premium-card purple" (click)="onStatClick('seats_filled')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Total Seat Capacity</span>
+                <span class="value">{{ courseDetail.admissionStats?.totalSeats || courseDetail.basicInfo.totalSeats || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#8B5CF6" fill-opacity="0.1" />
+                  <path d="M4 18V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12" stroke="#8B5CF6" stroke-width="2"/>
+                  <path d="M4 14h16M9 18v3M15 18v3" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seats Filled -->
+          <div class="stat-premium-card green" (click)="onStatClick('seats_filled')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Seats Filled</span>
+                <span class="value">{{ courseDetail.admissionStats?.seatsFilled || courseDetail.basicInfo.seatsFilled || 0 }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#10B981" fill-opacity="0.1" />
+                  <path d="M9 12l2 2 4-4" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="9" stroke="#10B981" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remaining Seats -->
+          <div class="stat-premium-card blue" (click)="onStatClick('seats_filled')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Remaining Seats</span>
+                <span class="value">{{ courseDetail.admissionStats?.remainingSeats !== undefined ? courseDetail.admissionStats?.remainingSeats : (courseDetail.basicInfo.remainingSeats || 0) }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#3B82F6" fill-opacity="0.1" />
+                  <path d="M12 8v4l3 3" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="12" r="9" stroke="#3B82F6" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Excess Admissions -->
+          <div class="stat-premium-card red" (click)="onStatClick('seats_filled')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Excess Admissions</span>
+                <span class="value">{{ courseDetail.admissionStats?.excessAdmissions !== undefined ? courseDetail.admissionStats?.excessAdmissions : (courseDetail.basicInfo.excessAdmissions || 0) }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#EF4444" fill-opacity="0.1" />
+                  <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#EF4444" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lateral Entry -->
+          <div class="stat-premium-card indigo" (click)="onStatClick('lateral_entry')">
+            <div class="card-content">
+              <div class="info">
+                <span class="label">Lateral Entry (Direct 2nd/3rd Yr)</span>
+                <span class="value">{{ courseDetail.admissionStats?.lateralEntryCount !== undefined ? courseDetail.admissionStats?.lateralEntryCount : (courseDetail.basicInfo.lateralEntryCount || 0) }}</span>
+              </div>
+              <div class="icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="24" height="24" rx="6" fill="#6366F1" fill-opacity="0.1" />
+                  <path d="M13 5l7 7-7 7M5 12h15" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
           <div class="stat-premium-card blue" (click)="onStatClick('total_all')">
             <div class="card-content">
               <div class="info">

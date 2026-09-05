@@ -212,7 +212,8 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
       this.searchTerm,
       this.activeFilter,
       this.sortBy,
-      this.sortDirection
+      this.sortDirection,
+      this.sessionFilter
     )
     // takeUntil cleans up if component is destroyed mid-flight;
     // switchMap is NOT used here because loadData() is already called
@@ -323,7 +324,8 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
       this.searchTerm,
       this.activeFilter,
       this.sortBy,
-      this.sortDirection
+      this.sortDirection,
+      this.sessionFilter
     )
     .pipe(takeUntil(this.destroy$))
     .subscribe({
@@ -332,6 +334,11 @@ export class CourseManagementComponent implements OnInit, OnDestroy {
           { header: 'S.No',                    key: 'sNo',                    width: 8  },
           { header: 'Course Name',              key: 'name',                   width: 30 },
           { header: 'Course Type',              key: 'courseType',             width: 18 },
+          { header: 'Total Seats',              key: 'totalSeats',             width: 14 },
+          { header: 'Seats Filled',             key: 'seatsFilled',            width: 14 },
+          { header: 'Remaining Seats',          key: 'remainingSeats',         width: 16 },
+          { header: 'Excess Admissions',        key: 'excessAdmissions',       width: 18 },
+          { header: 'Lateral Entry',            key: 'lateralEntryCount',      width: 15 },
           { header: 'Total Applications',       key: 'totalApplications',      width: 20 },
           { header: 'Total Admissions',         key: 'totalAdmissions',        width: 20 },
           { header: 'Remaining Applications',   key: 'remainingApplications',  width: 22 },

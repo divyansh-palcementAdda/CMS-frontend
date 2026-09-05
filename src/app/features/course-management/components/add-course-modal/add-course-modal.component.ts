@@ -63,6 +63,7 @@ export class AddCourseModalComponent implements OnInit {
       active: [true, [Validators.required]],
       duration: [null, [Validators.required]],
       fees: [null, [Validators.required, Validators.min(0)]],
+      totalSeats: [null, [Validators.min(0)]],
       courseTypeId: [null, [Validators.required]],
       institutionIds: [[]],
       consultancyIds: [[]]
@@ -79,6 +80,7 @@ export class AddCourseModalComponent implements OnInit {
           active: !!course.active,
           duration: course.duration,
           fees: course.fees,
+          totalSeats: course.totalSeats ?? null,
           courseTypeId: course.courseTypeId,
           institutionIds: course.institutionIds || []
         });
@@ -152,6 +154,9 @@ export class AddCourseModalComponent implements OnInit {
       active: this.courseForm.value.active === 'true' || this.courseForm.value.active === true,
       duration: Number(this.courseForm.value.duration),
       fees: Number(this.courseForm.value.fees),
+      totalSeats: this.courseForm.value.totalSeats !== null && this.courseForm.value.totalSeats !== undefined && this.courseForm.value.totalSeats !== ''
+        ? Number(this.courseForm.value.totalSeats)
+        : 0,
       courseTypeId: Number(this.courseForm.value.courseTypeId),
       institutionIds: sanitizeIds(this.courseForm.value.institutionIds),
       consultancyIds: sanitizeIds(this.courseForm.value.consultancyIds)

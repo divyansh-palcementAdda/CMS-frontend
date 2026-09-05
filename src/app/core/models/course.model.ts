@@ -23,6 +23,11 @@ export interface CourseDTO {
   feesLast30Days?: number;
   todayForms?: number;
   todayFirstFees?: number;
+  totalSeats?: number;
+  seatsFilled?: number;
+  remainingSeats?: number;
+  excessAdmissions?: number;
+  lateralEntryCount?: number;
 }
 
 export interface CreateCourseDTO {
@@ -32,6 +37,7 @@ export interface CreateCourseDTO {
   duration: number;
   fees: number;
   courseTypeId: number;
+  totalSeats?: number;
   institutionIds?: number[];
 }
 
@@ -59,6 +65,11 @@ export interface CourseItem {
   feesLast30Days?: number;
   todayForms?: number;
   todayFirstFees?: number;
+  totalSeats?: number;
+  seatsFilled?: number;
+  remainingSeats?: number;
+  excessAdmissions?: number;
+  lateralEntryCount?: number;
 }
 
 export interface CourseStats {
@@ -83,6 +94,11 @@ export interface CourseDetail {
     fees: string;
     duration: string;
     status: string;
+    totalSeats?: number;
+    seatsFilled?: number;
+    remainingSeats?: number;
+    excessAdmissions?: number;
+    lateralEntryCount?: number;
   };
   enrollmentStats: {
     currentEnrollment: number;
@@ -119,6 +135,11 @@ export interface CourseDetail {
     scholarApplications: number;
     directApplications: number;
     viaConsultancyApplications: number;
+    totalSeats?: number;
+    seatsFilled?: number;
+    remainingSeats?: number;
+    excessAdmissions?: number;
+    lateralEntryCount?: number;
   };
   totalApplications: any[];
   totalAdmissions: any[];
@@ -140,6 +161,11 @@ export interface CourseDetail {
   last30DaysForms?: number;
   last10DaysAdmissions?: number;
   last30DaysAdmissions?: number;
+  totalSeats?: number;
+  seatsFilled?: number;
+  remainingSeats?: number;
+  excessAdmissions?: number;
+  lateralEntryCount?: number;
 }
 
 export interface BulkUploadResponse {
