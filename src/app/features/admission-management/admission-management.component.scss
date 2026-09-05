@@ -824,6 +824,28 @@ $text-light: #64748B;
         }
       }
     }
+
+    &.source-lateral {
+      .mini-icon {
+        background: #F3E8FF;
+        color: #6B21A8;
+      }
+
+      &.active {
+        border-color: #7C3AED;
+        background: #FAF5FF;
+        box-shadow: 0 4px 12px rgba(107, 33, 168, 0.15);
+
+        .mini-icon {
+          background: #6B21A8;
+          color: white;
+        }
+
+        .mini-val {
+          color: #6B21A8;
+        }
+      }
+    }
   }
 
   .financial-summary-section {
@@ -1285,6 +1307,12 @@ $text-light: #64748B;
                   background: #FEF3C7;
                   color: #D97706;
                   border: 1px solid #FCD34D;
+                }
+
+                &.lateral-badge {
+                  background: #F3E8FF;
+                  color: #6B21A8;
+                  border: 1px solid #D8B4FE;
                 }
               }
             }

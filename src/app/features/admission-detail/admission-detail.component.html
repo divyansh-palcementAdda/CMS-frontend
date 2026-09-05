@@ -277,6 +277,18 @@
                     Details</button>
                 </div>
               </div>
+              <div class="info-group" style="grid-column: span 2;">
+                <label>Lateral Entry</label>
+                <div class="lateral-entry-display-card">
+                  <span class="badge" [ngClass]="detail.isLateralEntry ? 'purple-badge' : 'gray-badge'">
+                    {{ detail.isLateralEntry ? 'YES' : 'NO' }}
+                  </span>
+                  <div *ngIf="detail.isLateralEntry && detail.lateralEntryRemark" class="lateral-remark-bubble">
+                    <span class="remark-icon material-symbols-outlined">info</span>
+                    <span class="remark-content">{{ detail.lateralEntryRemark }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -638,6 +650,7 @@
     </ng-template>
 
     <app-fee-payment-modal [isVisible]="showFeeModal" [studentId]="detail?.id" [studentName]="detail?.fullName || ''"
+      [isLateralEntry]="detail?.isLateralEntry || false" [lateralEntryRemarkInput]="detail?.lateralEntryRemark || ''"
       [totalCourseFees]="detail?.totalCourseFees || 0" [discountAmount]="calculatedDiscountAmount"
       [alreadyPaidAmount]="detail?.totalFeesPaid || 0" [triggeredBySync]="isSyncMode" (close)="showFeeModal = false"
       (saved)="onFeeSaved($event)">

@@ -50,6 +50,45 @@
                 </div>
               </div>
 
+              <!-- Lateral Entry Toggle Section -->
+              <div class="lateral-entry-card full-width" [class.is-active]="isLateralEntryChecked">
+                <div class="lateral-toggle-row">
+                  <label class="lateral-switch">
+                    <input type="checkbox"
+                           [ngModel]="isLateralEntryChecked"
+                           (ngModelChange)="onLateralEntryToggle($event)"
+                           [ngModelOptions]="{standalone: true}">
+                    <span class="slider round"></span>
+                  </label>
+                  <div class="toggle-text-info">
+                    <div class="title-with-badge">
+                      <span class="toggle-main-title">Lateral Entry</span>
+                      <span *ngIf="isLateralEntryChecked" class="badge-lateral-active">ENABLED</span>
+                    </div>
+                    <span class="toggle-sub-info">Direct admission to 2nd, 3rd, or 4th Year</span>
+                  </div>
+                </div>
+
+                <!-- Lateral Entry Remarks (Displayed only when ON) -->
+                <div *ngIf="isLateralEntryChecked" class="lateral-remarks-area">
+                  <div class="remarks-header-row">
+                    <label class="remarks-title">Lateral Entry Remarks <span class="required">*</span></label>
+                    <span class="char-count">{{ (lateralEntryRemark || '').length }}/500</span>
+                  </div>
+                  <textarea [ngModel]="lateralEntryRemark"
+                            (ngModelChange)="lateralEntryRemark = $event; lateralEntryError = null"
+                            [ngModelOptions]="{standalone: true}"
+                            placeholder="e.g. Joined directly in 2nd Year / Migration from another university / Credit transfer approved"
+                            rows="3"
+                            maxlength="500"
+                            class="lateral-textarea"></textarea>
+                  <div class="remarks-footer-row">
+                    <span class="hint-text">Specify migration, credit transfer, or university approval details</span>
+                    <span class="error-text" *ngIf="lateralEntryError">{{ lateralEntryError }}</span>
+                  </div>
+                </div>
+              </div>
+
               <!-- Amount Field -->
               <div class="premium-input-group">
                 <label>Amount (₹) <span class="required">*</span></label>

@@ -532,6 +532,22 @@
                                                 <span class="mini-label">50% Fee Unpaid</span>
                                             </div>
                                         </div>
+
+                                        <!-- Lateral Entry -->
+                                        <div class="stat-mini-card source-lateral"
+                                            [class.active]="filters.statFilter === 'LATERAL_ENTRY' || filters.statFilter === 'LATERAL'"
+                                            (click)="onStatFilter('LATERAL_ENTRY')">
+                                            <div class="mini-icon">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                                </svg>
+                                            </div>
+                                            <div class="mini-data">
+                                                <span class="mini-val">{{ pageData.stats.lateralEntry || 0 }}</span>
+                                                <span class="mini-label">Lateral Entry</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -854,6 +870,8 @@
                                                     title="{{ item.focRemarks || 'Sarva Brahmin Samaj sponsored' }}">SBS</span>
                                                 <span *ngIf="item.focType === 'FOC'" class="foc-badge foc-type-badge"
                                                     title="{{ item.focRemarks || 'Free of Cost student' }}">FOC</span>
+                                                <span *ngIf="item.isLateralEntry" class="foc-badge lateral-badge"
+                                                    [title]="item.lateralEntryRemark || 'Lateral Entry Student'">LATERAL</span>
                                                 <span *ngIf="item.isDuplicateForm" class="foc-badge duplicate-badge"
                                                     [title]="item.duplicateRemarks || 'Duplicate student application form'">📑
                                                     DUPLICATE</span>
@@ -1157,6 +1175,8 @@
                 <!-- Fee Payment Modal -->
                 <app-fee-payment-modal *ngIf="showPaymentModal" [isVisible]="showPaymentModal"
                     [studentId]="selectedStudentIdForPayment" [studentName]="selectedStudentNameForPayment"
+                    [isLateralEntry]="selectedAdmissionForPayment?.isLateralEntry || false"
+                    [lateralEntryRemarkInput]="selectedAdmissionForPayment?.lateralEntryRemark || ''"
                     [totalCourseFees]="selectedAdmissionForPayment?.totalCourseFees || 0"
                     [discountAmount]="(selectedAdmissionForPayment?.totalCourseFees || 0) - (selectedAdmissionForPayment?.finalFeesAfterDiscount || 0)"
                     [alreadyPaidAmount]="selectedAdmissionForPayment?.totalFeesPaid || 0"
@@ -1526,6 +1546,28 @@
                                     <label class="radio-item">
                                         <input type="radio" [value]="false" [(ngModel)]="filters.isDiscounted">
                                         <span>No Discount</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Entry Type Filter -->
+                        <div class="filter-group">
+                            <h4 class="group-title">Entry Type</h4>
+                            <div class="filter-section">
+                                <label class="filter-label">Student Entry Type</label>
+                                <div class="radio-group">
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="null" [(ngModel)]="filters.isLateralEntry">
+                                        <span>All Students</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="true" [(ngModel)]="filters.isLateralEntry">
+                                        <span>Lateral Entry</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" [value]="false" [(ngModel)]="filters.isLateralEntry">
+                                        <span>Regular Entry</span>
                                     </label>
                                 </div>
                             </div>

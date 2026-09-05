@@ -27,6 +27,9 @@ export class FeePaymentModalComponent implements OnInit {
   @Input() focType = 'NONE';
   @Input() focRemarksInput = '';
 
+  @Input() isLateralEntry: boolean | null | undefined = false;
+  @Input() lateralEntryRemarkInput: string | null | undefined = '';
+
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<boolean>(); // Emits true if 50% condition met
 
@@ -39,6 +42,10 @@ export class FeePaymentModalComponent implements OnInit {
 
   selectedFocType = 'NONE';
   focRemarks = '';
+
+  isLateralEntryChecked = false;
+  lateralEntryRemark = '';
+  lateralEntryError: string | null = null;
 
   paymentModes = [
     { value: 'CASH', label: 'Cash' },
@@ -73,6 +80,10 @@ export class FeePaymentModalComponent implements OnInit {
       this.selectedFocType = this.focType || 'NONE';
       this.focRemarks = this.focRemarksInput || '';
       
+      this.isLateralEntryChecked = Boolean(this.isLateralEntry);
+      this.lateralEntryRemark = this.lateralEntryRemarkInput || '';
+      this.lateralEntryError = null;
+
       if (this.feeId) {
         this.loadFeeDetails();
       } else {
@@ -82,6 +93,14 @@ export class FeePaymentModalComponent implements OnInit {
         this.calculateThreshold(0);
       }
       this.onFocTypeChange(this.selectedFocType);
+    }
+  }
+
+  onLateralEntryToggle(checked: boolean): void {
+    this.isLateralEntryChecked = checked;
+    this.lateralEntryError = null;
+    if (!checked) {
+      this.lateralEntryRemark = '';
     }
   }
 
@@ -116,6 +135,10 @@ export class FeePaymentModalComponent implements OnInit {
           referenceNo: fee.referenceNo,
           remarks: fee.remarks
         });
+        if (fee.isLateralEntry !== undefined) {
+          this.isLateralEntryChecked = Boolean(fee.isLateralEntry);
+          this.lateralEntryRemark = fee.lateralEntryRemark || '';
+        }
         this.calculateThreshold(fee.amountPaid);
         this.isSubmitting = false;
       },
@@ -138,9 +161,22 @@ export class FeePaymentModalComponent implements OnInit {
   }
 
   async onSubmit() {
+    // Validate lateral entry if enabled
+    if (this.isLateralEntryChecked) {
+      if (!this.lateralEntryRemark || !this.lateralEntryRemark.trim()) {
+        this.lateralEntryError = 'Lateral Entry Remarks are required when Lateral Entry is enabled.';
+        return;
+      }
+      if (this.lateralEntryRemark.trim().length > 500) {
+        this.lateralEntryError = 'Lateral Entry Remarks cannot exceed 500 characters.';
+        return;
+      }
+    }
+
     if (this.selectedFocType !== 'NONE') {
       this.isSubmitting = true;
       this.error = null;
+      await this.syncLateralEntryIfChanged();
       this.admissionService.updateFocStatus(this.studentId!, this.selectedFocType, this.focRemarks).subscribe({
         next: () => {
           this.isSubmitting = false;
@@ -158,6 +194,7 @@ export class FeePaymentModalComponent implements OnInit {
     if (this.focType !== 'NONE' && this.selectedFocType === 'NONE') {
       this.isSubmitting = true;
       this.error = null;
+      await this.syncLateralEntryIfChanged();
       this.admissionService.updateFocStatus(this.studentId!, 'NONE', '').subscribe({
         next: () => {
           this.focType = 'NONE';
@@ -178,6 +215,27 @@ export class FeePaymentModalComponent implements OnInit {
     }
 
     this.recordPayment();
+  }
+
+  private async syncLateralEntryIfChanged(): Promise<boolean> {
+    const isChanged = (this.isLateralEntryChecked !== Boolean(this.isLateralEntry)) ||
+      (this.isLateralEntryChecked && (this.lateralEntryRemark || '').trim() !== (this.lateralEntryRemarkInput || '').trim());
+
+    if (isChanged && this.studentId) {
+      try {
+        await this.admissionService.updateLateralEntry(this.studentId, {
+          enabled: this.isLateralEntryChecked,
+          remark: this.isLateralEntryChecked ? this.lateralEntryRemark.trim() : undefined
+        }).toPromise();
+        this.isLateralEntry = this.isLateralEntryChecked;
+        this.lateralEntryRemarkInput = this.lateralEntryRemark;
+        return true;
+      } catch (err: any) {
+        this.error = err.error?.message || 'Failed to update Lateral Entry status.';
+        return false;
+      }
+    }
+    return true;
   }
 
   async recordPayment() {
@@ -203,6 +261,12 @@ export class FeePaymentModalComponent implements OnInit {
 
     this.isSubmitting = true;
     this.error = null;
+
+    const lateralSuccess = await this.syncLateralEntryIfChanged();
+    if (!lateralSuccess && this.error) {
+      this.isSubmitting = false;
+      return;
+    }
 
     const request = {
       ...this.paymentForm.value,

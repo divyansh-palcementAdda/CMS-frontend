@@ -76,6 +76,7 @@ export interface ActiveFilters {
   duplicateOnly: boolean | null;
   excludeDuplicate: boolean | null;
   includeDuplicate: boolean | null;
+  isLateralEntry: boolean | null;
 }
 
 @Component({
@@ -148,7 +149,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     courseIds: [],
     duplicateOnly: null,
     excludeDuplicate: true,
-    includeDuplicate: null
+    includeDuplicate: null,
+    isLateralEntry: null
   };
 
   // ── Excel Download Modal ──────────────────────────────────────────────
@@ -362,7 +364,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
         courseIds: params['courseIds'] ? params['courseIds'].split(',').filter((x: string) => x.trim() !== '').map((id: string) => +id) : [],
         duplicateOnly: params['duplicateOnly'] === 'true' ? true : (params['duplicateOnly'] === 'false' ? false : null),
         excludeDuplicate: params['excludeDuplicate'] === 'true' ? true : (params['excludeDuplicate'] === 'false' ? false : (params['duplicateOnly'] === 'true' || params['includeDuplicate'] === 'true' ? false : true)),
-        includeDuplicate: params['includeDuplicate'] === 'true' ? true : (params['includeDuplicate'] === 'false' ? false : null)
+        includeDuplicate: params['includeDuplicate'] === 'true' ? true : (params['includeDuplicate'] === 'false' ? false : null),
+        isLateralEntry: params['isLateralEntry'] === 'true' ? true : (params['isLateralEntry'] === 'false' ? false : null)
       };
       this.searchTerm = params['search'] || '';
       this.currentPage = params['page'] ? +params['page'] : 1;
@@ -513,6 +516,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
     if (this.filters.courseIds && this.filters.courseIds.length > 0) count++;
     if (this.filters.duplicateOnly !== null) count++;
     if (this.filters.includeDuplicate !== null) count++;
+    if (this.filters.isLateralEntry !== null) count++;
     this.activeFilterCount = count;
   }
 
@@ -581,7 +585,11 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       this.filters.courseIds,
       this.filters.duplicateOnly ?? undefined,
       this.filters.excludeDuplicate ?? undefined,
-      this.filters.includeDuplicate ?? undefined
+      this.filters.includeDuplicate ?? undefined,
+      undefined, // institutionId
+      undefined, // gender
+      undefined, // casteCategory
+      this.filters.isLateralEntry ?? undefined
     ).subscribe({
       next: data => {
         this.pageData = data;
@@ -640,7 +648,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       userId: null,
       duplicateOnly: null,
       excludeDuplicate: true,
-      includeDuplicate: null
+      includeDuplicate: null,
+      isLateralEntry: null
     };
 
     // 3. If we have saved state for the target tab, restore it
@@ -773,7 +782,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       courseIds: (this.filters.courseIds && this.filters.courseIds.length > 0) ? this.filters.courseIds.join(',') : null,
       duplicateOnly: this.filters.duplicateOnly !== null ? this.filters.duplicateOnly.toString() : null,
       excludeDuplicate: this.filters.excludeDuplicate !== null ? this.filters.excludeDuplicate.toString() : null,
-      includeDuplicate: this.filters.includeDuplicate !== null ? this.filters.includeDuplicate.toString() : null
+      includeDuplicate: this.filters.includeDuplicate !== null ? this.filters.includeDuplicate.toString() : null,
+      isLateralEntry: this.filters.isLateralEntry !== null ? this.filters.isLateralEntry.toString() : null
     };
 
     this.router.navigate([], {
@@ -821,7 +831,8 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
       courseIds: [],
       duplicateOnly: null,
       excludeDuplicate: true,
-      includeDuplicate: null
+      includeDuplicate: null,
+      isLateralEntry: null
     };
     this.searchTerm = '';
     this.applyFilters();

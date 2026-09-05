@@ -15,6 +15,8 @@ export interface FeeHistory {
   paymentMode: string;
   referenceNo: string;
   remarks: string;
+  isLateralEntry?: boolean;
+  lateralEntryRemark?: string;
 }
 
 export interface CourseWiseCollection {

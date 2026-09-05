@@ -67,7 +67,8 @@ export class AdmissionService {
     includeDuplicate?: boolean,
     institutionId?: number,
     gender?: string,
-    casteCategory?: string
+    casteCategory?: string,
+    isLateralEntry?: boolean
   ): Observable<AdmissionPageData> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -119,6 +120,7 @@ export class AdmissionService {
     if (institutionId) params = params.set('institutionId', institutionId.toString());
     if (gender) params = params.set('gender', gender);
     if (casteCategory) params = params.set('casteCategory', casteCategory);
+    if (isLateralEntry !== undefined && isLateralEntry !== null) params = params.set('isLateralEntry', isLateralEntry.toString());
 
     console.log('Final Payload', {
       userIds: userIds || null,
@@ -260,7 +262,8 @@ export class AdmissionService {
     excludeDuplicate?: boolean,
     includeDuplicate?: boolean,
     appStartDate?: string,
-    appEndDate?: string
+    appEndDate?: string,
+    isLateralEntry?: boolean
   ): Observable<Blob> {
     let params = new HttpParams();
     if (tab) params = params.set('tab', tab);
@@ -296,6 +299,7 @@ export class AdmissionService {
     if (includeDuplicate !== undefined && includeDuplicate !== null) params = params.set('includeDuplicate', includeDuplicate.toString());
     if (appStartDate) params = params.set('appStartDate', appStartDate);
     if (appEndDate) params = params.set('appEndDate', appEndDate);
+    if (isLateralEntry !== undefined && isLateralEntry !== null) params = params.set('isLateralEntry', isLateralEntry.toString());
 
     return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
   }
@@ -376,5 +380,9 @@ export class AdmissionService {
       payload.duplicateRemarks = duplicateRemarks;
     }
     return this.http.patch(`${this.apiUrl}/${studentId}/foc-status`, payload);
+  }
+
+  updateLateralEntry(studentId: number, request: { enabled: boolean; remark?: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${studentId}/lateral-entry`, request);
   }
 }

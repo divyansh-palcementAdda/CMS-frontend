@@ -46,6 +46,7 @@ export interface AdmissionStats {
   admFoc: number;
   admSbs: number;
   duplicateForms: number;
+  lateralEntry?: number;
 }
 
 export interface AdmissionItem {
@@ -154,6 +155,9 @@ export interface AdmissionItem {
 
   isDuplicateForm?: boolean;
   duplicateRemarks?: string;
+
+  isLateralEntry?: boolean;
+  lateralEntryRemark?: string;
 }
 
 export interface StudentFee {

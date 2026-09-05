@@ -280,6 +280,8 @@
   [feeId]="selectedFee?.id"
   [studentId]="selectedFee?.studentId"
   [studentName]="selectedFee?.studentName || ''"
+  [isLateralEntry]="selectedFee?.isLateralEntry || false"
+  [lateralEntryRemarkInput]="selectedFee?.lateralEntryRemark || ''"
   (close)="onModalClose()"
   (saved)="onFeeSaved()"
 ></app-fee-payment-modal>

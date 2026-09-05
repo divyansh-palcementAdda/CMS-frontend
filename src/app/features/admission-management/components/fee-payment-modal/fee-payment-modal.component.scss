@@ -387,3 +387,201 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+// Lateral Entry Section
+.lateral-entry-card {
+  grid-column: 1 / -1;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fdfaff;
+  border: 1.5px solid #ede9fe;
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    border-color: #ddd6fe;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06);
+  }
+
+  &.is-active {
+    background: #faf5ff;
+    border-color: #c4b5fd;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.08);
+  }
+
+  .lateral-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+
+    .lateral-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+
+      input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+
+        &:checked + .slider {
+          background-color: #7c3aed;
+        }
+
+        &:checked + .slider:before {
+          transform: translateX(20px);
+        }
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e1;
+        transition: 0.25s;
+        border-radius: 24px;
+
+        &:before {
+          position: absolute;
+          content: "";
+          height: 18px;
+          width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: #ffffff;
+          transition: 0.25s;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+      }
+    }
+
+    .toggle-text-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-grow: 1;
+
+      .title-with-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .toggle-main-title {
+          font-size: 0.938rem;
+          font-weight: 700;
+          color: #4c1d95;
+        }
+
+        .badge-lateral-active {
+          background: #7c3aed;
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: 800;
+          padding: 2px 8px;
+          border-radius: 6px;
+          letter-spacing: 0.04em;
+        }
+      }
+
+      .toggle-sub-info {
+        font-size: 0.75rem;
+        color: #7c3aed;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .lateral-remarks-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px dashed #e9d5ff;
+    width: 100%;
+    box-sizing: border-box;
+    animation: modalSlideUp 0.25s ease-out;
+
+    .remarks-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .remarks-title {
+        font-size: 0.813rem;
+        font-weight: 700;
+        color: #581c87;
+        margin: 0;
+
+        .required {
+          color: #dc2626;
+        }
+      }
+
+      .char-count {
+        font-size: 0.688rem;
+        font-weight: 600;
+        color: #8b5cf6;
+      }
+    }
+
+    .lateral-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: #ffffff;
+      border: 1.5px solid #d8b4fe;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      color: #1e293b;
+      line-height: 1.5;
+      min-height: 72px;
+      max-height: 160px;
+      resize: vertical;
+      transition: all 0.2s ease;
+
+      &::placeholder {
+        color: #a78bfa;
+        font-size: 0.813rem;
+        opacity: 0.8;
+      }
+
+      &:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+        outline: none;
+        background: #ffffff;
+      }
+    }
+
+    .remarks-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+
+      .hint-text {
+        font-size: 0.688rem;
+        color: #7c3aed;
+        font-weight: 500;
+      }
+
+      .error-text {
+        color: #dc2626;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
