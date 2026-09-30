@@ -18,6 +18,7 @@ export interface ConsultancyDTO {
   website?: string;
   courseCount?: number;
   representativeCount?: number;
+  representativeNames?: string[];
   studentCount?: number;
   institutionCount?: number;
   totalAdmissions?: number;
