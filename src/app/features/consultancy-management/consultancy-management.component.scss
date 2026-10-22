@@ -512,10 +512,6 @@ $text-light: #64748B;
           padding: 10px 12px;
           font-size: 13px;
         }
-
-        td.city-cell, th:nth-child(8) {
-          display: none; // Hide city on standard laptops to save space
-        }
       }
     }
   }
@@ -598,13 +594,6 @@ $text-light: #64748B;
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
-      }
-
-      table {
-        td.mobile-cell,
-        th:nth-child(3) {
-          display: none;
-        }
       }
     }
   }
