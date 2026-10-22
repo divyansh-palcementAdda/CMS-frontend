@@ -171,7 +171,7 @@ export class AdmissionManagementComponent implements OnInit, OnDestroy {
   sessions: string[] = (() => {
     const currentYear = new Date().getFullYear();
     const result = [];
-    for (let i = 4; i >= 0; i--) {
+    for (let i = 4; i >= -1; i--) {
       result.push((currentYear - i).toString());
     }
     return result;
