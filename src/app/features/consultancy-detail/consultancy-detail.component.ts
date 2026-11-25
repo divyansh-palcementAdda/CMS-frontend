@@ -370,7 +370,7 @@ export class ConsultancyDetailComponent implements OnInit {
   }
 
   // Table Actions
-  onViewCourse(id: number) { this.router.navigate(['/course-management', id]); }
+  onViewCourse(id: number) { this.router.navigate(['/courses', id]); }
   onEditCourse(id: number) { this.router.navigate(['/course-management'], { fragment: 'edit' }); }
   onDeleteCourse(course: any) { this.itemToDelete = course; this.deleteType = 'course'; this.showDeleteModal = true; }
 
@@ -378,11 +378,11 @@ export class ConsultancyDetailComponent implements OnInit {
   onEditUser(id: number) { this.router.navigate(['/users'], { fragment: 'edit' }); }
   onDeleteUser(user: any) { this.itemToDelete = user; this.deleteType = 'user'; this.showDeleteModal = true; }
 
-  onViewInstitution(id: number) { this.router.navigate(['/institution-management', id]); }
+  onViewInstitution(id: number) { this.router.navigate(['/institutions', id]); }
   onEditInstitution(id: number) { this.router.navigate(['/institution-management'], { fragment: 'edit' }); }
   onDeleteInstitution(inst: any) { this.itemToDelete = inst; this.deleteType = 'institution'; this.showDeleteModal = true; }
 
-  onViewAdmission(id: number) { this.router.navigate(['/admission-management', id]); }
+  onViewAdmission(id: number) { this.router.navigate(['/admissions', id]); }
   onEditAdmission(id: number) { this.router.navigate(['/admission-management'], { fragment: 'edit' }); }
   onDeleteAdmission(adm: any) { this.itemToDelete = adm; this.deleteType = 'admission'; this.showDeleteModal = true; }
 
@@ -423,7 +423,7 @@ export class ConsultancyDetailComponent implements OnInit {
         this.showDeleteModal = false;
         this.itemToDelete = null;
         if (this.deleteType === 'consultancy') {
-          this.router.navigate(['/consultancy-management']);
+          this.router.navigate(['/consultancy']);
         } else {
           this.fetchConsultancy(Number(this.route.snapshot.paramMap.get('id')));
         }
