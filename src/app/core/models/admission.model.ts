@@ -97,6 +97,7 @@ export interface AdmissionItem {
 
   commissionStatus?: string;
   commissionAmount?: number;
+  commissionPercentage?: number;
   commissionPaidDate?: string;
   commissionPaymentReference?: string;
 

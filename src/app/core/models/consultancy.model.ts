@@ -140,6 +140,7 @@ export interface ConsultancyAdmission {
   session: string;
   admissionDate: string;
   commissionAmount?: number;
+  commissionPercentage?: number;
   commissionStatus?: string;
 }
 
